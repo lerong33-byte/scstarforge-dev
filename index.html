@@ -3568,14 +3568,14 @@ function updatePower() {
         poolMin = qdDb.drawMin * (compCounts.qd||1);
       }
 
-      var colH = Math.max(1, Math.round(c.segs > 0 ? c.segs : poolMax));
-      var filled = colH;
+      var colH = poolMax;
+      var filled = Math.round(c.segs);
 
       var html = '';
       for (var i = 0; i < colH; i++) {
         var isFilled   = i < filled;
         var isMinBlock = i < poolMin;
-        var isOverMax  = false;
+        var isOverMax  = i >= poolMax;
         var isGrpStart = (i > 0 && i % GRP_SZ === 0);
         var mt = (BLK_GAP + (isGrpStart ? GRP_GAP : 0));
         var bg = isFilled
@@ -3757,8 +3757,8 @@ function updatePower() {
     var chartEl_f = document.getElementById('spvChart');
     if (chartEl_f) {
       chartEl_f.innerHTML = cols_f.map(function(col){
-        var colH_f = Math.max(1, Math.round(col.segs > 0 ? col.segs : 1));
-        var filled_f = colH_f;
+        var colH_f = genTotal_f;
+        var filled_f = Math.round(col.segs);
         var html_f = '';
         for (var i = 0; i < colH_f; i++) {
           var isFilled = i < filled_f;
