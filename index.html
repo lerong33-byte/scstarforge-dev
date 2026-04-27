@@ -589,16 +589,16 @@ option,optgroup{background:var(--bg2)}
 
 
 /* ── SPViewer-exact power chart OVERRIDE ── */
-#spvChart { display:flex !important; align-items:flex-end !important; gap:0 !important; flex-direction:row !important; padding:4px 0 2px !important; min-height:94px !important; overflow:visible !important; }
-#spvChart .spv-col { display:flex !important; flex-direction:column-reverse !important; width:36px !important; flex-shrink:0 !important; position:relative !important; padding:0 !important; align-items:center !important; }
-#spvChart .spv-block { width:34px !important; height:20px !important; min-height:20px !important; max-height:20px !important; margin:0 0 2px 0 !important; border-radius:4px !important; border:1.5px solid rgba(0,0,0,0.4) !important; cursor:pointer !important; box-sizing:border-box !important; flex-shrink:0 !important; display:block !important; }
+#spvChart { display:flex !important; align-items:flex-end !important; gap:1px !important; flex-direction:row !important; padding:2px 0 1px !important; min-height:60px !important; overflow:visible !important; flex-wrap:nowrap !important; width:100% !important; }
+#spvChart .spv-col { display:flex !important; flex-direction:column-reverse !important; flex:1 !important; min-width:0 !important; flex-shrink:1 !important; position:relative !important; padding:0 !important; align-items:center !important; }
+#spvChart .spv-block { width:calc(100% - 1px) !important; height:12px !important; min-height:12px !important; max-height:12px !important; margin:0 0 1px 0 !important; border-radius:2px !important; border:1px solid rgba(0,0,0,0.3) !important; cursor:pointer !important; box-sizing:border-box !important; flex-shrink:0 !important; display:block !important; }
 #spvChart .spv-block.filled  { background:rgb(252,165,48) !important; }
 #spvChart .spv-block.empty   { background:rgba(255,255,255,0.07) !important; }
 #spvChart .spv-block.minimum { background:rgb(200,120,20) !important; cursor:default !important; }
 #spvChart .spv-block:hover:not(.minimum) { filter:brightness(1.25) !important; }
-#spvChart .spv-col-foot { text-align:center; font-size:9px; font-family:var(--fmono); color:var(--t2); margin-top:3px; line-height:1.4; width:36px; }
-#spvChart .spv-col-icon { font-size:13px; line-height:1; display:block; }
-#spvChart .spv-col-pct  { font-size:9px; display:block; color:var(--t2); }
+#spvChart .spv-col-foot { text-align:center; font-size:8px; font-family:var(--fmono); color:var(--t2); margin-top:2px; line-height:1.3; width:100%; }
+#spvChart .spv-col-icon { font-size:10px; line-height:1; display:block; }
+#spvChart .spv-col-pct  { font-size:8px; display:block; color:var(--t2); }
 
 </style>
 
