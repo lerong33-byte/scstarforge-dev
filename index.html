@@ -3,6 +3,48 @@
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-C2ESKV4ZVD">
+
+// ══════════════════════════════════════════
+// SPViewer-exact power chart renderer
+// ══════════════════════════════════════════
+function renderSpvChart(cols, poolMax, userAdj, ship) {
+  var el = document.getElementById('spvChart');
+  if (!el) return;
+
+  var html = '';
+  cols.forEach(function(col) {
+    var key   = col.instTotal > 1 ? col.baseKey + '_' + col.instIdx : col.key;
+    var segs  = col.segs;                        // current draw
+    var maxSg = col.instMax || poolMax;           // max for this col
+    var minSg = col.instMin || 0;                 // min (locked) segs
+    var filled = Math.round(segs);
+
+    html += '<div class="spv-col">';
+
+    // blocks — bottom to top (reversed via flex-direction:column-reverse)
+    for (var i = 0; i < maxSg; i++) {
+      var isFilled  = i < filled;
+      var isMin     = i < minSg;
+      var cls       = isMin ? 'minimum' : (isFilled ? 'filled' : 'empty');
+      var dataAttrs = (!isMin)
+        ? ' data-key="'+(col.instTotal>1?col.baseKey+'_'+col.instIdx:col.key)+'" data-idx="'+i+'" data-gen="'+maxSg+'" data-min="'+minSg+'"'
+        : '';
+      html += '<div class="spv-block '+cls+'"'+dataAttrs+'></div>';
+    }
+
+    // footer: icon + percentage
+    var pct = maxSg > 0 ? Math.round((filled/maxSg)*100) + '%' : '-';
+    html += '<div class="spv-col-foot">';
+    html += '<span class="spv-col-icon">'+col.icon+'</span>';
+    html += '<span class="spv-col-pct">'+pct+'</span>';
+    html += '</div>';
+
+    html += '</div>';
+  });
+
+  el.innerHTML = html;
+}
+
 </script>
     <script>
           window.dataLayer = window.dataLayer || [];
@@ -15,7 +57,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v2.90-DEV.4</title>
+<title>SC-ShipForge v2.90-DEV.5</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -562,12 +604,31 @@ option,optgroup{background:var(--bg2)}
 
 
 
+
+/* ── SPViewer-exact power chart ── */
+#spvChart { display:flex; align-items:flex-end; gap:0; padding:4px 0 2px; min-height:90px; }
+.spv-col { display:flex; flex-direction:column-reverse; width:36px; flex-shrink:0; position:relative; }
+.spv-block {
+  width:34px; height:20px; margin:0 auto 2px;
+  border-radius:4px; border:1.5px solid rgba(0,0,0,0.5);
+  cursor:pointer; box-sizing:border-box; flex-shrink:0;
+}
+.spv-block.filled  { background:rgb(252,165,48); }
+.spv-block.empty   { background:rgba(255,255,255,0.08); }
+.spv-block.minimum { background:rgb(200,120,20); cursor:default; }
+.spv-block:hover:not(.minimum) { filter:brightness(1.2); }
+.spv-col-foot { text-align:center; font-size:9px; font-family:var(--fmono); color:var(--t2); margin-top:4px; line-height:1.3; }
+.spv-col-icon { font-size:14px; line-height:1; display:block; margin-bottom:1px; }
+.spv-col-pct  { font-size:9px; display:block; }
+/* hide old chart elements */
+.spv-col-val, .spv-col-count, .spv-col-icon-old { display:none !important; }
+
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.90-DEV.3</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.90-DEV.5</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="ss_inp_ship" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3492,55 +3553,33 @@ function updatePower() {
                 ? userPwrAdj[selShip][sys.key] : scaledBase;
       return {sys:sys, segs:adj, base:scaledBase, key:sys.key};
     }).filter(function(c){ return c.segs > 0 || c.base > 0 || c.sys.key === 'WeaponGun' || c.sys.key === 'Shield'; });
-    // SPViewer: one column per physical component instance
+
+    // ── SPViewer-exact: expand multi-instance components ──
     var expandedCols = [];
     cols.forEach(function(col) {
-      var count = col.key === 'Cooler' ? (compCounts.cooler||1) :
-                  col.key === 'Shield' ? (compCounts.sg||1) : 1;
-      var instKey2 = count > 1 ? col.key + '_' + ci : col.key;
-        var storedSegs = (userPwrAdj[selShip] && userPwrAdj[selShip][instKey2] !== undefined) ? userPwrAdj[selShip][instKey2] : (count > 1 ? col.segs / count : col.segs);
-        var perSegs = storedSegs;
-      var perBase = count > 1 ? col.base / count : col.base;
-      for(var ci=0; ci<count; ci++) {
+      var count = col.key === 'Cooler' ? (compCounts.cooler||1)
+                : col.key === 'Shield' ? (compCounts.sg||1) : 1;
+      for (var ci = 0; ci < count; ci++) {
         var instKey = count > 1 ? col.key + '_' + ci : col.key;
-        expandedCols.push({sys:col.sys, segs:perSegs, base:perBase, key:instKey, baseKey:col.key, instIdx:ci, instTotal:count});
+        var storedSegs = (userPwrAdj[selShip] && userPwrAdj[selShip][instKey] !== undefined)
+          ? userPwrAdj[selShip][instKey]
+          : (count > 1 ? col.segs / count : col.segs);
+        expandedCols.push({
+          key:       instKey,
+          baseKey:   col.key,
+          sys:       col.sys,
+          segs:      storedSegs,
+          base:      count > 1 ? col.base / count : col.base,
+          instIdx:   ci,
+          instTotal: count,
+          instMax:   poolMax,
+          instMin:   Math.floor((count > 1 ? col.base / count : col.base)),
+          icon:      {WeaponGun:'⚡',Boost:'≫',FlightController:'◎',QuantumDrive:'○',Radar:'◎',LifeSupportGenerator:'♥',Cooler:'❄',Cooler_0:'❄',Cooler_1:'❄',Shield:'◯',Shield_0:'◯',Shield_1:'◯',EMP:'⚡'}[instKey] || '◉'
+        });
       }
     });
-    cols = expandedCols;
+    renderSpvChart(expandedCols, poolMax, userPwrAdj, selShip);
 
-    // Use adjusted generation segments for capacity display
-    genSegs = adjGenSegs;
-
-    // Total used segments — OUTPUT shows used/generation like SPViewer
-    var usedSegs = cols.reduce(function(s,c){return s+c.segs;}, 0);
-    var pct = genSegs > 0 ? Math.round(usedSegs / genSegs * 100) : 0;
-    var isOver = usedSegs > genSegs;
-
-    // OUTPUT: used / total (matching SPViewer "0 / 33" style)
-    U('segUsed', Math.round(usedSegs * 10) / 10);
-    U('segTotal', genSegs);
-    var segUsedEl = document.getElementById('segUsed');
-    if (segUsedEl) segUsedEl.style.color = isOver ? '#ff4455' : usedSegs > genSegs * 0.9 ? '#ffaa00' : '#ffffff';
-
-    U('pwrPct', pct + '%');
-    var pwrPctEl = document.getElementById('pwrPct');
-    if (pwrPctEl) pwrPctEl.style.color = isOver ? '#ff4455' : pct > 85 ? '#ffaa00' : '#00ee88';
-
-    var conBar = document.getElementById('conBar');
-    if (conBar) {
-      conBar.style.width = Math.min(pct, 100) + '%';
-      conBar.style.background = isOver ? 'linear-gradient(90deg,#aa0022,#ff4455)' : pct > 85 ? 'linear-gradient(90deg,#aa6600,#ffaa00)' : 'linear-gradient(90deg,#00aa55,#00ee88)';
-    }
-
-    // Chart matches erkul/SPViewer: 1 block = 1 segment, column height = genTotal (PP budget)
-    // Groups of 4 blocks separated by a slightly larger gap
-    // Filled from bottom = allocated segments; empty above = free budget
-    var BLK_H   = 5;   // px per segment block
-    var BLK_GAP = 1;   // gap between blocks
-    var GRP_GAP = 2;   // extra gap every 4 blocks (visual grouping)
-    var GRP_SZ  = 4;   // blocks per group
-
-    var chartEl = document.getElementById('spvChart');
     var iconsEl = document.getElementById('spvIcons');
     if (!chartEl) return;
 
