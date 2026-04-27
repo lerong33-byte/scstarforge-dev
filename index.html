@@ -3546,7 +3546,7 @@ function updatePower() {
           key:instKey, baseKey:col.key, sys:col.sys,
           segs:stored, base:count>1?col.base/count:col.base,
           instIdx:ci, instTotal:count,
-          instMax:poolMax, instMin:Math.floor(count>1?col.base/count:col.base),
+          instMax:Math.round(count>1?col.base/count:col.base)||1, instMin:Math.floor(count>1?col.base/count:col.base),
           icon:_ICONS[col.key]||'◉'
         });
       }
@@ -6265,7 +6265,7 @@ window.addEventListener('load', function() {
   cols.forEach(function(col) {
     var key   = col.instTotal > 1 ? col.baseKey + '_' + col.instIdx : col.key;
     var segs  = col.segs;                        // current draw
-    var maxSg = col.instMax || poolMax;           // max for this col
+    var maxSg = Math.max(1, Math.round(col.instMax) || Math.round(segs) || 1); // per-component height
     var minSg = col.instMin || 0;                 // min (locked) segs
     var filled = Math.round(segs);
 
