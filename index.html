@@ -2316,7 +2316,9 @@ var _liveSync = {
 };
 
 // Start live sync when page loads
-
+window.addEventListener('load', function() {
+  setTimeout(function() { _liveSync.start(); }, 2000); // 2s delay after load
+});
 // ═══ STATE ═══
 window._WIKIMAP = {
   "F8C Lightning":"F8C_Lightning","Hammerhead":"Hammerhead","Gladius":"Gladius",
@@ -5185,11 +5187,878 @@ function quickSave() {
       }
     });
   });
-  
+  window.addEventListener('load', function() {
+  renderSavedList();
+  renderDashboard();
+    var wrap = document.getElementById('tgtImgWrap');
+    if (wrap) {
+      guardian.observe(wrap, { attributes: true, attributeFilter: ['style'] });
+    }
+  });
+})();
+
+
+// ── Weapon images ──
+var _WMAP_WEP = {"att1":"Attrition-1_Repeater","cf117":"CF-117_Bulldog_Repeater","omni3":"Omnisky_III_Repeater","m3a":"M3A_Cannon","ls1":"Lightstrike_I_Cannon","db1":"Deadbolt_I_Cannon","yj210":"YellowJacket_GT-210_Cannon","sc215":"Scorpion_GT-215_Cannon","nn13":"NN-13_Neutron_Repeater","cf227":"CF-227_Badger_Repeater","att2":"Attrition-2_Repeater","omni6":"Omnisky_VI_Repeater","m4a":"M4A_Cannon","ls2":"Lightstrike_II_Cannon","db2":"Deadbolt_II_Cannon","gt220":"Mantis_GT-220_Cannon","tar2":"Tarantula_GT-870_Mk2_Cannon","saw":"SW16BR2_Sawbuck_Cannon","nn14":"NN-14_Neutron_Repeater","cf337":"CF-337_Panther_Repeater","gt220s3":"Mantis_GT-220_(S3_variant)_Cannon","att3":"Attrition-3_Repeater","omni9":"Omnisky_IX_Repeater","m6a":"M6A_Laser_Cannon","ls3":"Lightstrike_III_Cannon","rl21":"Relentless_L-21_Cannon","tar3":"Tarantula_GT-870_Mk3_Cannon","db3":"Deadbolt_III_Cannon","c788":"C-788_Combine_Cannon","nn15":"NN-15_Neutron_Repeater","cf447":"CF-447_Rhino_Repeater","att4":"Attrition-4_Repeater","m7a":"M7A_Laser_Cannon","ad4b":"AD4B_Cannon_Cannon","bnk":"Breakneck_S4_Gatling","rev":"Revenant_Gatling","tar4":"Tarantula_GT-870_S4_Cannon","db4":"Deadbolt_IV_Cannon","att5":"Attrition-5_Repeater","ksb":"Klaus_Broadsword_S5_Cannon","db5":"Deadbolt_V_Cannon","ad5b":"AD5B_Ballistic_Gatling","db6":"Deadbolt_VI_Cannon","ad6b":"AD6B_Ballistic_Gatling","att6":"Attrition-6_Repeater","sf7b":"SF7B_Gatling_(Ares_Inferno)_Gatling","sf7e":"SF7E_Laser_Cannon_(Ares_Ion)_Repeater","s8bc":"S8_Ballistic_Cannon_Cannon","ignite2":"Ignite_II_Missile","arr2":"Arrester_II_Missile","arr3":"Arrester_III_Missile","tbolt3":"Thunderbolt_III_Missile","tbolt5":"Thunderbolt_V_Missile","s9torp":"S9/S10_Capital_Torpedo","ignite1":"Ignite_I_Missile","dominator2":"Dominator_II_Missile","striker2":"Striker_II_Missile","caterpillar2":"Caterpillar_II_Missile","dominator3":"Dominator_III_Missile","striker3":"Striker_III_Missile","badger3":"Badger_III_Missile","talon4":"Talon_IV_Missile","dominator5":"Dominator_V_Missile","arr4":"Arrester_IV_Missile","s8torp":"S8_Capital_Torpedo","m5a":"M5A_Laser_Cannon","cf557":"CF-557_Galdereen_Repeater","omni5":"Omnisky_IX_Repeater","terra":"Terra_Cannon_Cannon","laser1":"LR-1_LaserRepeater_Repeater","crossbow":"UltiFlex_Crossbow_Cannon"};
+var _wepImgCache = {};
+
+function loadWeaponImages() {
+  var thumbs = document.querySelectorAll('.slot-thumb');
+  thumbs.forEach(function(thumb) {
+    var row = thumb.closest('.slot-row');
+    if (!row) return;
+    // Get weapon id from the select in this row
+    var sel = row.querySelector('select.slot-sel[data-slotidx]');
+    var wid = sel ? (curSlots['sl'+sel.dataset.slotidx] || sel.value) : null;
+    if (!wid) {
+      sel = row.querySelector('select.slot-sel[data-missidx]');
+      wid = sel ? (curMissiles['ms'+sel.dataset.missidx] || sel.value) : null;
+    }
+    if (!wid) return;
+
+    // Set background to dark while loading
+    thumb.style.background = 'var(--bg4)';
+
+    // Get or create img element
+    var img = thumb.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.style.cssText = 'width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .3s;padding:4px;box-sizing:border-box';
+      img.onload = function(){ this.style.opacity = 1; };
+      thumb.appendChild(img);
+    }
+
+    if (_wepImgCache[wid]) { img.src = _wepImgCache[wid]; return; }
+
+    var wikiTitle = _WMAP_WEP[wid] || wid.replace(/_/g,' ');
+    var url = 'https://starcitizen.tools/api.php?action=query&titles='+encodeURIComponent(wikiTitle)+'&prop=pageimages&format=json&pithumbsize=300&pilimit=1&origin=*';
+    (function(capturedWid, capturedImg) {
+      fetch(url).then(function(r){return r.json();}).then(function(d){
+        var pages = d.query && d.query.pages;
+        if (!pages) return;
+        var p = pages[Object.keys(pages)[0]];
+        var src = p && p.thumbnail && p.thumbnail.source;
+        if (src) { _wepImgCache[capturedWid] = src; capturedImg.src = src; }
+      }).catch(function(){});
+    })(wid, img);
+  });
+}
+
+// ── Target image guardian ──
+(function() {
+  var guardian = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'attributes' && m.attributeName === 'style') {
+        var el = m.target;
+        if (_currentTarget && el.style.display === 'none') {
+          // Something hid the wrap while a target is selected - restore it
+          setTimeout(function() {
+            if (_currentTarget) loadTargetImage(_currentTarget);
+          }, 0);
+        }
+      }
+    });
+  });
+  window.addEventListener('load', function() {
+    var wrap = document.getElementById('tgtImgWrap');
+    if (wrap) {
+      guardian.observe(wrap, { attributes: true, attributeFilter: ['style'] });
+    }
+  });
+})();
+
+
+// ── Weapon images ──
+var _WMAP_WEP = {"att1":"Attrition-1_Repeater","cf117":"CF-117_Bulldog_Repeater","omni3":"Omnisky_III_Repeater","m3a":"M3A_Cannon","ls1":"Lightstrike_I_Cannon","db1":"Deadbolt_I_Cannon","yj210":"YellowJacket_GT-210_Cannon","sc215":"Scorpion_GT-215_Cannon","nn13":"NN-13_Neutron_Repeater","cf227":"CF-227_Badger_Repeater","att2":"Attrition-2_Repeater","omni6":"Omnisky_VI_Repeater","m4a":"M4A_Cannon","ls2":"Lightstrike_II_Cannon","db2":"Deadbolt_II_Cannon","gt220":"Mantis_GT-220_Cannon","tar2":"Tarantula_GT-870_Mk2_Cannon","saw":"SW16BR2_Sawbuck_Cannon","nn14":"NN-14_Neutron_Repeater","cf337":"CF-337_Panther_Repeater","gt220s3":"Mantis_GT-220_(S3_variant)_Cannon","att3":"Attrition-3_Repeater","omni9":"Omnisky_IX_Repeater","m6a":"M6A_Laser_Cannon","ls3":"Lightstrike_III_Cannon","rl21":"Relentless_L-21_Cannon","tar3":"Tarantula_GT-870_Mk3_Cannon","db3":"Deadbolt_III_Cannon","c788":"C-788_Combine_Cannon","nn15":"NN-15_Neutron_Repeater","cf447":"CF-447_Rhino_Repeater","att4":"Attrition-4_Repeater","m7a":"M7A_Laser_Cannon","ad4b":"AD4B_Cannon_Cannon","bnk":"Breakneck_S4_Gatling","rev":"Revenant_Gatling","tar4":"Tarantula_GT-870_S4_Cannon","db4":"Deadbolt_IV_Cannon","att5":"Attrition-5_Repeater","ksb":"Klaus_Broadsword_S5_Cannon","db5":"Deadbolt_V_Cannon","ad5b":"AD5B_Ballistic_Gatling","db6":"Deadbolt_VI_Cannon","ad6b":"AD6B_Ballistic_Gatling","att6":"Attrition-6_Repeater","sf7b":"SF7B_Gatling_(Ares_Inferno)_Gatling","sf7e":"SF7E_Laser_Cannon_(Ares_Ion)_Repeater","s8bc":"S8_Ballistic_Cannon_Cannon","ignite2":"Ignite_II_Missile","arr2":"Arrester_II_Missile","arr3":"Arrester_III_Missile","tbolt3":"Thunderbolt_III_Missile","tbolt5":"Thunderbolt_V_Missile","s9torp":"S9/S10_Capital_Torpedo","ignite1":"Ignite_I_Missile","dominator2":"Dominator_II_Missile","striker2":"Striker_II_Missile","caterpillar2":"Caterpillar_II_Missile","dominator3":"Dominator_III_Missile","striker3":"Striker_III_Missile","badger3":"Badger_III_Missile","talon4":"Talon_IV_Missile","dominator5":"Dominator_V_Missile","arr4":"Arrester_IV_Missile","s8torp":"S8_Capital_Torpedo","m5a":"M5A_Laser_Cannon","cf557":"CF-557_Galdereen_Repeater","omni5":"Omnisky_IX_Repeater","terra":"Terra_Cannon_Cannon","laser1":"LR-1_LaserRepeater_Repeater","crossbow":"UltiFlex_Crossbow_Cannon"};
+var _wepImgCache = {};
+var _wepImgObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (!entry.isIntersecting) return;
+    var el = entry.target;
+    var wid = el.dataset.wid;
+    if (!wid) return;
+    _wepImgObserver.unobserve(el);
+    var img = el.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.style.cssText = 'width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .3s';
+      img.onload = function(){ this.style.opacity=1; };
+      el.appendChild(img);
+    }
+    if (_wepImgCache[wid]) { img.src = _wepImgCache[wid]; return; }
+    var wikiTitle = _WMAP_WEP[wid] || wid;
+    var url = 'https://starcitizen.tools/api.php?action=query&titles='+encodeURIComponent(wikiTitle)+'&prop=pageimages&format=json&pithumbsize=300&pilimit=1&origin=*';
+    fetch(url).then(function(r){return r.json();}).then(function(d){
+      var pages = d.query && d.query.pages;
+      if (!pages) return;
+      var p = pages[Object.keys(pages)[0]];
+      var src = p && p.thumbnail && p.thumbnail.source;
+      if (src) { _wepImgCache[wid] = src; img.src = src; }
+    }).catch(function(){});
+  });
+}, {rootMargin: '100px'});
+
+function observeWeaponThumbs() {
+  // Load images for each weapon slot thumb
+  var slotDivs = document.querySelectorAll('.slot-row');
+  slotDivs.forEach(function(row, i) {
+    var sel = row.querySelector('select.slot-sel[data-slotidx]');
+    if (!sel) return;
+    var idx = sel.dataset.slotidx;
+    var wid = curSlots['sl'+idx] || sel.value;
+    if (!wid) return;
+    var thumb = row.querySelector('.slot-thumb');
+    if (!thumb) return;
+    thumb.dataset.wid = wid;
+    _wepImgObserver.observe(thumb);
+  });
+  // Missiles
+  var misRows = document.querySelectorAll('.slot-row');
+  misRows.forEach(function(row) {
+    var sel = row.querySelector('select.slot-sel[data-missidx]');
+    if (!sel) return;
+    var wid = curMissiles['ms'+sel.dataset.missidx] || sel.value;
+    if (!wid) return;
+    var thumb = row.querySelector('.slot-thumb');
+    if (!thumb) return;
+    thumb.dataset.wid = wid;
+    _wepImgObserver.observe(thumb);
+  });
+}
+
+
+// ══ DASHBOARD ══
+function renderDashboard() {
+  var hullCount = Object.values(SHIPS).reduce(function(a,b){return a+(b?b.length:0);},0);
+  var gunCount = WEAPONS.filter(function(w){return !w.type.includes('missile')&&w.type!=='torpedo';}).length;
+  var savedCount = getSavedLoadouts().length;
+  var el;
+  el=document.getElementById('dKpiHulls');    if(el)el.textContent=hullCount;
+  el=document.getElementById('dKpiGuns');     if(el)el.textContent=gunCount;
+  el=document.getElementById('dKpiMfr');      if(el)el.textContent=Object.keys(SHIPS).length;
+  el=document.getElementById('dKpiSaved');    if(el)el.textContent=savedCount;
+  el=document.getElementById('dashHullCount');if(el)el.textContent=hullCount+' HULLS';
+
+  var mfrEl=document.getElementById('dMfrBars');
+  if(mfrEl){
+    var mfrC={};Object.keys(SHIPS).forEach(function(m){if(SHIPS[m])mfrC[m]=SHIPS[m].length;});
+    var sorted=Object.keys(mfrC).sort(function(a,b){return mfrC[b]-mfrC[a];}).slice(0,8);
+    var max=mfrC[sorted[0]]||1;
+    mfrEl.style.display='flex';mfrEl.style.flexDirection='column';mfrEl.style.justifyContent='space-between';mfrEl.style.height='100%';
+  mfrEl.innerHTML=sorted.map(function(m){
+      var pct=Math.round((mfrC[m]/max)*100);
+      var short=m.replace('Aerospace','').replace('Interplanetary','').replace('Jumpworks','').replace('Industries','').replace('Dynamics','').replace('Systems','').trim();
+      return '<div onclick="filterShipsByMfr(\'' + m.replace(/'/g,"\\\\'") + '\')" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .1s" onmouseover="this.style.background=\'var(--bg4)\'" onmouseout="this.style.background=\'transparent\'"><div style="font-size:9px;font-family:var(--fmono);color:var(--t2);width:70px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+short+'</div><div style="flex:1;background:var(--bg4);border-radius:2px;height:5px"><div style="width:'+pct+'%;height:100%;background:var(--accent);border-radius:2px"></div></div><div style="font-size:9px;font-family:var(--fmono);color:var(--accent);width:16px;text-align:right">'+mfrC[m]+'</div></div>';
+    }).join('');
+  }
+
+  var sizeEl=document.getElementById('dSizeBars');
+  if(sizeEl){
+    var sC={XS:0,S:0,M:0,L:0,XL:0};
+    var sL={XS:'Extra Small',S:'Small',M:'Medium',L:'Large',XL:'Capital'};
+    var sCol={XS:'var(--cyan)',S:'var(--green)',M:'var(--accent)',L:'var(--warn)',XL:'var(--red)'};
+    Object.values(SHIP_DATA).forEach(function(s){if(s&&s.size&&sC[s.size]!==undefined)sC[s.size]++;});
+    var sT=Object.values(sC).reduce(function(a,b){return a+b;},0)||1;
+    sizeEl.style.display='flex';sizeEl.style.flexDirection='column';sizeEl.style.justifyContent='space-between';sizeEl.style.height='100%';
+  sizeEl.innerHTML=Object.keys(sC).map(function(sz){
+      var pct=Math.round((sC[sz]/sT)*100);
+      return '<div onclick="filterShipsBySize(\'' + sz + '\')" style="cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .1s" onmouseover="this.style.background=\'var(--bg4)\'" onmouseout="this.style.background=\'transparent\'"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:9px;font-family:var(--fmono);color:var(--t2)">'+sz+' &middot; '+sL[sz]+'</span><span style="font-size:9px;font-family:var(--fmono);color:'+sCol[sz]+'">'+sC[sz]+'</span></div><div style="background:var(--bg4);border-radius:2px;height:6px"><div style="width:'+pct+'%;height:100%;background:'+sCol[sz]+';border-radius:2px"></div></div></div>';
+    }).join('');
+  }
+
+  // Role filter buttons
+  var rfEl=document.getElementById('dRoleFilters');
+  if(rfEl && rfEl.children && !rfEl.children.length){
+    var allRoles=['All'];
+    Object.values(SHIP_DATA).forEach(function(s){
+      if(s&&s.role){var r=s.role.split('/')[0].trim();if(allRoles.indexOf(r)<0)allRoles.push(r);}
+    });
+    allRoles.slice(0,12).forEach(function(role,ri){
+      var btn=document.createElement('button');
+      btn.textContent=role;
+      var isActive=ri===0;
+      btn.style.cssText='background:'+(isActive?'var(--accent)':'var(--bg4)')+';border:1px solid '+(isActive?'var(--accent)':'var(--border)')+';border-radius:20px;padding:4px 11px;font-size:10px;font-family:var(--fmono);color:'+(isActive?'#fff':'var(--t2)')+';cursor:pointer;transition:all .15s;letter-spacing:.5px';
+      btn.dataset.role=role;
+      btn.onclick=function(){
+        rfEl.querySelectorAll('button').forEach(function(b){b.style.background='var(--bg4)';b.style.borderColor='var(--border)';b.style.color='var(--t2)';});
+        this.style.background='var(--accent)';this.style.borderColor='var(--accent)';this.style.color='#fff';
+        filterShipsByRole(this.dataset.role==='All'?null:this.dataset.role);
+      };
+      rfEl.appendChild(btn);
+    });
+  }
+  var qlEl=document.getElementById('dQuickLaunch');
+  if(qlEl){
+    var popular=['F8C Lightning','Gladius','Arrow','Sabre','Hammerhead','Carrack','Cutlass Black','Eclipse'].slice(0,8);
+    qlEl.innerHTML='';
+    popular.filter(function(s){return SHIP_DATA[s];}).forEach(function(s){
+      var def=SHIP_DATA[s];
+      var sc={XS:'var(--cyan)',S:'var(--green)',M:'var(--accent)',L:'var(--warn)',XL:'var(--red)'}[def.size]||'var(--t3)';
+      var card=document.createElement('div');
+      card.style.cssText='background:var(--bg4);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 6px;cursor:pointer;transition:border-color .15s';
+      card.innerHTML='<div style="font-size:10px;font-weight:600;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s+'</div><div style="display:flex;gap:3px;align-items:center"><span style="font-size:8px;font-family:var(--fmono);color:'+sc+';border:1px solid '+sc+';padding:1px 4px;border-radius:8px">'+def.size+'</span></div>';
+      card.onmouseover=function(){this.style.borderColor='var(--accent)';};
+      card.onmouseout=function(){this.style.borderColor='var(--border)';};
+      card.onclick=(function(n){return function(){pick(n);};})(s);
+      qlEl.appendChild(card);
+    });
+  }
+}
+
+function showDashboard() {
+  var dash=document.getElementById('mobiDash');
+  var lo=document.getElementById('loContent');
+  if(lo)lo.style.display='none';
+  if(dash){dash.style.display='flex';renderDashboard();}
+  // Switch to loadout tab visually
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('on');});
+  var loTab=document.querySelector('[data-t="lo"]');if(loTab)loTab.classList.add('on');
+  var loPan=document.getElementById('pane-lo');if(loPan)loPan.classList.add('on');
+}
+
+function hideDashboard() {
+  var dash=document.getElementById('mobiDash');
+  var lo=document.getElementById('loContent');
+  if(dash)dash.style.display='none';
+  if(lo)lo.style.display='block';
+}
+
+// Show dashboard on load
+window.addEventListener('load',function(){renderDashboard();});
+
+
+function filterShipsByRole(role) {
+  var qlEl = document.getElementById('dQuickLaunch');
+  if (!qlEl) return;
+  qlEl.innerHTML = '';
+  var shown = 0;
+  Object.keys(SHIPS).sort().forEach(function(mfr) {
+    if (!SHIPS[mfr] || shown >= 8) return;
+    SHIPS[mfr].forEach(function(s) {
+      if (shown >= 8) return;
+      var def = SHIP_DATA[s]; if (!def) return;
+      if (role && (!def.role || def.role.split('/')[0].trim() !== role)) return;
+      var sc={XS:'var(--cyan)',S:'var(--green)',M:'var(--accent)',L:'var(--warn)',XL:'var(--red)'}[def.size]||'var(--t3)';
+      var card=document.createElement('div');
+      card.style.cssText='background:var(--bg4);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 6px;cursor:pointer;transition:border-color .15s';
+      card.innerHTML='<div style="font-size:10px;font-weight:600;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s+'</div><span style="font-size:8px;font-family:var(--fmono);color:'+sc+';border:1px solid '+sc+';padding:1px 4px;border-radius:8px">'+def.size+'</span>';
+      card.onmouseover=function(){this.style.borderColor='var(--accent)';};
+      card.onmouseout=function(){this.style.borderColor='var(--border)';};
+      card.onclick=(function(n){return function(){pick(n);};})(s);
+      qlEl.appendChild(card); shown++;
+    });
+  });
+  // Also filter the main ship dropdown
+  var sSel=document.getElementById('sSel'); if(!sSel) return;
+  while(sSel.options.length>1) sSel.remove(1);
+  Object.keys(SHIPS).sort().forEach(function(mfr){
+    if(!SHIPS[mfr])return;
+    var ships=SHIPS[mfr].filter(function(s){
+      if(!role)return true;
+      var def=SHIP_DATA[s];
+      return def&&def.role&&def.role.split('/')[0].trim()===role;
+    });
+    if(!ships.length)return;
+    var og=document.createElement('optgroup'); og.label=mfr;
+    ships.sort().forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=s;og.appendChild(o);});
+    sSel.appendChild(og);
+  });
+}
+
+
+function filterLocs(filter, btn) {
+  // Update button styles
+  document.querySelectorAll('.loc-filter-btn').forEach(function(b) {
+    b.style.background = 'var(--bg4)';
+    b.style.borderColor = 'var(--border)';
+    b.style.color = 'var(--t2)';
+    b.classList.remove('active');
+  });
+  if (btn) {
+    btn.style.background = 'var(--accent)';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = '#fff';
+    btn.classList.add('active');
+  }
+  var lg = document.getElementById('locGrid');
+  if (!lg) return;
+  var filtered = LOCATIONS.filter(function(l) {
+    if (!filter) return true;
+    if (filter === 'Stanton') return l.sys && l.sys.includes('Stanton');
+    if (filter === 'Pyro') return l.sys && (l.sys.includes('Pyro') || l.sys.includes('Nyx'));
+    return l.tags && l.tags.includes(filter);
+  });
+  lg.innerHTML = filtered.map(function(l) {
+    var tags = l.tags.map(function(t) {
+      return '<span class="ltag ' + (t==='weapons'?'ltag-w':t==='components'?'ltag-c':'ltag-o') + '">' + t + '</span>';
+    }).join('');
+    var isPyro = l.sys && (l.sys.includes('Pyro') || l.sys.includes('Nyx'));
+    return '<div class="lcard"><div class="lcard-top"><div><div class="lname">' + l.name + '</div>'
+      + '<div class="lsys">' + l.sys
+      + (isPyro ? ' <span style="font-size:9px;color:var(--red);border:1px solid var(--red);border-radius:10px;padding:1px 6px;margin-left:4px">PYRO</span>' : '')
+      + '</div></div><div>' + tags + '</div></div>'
+      + '<div class="lst">' + l.st + '</div>'
+      + (l.tip ? '<div class="ltip">' + l.tip + '</div>' : '') + '</div>';
+  }).join('');
+}
+
+
+function shareLoadout(id, e) {
+  e.stopPropagation();
+  var arr = getSavedLoadouts();
+  var lo = arr.find(function(x){ return x.id === id; });
+  if (!lo) return;
+  // Build URL with loadout params
+  var params = {};
+  params.ship = lo.ship;
+  if (lo.slots) Object.keys(lo.slots).forEach(function(k){ params[k] = lo.slots[k]; });
+  if (lo.missiles) Object.keys(lo.missiles).forEach(function(k){ params['m_'+k] = lo.missiles[k]; });
+  if (lo.comps) Object.keys(lo.comps).forEach(function(k){ if(k!=='counts')params['c_'+k] = lo.comps[k]; });
+  var hash = Object.keys(params).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(params[k]); }).join('&');
+  var url = window.location.origin + window.location.pathname + '#' + hash;
+  // Copy to clipboard
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      showToast('Link copied! &#128279;');
+    }).catch(function() { prompt('Copy this link:', url); });
+  } else {
+    prompt('Copy this link:', url);
+  }
+}
+
+function showToast(msg, type) {
+  var colors = {success: 'var(--green)', warn: 'var(--warn)', error: 'var(--red)'};
+  var borders = {success: 'var(--green-border)', warn: 'var(--warn-border)', error: 'var(--red-border)'};
+  var color = colors[type] || 'var(--green)';
+  var border = borders[type] || 'var(--green-border)';
+  var t = document.getElementById('mobToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'mobToast';
+    t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--bg3);border-radius:var(--r);padding:8px 18px;font-size:11px;font-family:var(--fmono);letter-spacing:.5px;z-index:9999;pointer-events:none;transition:opacity .4s;box-shadow:0 4px 20px rgba(0,0,0,.5);border-left:3px solid var(--accent)';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.color = color;
+  t.style.borderLeftColor = border;
+  t.style.opacity = '1';
+  if (t._timer) clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.style.opacity = '0'; }, 3000);
+}
+
+
+function toggleCompExpand(id) {
+  var el = document.getElementById(id);
+  var arr = document.getElementById(id + '_arr');
+  if (!el) return;
+  var open = el.style.display === 'none' || el.style.display === '';
+  el.style.display = open ? 'block' : 'none';
+  if (arr) arr.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+
+function toggleCompSlot(e, slotKey, baseKey, cnt) {
+  e.stopPropagation();
+  curCompEnabled[slotKey] = (curCompEnabled[slotKey] === false) ? true : false;
+  var enabled = curCompEnabled[slotKey] !== false;
+  var btn = e.target;
+  btn.textContent = enabled ? 'ON' : 'OFF';
+  btn.style.background = enabled ? 'var(--green)' : 'var(--border)';
+  btn.style.color = enabled ? '#fff' : 'var(--t3)';
+  var row = btn.closest('div[style*="margin-bottom:6px"]') || btn.parentNode.parentNode;
+  if (row) row.style.opacity = enabled ? '1' : '0.4';
+  var sel = document.querySelector('[data-compkey="'+slotKey+'"]');
+  if (sel) sel.disabled = !enabled;
+  // Update effective count for power calc
+  var def = SHIP_DATA[selShip]; if(!def) return;
+  var totalCnt = (def.comps&&def.comps.counts&&def.comps.counts[baseKey])||1;
+  var activeCnt = 0;
+  for(var i=0;i<totalCnt;i++){ if(curCompEnabled[baseKey+'_'+i]!==false) activeCnt++; }
+  // Store effective count
+  if(!curComps._effectiveCounts) curComps._effectiveCounts={};
+  curComps._effectiveCounts[baseKey] = activeCnt;
+  updatePower();
+  updateTargetAnalysis();
+}
+
+
+function toggleSlot(e, idx) {
+  e.stopPropagation();
+  var key = 'sl'+idx;
+  curSlotEnabled[key] = (curSlotEnabled[key] === false) ? true : false;
+  var on = curSlotEnabled[key] !== false;
+  var btn = e.target;
+  btn.textContent = on ? 'ON' : 'OFF';
+  btn.style.background = on ? 'var(--green)' : 'var(--bg4)';
+  btn.style.borderColor = on ? 'var(--green)' : 'var(--border)';
+  btn.style.color = on ? '#fff' : 'var(--t3)';
+  var row = document.getElementById('slotrow'+idx);
+  if (row) row.style.opacity = on ? '1' : '0.5';
+  var sel = document.querySelector('select[data-slotidx="'+idx+'"]');
+  if (sel) sel.disabled = !on;
+  updatePower();
+  updateTargetAnalysis();
+}
+
+function toggleMis(e, idx) {
+  e.stopPropagation();
+  var key = 'ms'+idx;
+  curMisEnabled[key] = (curMisEnabled[key] === false) ? true : false;
+  var on = curMisEnabled[key] !== false;
+  var btn = e.target;
+  btn.textContent = on ? 'ON' : 'OFF';
+  btn.style.background = on ? 'var(--green)' : 'var(--bg4)';
+  btn.style.borderColor = on ? 'var(--green)' : 'var(--border)';
+  btn.style.color = on ? '#fff' : 'var(--t3)';
+  var row = document.getElementById('misrow'+idx);
+  if (row) row.style.opacity = on ? '1' : '0.5';
+  var sel = document.querySelector('select[data-missidx="'+idx+'"]');
+  if (sel) sel.disabled = !on;
+  updatePower();
+  updateTargetAnalysis();
+}
+
+
+function onTurretGunChange(sel) {
+  var slotIdx = parseInt(sel.dataset.slotidx);
+  var gunIdx = parseInt(sel.dataset.gunidx);
+  var gKey = 'sl'+slotIdx+'_gun'+gunIdx;
+  curSlots[gKey] = sel.value;
+  // Update main slot to first gun for DPS calc compat
+  curSlots['sl'+slotIdx] = curSlots['sl'+slotIdx+'_gun0'] || sel.value;
+  var def = SHIP_DATA[selShip];
+  sel.classList.toggle('mod', sel.value !== (def&&def.slots[slotIdx]?def.slots[slotIdx].default:''));
+  var info = document.getElementById('tgi_'+slotIdx+'_'+gunIdx);
+  if(info) { var w=WEAPONS.find(function(x){return x.id===sel.value;}); info.innerHTML=wepInfo(sel.value); }
+  // Update summary
+  var tExpandId = 'texp'+slotIdx;
+  var lbl = document.getElementById(tExpandId+'_arr');
+  if(lbl && lbl.previousSibling) {
+    var sl = def && def.slots[slotIdx];
+    var cnt = sl ? (sl.count||1) : 1;
+    var parts=[];
+    for(var gi=0;gi<cnt;gi++){var v=curSlots['sl'+slotIdx+'_gun'+gi]||sl.default;parts.push((v||'—').split(' ')[0]);}
+    if(lbl.previousSibling) lbl.previousSibling.textContent = parts.join(' / ');
+  }
+  updatePower();
+  updateTargetAnalysis();
+}
+
+function linkAllTurretGuns(e, slotIdx, count) {
+  e.stopPropagation();
+  var firstSel = document.querySelector('select[data-slotidx="'+slotIdx+'"][data-gunidx="0"]');
+  if(!firstSel) return;
+  var val = firstSel.value;
+  for(var gi=0;gi<count;gi++) {
+    var sel = document.querySelector('select[data-slotidx="'+slotIdx+'"][data-gunidx="'+gi+'"]');
+    if(sel){sel.value=val;curSlots['sl'+slotIdx+'_gun'+gi]=val;}
+    var info = document.getElementById('tgi_'+slotIdx+'_'+gi);
+    if(info) info.innerHTML = wepInfo(val);
+  }
+  curSlots['sl'+slotIdx] = val;
+  var btn = e.target;
+  btn.textContent='LINKED ✓';btn.style.color='var(--green)';btn.style.borderColor='var(--green)';
+  setTimeout(function(){btn.textContent='LINK ALL';btn.style.color='var(--t3)';btn.style.borderColor='var(--border)';},1500);
+  updatePower();
+  updateTargetAnalysis();
+}
+
+
+function toggleTurretTree(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var open = el.style.display === 'none' || el.style.display === '';
+  el.style.display = open ? 'block' : 'none';
+  // Update arrow
+  var arrow = el.previousSibling && el.previousSibling.querySelector('span:first-child');
+  if (arrow) arrow.textContent = open ? '▲' : '▼';
+}
+
+
+function onMisItemChange(sel) {
+  var rackIdx = parseInt(sel.dataset.missidx);
+  var itemIdx = parseInt(sel.dataset.misgidx);
+  var iKey = 'ms'+rackIdx+'_'+itemIdx;
+  curMissiles[iKey] = sel.value;
+  curMissiles['ms'+rackIdx] = curMissiles['ms'+rackIdx+'_0'] || sel.value;
+  // Update summary
+  var def = SHIP_DATA[selShip];
+  var ms = def && def.missiles && def.missiles[rackIdx];
+  var cnt = ms ? (ms.count||1) : 1;
+  var treeId = 'mtree'+rackIdx;
+  var tree = document.getElementById(treeId);
+  if(tree && tree.previousSibling) {
+    var summaryEl = tree.previousSibling.querySelector('span:nth-child(2)');
+    if(summaryEl) {
+      var parts=[];
+      for(var mi=0;mi<cnt;mi++){var v=curMissiles['ms'+rackIdx+'_'+mi]||ms.default;var w=WEAPONS.find(function(x){return x.id===v;});parts.push(w?w.name.split(' ').slice(0,2).join(' '):'—');}
+      var allSame=parts.every(function(x){return x===parts[0];});
+      summaryEl.textContent=allSame?parts[0]+' ×'+cnt:parts.join(', ');
+    }
+  }
+  // Update info row
+  var info=document.getElementById('mi'+rackIdx);
+  if(info)info.innerHTML=misInfo(sel.value);
+  updatePower();
+  updateTargetAnalysis();
+}
+
+function linkAllMissiles(e, rackIdx, count) {
+  e.stopPropagation();
+  var firstSel = document.querySelector('select[data-missidx="'+rackIdx+'"][data-misgidx="0"]');
+  if(!firstSel) return;
+  var val = firstSel.value;
+  for(var mi=0;mi<count;mi++) {
+    var sel = document.querySelector('select[data-missidx="'+rackIdx+'"][data-misgidx="'+mi+'"]');
+    if(sel){sel.value=val;curMissiles['ms'+rackIdx+'_'+mi]=val;}
+  }
+  curMissiles['ms'+rackIdx] = val;
+  // Update summary
+  var treeId='mtree'+rackIdx;
+  var tree=document.getElementById(treeId);
+  if(tree&&tree.previousSibling){
+    var summaryEl=tree.previousSibling.querySelector('span:nth-child(2)');
+    if(summaryEl){var w=WEAPONS.find(function(x){return x.id===val;});summaryEl.textContent=(w?w.name.split(' ').slice(0,2).join(' '):'—')+' ×'+count;}
+  }
+  var btn=e.target;
+  btn.textContent='SYNCED ✓';btn.style.color='var(--green)';btn.style.borderColor='var(--green)';
+  setTimeout(function(){btn.textContent='SYNC';btn.style.color='var(--t3)';btn.style.borderColor='var(--border)';},1500);
+  var info=document.getElementById('mi'+rackIdx);
+  if(info)info.innerHTML=misInfo(val);
+  updatePower();
+  updateTargetAnalysis();
+}
+
+
+function onRackChange(sel) {
+  var idx = parseInt(sel.dataset.rackidx);
+  curRacks['ms'+idx] = sel.value;
+  // Could update missile count based on rack capacity in future
+  sel.classList.toggle('mod', !!sel.value);
+}
+
+
+// ── Panel resize ──
+(function(){
+  function initResize(handle, getLeft, getRight, setLeft, setRight) {
+    var dragging = false, startX, startLeft, startRight;
+    handle.addEventListener('mousedown', function(e) {
+      dragging = true;
+      startX = e.clientX;
+      startLeft = getLeft();
+      startRight = getRight();
+      handle.classList.add('dragging');
+      document.body.classList.add('resizing');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      var newLeft = Math.max(180, Math.min(500, startLeft + dx));
+      var newRight = Math.max(180, Math.min(500, startRight - dx));
+      setLeft(newLeft);
+      setRight(newRight);
+    });
+    document.addEventListener('mouseup', function() {
+      if (!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+      document.body.classList.remove('resizing');
+    });
+  }
+
+  window.addEventListener('load', function() {
+    var lp = document.querySelector('aside.lp');
+    var rp = document.querySelector('aside.rp');
+    var center = document.querySelector('section.cp') || document.querySelector('.cp');
+    var rhLeft = document.getElementById('rh-left');
+    var rhRight = document.getElementById('rh-right');
+
+    if (rhLeft && lp && center) {
+      initResize(rhLeft,
+        function() { return lp.getBoundingClientRect().width; },
+        function() { return center.getBoundingClientRect().width; },
+        function(w) { lp.style.width = w + 'px'; lp.style.minWidth = w + 'px'; lp.style.maxWidth = w + 'px'; },
+        function(w) { /* center is flex:1, auto adjusts */ }
+      );
+    }
+    if (rhRight && rp && center) {
+      initResize(rhRight,
+        function() { return center.getBoundingClientRect().width; },
+        function() { return rp.getBoundingClientRect().width; },
+        function(w) { /* center auto adjusts */ },
+        function(w) { rp.style.width = w + 'px'; rp.style.minWidth = w + 'px'; rp.style.maxWidth = w + 'px'; }
+      );
+    }
+
+    // Double-click to reset
+    [rhLeft, rhRight].forEach(function(h) {
+      if (!h) return;
+      h.addEventListener('dblclick', function() {
+        if (lp) { lp.style.width = ''; lp.style.minWidth = ''; lp.style.maxWidth = ''; }
+        if (rp) { rp.style.width = ''; rp.style.minWidth = ''; rp.style.maxWidth = ''; }
+      });
+    });
+  });
+})();
+
+
+function filterShipsByMfr(mfr) {
+  hideDashboard();
+  // Focus ship search and show ships from that manufacturer
+  var si = document.getElementById('sSearch');
+  if (si) { si.value = mfr; var clr = document.getElementById('sSearchClear'); if(clr)clr.style.display='block'; }
+  buildSrbox(mfr.toLowerCase());
+  if (si) si.focus();
+}
+
+function filterShipsBySize(size) {
+  hideDashboard();
+  // Filter quick launch by size and show search
+  var si = document.getElementById('sSearch');
+  var sizeNames = {XS:'Extra Small',S:'Small',M:'Medium',L:'Large',XL:'Capital'};
+  if (si) { si.value = ''; var clr = document.getElementById('sSearchClear'); if(clr)clr.style.display='none'; }
+  // Filter the ship dropdown and show results
+  var sSel = document.getElementById('sSel');
+  if (sSel) {
+    while(sSel.options.length>1) sSel.remove(1);
+    Object.keys(SHIPS).sort().forEach(function(mfr){
+      if(!SHIPS[mfr])return;
+      var ships=SHIPS[mfr].filter(function(s){return SHIP_DATA[s]&&SHIP_DATA[s].size===size;});
+      if(!ships.length)return;
+      var og=document.createElement('optgroup');og.label=mfr;
+      ships.sort().forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=s;og.appendChild(o);});
+      sSel.appendChild(og);
+    });
+  }
+  // Show search box with filtered results
+  var sb = document.getElementById('srbox');
+  if(sb){
+    var byMfr={};
+    Object.keys(SHIPS).sort().forEach(function(mfr){
+      if(!SHIPS[mfr])return;
+      SHIPS[mfr].forEach(function(s){
+        if(SHIP_DATA[s]&&SHIP_DATA[s].size===size){if(!byMfr[mfr])byMfr[mfr]=[];byMfr[mfr].push(s);}
+      });
+    });
+    var html='';
+    Object.keys(byMfr).sort().forEach(function(mfr){
+      html+='<div style="padding:3px 10px 2px;font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);background:var(--bg3);border-bottom:1px solid var(--border)">'+mfr+'</div>';
+      byMfr[mfr].forEach(function(s){html+='<div class="sri" data-n="'+encodeURIComponent(s)+'">'+s+'</div>';});
+    });
+    sb.innerHTML=html||'<div style="padding:8px;color:var(--t3)">No ships found</div>';
+    Array.prototype.forEach.call(sb.querySelectorAll('.sri'),function(el){
+      el.onmousedown=function(e){e.preventDefault();pick(decodeURIComponent(this.getAttribute('data-n')));sb.style.display='none';};
+    });
+    sb.style.display='block';
+  }
+  showDashboard(); // Actually just show search results over dashboard
+}
+
+
+// ── LIVE STATS from Fleetyards ──
+var _fyCache = {}; // per-ship cache
+
+function fetchLiveStats(shipName) {
+  ['liveStatsCard','vesselStatsCard','dimensionsCard','fuelCard'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.style.display='none';
+  });
+
+  // Cache hit
+  if (_fyCache[shipName]) { _applyLiveStats(_fyCache[shipName]); return; }
+
+  // Get slug from live sync ship list (most reliable)
+  var slug = '';
+  var def = SHIP_DATA[shipName] || {};
+  if (def._fySlug) { slug = def._fySlug; }
+  else if (window._liveSync && window._liveSync._lastShips && window._liveSync._lastShips.length) {
+    var found = window._liveSync._lastShips.find(function(s){ return s.name === shipName; });
+    if (found) { slug = found.slug; def._fySlug = slug; }
+  }
+
+  if (slug) { fetchLiveStatsBySlug(shipName, slug); return; }
+
+  // No sync data yet — fetch full list to find slug
+  // (Fleetyards has no search API, must use full list)
+  _liveSync.fetchAllShips().then(function(ships) {
+    window._liveSync._lastShips = ships;
+    // Apply sync data while we have it
+    _liveSync.applyShipData(ships, true);
+    var found = ships.find(function(s){ return s.name === shipName; });
+    if (found) {
+      def._fySlug = found.slug;
+      fetchLiveStatsBySlug(shipName, found.slug);
+    } else {
+      console.log('[FY] Ship not found in Fleetyards:', shipName);
+    }
+  }).catch(function(e){ console.log('[FY] list error:', e.message); });
+}
+
+function fetchLiveStatsBySlug(shipName, slug) {
+  fetch('https://api.fleetyards.net/v1/models/' + slug)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      _fyCache[shipName] = d;
+      // Also store slug for future calls
+      if (SHIP_DATA[shipName]) SHIP_DATA[shipName]._fySlug = slug;
+      _applyLiveStats(d);
+    })
+    .catch(function(e){ console.log('[FY] stats fetch failed:', e.message); });
+}
+
+function _applyLiveStats(d) {
+  function set(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val !== null && val !== undefined ? val : '—';
+  }
+  function show(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = '';
+  }
+
+  // FLIGHT card
+  if (d.speeds) {
+    set('statAB', d.speeds.scmSpeedBoosted ? Math.round(d.speeds.scmSpeedBoosted) + ' m/s' : '—');
+    set('statPitch', d.speeds.pitchBoosted ? d.speeds.pitchBoosted.toFixed(1) + '°/s' : '—');
+    set('statRoll', d.speeds.rollBoosted ? d.speeds.rollBoosted.toFixed(1) + '°/s' : '—');
+    set('statYaw', d.speeds.yawBoosted ? d.speeds.yawBoosted.toFixed(1) + '°/s' : '—');
+    show('liveStatsCard');
+  }
+
+  // VESSEL card
+  var hasFocus = d.focus;
+  var hasCrew = d.crew && d.crew.max;
+  var hasCargo = d.metrics && d.metrics.cargo !== null;
+  var hasMass = d.metrics && d.metrics.mass;
+  if (hasFocus || hasCrew || hasCargo || hasMass) {
+    set('statFocus', d.focus || '—');
+    var crewMin = d.crew ? d.crew.min : null;
+    var crewMax = d.crew ? d.crew.max : null;
+    set('statCrew', crewMin && crewMax && crewMin !== crewMax ? crewMin + '–' + crewMax : (crewMax || '—'));
+    set('statCargo', d.metrics && d.metrics.cargo ? d.metrics.cargo + ' SCU' : '—');
+    if (d.metrics && d.metrics.mass) {
+      var mass = d.metrics.mass;
+      set('statMass', mass >= 1000000 ? (mass/1000000).toFixed(2)+' Mt' : mass >= 1000 ? Math.round(mass/1000)+' t' : Math.round(mass)+' kg');
+    } else {
+      set('statMass', '—');
+    }
+    show('vesselStatsCard');
+  }
+
+  // DIMENSIONS card
+  if (d.metrics && d.metrics.length) {
+    set('statLen', d.metrics.length + ' m');
+    set('statBeam', d.metrics.beam ? d.metrics.beam + ' m' : '—');
+    set('statHeight', d.metrics.height ? d.metrics.height + ' m' : '—');
+    show('dimensionsCard');
+  }
+
+  // FUEL card
+  var h2Total = 0, qtTotal = 0;
+  if (d.hydrogenFuelTanks) d.hydrogenFuelTanks.forEach(function(t){ h2Total += t.capacity||0; });
+  if (d.quantumFuelTanks) d.quantumFuelTanks.forEach(function(t){ qtTotal += t.capacity||0; });
+  if (h2Total > 0 || qtTotal > 0) {
+    set('statH2', h2Total > 0 ? h2Total.toFixed(1) + ' units' : '—');
+    set('statQT', qtTotal > 0 ? qtTotal.toFixed(2) + ' units' : '—');
+    show('fuelCard');
+  }
+}
+
+
+// ── Collapsible LP cards ──
+(function(){
+  var STORAGE_KEY = 'sc-shipforge-live_collapsed_v2';
+  function getCollapsed(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return [];} }
+  function saveCollapsed(ids){ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(ids));}catch(e){} }
+
+  function initCard(card){
+    var hd = card.querySelector('.tgt-title');
+    if (!hd || hd.dataset.collapseInit) return;
+    hd.dataset.collapseInit = '1';
+    hd.addEventListener('click', function(e){
+      e.stopPropagation();
+      card.classList.toggle('collapsed');
+      var id = card.id; if(!id) return;
+      var arr = getCollapsed();
+      if(card.classList.contains('collapsed')){ if(!arr.includes(id)) arr.push(id); }
+      else { arr = arr.filter(function(x){return x!==id;}); }
+      saveCollapsed(arr);
+    });
+  }
+
+  function restoreCollapsed(){
+    getCollapsed().forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.classList.add('collapsed');
+    });
+  }
+
+  function initAll(){
+    document.querySelectorAll('.lp-card, .dps-block').forEach(function(card) {
+      if (card.id === 'tgtPanel') return; // tgtPanel has its own collapse handler
+      initCard(card);
+    });
+  }
+
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      initAll();
+      restoreCollapsed();
+      // Re-init when lp-scroll contents change (e.g. after generate)
+      var lpScroll = document.querySelector('.lp-scroll');
+      if(lpScroll){
+        new MutationObserver(initAll).observe(lpScroll, {childList:true, subtree:false});
+      }
+    }, 500);
+  });
+})();
+
+
+// ── Power pip controls ──
+function resetPower() {
+  if (!selShip) return;
+  if (userPwrAdj[selShip]) delete userPwrAdj[selShip];
+  updatePower();
+  if (typeof showToast === 'function') showToast('↺ Power reset to default', 'success');
+}
+
+function setPower(key, segs) {
+  if (!selShip) return;
+  if (!userPwrAdj[selShip]) userPwrAdj[selShip] = {};
+  userPwrAdj[selShip][key] = segs;
+  updatePower();
+}
+
+// Delegate pip clicks on spvChart
+document.addEventListener('click', function(e) {
+  var block = e.target.closest ? e.target.closest('.spv-block') : null;
+  if (!block) return;
+  var key = block.dataset.key;
+  var idx = parseInt(block.dataset.idx, 10);
+  var gen = parseInt(block.dataset.gen, 10);
+  var min = parseInt(block.dataset.min, 10);
+  if (!key || isNaN(idx)) return;
+  // Click pip at index i → set allocation to i+1 segments
+  var newSegs = idx + 1;
+  newSegs = Math.max(min, Math.min(gen, newSegs));
+  setPower(key, newSegs);
+});
 
 
 // tgtPanel collapsible toggle — uses own storage key, independent of lp-card system
-
+window.addEventListener('load', function() {
+  var panel = document.getElementById('tgtPanel');
+  if (!panel) return;
+  var hd = panel.querySelector('.tgt-title');
+  if (!hd) return;
+  hd.addEventListener('click', function() {
+    panel.classList.toggle('collapsed');
+    try { localStorage.setItem('sc_tgt_collapsed', panel.classList.contains('collapsed') ? '1' : '0'); } catch(e){}
+  });
+  // Restore state from own key only
+  try { if (localStorage.getItem('sc_tgt_collapsed') === '1') panel.classList.add('collapsed'); } catch(e){}
+});
 
 
 // ══════════════════════════════════
@@ -5237,56 +6106,129 @@ function quickSave() {
     return {ok:false};
   }
 
-  // Static ship image map (starcitizen.tools MediaWiki thumbnails, 167 ships)
-  var _SS_IMGS = {"Avenger Stalker":"https://media.starcitizen.tools/thumb/3/34/Avenger_Stalker_-_In_flight_promo_shot.jpg/48px-Avenger_Stalker_-_In_flight_promo_shot.jpg.webp","Avenger Warlock":"https://media.starcitizen.tools/thumb/4/44/Avenger_Warlock_3.2_sale_Warlock_10-Squashed.jpg/48px-Avenger_Warlock_3.2_sale_Warlock_10-Squashed.jpg.webp","Avenger Titan":"https://media.starcitizen.tools/thumb/4/4b/Avenger_Titan_3.2_sale_Titan_01-Squashed.jpg/48px-Avenger_Titan_3.2_sale_Titan_01-Squashed.jpg.webp","Gladius":"https://media.starcitizen.tools/thumb/0/0c/Gladius_-_Flying_away_from_world_through_debris.jpg/48px-Gladius_-_Flying_away_from_world_through_debris.jpg.webp","Sabre":"https://media.starcitizen.tools/thumb/c/c7/Sabre_-_Flying_with_all_guns_firing.jpg/48px-Sabre_-_Flying_with_all_guns_firing.jpg.webp","Retaliator":"https://media.starcitizen.tools/thumb/4/4a/Retaliator_x2_flying_over_cloud_firing_torpedoes_-_cropped_and_adjusted.png/48px-Retaliator_x2_flying_over_cloud_firing_torpedoes_-_cropped_and_adjusted.png.webp","Reclaimer":"https://media.starcitizen.tools/thumb/c/cb/Reclaimer_-_Near_world_looking_at_wreckage_-_cropped.jpg/48px-Reclaimer_-_Near_world_looking_at_wreckage_-_cropped.jpg.webp","Redeemer":"https://media.starcitizen.tools/thumb/5/5c/Redeemer_-_Flying_x2_though_canyon_attacking_Cutlass%27s_-_cropped_and_adjusted.jpg/48px-Redeemer_-_Flying_x2_though_canyon_attacking_Cutlass%27s_-_cropped_and_adjusted.jpg.webp","Vanguard Warden":"https://media.starcitizen.tools/thumb/4/41/Warden_-_3.6.0_-_Landed_in_hangar_-_Front_Port.jpg/48px-Warden_-_3.6.0_-_Landed_in_hangar_-_Front_Port.jpg.webp","Vanguard Harbinger":"https://media.starcitizen.tools/thumb/7/73/Harbinger_-_Main_gun_firing_close_-_Front.jpg/48px-Harbinger_-_Main_gun_firing_close_-_Front.jpg.webp","Vanguard Sentinel":"https://media.starcitizen.tools/thumb/c/cd/Sentinel_-_Flying_through_debris_field_firing_guns.jpg/48px-Sentinel_-_Flying_through_debris_field_firing_guns.jpg.webp","Gladius Valiant":"https://media.starcitizen.tools/thumb/7/76/Gladius_Valiants_x2_flying_in_formation.jpg/48px-Gladius_Valiants_x2_flying_in_formation.jpg.webp","Sabre Comet":"https://media.starcitizen.tools/thumb/f/fd/Sabre_Comet_-_Flying_away_from_world_through_debris_field.jpg/48px-Sabre_Comet_-_Flying_away_from_world_through_debris_field.jpg.webp","Vanguard Hoplite":"https://media.starcitizen.tools/thumb/f/f4/HopLite_-_Flying_over_ArcCorp_-_Crop.jpg/48px-HopLite_-_Flying_over_ArcCorp_-_Crop.jpg.webp","Eclipse":"https://media.starcitizen.tools/thumb/b/bd/Aegis_Eclipse_over_Magda.png/48px-Aegis_Eclipse_over_Magda.png.webp","Sabre Raven":"https://media.starcitizen.tools/thumb/f/f3/Sabre_Raven_in_space_3.9.1.png/48px-Sabre_Raven_in_space_3.9.1.png.webp","Hammerhead":"https://media.starcitizen.tools/thumb/c/c8/Ext_03_03-Min.png/48px-Ext_03_03-Min.png.webp","Arrow":"https://media.starcitizen.tools/thumb/0/03/Arrow_Concept_CloudFormation_-_cropped.png/48px-Arrow_Concept_CloudFormation_-_cropped.png.webp","Nautilus":"https://media.starcitizen.tools/thumb/7/7c/Nautilus_-_Deploying_mines_-_Front_Starboard.png/48px-Nautilus_-_Deploying_mines_-_Front_Starboard.png.webp","Sabre Firebird":"https://media.starcitizen.tools/thumb/6/61/Sabre_Firebird_flying_through_clouds_with_sun_behind_-_Cropped.jpg/48px-Sabre_Firebird_flying_through_clouds_with_sun_behind_-_Cropped.jpg.webp","Mustang Alpha":"https://media.starcitizen.tools/thumb/5/52/Mustang_Alpha_flying_over_Lorville.jpg/48px-Mustang_Alpha_flying_over_Lorville.jpg.webp","Carrack":"https://media.starcitizen.tools/thumb/9/92/Carrack_over_microTech_3.8.png/48px-Carrack_over_microTech_3.8.png.webp","Terrapin":"https://media.starcitizen.tools/thumb/e/ed/Terrapin_-_x2_in_formation_over_worlds_-_cropped.jpg/48px-Terrapin_-_x2_in_formation_over_worlds_-_cropped.jpg.webp","Gladiator":"https://media.starcitizen.tools/thumb/f/f0/Gladator_flying_over_world.png/48px-Gladator_flying_over_world.png.webp","Hurricane":"https://media.starcitizen.tools/thumb/8/80/Hurricane_3.2_flyable_sale_Action_02-Squashed.jpg/48px-Hurricane_3.2_flyable_sale_Action_02-Squashed.jpg.webp","Defender":"https://media.starcitizen.tools/thumb/1/17/Defender_-_Firing_over_Delemar.jpg/48px-Defender_-_Firing_over_Delemar.jpg.webp","Hawk":"https://media.starcitizen.tools/thumb/6/6a/Star_Citizen-_Low_Flying_Hawk.png/48px-Star_Citizen-_Low_Flying_Hawk.png.webp","F8C Lightning":"https://media.starcitizen.tools/thumb/2/2f/F8C_flying_over_river_through_forest_-_Cropped.png/48px-F8C_flying_over_river_through_forest_-_Cropped.png.webp","Valkyrie":"https://media.starcitizen.tools/thumb/0/07/Valkyrie_flying_through_debris_shooting_back_at_ships_-_cut.jpg/48px-Valkyrie_flying_through_debris_shooting_back_at_ships_-_cut.jpg.webp","SRV":"https://media.starcitizen.tools/thumb/5/5a/SRV_towing_cargo_container_into_hangar_-_Cut.png/48px-SRV_towing_cargo_container_into_hangar_-_Cut.png.webp","MOLE":"https://media.starcitizen.tools/thumb/f/f0/Mole_flying_through_space_-_Isometric.jpg/48px-Mole_flying_through_space_-_Isometric.jpg.webp","RAFT":"https://media.starcitizen.tools/thumb/b/bb/RAFT_-_Flying_over_Lorville_-_cropped_and_adjusted.jpg/48px-RAFT_-_Flying_over_Lorville_-_cropped_and_adjusted.jpg.webp","Paladin":"https://media.starcitizen.tools/thumb/4/47/Paladin_firing_at_pirates_in_debris_field_-_cropped_%26_adjusted.png/48px-Paladin_firing_at_pirates_in_debris_field_-_cropped_%26_adjusted.png.webp","Buccaneer":"https://media.starcitizen.tools/thumb/a/ac/Buccaneer_-_3.10_-_Flying_over_Microtech.jpg/48px-Buccaneer_-_3.10_-_Flying_over_Microtech.jpg.webp","Mustang Beta":"https://media.starcitizen.tools/thumb/e/ea/Mustang_Beta_-_Flying_past_distant_world.jpg/48px-Mustang_Beta_-_Flying_past_distant_world.jpg.webp","Mustang Gamma":"https://media.starcitizen.tools/thumb/9/96/Mustang_Gamma_flying_over_forest.jpg/48px-Mustang_Gamma_flying_over_forest.jpg.webp","Caterpillar":"https://media.starcitizen.tools/thumb/e/e6/Caterpillar_flying_fast_through_space_-_Cropped.jpg/48px-Caterpillar_flying_fast_through_space_-_Cropped.jpg.webp","Cutlass Black":"https://media.starcitizen.tools/thumb/8/87/CutlassBlack_TouchingDown.png/48px-CutlassBlack_TouchingDown.png.webp","Cutlass Blue":"https://media.starcitizen.tools/thumb/d/d4/SKU_Cutlass_Blue.jpg/48px-SKU_Cutlass_Blue.jpg.webp","Cutlass Red":"https://media.starcitizen.tools/thumb/a/ac/Cutlass_Red_Squad_Concept.jpg/48px-Cutlass_Red_Squad_Concept.jpg.webp","Corsair":"https://media.starcitizen.tools/thumb/0/0e/SC-3.17_20221116_Corsair_Concept_Art_Recreation.png/48px-SC-3.17_20221116_Corsair_Concept_Art_Recreation.png.webp","Mercury Star Runner":"https://media.starcitizen.tools/thumb/e/e7/Mercury_-_flying_over_clouds.jpg/48px-Mercury_-_flying_over_clouds.jpg.webp","Nomad":"https://media.starcitizen.tools/thumb/1/1f/Nomad_flying_above_Crusader_clouds_-_Crop.jpg/48px-Nomad_flying_above_Crusader_clouds_-_Crop.jpg.webp","Cutlass Steel":"https://media.starcitizen.tools/thumb/7/72/Drake_cutlass_steel_weapon.jpg/48px-Drake_cutlass_steel_weapon.jpg.webp","Cutter":"https://media.starcitizen.tools/thumb/4/4a/Cutter_flying_over_clouds_-_Cut.jpg/48px-Cutter_flying_over_clouds_-_Cut.jpg.webp","Intrepid":"https://media.starcitizen.tools/thumb/9/9a/Intrepid_on_Crusader_landing_pad_-_cropped.jpg/48px-Intrepid_on_Crusader_landing_pad_-_cropped.jpg.webp","Herald":"https://media.starcitizen.tools/thumb/3/3e/Herald_landed_on_microTech_3.9.png/48px-Herald_landed_on_microTech_3.9.png.webp","Freelancer":"https://media.starcitizen.tools/thumb/9/9f/Freelancer.jpg/48px-Freelancer.jpg.webp","Freelancer DUR":"https://media.starcitizen.tools/thumb/9/98/MISC-freelancer-dur-side-3.4.1.jpg/48px-MISC-freelancer-dur-side-3.4.1.jpg.webp","Freelancer MIS":"https://media.starcitizen.tools/thumb/0/06/Freelancer_MIS_landed_at_frozen_outpost.jpg/48px-Freelancer_MIS_landed_at_frozen_outpost.jpg.webp","Freelancer MAX":"https://media.starcitizen.tools/thumb/9/96/Freelancer_MAX_-_flying_above_grey_clouds.jpg/48px-Freelancer_MAX_-_flying_above_grey_clouds.jpg.webp","P-52 Merlin":"https://media.starcitizen.tools/thumb/a/a6/P-52_-_Undocking_from_Constellation_over_world.jpg/48px-P-52_-_Undocking_from_Constellation_over_world.jpg.webp","Prospector":"https://media.starcitizen.tools/thumb/d/dd/Prospector_-_Hovering_mining_on_cliffside_1.jpg/48px-Prospector_-_Hovering_mining_on_cliffside_1.jpg.webp","P-72 Archimedes":"https://media.starcitizen.tools/thumb/4/48/Archimedes_and_Merlin_-_Flying_in_formation_-_Starboard_-_cropped.png/48px-Archimedes_and_Merlin_-_Flying_in_formation_-_Starboard_-_cropped.png.webp","Blade":"https://media.starcitizen.tools/thumb/4/4c/Blade-top-isc-2020-06-18.jpg/48px-Blade-top-isc-2020-06-18.jpg.webp","Prowler":"https://media.starcitizen.tools/thumb/a/a4/Prowler_-_Hovering_over_landscape.jpg/48px-Prowler_-_Hovering_over_landscape.jpg.webp","Glaive":"https://media.starcitizen.tools/thumb/3/39/Glaive-iso-isc-2020-06-18.jpg/48px-Glaive-iso-isc-2020-06-18.jpg.webp","Stinger":"https://media.starcitizen.tools/thumb/9/9a/Stinger_-_Squadron_42_CitizenCon_2954_Live_Gameplay_Reveal.jpg/48px-Stinger_-_Squadron_42_CitizenCon_2954_Live_Gameplay_Reveal.jpg.webp","Vulture":"https://media.starcitizen.tools/thumb/b/b8/Vulture_flying_through_debris_field.jpg/48px-Vulture_flying_through_debris_field.jpg.webp","Talon":"https://media.starcitizen.tools/thumb/f/f5/Talon_-_Diving_blurred_background.jpg/48px-Talon_-_Diving_blurred_background.jpg.webp","Talon Shrike":"https://media.starcitizen.tools/thumb/7/74/Talon_Diving_Concept.jpg/48px-Talon_Diving_Concept.jpg.webp","Railen":"https://media.starcitizen.tools/thumb/7/72/Railen_flying_through_clouds_-_Cut_and_contrast_adjusted.jpg/48px-Railen_flying_through_clouds_-_Cut_and_contrast_adjusted.jpg.webp","Syulen":"https://media.starcitizen.tools/thumb/0/01/Syulen_leaving_microTech.png/48px-Syulen_leaving_microTech.png.webp","Golem":"https://media.starcitizen.tools/thumb/2/2c/Golem_using_mining_laser_in_dense_debris_field_-_cropped.png/48px-Golem_using_mining_laser_in_dense_debris_field_-_cropped.png.webp","L-21 Wolf":"https://media.starcitizen.tools/thumb/0/03/L-21_Wolf_flying_above_clouds.png/48px-L-21_Wolf_flying_above_clouds.png.webp","Shiv":"https://media.starcitizen.tools/thumb/8/83/Shiv_flying_through_debris_field_firing_weapons_-_cropped_and_adjusted.jpg/48px-Shiv_flying_through_debris_field_firing_weapons_-_cropped_and_adjusted.jpg.webp","Reliant Kore":"https://media.starcitizen.tools/thumb/b/ba/Reliant_Kore_Landing_in_New_Babbage_Alpha_3.9.jpg/48px-Reliant_Kore_Landing_in_New_Babbage_Alpha_3.9.jpg.webp","Starfarer":"https://media.starcitizen.tools/thumb/d/d2/Starfarer_-_Flying_over_Lorville_with_traffic_-_cropped_and_adjusted.png/48px-Starfarer_-_Flying_over_Lorville_with_traffic_-_cropped_and_adjusted.png.webp","Hull A":"https://media.starcitizen.tools/thumb/9/9f/Hull-A_taking_off_from_Aberdeen_outpost.jpg/48px-Hull-A_taking_off_from_Aberdeen_outpost.jpg.webp","Hull B":"https://media.starcitizen.tools/thumb/9/97/Hull_B_flying_away_from_a_jump_point_-_cropped.jpg/48px-Hull_B_flying_away_from_a_jump_point_-_cropped.jpg.webp","Hull C":"https://media.starcitizen.tools/thumb/c/ca/Fully_Loaded_Hull_C.png/48px-Fully_Loaded_Hull_C.png.webp","300i":"https://media.starcitizen.tools/thumb/3/3f/300i_-_Flying_over_cloudtops_-_cropped.jpg/48px-300i_-_Flying_over_cloudtops_-_cropped.jpg.webp","Starfarer Gemini":"https://media.starcitizen.tools/thumb/7/7c/Starfarer_Gemini_-_Flying_with_blue_sky_and_clouds_-_cropped.png/48px-Starfarer_Gemini_-_Flying_with_blue_sky_and_clouds_-_cropped.png.webp","Razor":"https://media.starcitizen.tools/thumb/6/64/Mirai_Razor_landed_in_hangar_-_cropped.png/48px-Mirai_Razor_landed_in_hangar_-_cropped.png.webp","100i":"https://media.starcitizen.tools/thumb/8/87/100i_Microtech_-_cropped.png/48px-100i_Microtech_-_cropped.png.webp","125a":"https://media.starcitizen.tools/thumb/5/57/125a_Microtech_Firing_-_cropped.jpg/48px-125a_Microtech_Firing_-_cropped.jpg.webp","135c":"https://media.starcitizen.tools/thumb/2/2b/135c_with_100i_and_125a_flying_away_from_Port_Tressler_-_cropped.png/48px-135c_with_100i_and_125a_flying_away_from_Port_Tressler_-_cropped.png.webp","Razor EX":"https://media.starcitizen.tools/thumb/0/04/Razor_EX_-_Flying_low_over_grassland.jpg/48px-Razor_EX_-_Flying_low_over_grassland.jpg.webp","Fury":"https://media.starcitizen.tools/thumb/b/b9/Mirai_Fury_flying_fast_above_water_blurred_-_cropped.png/48px-Mirai_Fury_flying_fast_above_water_blurred_-_cropped.png.webp","Fury MX":"https://media.starcitizen.tools/thumb/8/86/Fury_Miru_Concept_Art.png/48px-Fury_Miru_Concept_Art.png.webp","Starlancer MAX":"https://media.starcitizen.tools/thumb/1/10/SC-3.24_20241115_110052_StarlancerMax-Clouds_f.png/48px-SC-3.24_20241115_110052_StarlancerMax-Clouds_f.png.webp","Starlancer TAC":"https://media.starcitizen.tools/thumb/a/a8/Starlancer_TAC_attacks_surrounding_ships_2_-_cropped.png/48px-Starlancer_TAC_attacks_surrounding_ships_2_-_cropped.png.webp","Guardian":"https://media.starcitizen.tools/thumb/0/02/Guardian_landed_in_ArcCorp_with_pilot_walking_towards_it_-_cropped_and_adjusted.jpg/48px-Guardian_landed_in_ArcCorp_with_pilot_walking_towards_it_-_cropped_and_adjusted.jpg.webp","Guardian QI":"https://media.starcitizen.tools/thumb/2/22/Guardian_QI_over_world_firing_weapons_-_cropped_and_adjusted.jpg/48px-Guardian_QI_over_world_firing_weapons_-_cropped_and_adjusted.jpg.webp","Fortune":"https://media.starcitizen.tools/thumb/7/73/Fortune_salvaging_crash_site_-_cropped.jpg/48px-Fortune_salvaging_crash_site_-_cropped.jpg.webp","Guardian MX":"https://media.starcitizen.tools/thumb/e/e5/Guardian_MX_x2_flying_low_and_fast_over_world_-_cropped.png/48px-Guardian_MX_x2_flying_low_and_fast_over_world_-_cropped.png.webp","Polaris":"https://media.starcitizen.tools/thumb/d/d2/Polaris_flying_through_asteroid_field_firing_torpedoes_and_missiles_-_cropped.png/48px-Polaris_flying_through_asteroid_field_firing_torpedoes_and_missiles_-_cropped.png.webp","M50":"https://media.starcitizen.tools/thumb/6/62/M50_Hangar.jpg/48px-M50_Hangar.jpg.webp","315p":"https://media.starcitizen.tools/thumb/7/7c/315p_-_Flying_high_over_clouds_-_cropped.png/48px-315p_-_Flying_high_over_clouds_-_cropped.png.webp","325a":"https://media.starcitizen.tools/thumb/0/04/325a_flying_over_snowy_mountains_-_cropped.png/48px-325a_flying_over_snowy_mountains_-_cropped.png.webp","350r":"https://media.starcitizen.tools/thumb/6/65/350r_-_Flying_over_Daymar_x2_-_cropped.jpg/48px-350r_-_Flying_over_Daymar_x2_-_cropped.jpg.webp","890 Jump":"https://media.starcitizen.tools/thumb/7/76/890_Jump_Leaving_Hurston_3.6.png/48px-890_Jump_Leaving_Hurston_3.6.png.webp","Constellation Andromeda":"https://media.starcitizen.tools/thumb/d/d7/Andromeda_flying_from_Station_-_Front_Starboard.jpg/48px-Andromeda_flying_from_Station_-_Front_Starboard.jpg.webp","Constellation Taurus":"https://media.starcitizen.tools/thumb/9/9d/Constellation_Taurus_-_Flying_through_clouds.jpg/48px-Constellation_Taurus_-_Flying_through_clouds.jpg.webp","Constellation Aquila":"https://media.starcitizen.tools/thumb/7/7e/Aquila_-_QT_-_Rear_Port.jpg/48px-Aquila_-_QT_-_Rear_Port.jpg.webp","Constellation Phoenix":"https://media.starcitizen.tools/thumb/0/0c/Constellation-phoenix-flyby-01_-_cropped_and_adjusted.jpg/48px-Constellation-phoenix-flyby-01_-_cropped_and_adjusted.jpg.webp","85X":"https://media.starcitizen.tools/thumb/e/ee/85X_flying_over_snowy_mountains_firing_guns_-_cropped.jpg/48px-85X_flying_over_snowy_mountains_firing_guns_-_cropped.jpg.webp","600i Explorer":"https://media.starcitizen.tools/thumb/a/ac/600i_Flying_over_Microtech_-_cropped.png/48px-600i_Flying_over_Microtech_-_cropped.png.webp","Apollo Triage":"https://media.starcitizen.tools/thumb/8/82/Apollo_Triage_searching_in_debris_field_-_cropped.png/48px-Apollo_Triage_searching_in_debris_field_-_cropped.png.webp","Apollo Medivac":"https://media.starcitizen.tools/thumb/e/e4/Apollo_Medivac_flying_over_crash_site_-_cropped_and_adjusted.png/48px-Apollo_Medivac_flying_over_crash_site_-_cropped_and_adjusted.png.webp","Mantis":"https://media.starcitizen.tools/thumb/8/82/RSI_Mantis_Hasgaha_3.7_2019-11-06.png/48px-RSI_Mantis_Hasgaha_3.7_2019-11-06.png.webp","Scorpius":"https://media.starcitizen.tools/thumb/3/30/RSI_Scorpius_on_ArcCorp.png/48px-RSI_Scorpius_on_ArcCorp.png.webp","400i":"https://media.starcitizen.tools/thumb/7/78/400i_cruising_through_Area18_3.15.png/48px-400i_cruising_through_Area18_3.15.png.webp","Scorpius Antares":"https://media.starcitizen.tools/thumb/5/57/Scorpius_Antares_Concept_Roadmap.png/48px-Scorpius_Antares_Concept_Roadmap.png.webp","Orion":"https://media.starcitizen.tools/thumb/2/20/The_Shipyard_-_Careers_and_Roles_-_Resources2.jpg/48px-The_Shipyard_-_Careers_and_Roles_-_Resources2.jpg.webp","Hull D":"https://media.starcitizen.tools/thumb/7/7a/Hull_D_-_Docked_at_large_station_-_cropped.png/48px-Hull_D_-_Docked_at_large_station_-_cropped.png.webp","Hull E":"https://media.starcitizen.tools/thumb/e/e1/Hull-E_Front_-_cropped.png/48px-Hull-E_Front_-_cropped.png.webp","Idris-M":"https://media.starcitizen.tools/thumb/d/dd/Idris_M_flying_over_world_-_cropped.jpg/48px-Idris_M_flying_over_world_-_cropped.jpg.webp","Idris-P":"https://media.starcitizen.tools/thumb/8/8d/Idris-P_fighting_group_of_Buccaneers_-_cropped.jpg/48px-Idris-P_fighting_group_of_Buccaneers_-_cropped.jpg.webp","Avenger Titan Renegade":"https://media.starcitizen.tools/thumb/5/50/Avenger_Titan_Renegade_3.2_sale_Renegade_01_-_cropped_and_adjusted.jpg/48px-Avenger_Titan_Renegade_3.2_sale_Renegade_01_-_cropped_and_adjusted.jpg.webp","600i Touring":"https://media.starcitizen.tools/thumb/8/80/600i_Landed_on_luxury_Island_-_Isometric.jpg/48px-600i_Landed_on_luxury_Island_-_Isometric.jpg.webp","Perseus":"https://media.starcitizen.tools/thumb/6/6c/Perseus_angled_combat.jpg/48px-Perseus_angled_combat.jpg.webp","Odyssey":"https://media.starcitizen.tools/thumb/8/82/MISC_Odyssey_Promo_flying_away_from_planet.jpg/48px-MISC_Odyssey_Promo_flying_away_from_planet.jpg.webp","Galaxy":"https://media.starcitizen.tools/thumb/1/1b/RSI_Galaxy_concept_-_front_quarter_-_Cut.jpg/48px-RSI_Galaxy_concept_-_front_quarter_-_Cut.jpg.webp","Zeus Mk II ES":"https://media.starcitizen.tools/thumb/9/9e/SC-3.24_20241025_204114_Zeus-ES-Good-Doctor_f.png/48px-SC-3.24_20241025_204114_Zeus-ES-Good-Doctor_f.png.webp","Zeus Mk II CL":"https://media.starcitizen.tools/thumb/d/d6/Zeus_mkII_CL_landed_loading_cargo_-_cropped.png/48px-Zeus_mkII_CL_landed_loading_cargo_-_cropped.png.webp","Asgard":"https://media.starcitizen.tools/thumb/1/17/Asgard_flying_through_debris_shooting_back_at_ships_-_cropped.jpg/48px-Asgard_flying_through_debris_shooting_back_at_ships_-_cropped.jpg.webp","Meteor":"https://media.starcitizen.tools/thumb/7/78/Meteor_reentry_burn_-_cropped_and_adjusted.jpg/48px-Meteor_reentry_burn_-_cropped_and_adjusted.jpg.webp","Salvation":"https://media.starcitizen.tools/thumb/2/21/Salvation_flying_away_from_world_-_cropped.jpg/48px-Salvation_flying_away_from_world_-_cropped.jpg.webp","Hermes":"https://media.starcitizen.tools/thumb/e/e0/Hermes_flying_away_from_jump_point_-_cropped.jpg/48px-Hermes_flying_away_from_jump_point_-_cropped.jpg.webp","Aurora Mk II":"https://media.starcitizen.tools/thumb/1/1f/Aurora_Mk_II_x3_flying_close_to_mountains_-_cropped.jpg/48px-Aurora_Mk_II_x3_flying_close_to_mountains_-_cropped.jpg.webp","Javelin":"https://media.starcitizen.tools/thumb/8/86/Javelin-fireworks-invictus-2950.jpg/48px-Javelin-fireworks-invictus-2950.jpg.webp","Cyclone":"https://media.starcitizen.tools/thumb/2/28/Cyclone_driving_through_fire_over_V_rocky_world_-_cropped.jpg/48px-Cyclone_driving_through_fire_over_V_rocky_world_-_cropped.jpg.webp","Cyclone TR":"https://media.starcitizen.tools/thumb/7/7d/Cyclone_TR_on_Aberdeen_-_Front_Starboard_1_-_Cut.png/48px-Cyclone_TR_on_Aberdeen_-_Front_Starboard_1_-_Cut.png.webp","Cyclone RC":"https://media.starcitizen.tools/thumb/8/86/Cyclone-RC_on_Hurston.png/48px-Cyclone-RC_on_Hurston.png.webp","Cyclone RN":"https://media.starcitizen.tools/thumb/4/43/Cyclone_RN_in_2948_Expo_-_Front_Starboard.jpg/48px-Cyclone_RN_in_2948_Expo_-_Front_Starboard.jpg.webp","Cyclone AA":"https://media.starcitizen.tools/thumb/4/4b/Cyclone_AA_in_2948_Expo_-_Front.jpg/48px-Cyclone_AA_in_2948_Expo_-_Front.jpg.webp","Lynx":"https://media.starcitizen.tools/thumb/1/17/Lynx_on_platform_in_nightime_Lorville_-_Cut.jpg/48px-Lynx_on_platform_in_nightime_Lorville_-_Cut.jpg.webp","C8 Pisces":"https://media.starcitizen.tools/thumb/4/45/Pisces_C8_flying_away_from_Carrack_through_debris_field_-_cropped.png/48px-Pisces_C8_flying_away_from_Carrack_through_debris_field_-_cropped.png.webp","Ballista":"https://media.starcitizen.tools/thumb/c/cb/Ballista_on_glassland_firing_weapons_-_cropped.jpg/48px-Ballista_on_glassland_firing_weapons_-_cropped.jpg.webp","C8X Pisces Expedition":"https://media.starcitizen.tools/thumb/e/ef/Pisces_C8X_flying_over_mountainous_volcanic_world_-_cropped_%26_adjusted.jpg/48px-Pisces_C8X_flying_over_mountainous_volcanic_world_-_cropped_%26_adjusted.jpg.webp","Cyclone MT":"https://media.starcitizen.tools/thumb/e/e8/Cyclone_MT_driving_through_mountainous_area_-_cropped_and_adjusted.jpg/48px-Cyclone_MT_driving_through_mountainous_area_-_cropped_and_adjusted.jpg.webp","HoverQuad":"https://media.starcitizen.tools/thumb/7/7f/CNOU_HoverQuad_Luminalia_Reveal-02_-_cropped.jpg/48px-CNOU_HoverQuad_Luminalia_Reveal-02_-_cropped.jpg.webp","Centurion":"https://media.starcitizen.tools/thumb/b/b0/Centurion_-_In_battle_with_all_guns_firing.png/48px-Centurion_-_In_battle_with_all_guns_firing.png.webp","Fury LX":"https://media.starcitizen.tools/thumb/c/c2/Fury_LX_x2_flying_low_and_fast_by_a_crashed_M50_-_Cut.jpg/48px-Fury_LX_x2_flying_low_and_fast_by_a_crashed_M50_-_Cut.jpg.webp","Cutter Scout":"https://media.starcitizen.tools/thumb/a/a8/Cutter_Scout_flying_above_the_clouds_-_Cut.jpg/48px-Cutter_Scout_flying_above_the_clouds_-_Cut.jpg.webp","Cutter Rambler":"https://media.starcitizen.tools/thumb/0/03/Cutter_Rambler_flying_over_valley_-_Cut.png/48px-Cutter_Rambler_flying_over_valley_-_Cut.png.webp","Clipper":"https://media.starcitizen.tools/thumb/7/74/Clipper_attacking_ships_around_station_-_cropped.jpg/48px-Clipper_attacking_ships_around_station_-_cropped.jpg.webp","Golem OX":"https://media.starcitizen.tools/thumb/7/78/Golem_OX_landing_at_outpost_-_cropped.jpg/48px-Golem_OX_landing_at_outpost_-_cropped.jpg.webp","MDC":"https://media.starcitizen.tools/thumb/9/91/MDC_in_forest_beside_shipreck_-_cropped.jpg/48px-MDC_in_forest_beside_shipreck_-_cropped.jpg.webp","Mustang Delta":"https://media.starcitizen.tools/thumb/5/5b/Mustang_Delta_Invictus_2950_promo_shot_-_cropped_contrast_adjusted.png/48px-Mustang_Delta_Invictus_2950_promo_shot_-_cropped_contrast_adjusted.png.webp","Mustang Omega":"https://media.starcitizen.tools/thumb/a/a7/Mustang_Omega_in_hangar.png/48px-Mustang_Omega_in_hangar.png.webp","Reliant Mako":"https://media.starcitizen.tools/thumb/9/9f/MISC_Reliant_Mako_Landing_at_Area11.png/48px-MISC_Reliant_Mako_Landing_at_Area11.png.webp","Reliant Sen":"https://media.starcitizen.tools/thumb/2/2f/Reliant_Sen_Formation_Alpha_3.9.jpg/48px-Reliant_Sen_Formation_Alpha_3.9.jpg.webp","Reliant Tana":"https://media.starcitizen.tools/thumb/b/b7/Reliant_Tana_Formation_Alpha_3.9.jpg/48px-Reliant_Tana_Formation_Alpha_3.9.jpg.webp","Scythe":"https://media.starcitizen.tools/thumb/b/b0/Scythe_ISC_2020-06-18.png/48px-Scythe_ISC_2020-06-18.png.webp","PTV":"https://media.starcitizen.tools/thumb/e/e0/PTV_-_Updated_3D_concept.png/48px-PTV_-_Updated_3D_concept.png.webp","Nova":"https://media.starcitizen.tools/thumb/7/79/Nova_x2_on_battlefield_-_Cropped.png/48px-Nova_x2_on_battlefield_-_Cropped.png.webp","ROC":"https://media.starcitizen.tools/thumb/6/63/Grin_ROC_Gallery_Surface_CaveMining.jpg/48px-Grin_ROC_Gallery_Surface_CaveMining.jpg.webp","ROC-DS":"https://media.starcitizen.tools/thumb/6/62/GRIN_ROC_DS_TopBanner_-_Crop.png/48px-GRIN_ROC_DS_TopBanner_-_Crop.png.webp","Spartan":"https://media.starcitizen.tools/thumb/f/ff/Spartan_Concept_Attack_-_cropped_and_adjusted.png/48px-Spartan_Concept_Attack_-_cropped_and_adjusted.png.webp","Mule":"https://media.starcitizen.tools/thumb/b/b7/Mule_front_%27claw%27_holding_a_cargo_box_-_Cropped.jpg/48px-Mule_front_%27claw%27_holding_a_cargo_box_-_Cropped.jpg.webp","Storm":"https://media.starcitizen.tools/thumb/0/07/Storm_closeup_firing_weapons.jpg/48px-Storm_closeup_firing_weapons.jpg.webp","Storm AA":"https://media.starcitizen.tools/thumb/0/01/Storm_AA_in_forest_firing_weapons_-_Cut_-_Contrast_change.jpg/48px-Storm_AA_in_forest_firing_weapons_-_Cut_-_Contrast_change.jpg.webp","Pulse":"https://media.starcitizen.tools/thumb/8/8e/Pulse_x2_fly_fast_through_dusty_world_firing_guns.png/48px-Pulse_x2_fly_fast_through_dusty_world_firing_guns.png.webp","Pulse LX":"https://media.starcitizen.tools/thumb/6/6f/Pulse_LX_flying_through_city_cropped.png/48px-Pulse_LX_flying_through_city_cropped.png.webp","Sabre Peregrine":"https://media.starcitizen.tools/thumb/1/12/Sabre_Peregrine_flying_fast_over_Teasa_Spaceport_-_Rear_Port.jpg/48px-Sabre_Peregrine_flying_fast_over_Teasa_Spaceport_-_Rear_Port.jpg.webp","MTC":"https://media.starcitizen.tools/thumb/a/a9/MTC_on_top_of_rocky_outcrop_-_cropped.png/48px-MTC_on_top_of_rocky_outcrop_-_cropped.png.webp","Prowler Utility":"https://media.starcitizen.tools/thumb/6/62/Prowler_Utility_on_outpost_landing_pad_-_cropped.png/48px-Prowler_Utility_on_outpost_landing_pad_-_cropped.png.webp","MOTH":"https://media.starcitizen.tools/thumb/c/c2/MOTH_in_debris_field_with_arms_extended_-_cropped.jpg/48px-MOTH_in_debris_field_with_arms_extended_-_cropped.jpg.webp","X1":"https://media.starcitizen.tools/thumb/9/9f/X1_firing_weapon_moving_fast_against_blurred_BG_-_Cut.png/48px-X1_firing_weapon_moving_fast_against_blurred_BG_-_Cut.png.webp","X1 Velocity":"https://media.starcitizen.tools/thumb/d/d7/X1_Velocity_profile_streak.png/48px-X1_Velocity_profile_streak.png.webp","X1 Force":"https://media.starcitizen.tools/thumb/f/fa/X1_Force_firing_weapon_moving_fast_against_blurred_BG_-_Cut.png/48px-X1_Force_firing_weapon_moving_fast_against_blurred_BG_-_Cut.png.webp","STV":"https://media.starcitizen.tools/thumb/0/0b/Greycat_stv_ship_wall_-_cropped_and_adjusted.jpg/48px-Greycat_stv_ship_wall_-_cropped_and_adjusted.jpg.webp","UTV":"https://media.starcitizen.tools/thumb/2/20/UTV_on_sand_-_Cropped.webp/48px-UTV_on_sand_-_Cropped.webp","Ursa Medivac":"https://media.starcitizen.tools/thumb/0/06/Ursa_Medivac_driving_by_Cutlass_crash_site_-_Cropped.jpg/48px-Ursa_Medivac_driving_by_Cutlass_crash_site_-_Cropped.jpg.webp","Terrapin Medic":"https://media.starcitizen.tools/thumb/4/48/SC-3.24_20241206_133812_Terrapin-Medic-over-Hurston.png/48px-SC-3.24_20241206_133812_Terrapin-Medic-over-Hurston.png.webp"};
   function imgURL(name) {
-    return _SS_IMGS[name] || (window._shipImgCache && window._shipImgCache[name]) || '';
+    var slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+    return 'https://starcitizen.tools/images/thumb/'+slug+'/80px-'+slug+'.jpg';
   }
-  window._ss_imgURL = imgURL;
-  window.prefetchImgForSearch = function(name) {
-    if (!name || _SS_IMGS[name]) return;
-    var cache = window._shipImgCache = window._shipImgCache || {};
-    if (cache[name] || cache[name+'_p']) return;
-    cache[name+'_p'] = true;
-    var title = name.replace(/\s+/g,'_');
-    fetch('https://starcitizen.tools/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=48&titles='+encodeURIComponent(title)+'&format=json&origin=*')
-      .then(function(r){return r.json();})
-      .then(function(d){
-        var pages = d.query&&d.query.pages; if(!pages) return;
-        var p = pages[Object.keys(pages)[0]];
-        var url = p&&p.thumbnail&&p.thumbnail.source;
-        if (url) { _SS_IMGS[name]=url; cache[name]=url; delete cache[name+'_p'];
-          document.querySelectorAll('.ss-thumb[data-ship="'+name.replace(/"/g,'&quot;')+'"]').forEach(function(i){i.src=url;}); }
-      }).catch(function(){delete cache[name+'_p'];});
+
+  function itemHTML(name, hl, isTarget) {
+    var d = SHIP_DATA&&SHIP_DATA[name]||{};
+    var sz = d.compSz||'';
+    var mfr = d.mfr||'';
+    var fn = isTarget ? 'ss_pick_tgt' : 'ss_pick_ship';
+    var safe = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<div class="ss-item" onclick="'+fn+'(\''+safe+'\')" data-nm="'+name.replace(/"/g,'&quot;')+'">'+
+      '<img class="ss-thumb" src="'+imgURL(name)+'" alt="" onerror="this.style.display=\'none\';this.nextSibling&&(this.nextSibling.style.display=\'flex\')">'+
+      '<span class="ss-thumb-ph" style="display:none">🚀</span>'+
+      '<span class="ss-name">'+hl+'</span>'+
+      (sz?'<span class="ss-sz">'+sz+'</span>':'')+
+      (mfr?'<span class="ss-mfr">'+mfr.split(' ')[0]+'</span>':'')+
+      '</div>';
+  }
+
+  function buildHTML(q, isTarget) {
+    var all = Object.keys(SHIP_DATA||{});
+    var key = isTarget?'tgt':'ship';
+    var recent = _recent[key];
+    if(!q||!q.trim()){
+      var html = '';
+      if(recent.length){
+        html += '<div class="ss-group-lbl">Recent</div>';
+        recent.slice(0,5).forEach(function(n){ html += itemHTML(n,n,isTarget); });
+      }
+      var quick = ['Gladius','Arrow','Sabre','Hammerhead','Carrack','Prospector'];
+      var qk = quick.filter(function(n){return SHIP_DATA&&SHIP_DATA[n]&&recent.indexOf(n)<0;}).slice(0,5);
+      if(qk.length){
+        html += '<div class="ss-group-lbl">Quick Select</div>';
+        qk.forEach(function(n){ html += itemHTML(n,n,isTarget); });
+      }
+      return html||'<div class="ss-empty">Type to search '+all.length+' ships</div>';
+    }
+    var results = [];
+    all.forEach(function(n){
+      var r = fuzzy(q.trim(),n);
+      if(r.ok) results.push({name:n,score:r.score,hl:r.hl});
+    });
+    results.sort(function(a,b){return b.score-a.score;});
+    results = results.slice(0,12);
+    if(!results.length) return '<div class="ss-empty">No ships match &ldquo;'+q.trim()+'&rdquo;</div>';
+    var html = '<div class="ss-group-lbl">'+results.length+' result'+(results.length===1?'':'s')+'</div>';
+    results.forEach(function(r){ html += itemHTML(r.name,r.hl,isTarget); });
+    return html;
+  }
+
+  function open(dropId){ var d=document.getElementById(dropId); if(d) d.classList.add('open'); }
+  function close(dropId){ var d=document.getElementById(dropId); if(d){ d.classList.remove('open'); } }
+  function update(dropId, q, isTarget){
+    var d=document.getElementById(dropId);
+    if(!d) return;
+    var inner=d.querySelector('.ss-inner');
+    if(inner) inner.innerHTML = buildHTML(q,isTarget);
+    open(dropId);
+    _hi[isTarget?'tgt':'ship']=-1;
+  }
+
+  window.ss_open_ship = function(q){ update('ss_drop_ship',q,false); };
+  window.ss_open_tgt  = function(q){ update('ss_drop_tgt', q,true);  };
+  window.ss_type_ship = function(inp){ inp.classList.toggle('has-val',inp.value!==''); update('ss_drop_ship',inp.value,false); };
+  window.ss_type_tgt  = function(inp){ inp.classList.toggle('has-val',inp.value!==''); update('ss_drop_tgt', inp.value,true);  };
+  window.ss_key_ship  = function(e){ ssNav(e,'ss_drop_ship','ship',false); };
+  window.ss_key_tgt   = function(e){ ssNav(e,'ss_drop_tgt', 'tgt', true);  };
+
+  function ssNav(e,dropId,key,isTarget){
+    var d=document.getElementById(dropId);
+    if(!d||!d.classList.contains('open')) return;
+    var items=d.querySelectorAll('.ss-item'), idx=_hi[key];
+    if(e.key==='ArrowDown'){e.preventDefault();idx=Math.min(idx+1,items.length-1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();idx=Math.max(idx-1,-1);}
+    else if(e.key==='Enter'){e.preventDefault();if(idx>=0&&items[idx])items[idx].click();return;}
+    else if(e.key==='Escape'){close(dropId);return;}
+    else return;
+    _hi[key]=idx;
+    Array.from(items).forEach(function(el,i){el.classList.toggle('hi',i===idx);});
+    if(idx>=0) items[idx].scrollIntoView({block:'nearest'});
+  }
+
+  window.ss_pick_ship = function(name){
+    saveRecent('ship',name);
+    close('ss_drop_ship');
+    var inp=document.getElementById('ss_inp_ship');
+    if(inp){inp.value=name;inp.classList.add('has-val');}
+    var clr=document.getElementById('ss_clr_ship');
+    if(clr) clr.classList.add('show');
+    pick(name);
   };
-
-  window.prefetchImgForSearch = prefetchImgForSearch;
-
+  window.ss_pick_tgt = function(name){
+    saveRecent('tgt',name);
+    close('ss_drop_tgt');
+    var inp=document.getElementById('ss_inp_tgt');
+    if(inp){inp.value=name;inp.classList.add('has-val');}
+    var clr=document.getElementById('ss_clr_tgt');
+    if(clr) clr.classList.add('show');
+    selectTarget(name);
+  };
+  window.ss_clear_ship = function(){
+    var inp=document.getElementById('ss_inp_ship');
+    if(inp){inp.value='';inp.classList.remove('has-val');inp.focus();}
+    document.getElementById('ss_clr_ship')?.classList.remove('show');
+    update('ss_drop_ship','',false);
+  };
+  window.ss_clear_tgt = function(){
+    var inp=document.getElementById('ss_inp_tgt');
+    if(inp){inp.value='';inp.classList.remove('has-val');inp.focus();}
+    document.getElementById('ss_clr_tgt')?.classList.remove('show');
+    selectTarget('');
+    update('ss_drop_tgt','',true);
+  };
 
   // Close on outside click
   document.addEventListener('click',function(e){
     if(!e.target.closest('#ss_wrap_ship')) close('ss_drop_ship');
     if(!e.target.closest('#ss_wrap_tgt'))  close('ss_drop_tgt');
   });
-
-  // Expose all smart search functions to global window scope
-  window.ss_open_ship = ss_open_ship;
-  window.ss_open_tgt  = ss_open_tgt;
-  window.ss_type_ship = ss_type_ship;
-  window.ss_type_tgt  = ss_type_tgt;
-  window.ss_key_ship  = ss_key_ship;
-  window.ss_key_tgt   = ss_key_tgt;
-  window.ss_pick_ship = ss_pick_ship;
-  window.ss_pick_tgt  = ss_pick_tgt;
-  window.ss_clear_ship = ss_clear_ship;
-  window.ss_clear_tgt  = ss_clear_tgt;
-
 }());
 
 
-
-
-// Eagerly prefetch images for common ships when page loads
 
 </script>
 
