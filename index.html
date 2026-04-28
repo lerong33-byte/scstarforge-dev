@@ -6815,13 +6815,8 @@ function openShipInBuilder(name) {
 }
 
 // Auto-render when ships tab is shown
-var _origShowTab = showTab;
-showTab = function(id, btn) {
-  _origShowTab(id, btn);
-  if (id === 'ships') {
-    setTimeout(renderShips, 100);
-  }
-};
+// image fix runs on tab click via event
+document.querySelector('[data-t="ships"]').addEventListener("click",function(){setTimeout(fixShipImages,2000)});
 
 
 function switchWpCat(cat, btn) {
