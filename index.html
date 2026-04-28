@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v2.9 DEV</title>
+<title>SC-ShipForge v3.0 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -661,7 +661,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.9-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v3.0-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3844,8 +3844,7 @@ function updatePower() {
           var attrs_f = canClick_f
             ? ' data-key="' + col.sys.key + '" data-idx="' + i + '" data-gen="' + genTotal_f + '" data-min="0"'
             : '';
-          if(!isFilled) continue;
-          html_f += '<div class="spv-block filled"'
+          html_f += '<div class="spv-block ' + (isFilled ? 'filled' : 'empty') + '"'
             + ' style="height:' + BLK_H_f + 'px;margin-top:' + mt + 'px;background:' + bg + ';' + (canClick_f?'cursor:pointer;':'') + '"'
             + attrs_f + '></div>';
         }
@@ -3863,8 +3862,24 @@ function updatePower() {
     if (chartEl_f) {
       chartEl_f.onclick = function(e) {
         var el = e.target;
+        // Icon click = toggle system on/off
         if (el.dataset && el.dataset.togglekey) {
           toggleSystem(el.dataset.togglekey);
+          return;
+        }
+        // Block click = adjust power for that column independently
+        if (el.dataset && el.dataset.key) {
+          var key = el.dataset.key;
+          var clickedIdx = parseInt(el.dataset.idx);
+          var genMax = parseInt(el.dataset.gen) || genTotal_f;
+          var dMin = parseInt(el.dataset.min) || 0;
+          if (!userPwrAdj[selShip]) userPwrAdj[selShip] = {};
+          var cur = userPwrAdj[selShip][key] !== undefined ? userPwrAdj[selShip][key] : dMin;
+          // Click filled = reduce to that level; click empty = fill up to it
+          var newVal = clickedIdx < cur ? clickedIdx : clickedIdx + 1;
+          newVal = Math.max(dMin, Math.min(newVal, genMax));
+          userPwrAdj[selShip][key] = newVal;
+          updatePower();
         }
       };
     }
@@ -6396,4 +6411,4 @@ window.addEventListener('load', function() {
 </body>
 </html>
 
-<!-- v2.9-DEV -->
+<!-- v3.0-DEV -->
