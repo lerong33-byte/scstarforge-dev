@@ -50,7 +50,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v2.90-DEV.19</title>
+<title>SC-ShipForge v2.91-FIX1 LIVE</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -637,7 +637,13 @@ option,optgroup{background:var(--bg2)}
 #spvChart .spv-block { width:16px !important; height:10px !important; min-height:10px !important; max-height:10px !important; margin:0 0 1px 0 !important; border-radius:2px !important; }
 #spvChart .spv-col-foot { font-size:7px !important; margin-top:2px !important; }
 #spvChart .spv-col-icon { font-size:10px !important; }
-</style>
+
+    /* Fix: Make ship search dropdown show all ships */
+    datalist, [role="listbox"], .dropdown-list {
+      max-height: 500px !important;
+      overflow-y: auto !important;
+    }
+    </style>
 
 <div id="app">
 
