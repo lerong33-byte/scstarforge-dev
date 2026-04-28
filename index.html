@@ -1,4 +1,11 @@
-<!DOCTYPE html>
+<div id="wpCatBar" style="display:flex;gap:4px;padding:8px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);background:#0b0f15">
+          <button class="wp-cat-btn on" data-cat="weapons" onclick="switchWpCat('weapons',this)" style="padding:6px 16px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(56,189,248,0.4);color:#38bdf8;background:rgba(56,189,248,0.12);cursor:pointer;transition:all .2s">Weapons</button>
+          <button class="wp-cat-btn" data-cat="pp" onclick="switchWpCat('pp',this)" style="padding:6px 16px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,0.08);color:#8a94a3;background:transparent;cursor:pointer;transition:all .2s">Power Plants</button>
+          <button class="wp-cat-btn" data-cat="sg" onclick="switchWpCat('sg',this)" style="padding:6px 16px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,0.08);color:#8a94a3;background:transparent;cursor:pointer;transition:all .2s">Shields</button>
+          <button class="wp-cat-btn" data-cat="cooler" onclick="switchWpCat('cooler',this)" style="padding:6px 16px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,0.08);color:#8a94a3;background:transparent;cursor:pointer;transition:all .2s">Coolers</button>
+          <button class="wp-cat-btn" data-cat="qd" onclick="switchWpCat('qd',this)" style="padding:6px 16px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,0.08);color:#8a94a3;background:transparent;cursor:pointer;transition:all .2s">Quantum Drives</button>
+        </div>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Google tag (gtag.js) -->
@@ -954,6 +961,7 @@ option,optgroup{background:var(--bg2)}
       <div class="pane" id="pane-pn">
         <div id="pnContent" style="flex:1;overflow-y:auto;padding:16px 16px 32px;display:flex;flex-direction:column;gap:14px">
           <div style="text-align:center;padding:40px 0;color:var(--t3);font-family:var(--fmono);font-size:13px">Loading patch notes…</div>
+        <div id="compGrid" class="wgrid" style="display:none"></div>
         </div>
       </div>
 
@@ -6696,6 +6704,59 @@ showTab = function(id, btn) {
   }
 };
 
+
+function switchWpCat(cat, btn) {
+  document.querySelectorAll('.wp-cat-btn').forEach(function(b) {
+    b.style.border = '1px solid rgba(255,255,255,0.08)';
+    b.style.color = '#8a94a3';
+    b.style.background = 'transparent';
+    b.classList.remove('on');
+  });
+  btn.style.border = '1px solid rgba(56,189,248,0.4)';
+  btn.style.color = '#38bdf8';
+  btn.style.background = 'rgba(56,189,248,0.12)';
+  btn.classList.add('on');
+  var wf = document.getElementById('wfiltBar');
+  var wg = document.getElementById('wgrid');
+  var cg = document.getElementById('compGrid');
+  if (cat === 'weapons') {
+    wf.style.display = '';
+    wg.style.display = '';
+    cg.style.display = 'none';
+  } else {
+    wf.style.display = 'none';
+    wg.style.display = 'none';
+    cg.style.display = '';
+    buildCompGrid(cat);
+  }
+}
+function buildCompGrid(cat) {
+  var grid = document.getElementById('compGrid');
+  if (!grid || typeof COMP_DB === 'undefined') return;
+  grid.innerHTML = '';
+  var db = COMP_DB[cat];
+  if (!db) return;
+  var labels = {pp:{h1:'OUTPUT',h2:'HEAT',h3:'EM SIG'},sg:{h1:'TOTAL HP',h2:'FACE HP',h3:'REGEN/s'},cooler:{h1:'COOLING',h2:'DRAW MIN',h3:'IR SIG'},qd:{h1:'RANGE',h2:'SPEED',h3:'SPOOL'}};
+  var lbl = labels[cat] || {h1:'STAT1',h2:'STAT2',h3:'STAT3'};
+  var names = Object.keys(db).sort(function(a,b){ return (db[b].sz||0)-(db[a].sz||0) || a.localeCompare(b); });
+  names.forEach(function(name) {
+    var c = db[name];
+    var card = document.createElement('div');
+    card.className = 'wcard';
+    var sz = c.sz || '?';
+    var v1, v2, v3;
+    if (cat === 'pp') { v1 = c.out; v2 = c.heat; v3 = c.em; }
+    else if (cat === 'sg') { v1 = c.totalHP; v2 = c.faceHP; v3 = c.regen; }
+    else if (cat === 'cooler') { v1 = c.cool; v2 = c.drawMin; v3 = c.ir; }
+    else if (cat === 'qd') { v1 = c.range + ' Mkm'; v2 = c.speed + ' Mm/s'; v3 = c.spool + 's'; }
+    card.innerHTML = '<div class="wc-hd"><span class="wc-nm">' + name + '</span><span class="wc-sz">S' + sz + '</span></div>' +
+      '<div class="wc-sub">' + (cat==='pp'?'Power Plant':cat==='sg'?'Shield Generator':cat==='cooler'?'Cooler':'Quantum Drive') + '</div>' +
+      '<div class="wc-stats"><div class="wc-st"><span class="wc-sl">' + lbl.h1 + '</span><span class="wc-sv">' + v1 + '</span></div>' +
+      '<div class="wc-st"><span class="wc-sl">' + lbl.h2 + '</span><span class="wc-sv">' + v2 + '</span></div>' +
+      '<div class="wc-st"><span class="wc-sl">' + lbl.h3 + '</span><span class="wc-sv">' + v3 + '</span></div></div>';
+    grid.appendChild(card);
+  });
+}
 </script>
 
 
