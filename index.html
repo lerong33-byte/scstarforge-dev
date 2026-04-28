@@ -20,7 +20,7 @@ function renderSpvChart(cols, poolMax, userAdj, ship) {
     var bKey   = col.baseKey || col.key;
     out += '<div class="spv-col"><div class="spv-segs">';
     for(var i=0;i<maxSg;i++){
-      var isFilled = i<filled, isMin = i<minSg;
+      var isFilled=i<filled, isMin=i<minSg;
       var cls = isMin?'spv-block minimum':isFilled?'spv-block filled':'spv-block empty';
       var da  = !isMin?' data-key="'+col.key+'" data-idx="'+i+'" data-gen="'+maxSg+'" data-min="'+minSg+'"':'';
       out += '<div class="'+cls+'"'+da+'></div>';
