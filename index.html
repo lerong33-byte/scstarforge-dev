@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v3.7 DEV</title>
+<title>SC-ShipForge v3.8 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -661,7 +661,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v3.7-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v3.8-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3746,7 +3746,7 @@ function updatePower() {
     // Fixed genTotal = 20, BLK_H = 5 for consistent look across all ships
     var sgMin_f=(sgDb_f?sgDb_f.drawMin:2)*(cC.sg||1);
     var clMin_f=(coolDb_f?coolDb_f.drawMin:2)*(cC.cooler||1);
-    var qdMin_f=qdDb_f?qdDb_f.drawMin:0;
+    var qdMin_f=Math.max(1,qdDb_f?qdDb_f.drawMin:1);
     var genTotal_f = Math.max(8, sgMin_f+clMin_f+qdMin_f+5+2+1+1+1);
     var BLK_H_f = 5, BLK_GAP_f = 1, GRP_GAP_f = 2, GRP_SZ_f = 4;
 
@@ -6402,3 +6402,4 @@ window.addEventListener('load', function() {
 <!-- v3.5-DEV -->
 <!-- v3.6-DEV -->
 <!-- v3.7-DEV -->
+<!-- v3.8-DEV -->
