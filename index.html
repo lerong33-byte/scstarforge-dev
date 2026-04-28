@@ -693,7 +693,11 @@ option,optgroup{background:var(--bg2)}
 
 
 /* ── Ships Database Tab ── */
-#pane-ships #shipsPage{padding:20px;max-width:1400px;margin:0 auto}
+#pane-ships #shipsPage{padding:20px;max-width:1400px;margin:0 auto;flex:1;overflow-y:auto;min-height:0}
+#pane-ships #shipsPage::-webkit-scrollbar{width:6px}
+#pane-ships #shipsPage::-webkit-scrollbar-track{background:transparent}
+#pane-ships #shipsPage::-webkit-scrollbar-thumb{background:rgba(56,189,248,0.2);border-radius:3px}
+#pane-ships #shipsPage::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,0.4)}
 #pane-ships .ships-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
 #pane-ships .ships-title{font-family:'Rajdhani','JetBrains Mono',monospace;font-size:24px;font-weight:700;letter-spacing:0.1em;color:#38bdf8;text-transform:uppercase;margin:0}
 #pane-ships .ships-count{font-family:'JetBrains Mono',monospace;font-size:12px;color:#8a94a3;background:rgba(56,189,248,0.08);padding:4px 10px;border-radius:12px;border:1px solid rgba(56,189,248,0.15)}
