@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v4.7 DEV</title>
+<title>SC-ShipForge v4.8 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -633,15 +633,15 @@ option,optgroup{background:var(--bg2)}
 #spvChart{display:flex!important;align-items:flex-end!important;gap:0!important;padding:2px 0!important}
 #spvChart .spv-col{display:flex!important;flex-direction:column!important;align-items:center!important;width:38px!important;flex-shrink:0!important;gap:1px!important}
 #spvChart .spv-segs{display:flex!important;flex-direction:column-reverse!important;align-items:center!important;gap:0!important}
-#spvChart .spv-block{width:34px!important;height:20px!important;min-height:20px!important;max-height:20px!important;margin-bottom:2px!important;border-radius:4px!important;border:1px solid rgba(0,0,0,0.4)!important;box-sizing:border-box!important;flex-shrink:0!important;display:block!important;cursor:pointer!important}
-#spvChart .spv-block.filled{background:rgb(252,165,48)!important}
+#spvChart .spv-block{width:34px!important;height:20px!important;min-height:20px!important;max-height:20px!important;margin-bottom:2px!important;border-radius:3px!important;border:1px solid rgba(0,0,0,0.3)!important;box-sizing:border-box!important;flex-shrink:0!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;font-size:8px!important;font-weight:700!important;color:rgba(0,0,0,0.5)!important;letter-spacing:0.5px!important}
+#spvChart .spv-block.filled{background:linear-gradient(180deg,rgba(252,185,60,0.95),rgba(230,145,30,0.9))!important;box-shadow:0 0 4px rgba(252,165,48,0.3)!important}
 #spvChart .spv-block.empty{background:rgba(255,255,255,0.10)!important;display:flex!important;align-items:center;justify-content:center}
 #spvChart .spv-block.minimum{background:rgb(200,120,20)!important;cursor:default!important}
 #spvChart .spv-block.filled:hover{filter:brightness(1.3)!important} #spvChart .spv-block.empty:hover{filter:brightness(2.0)!important;background:rgba(255,165,48,0.4)!important}
 .spv-block-wrap{display:block;margin:0;padding:0;cursor:pointer}.spv-block-wrap .spv-cb{display:none}.spv-block-wrap:hover .spv-block.filled{filter:brightness(1.3)}.spv-block-wrap:hover .spv-block.empty{background:rgba(255,255,255,0.22)!important}.spv-block{display:flex!important;align-items:center;justify-content:center;font-size:8px;font-family:var(--fmono);font-weight:700;color:rgba(255,255,255,0.8)}.spv-block.minimum{cursor:default}
 #spvChart .spv-col-foot{display:flex!important;flex-direction:column!important;align-items:center!important;margin-top:4px!important;width:36px!important}
-#spvChart .spv-col-icon{font-size:14px!important;line-height:1.2!important;display:block!important}
-#spvChart .spv-col-pct{font-size:9px!important;color:var(--t2)!important;font-family:var(--fmono)!important;display:block!important}
+#spvChart .spv-col-icon{font-size:13px!important;line-height:1!important;display:block!important;margin-top:3px!important;cursor:pointer!important;transition:opacity 0.2s,filter 0.2s!important}#spvChart .spv-col-icon:hover{filter:brightness(1.4)!important}
+#spvChart .spv-col-pct{font-size:8px!important;color:rgba(255,255,255,0.4)!important;font-family:var(--fmono)!important;display:block!important;letter-spacing:0!important}
 
 
 /* ── FINAL SIZE OVERRIDE: fit chart in left panel ── */
@@ -661,7 +661,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v4.7-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v4.8-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3884,7 +3884,7 @@ function updatePower() {
     var conBar_f = document.getElementById('conBar');
     if (conBar_f) {
       conBar_f.style.width = Math.min(100, pct_f) + '%';
-      conBar_f.style.background = pct_f > 100 ? 'linear-gradient(90deg,#aa0022,#ff4455)' : pct_f > 85 ? 'linear-gradient(90deg,#aa6600,#ffaa00)' : 'linear-gradient(90deg,#00aa55,#00ee88)';
+      conBar_f.style.background = pct_f > 100 ? 'linear-gradient(90deg,#7a0010,#cc2233,#ff4455)' : pct_f > 85 ? 'linear-gradient(90deg,#7a4400,#cc8800,#ffbb22)' : 'linear-gradient(90deg,#006633,#00aa55,#22dd77)'; conBar_f.style.boxShadow = pct_f > 100 ? '0 0 6px rgba(255,60,60,0.4)' : pct_f > 85 ? '0 0 6px rgba(255,170,0,0.4)' : '0 0 6px rgba(0,220,100,0.4)';
     }
   }
 
@@ -6431,3 +6431,4 @@ window.addEventListener('load', function() {
 <!-- v4.6-DEV -->
 <!-- v4.6-DEV -->
 <!-- v4.7-DEV -->
+<!-- v4.8-DEV -->
