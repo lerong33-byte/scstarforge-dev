@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v2.0 DEV</title>
+<title>SC-ShipForge v2.1 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -661,7 +661,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.0-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.1-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3391,17 +3391,18 @@ function renderSegBar(containerId, used, total, colorUsed, colorFree) {
     el.appendChild(d);
   }
 }
-  // ── FALLBACK: no live API data — build chart from COMP_DB drawMin ──
-  } else {
-    var def2=SHIP_DATA[selShip];if(!def2)return;
+  // ── FALLBACK: build power chart from COMP_DB drawMin when no live data ──
+  else {
+    var def2=SHIP_DATA[selShip]; if(!def2) return;
     var comps2=def2.comps||{};
-    var counts2=(comps2.counts)||{pp:1,sg:1,cooler:1,qd:1};
+    var counts2=comps2.counts||{pp:1,sg:1,cooler:1,qd:1};
     var ppDb2=COMP_DB.pp&&COMP_DB.pp[comps2.pp];
     var sgDb2=COMP_DB.sg&&COMP_DB.sg[comps2.sg];
     var coolDb2=COMP_DB.cooler&&COMP_DB.cooler[comps2.cooler];
     var qdDb2=COMP_DB.qd&&COMP_DB.qd[comps2.qd];
     var ppOut2=ppDb2?(ppDb2.out||20)*(counts2.pp||1):20;
     var genSegs2=Math.max(4,Math.round(ppOut2/16));
+    var _IC={WeaponGun:'\u26a1',Boost:'\u00bb',Shield:'\u29e1',Cooler:'\u2744',QuantumDrive:'\u25cb'};
     var SPV2=[
       {key:'WeaponGun',icon:'\u26a1',color:'#ffaa00',label:'Weapons',adj:true},
       {key:'Boost',icon:'\u00bb',color:'#44aaff',label:'Boost',adj:true},
@@ -6430,4 +6431,4 @@ window.addEventListener('load', function() {
 </body>
 </html>
 
-<!-- build:1777389835258 -->
+<!-- v2.1-DEV build:1777390352568 -->
