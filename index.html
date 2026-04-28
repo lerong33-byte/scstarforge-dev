@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v2.1 DEV</title>
+<title>SC-ShipForge v2.2 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -661,7 +661,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.1-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.2-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3391,42 +3391,6 @@ function renderSegBar(containerId, used, total, colorUsed, colorFree) {
     el.appendChild(d);
   }
 }
-  // ── FALLBACK: build power chart from COMP_DB drawMin when no live data ──
-  else {
-    var def2=SHIP_DATA[selShip]; if(!def2) return;
-    var comps2=def2.comps||{};
-    var counts2=comps2.counts||{pp:1,sg:1,cooler:1,qd:1};
-    var ppDb2=COMP_DB.pp&&COMP_DB.pp[comps2.pp];
-    var sgDb2=COMP_DB.sg&&COMP_DB.sg[comps2.sg];
-    var coolDb2=COMP_DB.cooler&&COMP_DB.cooler[comps2.cooler];
-    var qdDb2=COMP_DB.qd&&COMP_DB.qd[comps2.qd];
-    var ppOut2=ppDb2?(ppDb2.out||20)*(counts2.pp||1):20;
-    var genSegs2=Math.max(4,Math.round(ppOut2/16));
-    var _IC={WeaponGun:'\u26a1',Boost:'\u00bb',Shield:'\u29e1',Cooler:'\u2744',QuantumDrive:'\u25cb'};
-    var SPV2=[
-      {key:'WeaponGun',icon:'\u26a1',color:'#ffaa00',label:'Weapons',adj:true},
-      {key:'Boost',icon:'\u00bb',color:'#44aaff',label:'Boost',adj:true},
-      {key:'Shield',icon:'\u29e1',color:'#00ee88',label:'Shield',adj:true},
-      {key:'Cooler',icon:'\u2744',color:'#00ccff',label:'Cooler',adj:true},
-      {key:'QuantumDrive',icon:'\u25cb',color:'#cc88ff',label:'QD',adj:true}
-    ];
-    var expandedCols2=[];
-    SPV2.forEach(function(sys){
-      var cnt=1,dMin=2,dMax=6;
-      if(sys.key==='Shield'){cnt=counts2.sg||1;dMin=sgDb2?sgDb2.drawMin:2;dMax=sgDb2?sgDb2.drawMax:6;}
-      else if(sys.key==='Cooler'){cnt=counts2.cooler||1;dMin=coolDb2?coolDb2.drawMin:2;dMax=coolDb2?coolDb2.drawMax:6;}
-      else if(sys.key==='QuantumDrive'){dMin=qdDb2?qdDb2.drawMin:0;dMax=qdDb2?qdDb2.drawMax:4;}
-      for(var ci=0;ci<cnt;ci++){
-        var ik=cnt>1?sys.key+'_'+ci:sys.key;
-        var stored=(userPwrAdj[selShip]&&userPwrAdj[selShip][ik]!==undefined)?userPwrAdj[selShip][ik]:dMin;
-        expandedCols2.push({key:ik,baseKey:sys.key,sys:sys,segs:stored,base:dMin,instIdx:ci,instTotal:cnt,instMax:dMax,instMin:dMin,icon:sys.icon});
-      }
-    });
-    renderSpvChart(expandedCols2,genSegs2,userPwrAdj,selShip);
-    var td2=expandedCols2.reduce(function(s,c){return s+(c.segs||0);},0);
-    var suEl=document.getElementById('segUsed');if(suEl)suEl.textContent=Math.round(td2);
-    var stEl=document.getElementById('segTotal');if(stEl)stEl.textContent=genSegs2;
-  }
 
 function updatePower() {
   var def = SHIP_DATA[selShip]; if (!def) return;
@@ -3786,9 +3750,9 @@ function updatePower() {
     // Build segment draws proportional to component EU draw
     // Mirroring the live API grouped format: each value = segments used
     var ppOut_f  = ppDb_f   ? ppDb_f.out  * (cC.pp     || 1) : 100 * szF;
-    var sgDraw_f = sgDb_f   ? sgDb_f.drawMax  * (cC.sg     || 1) : 8   * szF;
-    var clDraw_f = coolDb_f ? coolDb_f.drawMax * (cC.cooler || 1) : 5   * szF;
-    var qdDraw_f = qdDb_f   ? qdDb_f.drawMax  * (cC.qd    || 1) : 6   * szF;
+    var sgDraw_f = sgDb_f   ? sgDb_f.drawMin * (cC.sg     || 1) : 8   * szF;
+    var clDraw_f = coolDb_f ? coolDb_f.drawMin * (cC.cooler || 1) : 2   * szF;
+    var qdDraw_f = qdDb_f   ? qdDb_f.drawMin * (cC.qd    || 1) : 6   * szF;
     var wepDraw_f = szF * 8;
     var boostDraw_f = szF * 4;
     var flightDraw_f = szF * 3;
@@ -3817,7 +3781,7 @@ function updatePower() {
       Radar:                1 * szF,
       LifeSupportGenerator: 1 * szF,
       Cooler:               (coolDb_f ? coolDb_f.drawMax : 5) * coolCount_f,
-      Shield:               (sgDb_f   ? sgDb_f.drawMax   : 8) * sgCount_f,
+      Shield:               (sgDb_f   ? sgDb_f.drawMin : 2) * sgCount_f,
       QuantumDrive:         (qdDb_f   ? qdDb_f.drawMax   : 6) * qdCount_f,
       EMP:                  0
     };
@@ -6431,4 +6395,4 @@ window.addEventListener('load', function() {
 </body>
 </html>
 
-<!-- v2.1-DEV build:1777390352568 -->
+<!-- v2.2-DEV build:1777390636703 -->
