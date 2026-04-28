@@ -50,7 +50,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v2.90-DEV.19</title>
+<title>SC-ShipForge v2.90-DEV.20</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -642,7 +642,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.90-DEV.19</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.90-DEV.20</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="ss_inp_ship" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -6302,7 +6302,7 @@ window.addEventListener('load', function() {
   cols.forEach(function(col) {
     var key   = col.instTotal > 1 ? col.baseKey + '_' + col.instIdx : col.key;
     var segs  = col.segs;                        // current draw
-    var maxSg = col.instMax; // = component base draw (natural seg count) = its own seg count
+    var maxSg = Math.max(1, col.instMax||1); // = component base draw (natural seg count) = its own seg count
     var minSg = col.instMin || 0;                 // min (locked) segs
     var filled = Math.round(segs);
 
