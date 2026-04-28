@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v2.0 LIVE</title>
+<title>SC-ShipForge v5.0 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -83,7 +83,7 @@ window.renderSpvChart = renderSpvChart;
 <meta name="twitter:description" content="Build and compare Star Citizen ship loadouts with live game data."/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230c0e12'/><text x='16' y='22' text-anchor='middle' font-size='20' fill='%237ab0e8'>⚡</text></svg>"/>
 <link rel="sitemap" type="application/xml" href="/sitemap.xml"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
 <style>
 /* ── TOKENS ── */
 button{background:transparent;border:none;cursor:pointer;font-family:inherit;outline:none}
@@ -656,12 +656,47 @@ option,optgroup{background:var(--bg2)}
       max-height: 500px !important;
       overflow-y: auto !important;
     }
-    </style>
+    
+
+/* ── Erkul Power Reskin v5.0 — ALL rules scoped to #pwrCard ── */
+#pwrCard{background:linear-gradient(160deg,#131820,#0e1218)!important;border:1px solid rgba(56,189,248,0.18)!important;border-radius:6px!important;position:relative!important;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04)!important}
+#pwrCard::before,#pwrCard::after{content:'';position:absolute;width:12px;height:12px;border-color:rgba(56,189,248,0.7);border-style:solid;pointer-events:none;z-index:1}
+#pwrCard::before{top:5px;left:5px;border-width:1.5px 0 0 1.5px}
+#pwrCard::after{top:5px;right:5px;border-width:1.5px 1.5px 0 0}
+#pwrCard .lp-card-title{font-family:'Rajdhani','JetBrains Mono',monospace!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.18em!important;color:#38bdf8!important}
+#pwrCard .pwr-eu{font-family:'JetBrains Mono',monospace!important;font-size:13px!important;font-weight:600!important;color:#f59e0b!important}
+#pwrCard .con-lbl{font-family:'Rajdhani',monospace!important;font-size:10px!important;font-weight:600!important;letter-spacing:0.18em!important;color:#8a94a3!important}
+#pwrCard #pwrPct{font-family:'JetBrains Mono',monospace!important;font-size:11px!important;font-weight:600!important}
+#pwrCard .con-bar-wrap{height:6px!important;background:rgba(255,255,255,0.06)!important;border-radius:3px!important;overflow:hidden!important;margin-bottom:10px!important}
+#pwrCard #conBar{height:100%!important;border-radius:3px!important;box-shadow:0 0 8px rgba(34,197,94,0.5)!important}
+#pwrCard #spvChart{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(18px,1fr))!important;gap:3px!important;align-items:end!important;padding:4px 0 2px!important;min-height:80px!important}
+#pwrCard #spvChart .spv-col{display:flex!important;flex-direction:column-reverse!important;align-items:stretch!important;gap:2px!important;width:auto!important;flex-shrink:unset!important}
+#pwrCard #spvChart .spv-block{width:100%!important;height:10px!important;min-height:10px!important;max-height:10px!important;margin:0!important;border-radius:2px!important;border:none!important;cursor:pointer!important;flex-shrink:0!important;display:block!important;transition:transform 0.1s ease,filter 0.1s ease!important}
+#pwrCard #spvChart .spv-block.filled{background:#22c55e!important;box-shadow:0 0 3px rgba(34,197,94,0.35)!important}
+#pwrCard #spvChart .spv-block.empty{background:#1e2530!important;display:block!important}
+#pwrCard #spvChart .spv-block.minimum{background:rgba(34,197,94,0.45)!important;cursor:default!important}
+#pwrCard #spvChart .spv-block:hover:not(.minimum){transform:scaleX(1.12)!important;filter:brightness(1.25)!important}
+#pwrCard #spvChart .spv-col-foot{display:flex!important;flex-direction:column!important;align-items:center!important;margin-top:4px!important;width:100%!important;gap:1px!important}
+#pwrCard #spvChart .spv-col-icon{font-size:12px!important;text-align:center!important;display:block!important;color:#22c55e!important;cursor:pointer!important;transition:color 0.2s,opacity 0.2s!important;margin-top:3px!important}
+#pwrCard #spvChart .col-off .spv-col-icon{color:rgba(255,255,255,0.2)!important;opacity:0.35!important}
+#pwrCard #spvChart .spv-col-val{display:none!important}
+#pwrCard .spv-modes{display:flex!important;gap:2px!important;margin:8px 0 4px!important;background:rgba(0,0,0,0.35)!important;border-radius:4px!important;padding:2px!important}
+#pwrCard .spv-mode-btn{flex:1!important;padding:5px!important;font-family:'Rajdhani',monospace!important;font-size:10px!important;font-weight:700!important;letter-spacing:0.12em!important;border-radius:3px!important;color:#8a94a3!important;background:transparent!important;border:none!important;cursor:pointer!important;transition:all 0.2s!important}
+#pwrCard .spv-mode-btn.on{background:#f59e0b!important;color:#0d1117!important;box-shadow:0 0 8px rgba(245,158,11,0.45)!important}
+#pwrCard #navModeBanner{font-size:10px!important;color:#f59e0b!important;font-family:'JetBrains Mono',monospace!important;text-align:center!important;padding:4px!important;background:rgba(245,158,11,0.08)!important;border-radius:3px!important;margin:4px 0!important;border:1px solid rgba(245,158,11,0.2)!important}
+#pwrCard .reset-pwr{width:100%!important;font-family:'Rajdhani',monospace!important;font-size:10px!important;font-weight:600!important;letter-spacing:0.12em!important;color:#8a94a3!important;background:rgba(255,255,255,0.04)!important;border:1px solid rgba(255,255,255,0.07)!important;border-radius:3px!important;padding:5px!important;cursor:pointer!important;margin-top:6px!important;transition:all 0.2s!important}
+#pwrCard .reset-pwr:hover{color:#e6ebf2!important;background:rgba(255,255,255,0.08)!important}
+#pwrCard .speed-row{display:flex!important;justify-content:space-between!important;align-items:center!important;padding:3px 0!important;margin:2px 0!important}
+#pwrCard .sig-lbl{font-family:'Rajdhani',monospace!important;font-size:10px!important;font-weight:600!important;letter-spacing:0.14em!important;color:#8a94a3!important}
+#pwrCard .sig-val{font-family:'JetBrains Mono',monospace!important;font-size:12px!important;font-weight:600!important;color:#e6ebf2!important}
+/* ── End Erkul Reskin ── */
+
+</style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.0</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v5.0-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -6433,3 +6468,4 @@ window.addEventListener('load', function() {
 <!-- v4.7-DEV -->
 <!-- v4.8-DEV -->
 <!-- v2.0 LIVE -->
+<!-- v5.0-DEV scoped erkul reskin -->
