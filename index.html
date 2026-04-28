@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v4.5 DEV</title>
+<title>SC-ShipForge v4.6 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -661,7 +661,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v4.5-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v4.6-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3845,7 +3845,7 @@ function updatePower() {
           var bg = isFilled ? col.sys.color : 'rgba(255,255,255,0.07)';
           var canClick_f = col.sys.adj && !isMinBlock_f && !isOverMax_f;
           var attrs_f = canClick_f
-            ? ' data-key="' + col.key + '" data-idx="' + i + '" data-gen="' + genTotal_f + '" data-min="0"'
+            ? ' data-key="' + col.key + '" data-idx="' + i + '" data-gen="' + colH_f + '" data-min="0"'
             : '';
           html_f += '<div class="spv-block ' + (isFilled ? 'filled' : 'empty') + '"'
             + ' style="height:' + BLK_H_f + 'px;margin-top:' + mt + 'px;background:' + bg + ';' + (canClick_f?'cursor:pointer;':'') + '"'
@@ -6420,3 +6420,4 @@ window.addEventListener('load', function() {
 <!-- v4.3-DEV -->
 <!-- v4.4-DEV -->
 <!-- v4.5-DEV -->
+<!-- v4.6-DEV -->
