@@ -2665,16 +2665,21 @@ function updatePower() {
       var count = col.key==='Cooler'?(compCounts.cooler||1):col.key==='Shield'?(compCounts.sg||1):1;
       for(var ci=0; ci<count; ci++) {
         var instKey = count>1 ? col.key+'_'+ci : col.key;
-        var segs = (userPwrAdj[selShip]&&userPwrAdj[selShip][instKey]!==undefined) ? userPwrAdj[selShip][instKey] : (count>1?col.segs/count:col.segs);
         expandedCols.push({
-          key:instKey, baseKey:col.key, sys:col.sys, segs:segs, base:col.base,
-          instIdx:ci, instTotal:count, instMax:(count>1?Math.max(1,Math.round(col.base/count)):Math.max(1,Math.round(col.base))), instMin:0,
-          icon:col.icon
+          key: instKey,
+          baseKey: col.key,
+          sys: col.sys,
+          segs: (userPwrAdj[selShip]&&userPwrAdj[selShip][instKey]!==undefined) ? userPwrAdj[selShip][instKey] : (count>1?col.segs/count:col.segs),
+          base: col.base,
+          instIdx: ci,
+          instTotal: count,
+          instMax: Math.max(1, Math.round(count>1 ? col.base/count : col.base)),
+          instMin: 0,
+          icon: col.icon
         });
       }
     });
     renderSpvChart(expandedCols, poolMax, userPwrAdj, selShip);
-
     var iconsEl = document.getElementById('spvIcons');
     if (!chartEl) return;
 
