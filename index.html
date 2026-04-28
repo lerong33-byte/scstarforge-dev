@@ -7076,6 +7076,59 @@ function openShipModal(name) {
   mc.innerHTML = html;
   document.getElementById('shipModal').classList.add('open');
 }
+
+function fixShipImages() {
+  var cards = document.querySelectorAll('#pane-ships .ship-card');
+  cards.forEach(function(c) {
+    var img = c.querySelector('.ship-card-img');
+    var placeholder = c.querySelector('.ship-card-no-img');
+    // Skip if image already loaded
+    if (img && img.src && img.naturalWidth > 0) return;
+    var name = c.getAttribute('data-ship');
+    var wikiTitle = (window._WIKIMAP && window._WIKIMAP[name]) ? window._WIKIMAP[name] : name.replace(/ /g, '_');
+    // Try: get page images list then fetch first image URL
+    var apiBase = 'https://starcitizen.tools/api.php?format=json&origin=*&action=query&titles=';
+    fetch(apiBase + encodeURIComponent(wikiTitle) + '&prop=images&imlimit=5')
+      .then(function(r){return r.json()})
+      .then(function(d){
+        var pg = Object.values(d.query.pages)[0];
+        if (!pg || !pg.images || pg.images.length === 0) return;
+        // Find a good image - prefer ones with the ship name, skip icons/logos
+        var imgFile = null;
+        for (var i = 0; i < pg.images.length; i++) {
+          var title = pg.images[i].title;
+          if (title.match(/\.(jpg|jpeg|png|webp)$/i) && !title.match(/icon|logo|silhouette|placeholder|thumb/i)) {
+            imgFile = title;
+            break;
+          }
+        }
+        if (!imgFile) return;
+        // Get the thumbnail URL for this image
+        return fetch(apiBase + encodeURIComponent(imgFile) + '&prop=imageinfo&iiprop=url&iiurlwidth=400');
+      })
+      .then(function(r){if(r)return r.json()})
+      .then(function(d){
+        if (!d) return;
+        var pg = Object.values(d.query.pages)[0];
+        if (pg && pg.imageinfo && pg.imageinfo[0]) {
+          var thumbUrl = pg.imageinfo[0].thumburl || pg.imageinfo[0].url;
+          if (thumbUrl && img) {
+            img.src = thumbUrl;
+            img.onload = function(){ if(placeholder) placeholder.style.display='none'; };
+          }
+        }
+      })
+      .catch(function(){});
+  });
+}
+// Run image fixer after a delay to let initial render complete
+setTimeout(fixShipImages, 3000);
+// Also run when switching to ships tab
+var _origShowTab = showTab;
+showTab = function(id, btn) {
+  _origShowTab(id, btn);
+  if (id === 'ships') setTimeout(fixShipImages, 1000);
+};
 </script>
 
 
