@@ -2,7 +2,43 @@
 <html lang="en">
 <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C2ESKV4ZVD"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C2ESKV4ZVD">
+
+// ══════════════════════════════════════════
+// SPViewer-exact power chart renderer
+// ══════════════════════════════════════════
+function renderSpvChart(cols, poolMax, userAdj, ship) {
+  var el = document.getElementById('spvChart');
+  if (!el) return;
+  var ICONS = {WeaponGun:'⚡',Boost:'»',FlightController:'◎',QuantumDrive:'○',Radar:'◈',LifeSupportGenerator:'♥',Cooler:'❄',Cooler_0:'❄',Cooler_1:'❄',Shield:'◯',Shield_0:'◯',Shield_1:'◯',EMP:'⚡'};
+  var out = '';
+  cols.forEach(function(col) {
+    var maxSg  = Math.max(1, Math.round(col.base));
+    var filled = Math.max(0, Math.round(col.segs));
+    var minSg  = Math.max(0, Math.round(col.instMin||0));
+    var pct    = maxSg > 0 ? Math.round((filled/maxSg)*100)+'%' : '-';
+    var bKey   = col.baseKey || col.key;
+    out += '<div class="spv-col"><div class="spv-segs">';
+    for(var i=0;i<maxSg;i++){
+      var isFilled=i<filled, isMin=i<minSg;
+      var cls = isMin?'spv-block minimum':isFilled?'spv-block filled':'spv-block empty';
+      var da  = !isMin?' data-key="'+col.key+'" data-idx="'+i+'" data-gen="'+maxSg+'" data-min="'+minSg+'"':'';
+      out += '<div class="'+cls+'"'+da+'></div>';
+    }
+    out += '</div><div class="spv-col-foot"><span class="spv-col-icon">'+(ICONS[bKey]||'◉')+'</span><span class="spv-col-pct">'+pct+'</span></div></div>';
+  });
+  el.innerHTML = out;
+}
+window.renderSpvChart = renderSpvChart;
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C2ESKV4ZVD">
+
+// ══════════════════════════════════════════
+// SPViewer-exact power chart renderer
+// ══════════════════════════════════════════
+
+
+</script>
     <script>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -14,7 +50,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge LIVE — Star Citizen Loadout Builder</title>
+<title>SC-ShipForge v2.90-DEV.19</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -130,7 +166,7 @@ option,optgroup{background:var(--bg2)}
 .spv-col-val{font-size:9px;font-family:var(--fmono);color:rgba(255,255,255,.8);text-align:center;font-weight:700;position:absolute;top:-13px;left:0;right:0;pointer-events:none}
 .spv-col-count{font-size:8px;color:var(--t2);text-align:center;font-family:var(--fmono);position:absolute;bottom:16px;left:0;right:0;pointer-events:none}
 .spv-off-lbl{font-size:8px;color:var(--t3)}
-.spv-block{border-radius:1px;cursor:pointer}
+.spv-block{border-radius:4px!important;cursor:pointer}
 .spv-reset-btn{display:block;width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:var(--r-sm);color:var(--t2);font-size:11px;font-family:var(--fmono);padding:5px;cursor:pointer;transition:all .15s}
 .spv-reset-btn:hover{border-color:var(--accent);color:var(--accent)}
 .spv-modes{display:flex;gap:6px;margin-top:8px}
@@ -532,28 +568,107 @@ option,optgroup{background:var(--bg2)}
 #tgtPanel .tgt-title::after{content:'▾';font-size:10px;color:var(--t3);transition:transform .2s;margin-left:auto}
 #tgtPanel.collapsed .tgt-title::after{transform:rotate(-90deg)}
 
+
+
+/* ── Smart Ship Search ── */
+.ss-wrap{position:relative;display:flex;align-items:center;min-width:180px;max-width:280px}
+.ss-input{width:100%;background:#12151c;border:1px solid #222e40;border-radius:20px;padding:6px 28px 6px 32px;font-size:13px;color:#c0cee0;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .15s}
+.ss-input:focus,.ss-input.has-val{border-color:#7ab0e8}
+.ss-icon{position:absolute;left:11px;color:#2e3e52;font-size:13px;pointer-events:none}
+.ss-clear{position:absolute;right:9px;background:none;border:none;color:#2e3e52;cursor:pointer;font-size:15px;line-height:1;padding:0;display:none}
+.ss-clear.show{display:block}
+.ss-drop{position:absolute;top:calc(100% + 6px);left:0;min-width:300px;background:#12151c;border:1px solid #2a3850;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.7);z-index:9999;display:none;flex-direction:column;overflow:hidden}
+.ss-drop.open{display:flex}
+.ss-inner{max-height:340px;overflow-y:auto}
+.ss-inner::-webkit-scrollbar{width:3px}
+.ss-inner::-webkit-scrollbar-thumb{background:#2a3850}
+.ss-group-lbl{font-size:9px;letter-spacing:1.5px;color:#2e3e52;font-family:'JetBrains Mono',monospace;padding:8px 12px 3px;text-transform:uppercase;background:#0c0e12;position:sticky;top:0;z-index:1}
+.ss-item{display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;transition:background .1s}
+.ss-item:hover,.ss-item.hi{background:#1c2535}
+.ss-thumb{width:36px;height:24px;object-fit:contain;border-radius:3px;flex-shrink:0;background:#0c0e12;opacity:.9}
+.ss-thumb-ph{width:36px;height:24px;display:flex;align-items:center;justify-content:center;color:#2e3e52;font-size:14px;flex-shrink:0}
+.ss-name{flex:1;font-size:12px;font-family:'JetBrains Mono',monospace;color:#c0cee0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ss-name mark{background:none;color:#7ab0e8;font-weight:700;font-style:normal}
+.ss-sz{font-size:9px;font-family:'JetBrains Mono',monospace;color:#5878a0;border:1px solid #222e40;border-radius:3px;padding:1px 5px;flex-shrink:0}
+.ss-mfr{font-size:9px;color:#2e3e52;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.ss-empty{padding:14px 12px;text-align:center;color:#2e3e52;font-size:11px;font-family:'JetBrains Mono',monospace}
+.ss-foot{border-top:1px solid #1c2535;padding:5px 12px;display:flex;gap:10px;font-size:9px;color:#2e3e52;font-family:'JetBrains Mono',monospace}
+.ss-foot kbd{background:#1c2535;border-radius:2px;padding:1px 4px;color:#5878a0}
+
+
+
+
+/* ── SPViewer-exact power chart ── */
+#spvChart { display:flex; align-items:flex-end; gap:0; padding:4px 0 2px; min-height:90px; }
+.spv-col { display:flex; flex-direction:column-reverse; width:36px; flex-shrink:0; position:relative; }
+.spv-block {
+  width:34px; height:20px; margin:0 auto 2px;
+  border-radius:4px; border:1.5px solid rgba(0,0,0,0.5);
+  cursor:pointer; box-sizing:border-box; flex-shrink:0;
+}
+.spv-block.filled  { background:rgb(252,165,48); }
+.spv-block.empty   { background:rgba(255,255,255,0.08); }
+.spv-block.minimum { background:rgb(200,120,20); cursor:default; }
+.spv-block:hover:not(.minimum) { filter:brightness(1.2); }
+.spv-col-foot { text-align:center; font-size:9px; font-family:var(--fmono); color:var(--t2); margin-top:4px; line-height:1.3; }
+.spv-col-icon { font-size:14px; line-height:1; display:block; margin-bottom:1px; }
+.spv-col-pct  { font-size:9px; display:block; }
+/* hide old chart elements */
+.spv-col-val, .spv-col-count, .spv-col-icon-old { display:none !important; }
+
+
+/* ── SPViewer-exact power chart ── */
+#spvChart{display:flex!important;align-items:flex-end!important;gap:0!important;padding:2px 0!important}
+#spvChart .spv-col{display:flex!important;flex-direction:column!important;align-items:center!important;width:36px!important;flex-shrink:0!important}
+#spvChart .spv-segs{display:flex!important;flex-direction:column-reverse!important;align-items:center!important;gap:0!important}
+#spvChart .spv-block{width:34px!important;height:20px!important;min-height:20px!important;max-height:20px!important;margin-bottom:2px!important;border-radius:4px!important;border:1px solid rgba(0,0,0,0.4)!important;box-sizing:border-box!important;flex-shrink:0!important;display:block!important;cursor:pointer!important}
+#spvChart .spv-block.filled{background:rgb(252,165,48)!important}
+#spvChart .spv-block.empty{display:none!important}
+#spvChart .spv-block.minimum{background:rgb(200,120,20)!important;cursor:default!important}
+#spvChart .spv-block.filled:hover,#spvChart .spv-block.empty:hover{filter:brightness(1.2)!important}
+#spvChart .spv-col-foot{display:flex!important;flex-direction:column!important;align-items:center!important;margin-top:4px!important;width:36px!important}
+#spvChart .spv-col-icon{font-size:14px!important;line-height:1.2!important;display:block!important}
+#spvChart .spv-col-pct{font-size:9px!important;color:var(--t2)!important;font-family:var(--fmono)!important;display:block!important}
+
+
+/* ── FINAL SIZE OVERRIDE: fit chart in left panel ── */
+#spvChart { flex-wrap:nowrap !important; gap:0 !important; }
+#spvChart .spv-col { width:18px !important; min-width:18px !important; max-width:18px !important; }
+#spvChart .spv-block { width:16px !important; height:10px !important; min-height:10px !important; max-height:10px !important; margin:0 0 1px 0 !important; border-radius:2px !important; }
+#spvChart .spv-col-foot { font-size:7px !important; margin-top:2px !important; }
+#spvChart .spv-col-icon { font-size:10px !important; }
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.89</span></div>
-    <div class="nav-search-wrap search-box">
-      <span class="search-icon">&#9906;</span>
-      <input type="text" id="sSearch" placeholder="Search ships…" oninput="onSearch()" onfocus="buildSrbox(this.value.trim().toLowerCase())" onblur="setTimeout(function(){var sb=document.getElementById('srbox');if(sb)sb.style.display='none';},150)" autocomplete="off"/>
-      <span id="sSearchClear" class="search-clear" onclick="clearShipSearch()" title="Clear">&#10005;</span>
-      <div id="srbox" class="search-dropdown"></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.90-DEV.19</span></div>
+    <div class="ss-wrap" id="ss_wrap_ship">
+      <span class="ss-icon">⚡</span>
+      <input id="ss_inp_ship" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
+        oninput="ss_type_ship(this)"
+        onfocus="ss_open_ship(this.value)"
+        onkeydown="ss_key_ship(event)"/>
+      <button class="ss-clear" id="ss_clr_ship" onclick="ss_clear_ship()" title="Clear">&times;</button>
+      <div class="ss-drop" id="ss_drop_ship">
+        <div class="ss-inner"></div>
+        <div class="ss-foot"><kbd>&uarr;&darr;</kbd>navigate &nbsp;<kbd>Enter</kbd>select &nbsp;<kbd>Esc</kbd>close</div>
+      </div>
     </div>
     <div style="font-size:9px;color:var(--border);font-family:var(--fmono);padding:0 4px;flex-shrink:0">VS</div>
-    <div class="nav-search-wrap search-box" id="tgtSearchWrap">
-      <span class="search-icon">&#9906;</span>
-      <input type="text" id="tgtSearch" placeholder="Search target…" autocomplete="off"
-        oninput="onTgtSearch(this.value)"
-        onfocus="buildTgtDropdown(this.value.trim().toLowerCase())"
-        onblur="setTimeout(function(){var dd=document.getElementById('tgtDropdown');if(dd)dd.style.display='none';},150)"/>
-      <span id="tgtSearchClear" class="search-clear" onclick="clearTgtSearch()" title="Clear">&#10005;</span>
-      <div id="tgtDropdown" class="search-dropdown"></div>
-    </div>
+    <div class="ss-wrap" id="ss_wrap_tgt" style="max-width:100%">
+          <span class="ss-icon" style="color:#e85060">🎯</span>
+          <input id="ss_inp_tgt" class="ss-input" type="text" placeholder="Search target…" autocomplete="off"
+            style="border-color:#2a3850"
+            oninput="ss_type_tgt(this)"
+            onfocus="ss_open_tgt(this.value)"
+            onkeydown="ss_key_tgt(event)"/>
+          <button class="ss-clear" id="ss_clr_tgt" onclick="ss_clear_tgt()" title="Clear">&times;</button>
+          <div class="ss-drop" id="ss_drop_tgt" style="min-width:260px">
+            <div class="ss-inner"></div>
+            <div class="ss-foot"><kbd>&uarr;&darr;</kbd>navigate &nbsp;<kbd>Enter</kbd>select &nbsp;<kbd>Esc</kbd>close</div>
+          </div>
+        </div>
     <div class="nav-divider" style="display:none"></div>
     <div class="nav-ship" style="display:none">
       <span id="stag" style="display:none"></span>
@@ -3453,39 +3568,28 @@ function updatePower() {
       return {sys:sys, segs:adj, base:scaledBase, key:sys.key};
     }).filter(function(c){ return c.segs > 0 || c.base > 0 || c.sys.key === 'WeaponGun' || c.sys.key === 'Shield'; });
 
-    // Use adjusted generation segments for capacity display
-    genSegs = adjGenSegs;
+    
+    // ── SPViewer-exact: expand per-instance ──
+    var expandedCols = [];
+    var _ICONS = {WeaponGun:'⚡',Boost:'»',FlightController:'◎',QuantumDrive:'○',Radar:'◎',LifeSupportGenerator:'♥',Cooler:'❄',Shield:'◯',EMP:'⚡'};
+    cols.forEach(function(col) {
+      var count = col.key==='Cooler'?(compCounts&&compCounts.cooler||1):col.key==='Shield'?(compCounts&&compCounts.sg||1):1;
+      for(var ci=0;ci<count;ci++){
+        var instKey = count>1 ? col.key+'_'+ci : col.key;
+        var stored  = (userPwrAdj[selShip]&&userPwrAdj[selShip][instKey]!==undefined)
+          ? userPwrAdj[selShip][instKey]
+          : (count>1 ? col.segs/count : col.segs);
+        expandedCols.push({
+          key:instKey, baseKey:col.key, sys:col.sys,
+          segs:stored, base:count>1?col.base/count:col.base,
+          instIdx:ci, instTotal:count,
+          instMax:Math.max(1,Math.round(count>1?col.base/count:col.base)), instMin:Math.floor(count>1?col.base/count:col.base),
+          icon:_ICONS[col.key]||'◉'
+        });
+      }
+    });
+    renderSpvChart(expandedCols, poolMax, userPwrAdj, selShip);
 
-    // Total used segments — OUTPUT shows used/generation like SPViewer
-    var usedSegs = cols.reduce(function(s,c){return s+c.segs;}, 0);
-    var pct = genSegs > 0 ? Math.round(usedSegs / genSegs * 100) : 0;
-    var isOver = usedSegs > genSegs;
-
-    // OUTPUT: used / total (matching SPViewer "0 / 33" style)
-    U('segUsed', Math.round(usedSegs * 10) / 10);
-    U('segTotal', genSegs);
-    var segUsedEl = document.getElementById('segUsed');
-    if (segUsedEl) segUsedEl.style.color = isOver ? '#ff4455' : usedSegs > genSegs * 0.9 ? '#ffaa00' : '#ffffff';
-
-    U('pwrPct', pct + '%');
-    var pwrPctEl = document.getElementById('pwrPct');
-    if (pwrPctEl) pwrPctEl.style.color = isOver ? '#ff4455' : pct > 85 ? '#ffaa00' : '#00ee88';
-
-    var conBar = document.getElementById('conBar');
-    if (conBar) {
-      conBar.style.width = Math.min(pct, 100) + '%';
-      conBar.style.background = isOver ? 'linear-gradient(90deg,#aa0022,#ff4455)' : pct > 85 ? 'linear-gradient(90deg,#aa6600,#ffaa00)' : 'linear-gradient(90deg,#00aa55,#00ee88)';
-    }
-
-    // Chart matches erkul/SPViewer: 1 block = 1 segment, column height = genTotal (PP budget)
-    // Groups of 4 blocks separated by a slightly larger gap
-    // Filled from bottom = allocated segments; empty above = free budget
-    var BLK_H   = 5;   // px per segment block
-    var BLK_GAP = 1;   // gap between blocks
-    var GRP_GAP = 2;   // extra gap every 4 blocks (visual grouping)
-    var GRP_SZ  = 4;   // blocks per group
-
-    var chartEl = document.getElementById('spvChart');
     var iconsEl = document.getElementById('spvIcons');
     if (!chartEl) return;
 
@@ -3516,10 +3620,11 @@ function updatePower() {
         poolMin = qdDb.drawMin * (compCounts.qd||1);
       }
 
-      var filled = Math.min(Math.round(c.segs), genTotal);
+      var colH = poolMax;
+      var filled = Math.round(c.segs);
 
       var html = '';
-      for (var i = 0; i < genTotal; i++) {
+      for (var i = 0; i < colH; i++) {
         var isFilled   = i < filled;
         var isMinBlock = i < poolMin;
         var isOverMax  = i >= poolMax;
@@ -3530,7 +3635,7 @@ function updatePower() {
           : (isOverMax  ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.07)');
         var canClick = c.sys.adj && !isMinBlock && !isOverMax;
         var attrs = canClick
-          ? ' data-key="' + c.sys.key + '" data-idx="' + i + '" data-gen="' + poolMax + '" data-min="' + poolMin + '"'
+          ? ' data-key="' + c.key + '" data-idx="' + i + '" data-gen="' + poolMax + '" data-min="' + poolMin + '"'
           : '';
         html += '<div class="spv-block ' + (isFilled ? 'filled' : 'empty') + '"'
           + ' style="height:' + BLK_H + 'px;margin-top:' + mt + 'px;background:' + bg + ';' + (canClick?'cursor:pointer;':'') + '"'
@@ -3541,7 +3646,7 @@ function updatePower() {
       var segDisp = (!isOff && filled > 0) ? filled : '';
       var valHtml = segDisp ? '<div class="spv-col-val">' + segDisp + '</div>'
                     : (isOff ? '<div class="spv-col-val spv-off-lbl">OFF</div>' : '');
-      var cntHtml = compCount > 1 ? '<div class="spv-col-count" style="' + (c.sys.key==='Cooler'?'color:'+c.sys.color+';font-weight:700;font-size:10px;opacity:1':'') + '">×' + compCount + '</div>' : '';
+      var cntHtml = ''; // per-instance, no badge
 
       var isOffOpacity = isOff ? '0.2' : '1';
       var iconHtml = '<div class="spv-col-icon" data-togglekey="' + c.sys.key + '" style="color:' + (isOff ? 'rgba(255,255,255,0.2)' : c.sys.color) + ';opacity:' + isOffOpacity + '">' + c.sys.icon + '</div>';
@@ -3679,6 +3784,19 @@ function updatePower() {
                  ? userPwrAdj[selShip][s.key] : baseSegs;
       return {sys:s, segs:segs, base:baseSegs, key:s.key};
     });
+    // SPViewer: one column per physical component instance
+    var expandedColsF = [];
+    cols_f.forEach(function(col) {
+      var count = col.key === 'Cooler' ? (cC.cooler||1) :
+                  col.key === 'Shield' ? (cC.sg||1) : 1;
+      var perSegs = count > 1 ? col.segs / count : col.segs;
+      var perBase = count > 1 ? col.base / count : col.base;
+      for(var ci=0; ci<count; ci++) {
+        var instKeyF = count > 1 ? col.key + '_' + ci : col.key;
+        expandedColsF.push({sys:col.sys, segs:perSegs, base:perBase, key:instKeyF, baseKey:col.key, instIdx:ci, instTotal:count});
+      }
+    });
+    cols_f = expandedColsF;
 
     var usedSegs_f = cols_f.reduce(function(a,col){return a+col.segs;},0);
     var pct_f = genTotal_f > 0 ? Math.round(usedSegs_f / genTotal_f * 100) : 0;
@@ -3692,10 +3810,10 @@ function updatePower() {
     var chartEl_f = document.getElementById('spvChart');
     if (chartEl_f) {
       chartEl_f.innerHTML = cols_f.map(function(col){
-        var filled_f = Math.min(col.segs, genTotal_f);
-        var compCount_f = col.key === 'Shield' ? (cC.sg||1) : col.key === 'Cooler' ? (cC.cooler||1) : 1;
+        var colH_f = genTotal_f;
+        var filled_f = Math.round(col.segs);
         var html_f = '';
-        for (var i = 0; i < genTotal_f; i++) {
+        for (var i = 0; i < colH_f; i++) {
           var isFilled = i < filled_f;
           var isGrpStart = (i > 0 && i % GRP_SZ_f === 0);
           var mt = (BLK_GAP_f + (isGrpStart ? GRP_GAP_f : 0));
@@ -3711,7 +3829,7 @@ function updatePower() {
             + attrs_f + '></div>';
         }
         var valHtml_f = filled_f > 0 ? '<div class="spv-col-val">' + filled_f + '</div>' : '';
-        var cntHtml_f = compCount_f > 1 ? '<div class="spv-col-count" style="' + (col.key==='Cooler'?'color:'+col.sys.color+';font-weight:700;font-size:10px;opacity:1':'') + '">×' + compCount_f + '</div>' : '';
+        var cntHtml_f = ''; // per-instance, no badge
         var fbOff = (filled_f === 0 && userPwrAdj[selShip] && userPwrAdj[selShip][col.key] === 0);
         var iconHtml_f = '<div class="spv-col-icon" data-togglekey="' + col.key + '" style="color:' + (filled_f===0?'rgba(255,255,255,0.2)':col.sys.color) + ';opacity:' + (filled_f===0?'0.2':'1') + '">' + col.sys.icon + '</div>';
         return '<div class="spv-col' + (filled_f===0?' col-off':'') + '"'
@@ -5995,6 +6113,230 @@ window.addEventListener('load', function() {
   try { if (localStorage.getItem('sc_tgt_collapsed') === '1') panel.classList.add('collapsed'); } catch(e){}
 });
 
+
+// ══════════════════════════════════
+//  SMART SEARCH — v2 (ship + target)
+// ══════════════════════════════════
+(function(){
+  var _recent = {ship:[], tgt:[]};
+  try{ _recent.ship = JSON.parse(localStorage.getItem('ss_r_ship')||'[]'); }catch(e){}
+  try{ _recent.tgt  = JSON.parse(localStorage.getItem('ss_r_tgt')||'[]');  }catch(e){}
+  var _hi = {ship:-1, tgt:-1};
+
+  function saveRecent(key, name) {
+    var arr = _recent[key];
+    arr = [name].concat(arr.filter(function(n){return n!==name;})).slice(0,6);
+    _recent[key] = arr;
+    try{ localStorage.setItem('ss_r_'+key, JSON.stringify(arr)); }catch(e){}
+  }
+
+  function fuzzy(q, name) {
+    if(!q) return {ok:true,score:0,hl:name};
+    var ql = q.toLowerCase(), nl = name.toLowerCase();
+    // exact prefix
+    if(nl.startsWith(ql)) return {ok:true,score:100+ql.length,hl:'<mark>'+name.slice(0,ql.length)+'</mark>'+name.slice(ql.length)};
+    // contains
+    var ci = nl.indexOf(ql);
+    if(ci>=0) return {ok:true,score:80,hl:name.slice(0,ci)+'<mark>'+name.slice(ci,ci+ql.length)+'</mark>'+name.slice(ci+ql.length)};
+    // word start
+    var words = nl.split(/[\s-]+/), pos=0;
+    for(var wi=0;wi<words.length;wi++){
+      if(words[wi].startsWith(ql)){
+        var ws=nl.indexOf(words[wi],pos);
+        return {ok:true,score:60,hl:name.slice(0,ws)+'<mark>'+name.slice(ws,ws+ql.length)+'</mark>'+name.slice(ws+ql.length)};
+      }
+      pos+=words[wi].length+1;
+    }
+    // fuzzy chars
+    var qi=0,pts=[];
+    for(var ni=0;ni<nl.length&&qi<ql.length;ni++){if(nl[ni]===ql[qi]){pts.push(ni);qi++;}}
+    if(qi===ql.length){
+      var hl='',last=0;
+      pts.forEach(function(p){hl+=name.slice(last,p)+'<mark>'+name[p]+'</mark>';last=p+1;});
+      hl+=name.slice(last);
+      return {ok:true,score:20,hl:hl};
+    }
+    return {ok:false};
+  }
+
+  function imgURL(name) {
+    var slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+    return 'https://starcitizen.tools/images/thumb/'+slug+'/80px-'+slug+'.jpg';
+  }
+
+  function itemHTML(name, hl, isTarget) {
+    var d = SHIP_DATA&&SHIP_DATA[name]||{};
+    var sz = d.compSz||'';
+    var mfr = d.mfr||'';
+    var fn = isTarget ? 'ss_pick_tgt' : 'ss_pick_ship';
+    var safe = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<div class="ss-item" onclick="'+fn+'(\''+safe+'\')" data-nm="'+name.replace(/"/g,'&quot;')+'">'+
+      '<img class="ss-thumb" src="'+imgURL(name)+'" alt="" onerror="this.style.display=\'none\';this.nextSibling&&(this.nextSibling.style.display=\'flex\')">'+
+      '<span class="ss-thumb-ph" style="display:none">🚀</span>'+
+      '<span class="ss-name">'+hl+'</span>'+
+      (sz?'<span class="ss-sz">'+sz+'</span>':'')+
+      (mfr?'<span class="ss-mfr">'+mfr.split(' ')[0]+'</span>':'')+
+      '</div>';
+  }
+
+  function buildHTML(q, isTarget) {
+    var all = Object.keys(SHIP_DATA||{});
+    var key = isTarget?'tgt':'ship';
+    var recent = _recent[key];
+    if(!q||!q.trim()){
+      var html = '';
+      if(recent.length){
+        html += '<div class="ss-group-lbl">Recent</div>';
+        recent.slice(0,5).forEach(function(n){ html += itemHTML(n,n,isTarget); });
+      }
+      var quick = ['Gladius','Arrow','Sabre','Hammerhead','Carrack','Prospector'];
+      var qk = quick.filter(function(n){return SHIP_DATA&&SHIP_DATA[n]&&recent.indexOf(n)<0;}).slice(0,5);
+      if(qk.length){
+        html += '<div class="ss-group-lbl">Quick Select</div>';
+        qk.forEach(function(n){ html += itemHTML(n,n,isTarget); });
+      }
+      return html||'<div class="ss-empty">Type to search '+all.length+' ships</div>';
+    }
+    var results = [];
+    all.forEach(function(n){
+      var r = fuzzy(q.trim(),n);
+      if(r.ok) results.push({name:n,score:r.score,hl:r.hl});
+    });
+    results.sort(function(a,b){return b.score-a.score;});
+    results = results.slice(0,12);
+    if(!results.length) return '<div class="ss-empty">No ships match &ldquo;'+q.trim()+'&rdquo;</div>';
+    var html = '<div class="ss-group-lbl">'+results.length+' result'+(results.length===1?'':'s')+'</div>';
+    results.forEach(function(r){ html += itemHTML(r.name,r.hl,isTarget); });
+    return html;
+  }
+
+  function open(dropId){ var d=document.getElementById(dropId); if(d) d.classList.add('open'); }
+  function close(dropId){ var d=document.getElementById(dropId); if(d){ d.classList.remove('open'); } }
+  function update(dropId, q, isTarget){
+    var d=document.getElementById(dropId);
+    if(!d) return;
+    var inner=d.querySelector('.ss-inner');
+    if(inner) inner.innerHTML = buildHTML(q,isTarget);
+    open(dropId);
+    _hi[isTarget?'tgt':'ship']=-1;
+  }
+
+  window.ss_open_ship = function(q){ update('ss_drop_ship',q,false); };
+  window.ss_open_tgt  = function(q){ update('ss_drop_tgt', q,true);  };
+  window.ss_type_ship = function(inp){ inp.classList.toggle('has-val',inp.value!==''); update('ss_drop_ship',inp.value,false); };
+  window.ss_type_tgt  = function(inp){ inp.classList.toggle('has-val',inp.value!==''); update('ss_drop_tgt', inp.value,true);  };
+  window.ss_key_ship  = function(e){ ssNav(e,'ss_drop_ship','ship',false); };
+  window.ss_key_tgt   = function(e){ ssNav(e,'ss_drop_tgt', 'tgt', true);  };
+
+  function ssNav(e,dropId,key,isTarget){
+    var d=document.getElementById(dropId);
+    if(!d||!d.classList.contains('open')) return;
+    var items=d.querySelectorAll('.ss-item'), idx=_hi[key];
+    if(e.key==='ArrowDown'){e.preventDefault();idx=Math.min(idx+1,items.length-1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();idx=Math.max(idx-1,-1);}
+    else if(e.key==='Enter'){e.preventDefault();if(idx>=0&&items[idx])items[idx].click();return;}
+    else if(e.key==='Escape'){close(dropId);return;}
+    else return;
+    _hi[key]=idx;
+    Array.from(items).forEach(function(el,i){el.classList.toggle('hi',i===idx);});
+    if(idx>=0) items[idx].scrollIntoView({block:'nearest'});
+  }
+
+  window.ss_pick_ship = function(name){
+    saveRecent('ship',name);
+    close('ss_drop_ship');
+    var inp=document.getElementById('ss_inp_ship');
+    if(inp){inp.value=name;inp.classList.add('has-val');}
+    var clr=document.getElementById('ss_clr_ship');
+    if(clr) clr.classList.add('show');
+    pick(name);
+  };
+  window.ss_pick_tgt = function(name){
+    saveRecent('tgt',name);
+    close('ss_drop_tgt');
+    var inp=document.getElementById('ss_inp_tgt');
+    if(inp){inp.value=name;inp.classList.add('has-val');}
+    var clr=document.getElementById('ss_clr_tgt');
+    if(clr) clr.classList.add('show');
+    selectTarget(name);
+  };
+  window.ss_clear_ship = function(){
+    var inp=document.getElementById('ss_inp_ship');
+    if(inp){inp.value='';inp.classList.remove('has-val');inp.focus();}
+    document.getElementById('ss_clr_ship')?.classList.remove('show');
+    update('ss_drop_ship','',false);
+  };
+  window.ss_clear_tgt = function(){
+    var inp=document.getElementById('ss_inp_tgt');
+    if(inp){inp.value='';inp.classList.remove('has-val');inp.focus();}
+    document.getElementById('ss_clr_tgt')?.classList.remove('show');
+    selectTarget('');
+    update('ss_drop_tgt','',true);
+  };
+
+  // Close on outside click
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('#ss_wrap_ship')) close('ss_drop_ship');
+    if(!e.target.closest('#ss_wrap_tgt'))  close('ss_drop_tgt');
+  });
+
+  window.ss_open_ship  = ss_open_ship;
+  window.ss_open_tgt   = ss_open_tgt;
+  window.ss_type_ship  = ss_type_ship;
+  window.ss_type_tgt   = ss_type_tgt;
+  window.ss_key_ship   = ss_key_ship;
+  window.ss_key_tgt    = ss_key_tgt;
+  window.ss_pick_ship  = ss_pick_ship;
+  window.ss_pick_tgt   = ss_pick_tgt;
+  window.ss_clear_ship = ss_clear_ship;
+  window.ss_clear_tgt  = ss_clear_tgt;
+
+  window.renderSpvChart = renderSpvChart;
+
+  // ── SPViewer-exact chart renderer ──
+  function renderSpvChart(cols, poolMax, userAdj, ship) {
+  var el = document.getElementById('spvChart');
+  if (!el) return;
+
+  var html = '';
+  cols.forEach(function(col) {
+    var key   = col.instTotal > 1 ? col.baseKey + '_' + col.instIdx : col.key;
+    var segs  = col.segs;                        // current draw
+    var maxSg = col.instMax; // = component base draw (natural seg count) = its own seg count
+    var minSg = col.instMin || 0;                 // min (locked) segs
+    var filled = Math.round(segs);
+
+    html += '<div class="spv-col">';
+
+    // blocks — bottom to top (reversed via flex-direction:column-reverse)
+    for (var i = 0; i < maxSg; i++) {
+      var isFilled  = i < filled;
+      var isMin     = i < minSg;
+      var cls       = isMin ? 'minimum' : (isFilled ? 'filled' : 'empty');
+      var dataAttrs = (!isMin)
+        ? ' data-key="'+(col.instTotal>1?col.baseKey+'_'+col.instIdx:col.key)+'" data-idx="'+i+'" data-gen="'+maxSg+'" data-min="'+minSg+'"'
+        : '';
+      html += '<div class="spv-block '+cls+'"'+dataAttrs+'></div>';
+    }
+
+    // footer: icon + instance label
+    var instLabel = col.instTotal > 1 ? (col.instIdx + 1) : '';
+    html += '<div class="spv-col-foot">';
+    html += '<span class="spv-col-icon">'+col.icon+'</span>';
+    html += '<span class="spv-col-pct">'+(instLabel ? instLabel : '')+'</span>';
+    html += '</div>';
+
+    html += '</div>';
+  });
+
+  el.innerHTML = html;
+}
+  window.renderSpvChart = renderSpvChart;
+
+}());
+
+
+
 </script>
 
 
@@ -6024,5 +6366,6 @@ window.addEventListener('load', function() {
       <div id="fbStatus" style="display:none;text-align:center;padding:8px;border-radius:var(--r-sm);font-size:12px;font-family:var(--fmono)"></div>
     </div>
   </div>
+</div>
 </body>
 </html>
