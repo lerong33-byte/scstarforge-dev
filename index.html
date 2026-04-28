@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v4.1 DEV</title>
+<title>SC-ShipForge v4.2 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -661,7 +661,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v4.1-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v4.2-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -4045,7 +4045,16 @@ function pwrBlockClick(sysKey, blockIdx, poolMax, poolMin) {
   // blockIdx = segment index clicked (0=bottom), poolMax = max segs for this pool
   // poolMin = minimum segments (floor, passed as 4th arg)
   var live = (liveShipData&&liveShipData[selShip]);
-  if (!live || !live.power) return;
+  if (!live || !live.power) {
+    // Fallback: adjust userPwrAdj directly without live data
+    if (!userPwrAdj[selShip]) userPwrAdj[selShip] = {};
+    var cur = userPwrAdj[selShip][sysKey] !== undefined ? userPwrAdj[selShip][sysKey] : blockIdx+1;
+    var newVal = blockIdx < Math.round(cur) ? blockIdx : blockIdx + 1;
+    newVal = Math.max(poolMin||0, Math.min(newVal, poolMax));
+    userPwrAdj[selShip][sysKey] = newVal;
+    updatePower();
+    return;
+  }
   poolMin = poolMin || 0;
 
   if (!userPwrAdj[selShip]) {
@@ -6408,3 +6417,4 @@ window.addEventListener('load', function() {
 <!-- v3.9-DEV -->
 <!-- v4.0-DEV -->
 <!-- v4.1-DEV -->
+<!-- v4.2-DEV -->
