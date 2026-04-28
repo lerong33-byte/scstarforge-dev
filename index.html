@@ -751,6 +751,9 @@ option,optgroup{background:var(--bg2)}
 .wcard[data-cat="sg"]::before{background:linear-gradient(90deg,#a855f7,#c084fc)}
 .wcard[data-cat="cooler"]::before{background:linear-gradient(90deg,#06b6d4,#38bdf8)}
 .wcard[data-cat="qd"]::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+
+.wcard-icon{position:absolute;top:8px;right:42px;width:32px;height:32px;opacity:0.12}
+.wcard-icon svg{width:100%;height:100%}
 </style>
 
 <div id="app">
@@ -6758,19 +6761,28 @@ function buildCompGrid(cat) {
   var db = COMP_DB[cat];
   if (!db) return;
   var labels = {pp:{h1:'OUTPUT',h2:'HEAT',h3:'EM SIG'},sg:{h1:'TOTAL HP',h2:'FACE HP',h3:'REGEN/s'},cooler:{h1:'COOLING',h2:'DRAW MIN',h3:'IR SIG'},qd:{h1:'RANGE',h2:'SPEED',h3:'SPOOL'}};
+  var icons = {
+    pp:'<svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    sg:'<svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    cooler:'<svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>',
+    qd:'<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>'
+  };
   var lbl = labels[cat] || {h1:'STAT1',h2:'STAT2',h3:'STAT3'};
+  var icon = icons[cat] || '';
   var names = Object.keys(db).sort(function(a,b){ return (db[b].sz||0)-(db[a].sz||0) || a.localeCompare(b); });
   names.forEach(function(name) {
     var c = db[name];
     var card = document.createElement('div');
     card.className = 'wcard';
+    card.setAttribute('data-cat', cat);
     var sz = c.sz || '?';
     var v1, v2, v3;
     if (cat === 'pp') { v1 = c.out; v2 = c.heat; v3 = c.em; }
     else if (cat === 'sg') { v1 = c.totalHP; v2 = c.faceHP; v3 = c.regen; }
     else if (cat === 'cooler') { v1 = c.cool; v2 = c.drawMin; v3 = c.ir; }
     else if (cat === 'qd') { v1 = c.range + ' Mkm'; v2 = c.speed + ' Mm/s'; v3 = c.spool + 's'; }
-    card.innerHTML = '<div class="wc-hd"><span class="wc-nm">' + name + '</span><span class="wc-sz">S' + sz + '</span></div>' +
+    card.innerHTML = '<div class="wcard-icon">' + icon + '</div>' +
+      '<div class="wc-hd"><span class="wc-nm">' + name + '</span><span class="wc-sz">S' + sz + '</span></div>' +
       '<div class="wc-sub">' + (cat==='pp'?'Power Plant':cat==='sg'?'Shield Generator':cat==='cooler'?'Cooler':'Quantum Drive') + '</div>' +
       '<div class="wc-stats"><div class="wc-st"><span class="wc-sl">' + lbl.h1 + '</span><span class="wc-sv">' + v1 + '</span></div>' +
       '<div class="wc-st"><span class="wc-sl">' + lbl.h2 + '</span><span class="wc-sv">' + v2 + '</span></div>' +
@@ -6806,7 +6818,21 @@ setTimeout(function() {
     var typeEl = c.querySelector('.wc-b');
     if (typeEl) c.setAttribute('data-wtype', typeEl.textContent.trim().toLowerCase());
   });
-}, 500);
+
+    // Add weapon icons
+    cards.forEach(function(c) {
+      if (!c.querySelector('.wcard-icon')) {
+        var type = c.getAttribute('data-wtype') || '';
+        var iconSvg = type === 'ballistic' 
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
+        var iconDiv = document.createElement('div');
+        iconDiv.className = 'wcard-icon';
+        iconDiv.innerHTML = iconSvg;
+        c.insertBefore(iconDiv, c.firstChild);
+      }
+    });
+  }, 500);
 </script>
 
 
