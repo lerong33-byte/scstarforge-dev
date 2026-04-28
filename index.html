@@ -50,7 +50,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v2.90-DEV.16</title>
+<title>SC-ShipForge v2.90-DEV.17</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -630,12 +630,19 @@ option,optgroup{background:var(--bg2)}
 #spvChart .spv-col-icon{font-size:14px!important;line-height:1.2!important;display:block!important}
 #spvChart .spv-col-pct{font-size:9px!important;color:var(--t2)!important;font-family:var(--fmono)!important;display:block!important}
 
+
+/* ── FINAL SIZE OVERRIDE: fit chart in left panel ── */
+#spvChart { flex-wrap:nowrap !important; gap:0 !important; }
+#spvChart .spv-col { width:18px !important; min-width:18px !important; max-width:18px !important; }
+#spvChart .spv-block { width:16px !important; height:10px !important; min-height:10px !important; max-height:10px !important; margin:0 0 1px 0 !important; border-radius:2px !important; }
+#spvChart .spv-col-foot { font-size:7px !important; margin-top:2px !important; }
+#spvChart .spv-col-icon { font-size:10px !important; }
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.90-DEV.16</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v2.90-DEV.17</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="ss_inp_ship" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
