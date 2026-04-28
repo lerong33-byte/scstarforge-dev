@@ -62,7 +62,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v1.9 DEV</title>
+<title>SC-ShipForge v2.0 DEV</title>
 <meta name="description" content="SC-ShipForge DEV — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -3575,7 +3575,7 @@ function updatePower() {
 
     var cols = SPV_SYSTEMS.map(function(sys) {
       // Use raw API segment values directly — already in genSegs units
-      var scaledBase = stockDraws[sys.key] || 0;
+      var scaledBase = compBase(sys.key);
 
       // Use compBase (drawMin) as fallback when live API has no data
       if (scaledBase === 0) scaledBase = compBase(sys.key);
@@ -3603,7 +3603,7 @@ function updatePower() {
           key:instKey, baseKey:col.key, sys:col.sys,
           segs:stored, base:count>1?col.base/count:col.base,
           instIdx:ci, instTotal:count,
-          instMax:Math.max(1,Math.round(count>1?col.base/count:col.base)), instMin:Math.floor(count>1?col.base/count:col.base),
+          instMax:(function(){if(col.key==="Cooler"&&coolDb)return coolDb.drawMax||Math.round(count>1?col.base/count:col.base);if(col.key==="Shield"&&sgDb)return sgDb.drawMax||Math.round(count>1?col.base/count:col.base);if(col.key==="QuantumDrive"&&qdDb)return qdDb.drawMax||Math.round(count>1?col.base/count:col.base);return Math.max(1,Math.round(count>1?col.base/count:col.base));}()), instMin:(function(){if(col.key==="Cooler"&&coolDb)return coolDb.drawMin||0;if(col.key==="Shield"&&sgDb)return sgDb.drawMin||0;if(col.key==="QuantumDrive"&&qdDb)return qdDb.drawMin||0;return Math.floor(count>1?col.base/count:col.base);}()),
           icon:_ICONS[col.key]||'◉'
         });
       }
