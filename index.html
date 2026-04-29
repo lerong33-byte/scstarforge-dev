@@ -64,7 +64,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.10 DEV</title>
+<title>SC-ShipForge v6.11 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -839,31 +839,6 @@ option,optgroup{background:var(--bg2)}
 .lp,.rp{flex-shrink:1}
 @media(max-width:1100px){.lp{max-width:200px}.rp{max-width:280px}}
 @media(max-width:800px){.lp{display:none}.rp{display:none}}
-
-/* === LIVE STATS + SHOWDOWN + OFF STATE v6.10 === */
-.ls-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.04);border-radius:6px;padding:7px 9px}
-.ls-lbl{font-size:9px;color:#8892a0;letter-spacing:.3px;margin:0;text-transform:uppercase}
-.ls-val{font-size:18px;font-weight:700;margin:1px 0 0}
-.ls-sub{font-size:9px;color:#8892a0;margin:1px 0 0}
-.ls-mini{display:flex;justify-content:space-between;font-size:10px;padding:3px 7px;background:rgba(255,255,255,.015);border-radius:4px}
-.ls-mini-l{color:#8892a0}
-.ls-mini-v{font-weight:600;color:#c9d1d9}
-#liveStatsPanel{position:relative}
-#liveStatsPanel::before{content:"⋯";position:absolute;top:4px;right:8px;font-size:18px;color:#8892a0;cursor:pointer;padding:2px 6px;border-radius:4px}
-#pane-sd{padding:16px}
-#pane-sd .sd-mode-bar{display:flex;justify-content:center;gap:8px;margin-bottom:16px}
-#pane-sd .sd-mode-btn{padding:8px 24px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#8892a0;cursor:pointer;font-size:13px;font-weight:600}
-#pane-sd .sd-mode-btn.active{background:rgba(59,130,246,.15);color:#60a5fa;border-color:rgba(59,130,246,.3)}
-#pane-sd .sd-enemies{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:8px}
-#pane-sd .sd-enemy{padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;text-align:center;cursor:pointer}
-#pane-sd .sd-enemy:hover{border-color:rgba(255,255,255,.15)}
-#pane-sd .sd-enemy.selected{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.08)}
-#pane-sd .sd-enemy-name{font-size:13px;font-weight:600;margin:0}
-#pane-sd .sd-enemy-diff{font-size:11px;margin:2px 0 0}
-#pane-sd .sd-sim{padding:16px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:rgba(0,0,0,.1);margin:16px 0}
-#pane-sd .sd-verdict{text-align:center;padding:14px;border-radius:10px;margin:12px 0}
-/* OFF state for weapons */
-#loContent .slot-row.weapon-off,#loContent .slot.weapon-off{opacity:.4;transition:opacity .2s}
 </style>
 
 <div id="app">
@@ -1039,7 +1014,6 @@ option,optgroup{background:var(--bg2)}
         <button class="tab" data-t="lc" onclick="showTab('lc',this)">BUY LOCATIONS</button>
         <button class="tab" data-t="pn" onclick="showTab('pn',this);loadPatchNotes()">PATCH NOTES</button>
         <button class="tab" data-t="cmp" onclick="showTab('cmp',this);populateCompareSelects();if(selShip){document.getElementById('cmpSelA').value=selShip;renderComparison();}">⬡ COMPARE</button>
-        <button class="tab" data-t="sd" onclick="showTab('sd',this)">SHOWDOWN</button>
         <button class="tab" id="feedbackBtn" onclick="toggleFeedback()" style="color:var(--accent);border-left:1px solid var(--border)">&#10022; FEEDBACK</button>
         <button class="tab" id="quickSaveBtn" onclick="quickSave();showTab('sv',this)" style="color:var(--green);border-left:1px solid var(--border)">&#9672; SAVE</button>
       </div>
@@ -1122,7 +1096,6 @@ option,optgroup{background:var(--bg2)}
       
 
       </div>
-      <div class="pane" id="pane-sd"><div class="sd-mode-bar"><button class="sd-mode-btn active" id="sdPveBtn" onclick="sdSetMode('pve')">PVE</button><button class="sd-mode-btn" id="sdPvpBtn" onclick="sdSetMode('pvp')">PVP</button></div><div id="sdArena"></div><p style="font-size:12px;color:#8892a0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600">CHOOSE YOUR OPPONENT</p><div class="sd-enemies" id="sdEnemyGrid"></div></div>
       <div class="pane" id="pane-ships">
         <div id="shipsPage">
           <div class="ships-header">
@@ -1159,7 +1132,34 @@ option,optgroup{background:var(--bg2)}
 
     
 
-        <aside class="rp"><div id="liveStatsPanel" style="padding:10px;display:flex;flex-direction:column;gap:6px;height:100%;overflow-y:auto"><p style="font-size:11px;color:#8892a0;font-weight:600;letter-spacing:.5px;text-align:center;margin:0">LIVE STATS</p><div class="ls-card"><p class="ls-lbl">TOTAL DPS</p><p class="ls-val" id="lsDps" style="color:#ef4444">0</p><p class="ls-sub" id="lsDpsSub">select a ship</p></div><div class="ls-card"><p class="ls-lbl">SHIELD HP</p><p class="ls-val" id="lsShield" style="color:#a78bfa">0</p><p class="ls-sub" id="lsShieldSub"></p></div><div class="ls-card"><p class="ls-lbl">POWER</p><p class="ls-val" id="lsPower" style="color:#34d399">0%</p><div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:4px"><div id="lsPowerBar" style="height:4px;border-radius:2px;background:#34d399;width:0%;transition:width .3s"></div></div></div><div class="ls-card"><p class="ls-lbl">ALPHA STRIKE</p><p class="ls-val" id="lsAlpha">0</p></div><div class="ls-card" style="text-align:center"><p class="ls-lbl" style="margin-bottom:4px">HARDPOINTS</p><svg id="lsShipSvg" viewBox="0 0 120 85" style="width:90px"><polygon points="60,8 45,28 33,42 26,72 94,72 87,42 75,28" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/></svg><p id="lsHpSummary" style="font-size:9px;color:#8892a0;margin:3px 0 0"></p></div><div id="lsBreakdown" style="display:flex;flex-direction:column;gap:2px"></div><button style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#ef4444;font-size:11px;font-weight:600;cursor:pointer;margin-top:auto" onclick="showTab('sd',document.querySelector('[data-t=sd]'))">SHIP SHOWDOWN</button></div></aside>
+        <aside class="rp">
+      <!-- ── TARGET IMAGE — fixed, never scrolls ── -->
+      <div id="tgtImgWrap" style="position:relative;height:160px;background:var(--bg3);border-radius:var(--r);overflow:hidden;border:1px solid var(--border);flex-shrink:0;margin:8px 8px 0">
+        <img id="tgtImg" style="width:100%;height:100%;object-fit:cover;object-position:center;display:none" alt=""/>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:12px;font-family:var(--fmono)" id="tgtImgPh">Select a target</div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:6px 10px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:11px;font-family:var(--fmono);color:#fff;letter-spacing:.5px" id="tgtImgLabel"></div>
+      </div>
+
+      <!-- ── SCROLLABLE: verdict + stats ── -->
+      <div class="rp-scroll">
+
+        <select id="tgtSel" class="tgt-sel-dd" style="display:none"><option value="">— Select target —</option></select>
+
+
+        <!-- ── YOU WIN / YOU LOSE ── -->
+        <div id="verdictWrap" style="display:none;flex-shrink:0"></div>
+
+        <!-- ── TARGET ANALYSIS (collapsible) ── -->
+        <div class="tgt-panel-inner" id="tgtPanel">
+          <div class="tgt-title" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+            <span>TARGET ANALYSIS</span>
+          </div>
+          <div id="tgtContent" style="font-size:11px">
+            <div style="font-size:12px;color:var(--t3);text-align:center;padding:12px 0;font-style:italic;font-family:var(--fmono)">Select a target to analyse</div>
+          </div>
+        </div>
+      </div>
+    </aside>
 
   </div>
 </div>
@@ -7200,77 +7200,7 @@ showTab = function(id, btn) {
 };
 
 // Ensure ships render on load
-if(typeof renderShips==="function")
-// === LIVE STATS + SHOWDOWN v6.10 ===
-function updateLiveStats(){
-  if(!window.selShip||!document.getElementById("lsDps"))return;
-  var ship=SHIP_DATA[window.selShip];if(!ship)return;
-  var sels=document.querySelectorAll("#loContent .slot-sel");
-  var totalDps=0,totalAlpha=0,totalDraw=0,eCount=0,bCount=0;
-  sels.forEach(function(s){
-    var w=WEAPONS.find(function(x){return x.id===s.value});
-    if(!w)return;
-    var slotEl=s.closest(".slot-row, .slot");
-    var onBtn=slotEl?slotEl.querySelector(".slot-body-top button"):null;
-    if(onBtn&&onBtn.textContent.trim()==="OFF"){if(slotEl)slotEl.classList.add("weapon-off");return;}
-    if(slotEl)slotEl.classList.remove("weapon-off");
-    if(w.type==="energy"){totalDps+=w.dps;totalAlpha+=(w.alpha||0);totalDraw+=(w.draw||0);eCount++;}
-    else if(w.type==="ballistic"){totalDps+=w.dps;totalAlpha+=(w.alpha||0);totalDraw+=(w.draw||0);bCount++;}
-  });
-  var shieldHP=0,shieldRegen=0,ppOut=0,compDraw=0;
-  if(ship.comps){
-    var pp=COMP_DB.pp[ship.comps.pp];var ppC=(ship.comps.counts&&ship.comps.counts.pp)||1;if(pp)ppOut=pp.out*ppC;
-    var sg=COMP_DB.sg[ship.comps.sg];var sgC=(ship.comps.counts&&ship.comps.counts.sg)||1;
-    if(sg){shieldHP=sg.totalHP*sgC;shieldRegen=sg.regen*sgC;compDraw+=(sg.drawMax||0)*sgC;}
-    var cl=COMP_DB.cooler[ship.comps.cooler];var clC=(ship.comps.counts&&ship.comps.counts.cooler)||1;
-    if(cl)compDraw+=(cl.drawMax||0)*clC;
-    var qd=COMP_DB.qd[ship.comps.qd];if(qd)compDraw+=(qd.drawMax||0)*((ship.comps.counts&&ship.comps.counts.qd)||1);
-  }
-  var allDraw=totalDraw+compDraw;var powerPct=ppOut>0?Math.round((allDraw/ppOut)*100):0;
-  document.getElementById("lsDps").textContent=totalDps.toLocaleString();
-  document.getElementById("lsDpsSub").textContent=eCount+"x energy + "+bCount+"x ballistic";
-  document.getElementById("lsShield").textContent=shieldHP.toLocaleString();
-  document.getElementById("lsShieldSub").textContent="regen "+shieldRegen.toLocaleString()+"/s";
-  document.getElementById("lsPower").textContent=powerPct+"%";
-  var pb=document.getElementById("lsPowerBar");pb.style.width=Math.min(powerPct,100)+"%";pb.style.background=powerPct>90?"#ef4444":powerPct>70?"#fbbf24":"#34d399";
-  document.getElementById("lsAlpha").textContent=totalAlpha.toLocaleString();
-  var svg=document.getElementById("lsShipSvg");
-  var h="<polygon points=\"60,8 45,28 33,42 26,72 94,72 87,42 75,28\" fill=\"none\" stroke=\"rgba(255,255,255,.1)\" stroke-width=\"1\"/>";
-  var pos=[[60,18],[35,42],[85,42],[45,58],[75,58],[60,35],[50,28],[70,28]];
-  var slots=ship.slots||[];var guns=eCount+bCount;
-  slots.forEach(function(s,i){if(i>=pos.length)return;h+="<circle cx=\""+pos[i][0]+"\" cy=\""+pos[i][1]+"\" r=\"3\" fill=\"#ef4444\" opacity=\".8\"/>";});
-  svg.innerHTML=h;
-  document.getElementById("lsHpSummary").textContent=guns+" weapon"+(guns!==1?"s":"")+" active";
-  var bd=document.getElementById("lsBreakdown");
-  bd.innerHTML="<div class=\"ls-mini\"><span class=\"ls-mini-l\">SCM</span><span class=\"ls-mini-v\">"+(ship.scm||0)+" m/s</span></div>"+
-    "<div class=\"ls-mini\"><span class=\"ls-mini-l\">Size</span><span class=\"ls-mini-v\">"+(ship.size||"?")+"</span></div>"+
-    "<div class=\"ls-mini\"><span class=\"ls-mini-l\">Total draw</span><span class=\"ls-mini-v\">"+allDraw+" EU</span></div>"+
-    "<div class=\"ls-mini\"><span class=\"ls-mini-l\">PP output</span><span class=\"ls-mini-v\">"+ppOut+"</span></div>"+
-    "<div class=\"ls-mini\"><span class=\"ls-mini-l\">Headroom</span><span class=\"ls-mini-v\" style=\"color:"+(ppOut-allDraw>0?"#34d399":"#ef4444")+"\">"+(ppOut-allDraw>0?"+":"")+(ppOut-allDraw)+" EU</span></div>";
-}
-document.addEventListener("change",function(e){if(e.target&&e.target.classList.contains("slot-sel"))setTimeout(updateLiveStats,100);});
-document.addEventListener("click",function(e){if(e.target&&e.target.tagName==="BUTTON"&&(e.target.textContent.trim()==="ON"||e.target.textContent.trim()==="OFF"))setTimeout(updateLiveStats,100);});
-setInterval(updateLiveStats,2000);
-
-var SD_ENEMIES=[{name:"Aurora MR",diff:"Easy",color:"#34d399"},{name:"Mustang Delta",diff:"Easy",color:"#34d399"},{name:"Buccaneer",diff:"Medium",color:"#fbbf24"},{name:"Cutlass Black",diff:"Medium",color:"#fbbf24"},{name:"Gladius",diff:"Medium",color:"#fbbf24"},{name:"Vanguard Warden",diff:"Hard",color:"#ef4444"},{name:"Eclipse",diff:"Hard",color:"#ef4444"},{name:"Hammerhead",diff:"Boss",color:"#a32d2d"},{name:"Idris-M",diff:"Boss",color:"#a32d2d"}];
-function sdSetMode(m){document.getElementById("sdPveBtn").className="sd-mode-btn"+(m==="pve"?" active":"");document.getElementById("sdPvpBtn").className="sd-mode-btn"+(m==="pvp"?" active":"");}
-function initShowdown(){var g=document.getElementById("sdEnemyGrid");if(!g)return;var h="";SD_ENEMIES.forEach(function(e){h+="<div class=\"sd-enemy\" onclick=\"runShowdown('"+e.name+"')\"><p class=\"sd-enemy-name\">"+e.name+"</p><p class=\"sd-enemy-diff\" style=\"color:"+e.color+"\">"+e.diff+"</p></div>";});g.innerHTML=h;}
-function runShowdown(opp){var me=window.selShip;if(!me){document.getElementById("sdArena").innerHTML="<p style=\"text-align:center;color:#8892a0;padding:20px\">Load a ship first in the Loadout Builder</p>";return;}
-  var ms=SHIP_DATA[me],os=SHIP_DATA[opp];if(!os)return;
-  var mySels=document.querySelectorAll("#loContent .slot-sel");var md=0;mySels.forEach(function(s){var w=WEAPONS.find(function(x){return x.id===s.value});var slotEl=s.closest(".slot-row, .slot");var onBtn=slotEl?slotEl.querySelector(".slot-body-top button"):null;if(onBtn&&onBtn.textContent.trim()==="OFF")return;if(w&&(w.type==="energy"||w.type==="ballistic"))md+=w.dps;});
-  var od=0;if(os.slots)os.slots.forEach(function(s){if(s.default){var w=WEAPONS.find(function(x){return x.id===s.default});if(w&&(w.type==="energy"||w.type==="ballistic"))od+=w.dps;}});
-  var msg=COMP_DB.sg[ms.comps.sg],mh=msg?(msg.totalHP*((ms.comps.counts&&ms.comps.counts.sg)||1)):0;
-  var osg=COMP_DB.sg[os.comps.sg],oh=osg?(osg.totalHP*((os.comps.counts&&os.comps.counts.sg)||1)):0;
-  var mt=od>0?Math.round(mh/od*10)/10:999,ot=md>0?Math.round(oh/md*10)/10:999;
-  var v,vc,vb;
-  if(ot<mt*0.7){v="YOU WIN";vc="#34d399";vb="rgba(34,197,94,.1)";}
-  else if(mt<ot*0.7){v="YOU LOSE";vc="#ef4444";vb="rgba(239,68,68,.1)";}
-  else{v="CLOSE FIGHT";vc="#fbbf24";vb="rgba(234,179,8,.1)";}
-  document.getElementById("sdArena").innerHTML="<div style=\"display:flex;margin-bottom:16px\"><div style=\"flex:1;text-align:center;padding:16px\"><p style=\"font-size:11px;color:#8892a0;margin:0 0 4px\">YOUR SHIP</p><p style=\"font-size:18px;font-weight:700;margin:0\">"+me+"</p><p style=\"font-size:12px;color:#8892a0;margin:4px 0\">DPS: "+md+" | Shield: "+mh.toLocaleString()+"</p></div><div style=\"display:flex;align-items:center;justify-content:center;width:50px\"><div style=\"width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:700;color:#8892a0\">VS</div></div><div style=\"flex:1;text-align:center;padding:16px\"><p style=\"font-size:11px;color:#8892a0;margin:0 0 4px\">OPPONENT</p><p style=\"font-size:18px;font-weight:700;margin:0\">"+opp+"</p><p style=\"font-size:12px;color:#8892a0;margin:4px 0\">DPS: "+od+" | Shield: "+oh.toLocaleString()+"</p></div></div><div class=\"sd-sim\"><p style=\"font-size:12px;color:#8892a0;text-align:center;margin:0 0 12px;font-weight:600\">ENGAGEMENT</p><div style=\"display:flex;gap:12px;margin-bottom:12px\"><div style=\"flex:1\"><p style=\"font-size:12px;margin:0 0 4px\"><span style=\"color:#60a5fa\">"+me+"</span> TTK: "+ot+"s</p><div style=\"height:8px;background:rgba(255,255,255,.06);border-radius:4px\"><div style=\"height:8px;width:"+Math.min(100,Math.round(ot/(mt+ot)*100))+'%;background:#60a5fa;border-radius:4px\"></div></div></div><div style=\"flex:1\"><p style=\"font-size:12px;margin:0 0 4px\"><span style=\"color:#ef4444\">"+opp+"</span> TTK: "+mt+"s</p><div style=\"height:8px;background:rgba(255,255,255,.06);border-radius:4px\"><div style=\"height:8px;width:"+Math.min(100,Math.round(mt/(mt+ot)*100))+'%;background:#ef4444;border-radius:4px\"></div></div></div></div></div><div class=\"sd-verdict\" style=\"background:"+vb+";border:1px solid "+vc+"30\"><p style=\"font-size:20px;font-weight:700;margin:0;color:"+vc+"\">"+v+"</p><p style=\"font-size:13px;color:#8892a0;margin:4px 0 0\">You kill in "+ot+"s vs they kill in "+mt+"s</p></div>";
-  document.querySelectorAll(".sd-enemy").forEach(function(el){el.classList.remove("selected");if(el.querySelector(".sd-enemy-name").textContent===opp)el.classList.add("selected");});
-}
-setTimeout(initShowdown,1000);
-setTimeout(renderShips,500);
+if(typeof renderShips==="function")setTimeout(renderShips,500);
 </script>
 
 
