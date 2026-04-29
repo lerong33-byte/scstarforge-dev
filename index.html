@@ -1,58 +1,4 @@
-<!DOCTYPE html
-          
->
-<html lang="en">
-<head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C2ESKV4ZVD">
 
-// ══════════════════════════════════════════
-// SPViewer-exact power chart renderer
-// ══════════════════════════════════════════
-function renderSpvChart(cols, poolMax, userAdj, ship) {
-  var el = document.getElementById('spvChart');
-  if (!el) return;
-  var ICONS = {WeaponGun:'⚡',Boost:'»',FlightController:'◎',QuantumDrive:'○',Radar:'◈',LifeSupportGenerator:'♥',Cooler:'❄',Cooler_0:'❄',Cooler_1:'❄',Shield:'◯',Shield_0:'◯',Shield_1:'◯',EMP:'⚡'};
-  var out = '';
-  cols.forEach(function(col) {
-    var maxSg  = Math.max(1, Math.round(col.base));
-    var filled = Math.max(0, Math.round(col.segs));
-    var minSg  = Math.max(0, Math.round(col.instMin||0));
-    var pct    = maxSg > 0 ? Math.round((filled/maxSg)*100)+'%' : '-';
-    var bKey   = col.baseKey || col.key;
-    var icon   = ICONS[bKey] || '◉';
-    out += '<div class="spv-col">';
-    out += '<div class="spv-segs">';
-    for(var i = maxSg-1; i >= 0; i--) {
-      var isMin    = i < minSg;
-      var isFilled = i < filled;
-      var isL      = (i === 0 && minSg > 0);
-      var isH      = (i === maxSg - 1 && maxSg > 1);
-      var lbl      = isL ? 'L' : (isH ? 'H' : '');
-      var cls      = isMin ? 'spv-block minimum' : (isFilled ? 'spv-block filled' : 'spv-block empty');
-      var da       = ' data-key="'+col.key+'" data-idx="'+i+'" data-gen="'+maxSg+'" data-min="'+minSg+'"';
-      if (isMin) {
-        out += '<div class="'+cls+'">'+lbl+'</div>';
-      } else {
-        out += '<label class="spv-block-wrap"><input type="checkbox" class="spv-cb"'+da+(isFilled?' checked':'')+' onchange="pwrBlockClick(\''+col.key+'\','+i+','+maxSg+','+minSg+')"><div class="'+cls+'">'+lbl+'</div></label>';
-      }
-    }
-    out += '</div>';
-    out += '<div class="spv-col-foot"><span class="spv-col-icon">'+icon+'</span><span class="spv-col-pct">'+pct+'</span></div>';
-    out += '</div>';
-  });
-  el.innerHTML = out;
-}
-window.renderSpvChart = renderSpvChart;
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C2ESKV4ZVD">
-
-// ══════════════════════════════════════════
-// SPViewer-exact power chart renderer
-// ══════════════════════════════════════════
-
-
-</script>
     <script>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -64,7 +10,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.16-DEV</title>
+<title>SC-ShipForge v6.17-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -898,8 +844,7 @@ option,optgroup{background:var(--bg2)}
 .sd-enemy-total{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid rgba(100,116,139,.2);font-size:12px;color:#e2e8f0;}
 
 /* v6.13 PVP Ship Selector */
-.sd-pvp-wrap{margin-bottom:16px;display:none;}
-.sd-pvp-wrap.active{display:block;}
+.sd-pvp-wrap{margin-bottom:16px;display:block;}
 .sd-pvp-search{width:100%;padding:10px 14px;background:rgba(30,41,59,.7);border:1px solid rgba(100,116,139,.3);border-radius:6px;color:#e2e8f0;font-size:13px;outline:none;}
 .sd-pvp-search:focus{border-color:#dc2626;}
 .sd-pvp-search::placeholder{color:#64748b;}
@@ -1230,7 +1175,7 @@ option,optgroup{background:var(--bg2)}
     <button onclick="sdSetMode('pvp',this)">PVP</button>
   </div>
     <div class="sd-pvp-wrap" id="sdPvpWrap">
-    <input type="text" class="sd-pvp-search" id="sdPvpSearch" placeholder="Search opponent ship..." autocomplete="off">
+    <input type="text" class="sd-pvp-search" id="sdPvpSearch" placeholder="Search enemy ship..." autocomplete="off">
     <div class="sd-pvp-list" id="sdPvpList"></div>
     <div class="sd-pvp-selected" id="sdPvpSelected">
       <div class="sd-pvp-selected-name" id="sdPvpName"></div>
@@ -7698,67 +7643,7 @@ resEl.appendChild(rd);
 
 </script>
 
-<script>
-/* v6.13 PVP Ship Selector */
-window._pvpShip=null;
-(function(){
-var oldSdSetMode=window.sdSetMode;
-window.sdSetMode=function(mode,btn){
-oldSdSetMode(mode,btn);
-var wrap=document.getElementById("sdPvpWrap");
-var arena=document.getElementById("sdArena");
-if(mode==="pvp"){
-wrap.classList.add("active");
-arena.style.display="none";
-}else{
-wrap.classList.remove("active");
-arena.style.display="";
-document.getElementById("sdPvpSelected").classList.remove("active");
-document.getElementById("sdPvpList").classList.remove("open");
-document.getElementById("sdPvpSearch").value="";
-window._pvpShip=null;
-}
-};
-var searchEl=document.getElementById("sdPvpSearch");
-var listEl=document.getElementById("sdPvpList");
-if(searchEl){
-searchEl.addEventListener("input",function(){
-var q=this.value.toLowerCase().trim();
-if(q.length<1){listEl.classList.remove("open");listEl.innerHTML="";return;}
-var names=Object.keys(SHIP_DATA);
-var matches=names.filter(function(n){return n.toLowerCase().indexOf(q)>-1;}).slice(0,15);
-if(matches.length===0){listEl.classList.remove("open");listEl.innerHTML="";return;}
-listEl.innerHTML="";
-matches.forEach(function(nm){
-var item=document.createElement("div");
-item.className="sd-pvp-item";
-var nameSpan=document.createElement("span");
-nameSpan.textContent=nm;
-var roleSpan=document.createElement("span");
-roleSpan.className="sd-pvp-role";
-roleSpan.textContent=SHIP_DATA[nm].role||"";
-item.appendChild(nameSpan);
-item.appendChild(roleSpan);
-item.onclick=function(){
-window._pvpShip=nm;
-searchEl.value="";
-listEl.classList.remove("open");
-listEl.innerHTML="";
-var selDiv=document.getElementById("sdPvpSelected");
-selDiv.classList.add("active");
-document.getElementById("sdPvpName").textContent=nm;
-document.getElementById("sdPvpRole").textContent=SHIP_DATA[nm].role||"";
-};
-listEl.appendChild(item);
-});
-listEl.classList.add("open");
-});
-searchEl.addEventListener("focus",function(){
-if(this.value.length>0)this.dispatchEvent(new Event("input"));
-});
-}
-})();
-</script>
+
 
 
 
@@ -7919,6 +7804,22 @@ newBtn.addEventListener("click",function(){showFightResult(enemyName);});
 }
 },150);
 };
+})();
+</script>
+
+<script>
+/* v6.17 Unified search + scroll */
+(function(){
+var obs=new MutationObserver(function(){
+var cfg=document.querySelector(".sd-config");
+if(cfg&&!cfg.dataset.scrolled){
+cfg.style.maxHeight="400px";
+cfg.style.overflowY="auto";
+cfg.style.scrollbarWidth="thin";
+cfg.dataset.scrolled="1";
+}
+});
+obs.observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 </body>
