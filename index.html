@@ -922,6 +922,14 @@ option,optgroup{background:var(--bg2)}
 .sd-role-btn{padding:2px 6px;font-size:8px;border-radius:3px;border:1px solid rgba(100,116,139,.3);background:transparent;color:#94a3b8;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;}
 .sd-role-btn.active{background:#dc2626;color:#fff;border-color:#dc2626;}
 .sd-role-btn:hover{border-color:#dc2626;}
+
+/* v6.35 Larger showdown search */
+#sdSearchWrap{max-width:100% !important;width:100% !important;}
+#sdSearchWrap .ss-input{font-size:14px !important;padding:10px 14px 10px 32px !important;}
+#sdSearchWrap .ss-icon{font-size:16px !important;left:10px !important;}
+#sdSearchWrap{border:1px solid rgba(220,38,38,.3) !important;border-radius:8px !important;background:rgba(30,41,59,.8) !important;}
+#sdSearchWrap:focus-within{border-color:#dc2626 !important;box-shadow:0 0 12px rgba(220,38,38,.2) !important;}
+#sdShipInput::placeholder{color:#64748b;font-size:13px;}
 </style>
 
 <div id="app">
@@ -1182,9 +1190,9 @@ option,optgroup{background:var(--bg2)}
       </div>
       <div class="pane" id="pane-sd">
   <div style="text-align:center;padding:12px 0 10px;"><div style="display:inline-block;padding:8px 28px;background:linear-gradient(135deg,rgba(220,38,38,.15),rgba(220,38,38,.05));border:1px solid rgba(220,38,38,.4);border-radius:8px;"><span style="font-size:18px;font-weight:800;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,#ef4444,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">&#9876; SHIP SHOWDOWN</span></div></div>
-    <div class="ss-wrap" id="sdSearchWrap" style="margin-bottom:12px;">
+    <div class="ss-wrap" id="sdSearchWrap" style="margin-bottom:12px;margin-top:4px;">
     <span class="ss-icon">&#9876;</span>
-    <input class="ss-input" id="sdShipInput" placeholder="Search enemy ship…" autocomplete="off">
+    <input class="ss-input" id="sdShipInput" placeholder="Select your opponent…" autocomplete="off">
     <button class="ss-clear" id="sdShipClear" style="display:none;">×</button>
     <div class="ss-drop" id="sdShipDrop" style="display:none;">
       <div class="sd-role-bar" id="sdRoleBar" style="padding:4px 6px;border-bottom:1px solid rgba(100,116,139,.2);"><button class="sd-role-btn active" data-role="all">All</button><button class="sd-role-btn" data-role="Fighter">Fighter</button><button class="sd-role-btn" data-role="Bomber">Bomber</button><button class="sd-role-btn" data-role="Gunship">Gunship</button><button class="sd-role-btn" data-role="Interdiction">Interdict</button><button class="sd-role-btn" data-role="Capital">Capital</button><button class="sd-role-btn" data-role="Starter">Starter</button></div>
