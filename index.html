@@ -7801,88 +7801,6 @@ inp.value="";drop.style.display="none";inner.innerHTML="";clrBtn.style.display="
 
 
 
-<script>
-/* v6.22 Two-col enemy loadout FIXED */
-function getDpsForSel(sel){var w=WEAPONS.find(function(x){return x.id===sel.value});return w?w.dps:0;}
-function updateEnemyTotal(cfg){var dps=0;cfg.querySelectorAll(".sd-slot select").forEach(function(s){var row=s.closest(".sd-slot");var btn=row?row.querySelector("button"):null;if(btn&&btn.textContent==="OFF")return;var w=WEAPONS.find(function(x){return x.id===s.value});if(w&&(w.type==="energy"||w.type==="ballistic"))dps+=w.dps;});var el=document.getElementById("sdEnemyDpsVal");if(el)el.textContent=dps.toLocaleString();}
-window.runShowdown=function(en){
-var res=document.getElementById("sdResult");if(!res||!en)return;res.innerHTML="";
-var ship=SHIP_DATA[en];if(!ship)return;
-var cfg=document.createElement("div");cfg.className="sd-config";
-var hdr=document.createElement("div");hdr.style.cssText="display:flex;justify-content:space-between;padding:6px 8px;font-size:12px;font-weight:700;border-bottom:1px solid rgba(100,116,139,.3);margin-bottom:6px;";
-hdr.innerHTML="<span style=color:#94a3b8>ENEMY LOADOUT</span><span style=color:#ef4444>"+en+"</span>";cfg.appendChild(hdr);
-var grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:10px;";
-var L=document.createElement("div");L.style.cssText="background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.25);border-radius:8px;padding:10px 12px;";
-L.innerHTML="<div style=font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px>WEAPONS</div>";
-if(ship.slots){
-var hd=document.createElement('div');hd.className='lo-section-hd';hd.textContent='HARDPOINTS';L.appendChild(hd);
-var wpnWrap=document.createElement('div');L.appendChild(wpnWrap);
-ship.slots.forEach(function(sl,idx){
-var gc=sl.count||1;
-var row=document.createElement('div');row.className='slot-row';
-var top=document.createElement('div');top.className='slot-top';
-var thumb=document.createElement('div');thumb.className='slot-thumb';top.appendChild(thumb);
-var body=document.createElement('div');body.className='slot-body';
-var sbt=document.createElement('div');sbt.className='slot-body-top';
-var chip=document.createElement('span');chip.className='sz-chip sz-s'+sl.sz;chip.textContent='S'+sl.sz;sbt.appendChild(chip);
-var lbl=document.createElement('span');lbl.className='slot-lbl';lbl.textContent=sl.lbl+(gc>1?' × '+gc:'');sbt.appendChild(lbl);
-var note=document.createElement('span');note.className='slot-note';sbt.appendChild(note);
-var onb=document.createElement('button');onb.textContent='ON';onb.onclick=function(){if(onb.textContent==='ON'){onb.textContent='OFF';row.style.opacity='.4';}else{onb.textContent='ON';row.style.opacity='1';}calcEnemyStats(cfg,en);};sbt.appendChild(onb);
-body.appendChild(sbt);
-var sels=[];
-for(var gi=0;gi<gc;gi++){
-var se=document.createElement('select');se.className='slot-sel';
-var emOpt=document.createElement('option');emOpt.value='';emOpt.textContent='[Empty]';se.appendChild(emOpt);
-WEAPONS.filter(function(w){return w.sz<=sl.sz&&(w.type==='energy'||w.type==='ballistic')}).forEach(function(w){
-var o=document.createElement('option');o.value=w.id;o.textContent=w.name+' ('+w.dps+'DPS) S'+w.sz;if(w.id===sl.default)o.selected=true;se.appendChild(o);});
-se.onchange=function(){updInfo();calcEnemyStats(cfg,en);};
-sels.push(se);body.appendChild(se);}
-top.appendChild(body);row.appendChild(top);
-var info=document.createElement('div');info.className='slot-info';
-function updInfo(){var w=WEAPONS.find(function(x){return x.id===sels[0].value});if(!w){info.innerHTML='';note.textContent='';return;}
-note.textContent=' · '+w.name;
-var tc=w.type==='energy'?'si-e':'si-b';
-info.innerHTML='<span class="'+tc+'">'+w.type+'</span> <span class="si-dps">'+(w.dps*gc)+' DPS</span><br><span>'+w.range+'m · S'+w.sz+' · Draw:'+(w.draw*gc)+'EU</span><div class="si-loc">'+w.loc+'</div>';}
-updInfo();row.appendChild(info);
-wpnWrap.appendChild(row);
-});}
-if(ship.missiles&&ship.missiles.length>0){
-var mhd=document.createElement('div');mhd.className='lo-section-hd';mhd.textContent='MISSILES';L.appendChild(mhd);
-var mslWrap=document.createElement('div');L.appendChild(mslWrap);
-ship.missiles.forEach(function(ml){
-var row=document.createElement('div');row.className='slot-row';
-var top=document.createElement('div');top.className='slot-top';
-var thumb=document.createElement('div');thumb.className='slot-thumb';top.appendChild(thumb);
-var body=document.createElement('div');body.className='slot-body';
-var sbt=document.createElement('div');sbt.className='slot-body-top';
-var chip=document.createElement('span');chip.className='sz-chip sz-s'+ml.sz;chip.textContent='S'+ml.sz;sbt.appendChild(chip);
-var lbl=document.createElement('span');lbl.className='slot-lbl';lbl.textContent=ml.lbl+' × '+(ml.count||1);sbt.appendChild(lbl);
-var onb=document.createElement('button');onb.textContent='ON';onb.onclick=function(){if(onb.textContent==='ON'){onb.textContent='OFF';row.style.opacity='.4';}else{onb.textContent='ON';row.style.opacity='1';}};sbt.appendChild(onb);
-body.appendChild(sbt);
-var mse=document.createElement('select');mse.className='slot-sel';
-WEAPONS.filter(function(w){return w.sz<=ml.sz&&w.type.indexOf('missile')>-1}).forEach(function(w){var o=document.createElement('option');o.value=w.id;o.textContent=w.name+' ('+w.type.replace('missile-','').toUpperCase()+')';if(w.id===ml.default)o.selected=true;mse.appendChild(o);});
-body.appendChild(mse);top.appendChild(body);row.appendChild(top);
-mslWrap.appendChild(row);
-});}
-if(ship.comps){var co=ship.comps;var cn=co.counts||{};
-[{k:"pp",l:"Power Plant",c:cn.pp||1},{k:"sg",l:"Shield Gen",c:cn.sg||1},{k:"cooler",l:"Cooler",c:cn.cooler||1},{k:"qd",l:"QT Drive",c:cn.qd||1}].forEach(function(t){
-if(!co[t.k]||!COMP_DB[t.k])return;
-var r=document.createElement("div");r.style.cssText="display:flex;align-items:center;gap:3px;padding:3px 5px;background:rgba(30,41,59,.5);border-radius:3px;margin-bottom:2px;font-size:9px;";
-var lb=document.createElement("span");lb.style.cssText="color:#94a3b8;min-width:60px;font-size:9px;";lb.textContent=t.l;
-var se=document.createElement("select");se.dataset.compType=t.k;se.style.cssText="flex:1;padding:2px 3px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:2px;color:#e2e8f0;font-size:9px;min-width:0;";
-Object.keys(COMP_DB[t.k]).sort().forEach(function(n){var o=document.createElement("option");o.value=n;o.textContent=n;if(n===co[t.k])o.selected=true;se.appendChild(o);});
-r.appendChild(lb);r.appendChild(se);
-if(t.c>1){var cx=document.createElement("span");cx.style.cssText="color:#94a3b8;font-size:8px;";cx.textContent="x"+t.c;r.appendChild(cx);}
-R.appendChild(r);});
-if(co.radar){var rr=document.createElement("div");rr.style.cssText="display:flex;align-items:center;gap:3px;padding:3px 5px;background:rgba(30,41,59,.5);border-radius:3px;margin-bottom:2px;font-size:9px;";rr.innerHTML="<span style=color:#94a3b8;min-width:60px>Radar</span><span style=color:#e2e8f0;font-weight:600>"+co.radar+"</span>";R.appendChild(rr);}}
-grid.appendChild(R);cfg.appendChild(grid);
-var td=document.createElement("div");td.style.cssText="display:flex;justify-content:space-between;padding:8px 16px;margin:6px auto 0;max-width:400px;font-size:13px;font-weight:700;color:#e2e8f0;background:linear-gradient(135deg,rgba(220,38,38,.1),rgba(220,38,38,.05));border:1px solid rgba(220,38,38,.2);border-radius:6px;";
-td.innerHTML="<span>Enemy Total DPS</span><span id=sdEnemyDpsVal></span>";cfg.appendChild(td);
-var fb=document.createElement("button");fb.style.cssText="display:block;width:100%;padding:5px;margin-top:3px;background:#dc2626;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:1px;";fb.innerHTML="<span style=\"background:linear-gradient(90deg,#ef4444,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;\">&#9876; FIGHT</span>";
-fb.onclick=function(){showFightResult(en);};cfg.appendChild(fb);
-res.appendChild(cfg);updateEnemyTotal(cfg);
-};
-</script>
 
 <script>
 /* v6.29 ALL: runShowdown + search + overflow fix */
@@ -8412,6 +8330,95 @@ function tick(){
 setInterval(tick,500);
 tick();
 })();</script>
+
+<script>
+/* v6.94-DEV 3-col Showdown */
+window.runShowdown=function(en){
+if(window.SD_MODE==="pvp"){if(typeof buildPvpConfig==="function")buildPvpConfig(en);return;}
+var res=document.getElementById("sdResult");if(!res||!en)return;res.innerHTML="";
+var ship=SHIP_DATA[en];if(!ship)return;
+
+// 3-column arena grid
+var grid=document.createElement("div");grid.className="sd-arena-grid";
+
+// LEFT: Ship card
+var shipCol=document.createElement("div");shipCol.className="sd-ship-col";
+shipCol.innerHTML='<div class="sd-ship-img-wrap"><img class="sd-ship-img" alt="" style="display:none"><div class="sd-ship-name-overlay"><div class="sd-ship-name">'+en+'</div><div class="sd-ship-role">'+(ship.role||'')+(ship.size?' · SIZE '+ship.size:'')+'</div></div></div><div class="sd-ship-meta"><div class="sd-ship-row"><span class="sd-ship-lbl">Manufacturer</span><span class="sd-ship-val sd-meta-mfr">—</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Career</span><span class="sd-ship-val sd-meta-career">—</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Crew</span><span class="sd-ship-val sd-meta-crew">'+(ship.crew||'—')+'</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Cargo</span><span class="sd-ship-val sd-meta-cargo">'+(ship.cargo?ship.cargo+' SCU':'—')+'</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">SCM Speed</span><span class="sd-ship-val">'+(ship.scm?ship.scm+' m/s':'—')+'</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Length</span><span class="sd-ship-val sd-meta-length">—</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Width</span><span class="sd-ship-val sd-meta-width">—</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Height</span><span class="sd-ship-val sd-meta-height">—</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Status</span><span class="sd-ship-val sd-meta-status">—</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Pledge</span><span class="sd-ship-val amber sd-meta-pledge">—</span></div><div class="sd-ship-row"><span class="sd-ship-lbl">Warbond</span><span class="sd-ship-val sd-meta-warbond">—</span></div><div class="sd-ship-buy sd-meta-buy">In-game: loading…</div></div>';
+grid.appendChild(shipCol);
+
+// CENTER: Enemy loadout
+var loadoutCol=document.createElement("div");loadoutCol.className="sd-loadout-col";
+var lHdr=document.createElement("div");lHdr.className="sd-loadout-hdr";
+lHdr.innerHTML='<div class="sd-loadout-hdr-title">Enemy Loadout</div><div class="sd-loadout-hdr-ship">'+en+'</div>';
+loadoutCol.appendChild(lHdr);
+
+if(ship.slots&&ship.slots.length){
+var hpHd=document.createElement("div");hpHd.style.cssText="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin:0 0 6px;";hpHd.textContent="Hardpoints";loadoutCol.appendChild(hpHd);
+ship.slots.forEach(function(sl){
+var isGroup=Array.isArray(sl.weapons);
+var slotDiv=document.createElement("div");slotDiv.style.cssText="margin-bottom:8px;padding:8px;background:rgba(30,41,59,.5);border-radius:6px;border:1px solid rgba(100,116,139,.15);";
+var slotHdr=document.createElement("div");slotHdr.style.cssText="font-size:10px;font-weight:700;color:#e2e8f0;margin-bottom:6px;";
+slotHdr.innerHTML=sl.label+(sl.count&&sl.count>1?' <span style="color:#fbbf24">×'+sl.count+'</span>':'');
+if(isGroup&&sl.weapons.length){var sub=document.createElement("span");sub.style.cssText="font-size:9px;color:#64748b;font-weight:400;margin-left:6px;";sub.textContent='▸ '+sl.weapons.map(function(w){return w.id;}).join(' / ');slotHdr.appendChild(sub);}
+slotDiv.appendChild(slotHdr);
+if(isGroup){
+sl.weapons.forEach(function(w){
+var row=document.createElement("div");row.className="sd-slot";row.style.cssText="display:flex;align-items:center;gap:6px;margin-bottom:4px;";
+var tog=document.createElement("button");tog.className="sd-slot-toggle";tog.textContent="ON";tog.style.cssText="padding:2px 6px;font-size:9px;font-weight:700;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.4);color:#22c55e;border-radius:3px;cursor:pointer;min-width:32px;";
+tog.onclick=function(){var off=tog.textContent==="OFF";tog.textContent=off?"ON":"OFF";tog.style.background=off?"rgba(34,197,94,.15)":"rgba(100,116,139,.15)";tog.style.color=off?"#22c55e":"#64748b";calcEnemyStats(loadoutCol,en);};
+var lbl=document.createElement("span");lbl.style.cssText="color:#64748b;font-size:10px;min-width:20px;";lbl.textContent="S"+w.size;
+var sel=document.createElement("select");sel.className="sd-slot select";sel.style.cssText="flex:1;padding:4px 6px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:11px;";
+WEAPONS.filter(function(x){return x.size===w.size;}).sort(function(a,b){return b.dps-a.dps;}).forEach(function(wp){var o=document.createElement("option");o.value=wp.id;o.textContent=wp.id+" ("+Math.round(wp.dps)+")";if(wp.id===w.id)o.selected=true;sel.appendChild(o);});
+sel.onchange=function(){calcEnemyStats(loadoutCol,en);};
+row.appendChild(tog);row.appendChild(lbl);row.appendChild(sel);
+slotDiv.appendChild(row);});}
+loadoutCol.appendChild(slotDiv);});}
+
+var co=ship.comps||{};var cn=co.counts||{};
+var sysSep=document.createElement("div");sysSep.style.cssText="margin:10px 0 6px;border-top:1px solid rgba(100,116,139,.3);padding-top:8px;font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;";sysSep.textContent="Systems";loadoutCol.appendChild(sysSep);
+[{k:"pp",l:"Power Plant",c:cn.pp||1},{k:"sg",l:"Shield",c:cn.sg||1},{k:"cooler",l:"Cooler",c:cn.cooler||1},{k:"qd",l:"Quantum Drive",c:cn.qd||1}].forEach(function(t){
+if(!co[t.k]||!COMP_DB[t.k])return;
+var r=document.createElement("div");r.style.cssText="display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(15,23,42,.4);border-radius:5px;margin-bottom:4px;";
+var lb=document.createElement("span");lb.style.cssText="color:#94a3b8;min-width:90px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;";lb.textContent=t.l;
+var se=document.createElement("select");se.dataset.compType=t.k;se.style.cssText="flex:1;padding:4px 6px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:11px;min-width:0;";
+Object.keys(COMP_DB[t.k]).sort().forEach(function(n){var o=document.createElement("option");o.value=n;o.textContent=n;if(n===co[t.k])o.selected=true;se.appendChild(o);});
+se.onchange=function(){calcEnemyStats(loadoutCol,en);};
+r.appendChild(lb);r.appendChild(se);
+if(t.c>1){var cx=document.createElement("span");cx.className="xcnt";cx.style.cssText="color:#fbbf24;font-size:10px;font-weight:700;flex-shrink:0;";cx.textContent="×"+t.c;r.appendChild(cx);}
+loadoutCol.appendChild(r);});
+if(co.radar){var rr=document.createElement("div");rr.style.cssText="display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(15,23,42,.4);border-radius:5px;margin-bottom:4px;";rr.innerHTML='<span style="color:#94a3b8;min-width:90px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Radar</span><span style="color:#e2e8f0;font-size:11px;">'+co.radar+'</span>';loadoutCol.appendChild(rr);}
+if(ship.missiles&&ship.missiles.length){
+var mslSep=document.createElement("div");mslSep.style.cssText="margin:10px 0 6px;border-top:1px solid rgba(100,116,139,.3);padding-top:8px;font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;";mslSep.textContent="Missiles";loadoutCol.appendChild(mslSep);
+ship.missiles.forEach(function(m){var mr=document.createElement("div");mr.style.cssText="display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(15,23,42,.4);border-radius:5px;margin-bottom:4px;font-size:11px;";mr.innerHTML='<span style="color:#60a5fa;min-width:70px;font-weight:600;">S'+m.size+' Rack</span><span style="color:#e2e8f0;">'+m.id+'</span><span style="color:#fbbf24;margin-left:auto;">×'+m.count+'</span>';loadoutCol.appendChild(mr);});}
+var dpsBar=document.createElement("div");dpsBar.className="sd-dps-bar";
+dpsBar.innerHTML='<span>Enemy Total DPS</span><span id="sdEnemyDpsVal">—</span>';
+loadoutCol.appendChild(dpsBar);
+grid.appendChild(loadoutCol);
+
+// RIGHT: Stats + Fight
+var statsCol=document.createElement("div");statsCol.className="sd-stats-col";
+var statsDiv=document.createElement("div");statsDiv.className="sd-stats";statsCol.appendChild(statsDiv);
+var fightWrap=document.createElement("div");fightWrap.className="sd-fight-wrap";
+var fb=document.createElement("button");fb.className="sd-fight-btn";fb.textContent="⚔ FIGHT";
+fb.onclick=function(){showFightResult(en);};
+fightWrap.appendChild(fb);
+var verdictDiv=document.createElement("div");verdictDiv.id="sdVerdictBox";fightWrap.appendChild(verdictDiv);
+statsCol.appendChild(fightWrap);
+grid.appendChild(statsCol);
+
+res.appendChild(grid);
+calcEnemyStats(loadoutCol,en);
+
+// Populate ship card async
+if(window.__enemyInfoCardInstalled&&typeof window.__buildEnemyCard==="function"){
+window.__buildEnemyCard(en,shipCol);
+}else{
+var buyEl=shipCol.querySelector(".sd-meta-buy");
+if(buyEl)buyEl.textContent="In-game: Check New Deal (Lorville) or Astro Armada (Area18)";
+}
+};
+window.initShowdown=function(){};
+</script>
 
 <!-- SHOWDOWN_REDESIGN -->
 <style id="showdownRedesign">
