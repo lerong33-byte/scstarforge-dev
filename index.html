@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.89-DEV</title>
+<title>SC-ShipForge v6.90-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.89-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.90-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -1204,8 +1204,8 @@ option,optgroup{background:var(--bg2)}
     <button onclick="runShowdown(window._pvpShip)" style="margin-top:4px;padding:5px;background:#dc2626;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:.5px;">CONFIGURE ENEMY</button>
   </div>
 <div id="sdArena"></div>
-</div>
   <div id="sdResult"></div>
+</div>
 </div>
 <div class="pane" id="pane-ships">
         <div id="shipsPage">
@@ -7365,7 +7365,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.89-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.90-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -8438,8 +8438,8 @@ tick();
 #pane-sd #sdSelectedShip > button{display:none!important;}
 /* Hide the entire actions row — no buttons remain */
 .enemy-info-card .eic-actions{display:none!important;}
-/* Showdown pane height: hug the content */
-#pane-sd{height:auto!important;min-height:0!important;}
+/* Showdown pane: scrollable, full height */
+#pane-sd{height:auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;}
 /* Slightly tighten the card image height for a cleaner look */
 .enemy-info-card .eic-img-wrap{min-height:210px!important;max-height:240px!important;}
 /* Improve name overlay typography */
