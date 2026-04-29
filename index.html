@@ -64,7 +64,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.4 DEV</title>
+<title>SC-ShipForge v6.5 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -906,7 +906,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.4 DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.5 DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7316,19 +7316,24 @@ if(typeof renderShips==="function")
 
 // === LIVE STATS v6.4 ===
 function updateLiveStats(){
-  if(!window.selShip || !document.getElementById('lsDps')) return;
-  var ship = SHIP_DATA[window.selShip];
-  if(!ship) return;
-  var sels = document.querySelectorAll('#loContent .slot-sel');
+  if(!window.selShip||!document.getElementById('lsDps'))return;
+  var ship=SHIP_DATA[window.selShip];if(!ship)return;
+  var sels=document.querySelectorAll('#loContent .slot-sel');
   var totalDps=0,totalAlpha=0,totalDraw=0,eCount=0,bCount=0;
   sels.forEach(function(s){
-    var w = WEAPONS.find(function(x){return x.id===s.value});
-    if(w && w.dps>0){totalDps+=w.dps;totalAlpha+=(w.alpha||0);totalDraw+=(w.draw||0);if(w.type==='energy')eCount++;else if(w.type==='ballistic')bCount++;}
+    var w=WEAPONS.find(function(x){return x.id===s.value});
+    if(!w)return;
+    if(w.type==='energy'){totalDps+=w.dps;totalAlpha+=(w.alpha||0);totalDraw+=(w.draw||0);eCount++;}
+    else if(w.type==='ballistic'){totalDps+=w.dps;totalAlpha+=(w.alpha||0);totalDraw+=(w.draw||0);bCount++;}
   });
   var shieldHP=0,shieldRegen=0,ppOut=0;
   if(ship.comps){
-    var pp=COMP_DB.pp[ship.comps.pp];if(pp){ppOut=pp.out*(ship.comps.counts&&ship.comps.counts.pp||1);}
-    var sg=COMP_DB.sg[ship.comps.sg];if(sg){var sgC=ship.comps.counts&&ship.comps.counts.sg||1;shieldHP=sg.totalHP*sgC;shieldRegen=sg.regen*sgC;}
+    var pp=COMP_DB.pp[ship.comps.pp];
+    var ppC=(ship.comps.counts&&ship.comps.counts.pp)||1;
+    if(pp)ppOut=pp.out*ppC;
+    var sg=COMP_DB.sg[ship.comps.sg];
+    var sgC=(ship.comps.counts&&ship.comps.counts.sg)||1;
+    if(sg){shieldHP=sg.totalHP*sgC;shieldRegen=sg.regen*sgC;}
   }
   var powerPct=ppOut>0?Math.round((totalDraw/ppOut)*100):0;
   document.getElementById('lsDps').textContent=totalDps.toLocaleString();
@@ -7342,16 +7347,18 @@ function updateLiveStats(){
   document.getElementById('lsAlpha').textContent=totalAlpha.toLocaleString();
   var svg=document.getElementById('lsShipSvg');
   var h='<polygon points="60,8 45,28 33,42 26,72 94,72 87,42 75,28" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>';
-  var pos=[[60,18],[35,42],[85,42],[45,58],[75,58],[60,35]];
+  var pos=[[60,18],[35,42],[85,42],[45,58],[75,58],[60,35],[50,28],[70,28]];
   var slots=ship.slots||[];
+  var activeGuns=eCount+bCount;
   slots.forEach(function(s,i){if(i>=pos.length)return;h+='<circle cx="'+pos[i][0]+'" cy="'+pos[i][1]+'" r="3" fill="#ef4444" opacity=".8"/>';});
   svg.innerHTML=h;
-  document.getElementById('lsHpSummary').textContent=slots.length+'x mounts';
+  document.getElementById('lsHpSummary').textContent=activeGuns+'/'+slots.length+' weapons active';
   var bd=document.getElementById('lsBreakdown');
   bd.innerHTML='<div class="ls-mini"><span class="ls-mini-l">SCM</span><span class="ls-mini-v">'+(ship.scm||0)+' m/s</span></div>'
+    +'<div class="ls-mini"><span class="ls-mini-l">Size</span><span class="ls-mini-v">'+(ship.size||'?')+'</span></div>'
     +'<div class="ls-mini"><span class="ls-mini-l">Wpn draw</span><span class="ls-mini-v">'+totalDraw+' EU</span></div>'
-    +'<div class="ls-mini"><span class="ls-mini-l">PP out</span><span class="ls-mini-v">'+ppOut+'</span></div>'
-    +'<div class="ls-mini"><span class="ls-mini-l">Size</span><span class="ls-mini-v">'+(ship.size||'?')+'</span></div>';
+    +'<div class="ls-mini"><span class="ls-mini-l">PP output</span><span class="ls-mini-v">'+ppOut+'</span></div>'
+    +'<div class="ls-mini"><span class="ls-mini-l">Headroom</span><span class="ls-mini-v" style="color:'+(ppOut-totalDraw>0?'#34d399':'#ef4444')+'">'+(ppOut-totalDraw>0?'+':'')+(ppOut-totalDraw)+' EU</span></div>';
 }
 document.addEventListener('change',function(e){if(e.target&&e.target.classList.contains('slot-sel'))setTimeout(updateLiveStats,100);});
 setInterval(updateLiveStats,2000);
