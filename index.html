@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.88-DEV</title>
+<title>SC-ShipForge v6.89-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.88-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.89-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7365,7 +7365,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.88-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.89-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -8285,7 +8285,7 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 .enemy-info-card .eic-name-overlay{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85));}
 .enemy-info-card .eic-name{font-family:var(--fmono);font-size:18px;font-weight:800;color:var(--hud-t1);letter-spacing:1.5px;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.8);line-height:1.1;}
 .enemy-info-card .eic-role{font-family:var(--fmono);font-size:9px;color:var(--hud-cyan);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
-.enemy-info-card .eic-info{padding:14px 18px;display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;align-content:start;}
+.enemy-info-card .eic-info{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:7px 28px;align-content:start;}
 .enemy-info-card .eic-row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgba(255,255,255,.04);padding:3px 0;}
 .enemy-info-card .eic-row .eic-lbl{font-family:var(--fmono);font-size:9px;color:var(--hud-t3);letter-spacing:1.5px;text-transform:uppercase;}
 .enemy-info-card .eic-row .eic-val{font-family:var(--fmono);font-size:11px;color:var(--hud-t1);font-weight:700;text-align:right;}
@@ -8293,7 +8293,7 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 .enemy-info-card .eic-actions{grid-column:1 / -1;display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
 .enemy-info-card .eic-action{flex:1;min-width:140px;padding:6px 10px;background:linear-gradient(180deg,#1c2c46,#11192c);border:1px solid var(--hud-line-bright);border-left:3px solid var(--hud-cyan);border-radius:3px;color:var(--hud-cyan);font-family:var(--fmono);font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;text-align:center;cursor:pointer;transition:all .1s;}
 .enemy-info-card .eic-action:hover{filter:brightness(1.2);border-left-color:var(--hud-orange);color:var(--hud-orange);}
-.enemy-info-card .eic-buy-info{grid-column:1 / -1;font-family:var(--fmono);font-size:10px;color:var(--hud-t2);padding:6px 8px;background:rgba(0,0,0,.3);border-radius:3px;margin-top:4px;line-height:1.4;}
+.enemy-info-card .eic-buy-info{grid-column:1 / -1;font-family:var(--fmono);font-size:10px;color:var(--hud-t2);padding:8px 10px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.06);border-radius:4px;margin-top:6px;line-height:1.6;}
 @media (max-width:900px){.enemy-info-card{grid-template-columns:1fr!important;}.enemy-info-card .eic-img-wrap{min-height:180px;}}
 </style>
 <script>(function(){
@@ -8385,16 +8385,10 @@ function buildCard(name){
   var roleBasic=sd.role||'';
   var sizeBasic=sd.size||'';
   var crewBasic=sd.crew||'';
-  card.innerHTML='<div class="eic-img-wrap loading"><img class="eic-img" alt="" style="display:none"><div class="eic-name-overlay"><div class="eic-name">'+name+'</div><div class="eic-role">'+(roleBasic?roleBasic+' · ':'')+(sizeBasic?'Size '+sizeBasic:'')+'</div></div></div><div class="eic-info"><div class="eic-row"><span class="eic-lbl">Manufacturer</span><span class="eic-val eic-manf">—</span></div><div class="eic-row"><span class="eic-lbl">Career</span><span class="eic-val eic-career">—</span></div><div class="eic-row"><span class="eic-lbl">Role</span><span class="eic-val eic-role-detail">'+(roleBasic||'—')+'</span></div><div class="eic-row"><span class="eic-lbl">Size</span><span class="eic-val eic-size">—</span></div><div class="eic-row"><span class="eic-lbl">Crew</span><span class="eic-val eic-crew">—</span></div><div class="eic-row"><span class="eic-lbl">Cargo</span><span class="eic-val eic-cargo">—</span></div><div class="eic-row"><span class="eic-lbl">Length</span><span class="eic-val eic-length">—</span></div><div class="eic-row"><span class="eic-lbl">Width</span><span class="eic-val eic-width">—</span></div><div class="eic-row"><span class="eic-lbl">Height</span><span class="eic-val eic-height">—</span></div><div class="eic-row"><span class="eic-lbl">Status</span><span class="eic-val eic-status">—</span></div><div class="eic-row"><span class="eic-lbl">Pledge</span><span class="eic-val eic-cost eic-pledge">—</span></div><div class="eic-row"><span class="eic-lbl">Warbond</span><span class="eic-val eic-warbond">—</span></div><div class="eic-buy-info"><b>In-game:</b> <span class="eic-dealer">—</span><br><b>Availability:</b> <span class="eic-avail">—</span></div><div class="eic-actions"><a class="eic-action eic-rsi" target="_blank" href="#">RSI Pledge Store</a><a class="eic-action eic-wiki" target="_blank" href="https://starcitizen.tools/'+encodeURIComponent(name.replace(/ /g,'_'))+'">Wiki Page</a><button class="eic-action eic-configure" type="button">Configure Loadout</button></div></div>';
+  card.innerHTML='<div class="eic-img-wrap loading"><img class="eic-img" alt="" style="display:none"><div class="eic-name-overlay"><div class="eic-name">'+name+'</div><div class="eic-role">'+(roleBasic?roleBasic+' · ':'')+(sizeBasic?'Size '+sizeBasic:'')+'</div></div></div><div class="eic-info"><div class="eic-row"><span class="eic-lbl">Manufacturer</span><span class="eic-val eic-manf">—</span></div><div class="eic-row"><span class="eic-lbl">Career</span><span class="eic-val eic-career">—</span></div><div class="eic-row"><span class="eic-lbl">Role</span><span class="eic-val eic-role-detail">'+(roleBasic||'—')+'</span></div><div class="eic-row"><span class="eic-lbl">Size</span><span class="eic-val eic-size">—</span></div><div class="eic-row"><span class="eic-lbl">Crew</span><span class="eic-val eic-crew">—</span></div><div class="eic-row"><span class="eic-lbl">Cargo</span><span class="eic-val eic-cargo">—</span></div><div class="eic-row"><span class="eic-lbl">Length</span><span class="eic-val eic-length">—</span></div><div class="eic-row"><span class="eic-lbl">Width</span><span class="eic-val eic-width">—</span></div><div class="eic-row"><span class="eic-lbl">Height</span><span class="eic-val eic-height">—</span></div><div class="eic-row"><span class="eic-lbl">Status</span><span class="eic-val eic-status">—</span></div><div class="eic-row"><span class="eic-lbl">Pledge</span><span class="eic-val eic-cost eic-pledge">—</span></div><div class="eic-row"><span class="eic-lbl">Warbond</span><span class="eic-val eic-warbond">—</span></div><div class="eic-buy-info"><b>In-game:</b> <span class="eic-dealer">—</span><br><b>Availability:</b> <span class="eic-avail">—</span></div></div>';
   sel.appendChild(card);Array.prototype.forEach.call(sel.children,function(c){if(c!==card&&!c.classList.contains('enemy-info-card')){c.style.setProperty('display','none','important');}});
   
-  // Hook configure button — invoke runShowdown again or trigger original behaviour
-  var cfgBtn=card.querySelector('.eic-configure');
-  cfgBtn.onclick=function(){
-    // Scroll the config card into view
-    var cfg=document.querySelector('#pane-sd .sd-config');
-    if(cfg)cfg.scrollIntoView({behavior:'smooth',block:'start'});
-  };
+
   
   fetchInfo(name).then(function(info){
     if(!card.parentNode)return;
@@ -8440,11 +8434,16 @@ tick();
 
 <!-- SHOWDOWN_TIGHTEN -->
 <style id="showdownTighten">
-/* Hide Configure Enemy / Configure Loadout buttons (functionality is duplicated elsewhere) */
+/* Hide any stray buttons in the selected ship area */
 #pane-sd #sdSelectedShip > button{display:none!important;}
-#pane-sd .eic-action.eic-configure{display:none!important;}
-/* Showdown pane height: hug the content instead of expanding to fill empty space */
+/* Hide the entire actions row — no buttons remain */
+.enemy-info-card .eic-actions{display:none!important;}
+/* Showdown pane height: hug the content */
 #pane-sd{height:auto!important;min-height:0!important;}
+/* Slightly tighten the card image height for a cleaner look */
+.enemy-info-card .eic-img-wrap{min-height:210px!important;max-height:240px!important;}
+/* Improve name overlay typography */
+.enemy-info-card .eic-name{font-size:20px!important;letter-spacing:2px!important;}
 </style>
 </body>
 <!-- deploy-force --><!-- deploy -->
