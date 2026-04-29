@@ -8249,6 +8249,25 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 <script>
 (function(){window.getUserDps=function(){var d=document.getElementById('totalDPS'),s=document.getElementById('shpTotal'),a=document.getElementById('totalAlpha');return{dps:d?parseFloat((d.textContent||'0').replace(/[^\d.]/g,''))||0:0,shieldHP:s?parseFloat((s.textContent||'0').replace(/[^\d.]/g,''))||0:0,alpha:a?parseFloat((a.textContent||'0').replace(/[^\d.]/g,''))||0:0};};window.getShipDps=function(){var stats=document.querySelector('#pane-sd .sd-stats');if(!stats)return{dps:0,shieldHP:0,alpha:0};var t=stats.textContent||'';function pluck(label){var re=new RegExp(label+'\\s*[:\\s]?\\s*([0-9,.]+)','i');var m=t.match(re);return m?parseFloat(m[1].replace(/,/g,''))||0:0;}return{dps:pluck('Total DPS'),shieldHP:pluck('Shield HP')||pluck('SHP'),alpha:pluck('Alpha Strike')||pluck('Alpha')};};})();
 </script>
+
+<!-- FIT_VIEWPORT -->
+<style id="fitViewport">
+/* === FIT VIEWPORT: kill all max-widths, every pane spans full width === */
+#app, .body, .cp{width:100%!important;max-width:none!important;}
+.pane{width:100%!important;max-width:none!important;box-sizing:border-box!important;}
+#pane-sd #sdResult{align-items:stretch!important;}
+#pane-sd #sdResult > .sd-verdict{max-width:none!important;width:100%!important;}
+#pane-sd #sdResult > .sd-config{max-width:none!important;width:100%!important;}
+#pane-sd #sdResult > .sd-stats{max-width:none!important;width:100%!important;}
+#pane-lo{width:100%!important;max-width:none!important;}
+#loContent{width:100%!important;max-width:none!important;}
+#p2cards{position:relative!important;width:auto!important;max-width:none!important;}
+#pane-cmp,#pane-ships,#pane-pn,#pane-buy,#pane-wp,#pane-fb,#pane-save{width:100%!important;max-width:none!important;}
+.tabs{width:100%!important;max-width:none!important;}
+nav.nav{width:100%!important;max-width:none!important;}
+#referralBanner{width:100%!important;max-width:none!important;}
+main.body, .body{grid-template-columns:1fr!important;width:100%!important;}
+</style>
 </body>
 <!-- deploy-force --><!-- deploy -->
 </html>
