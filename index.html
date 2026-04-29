@@ -7763,7 +7763,7 @@ var cfg=document.createElement("div");cfg.className="sd-config";
 var hdr=document.createElement("div");hdr.style.cssText="display:flex;justify-content:space-between;padding:6px 8px;font-size:12px;font-weight:700;border-bottom:1px solid rgba(100,116,139,.3);margin-bottom:6px;";
 hdr.innerHTML="<span style=color:#94a3b8>ENEMY LOADOUT</span><span style=color:#ef4444>"+en+"</span>";cfg.appendChild(hdr);
 var grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:10px;";
-var L=document.createElement("div");L.style.cssText="background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.25);border-radius:6px;padding:8px;";
+var L=document.createElement("div");L.style.cssText="background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.25);border-radius:8px;padding:10px 12px;";
 L.innerHTML="<div style=font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px>WEAPONS</div>";
 if(ship.slots){ship.slots.forEach(function(sl){
 var r=document.createElement("div");r.className="sd-slot";r.style.cssText="display:flex;align-items:center;gap:3px;padding:3px 5px;background:rgba(30,41,59,.5);border-radius:3px;margin-bottom:2px;";
@@ -7839,21 +7839,21 @@ hdr.innerHTML="<span style=color:#94a3b8>ENEMY LOADOUT</span><span style=color:#
 var grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:8px;";
 var L=document.createElement("div");L.style.cssText="background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.25);border-radius:6px;padding:6px;overflow-y:auto;max-height:380px;scrollbar-width:thin;";
 if(ship.slots){ship.slots.forEach(function(sl){
-var r=document.createElement("div");r.className="sd-slot";r.style.cssText="display:flex;align-items:center;gap:4px;padding:5px 6px;background:rgba(15,23,42,.4);border-radius:4px;margin-bottom:3px;";
-var lb=document.createElement("span");lb.style.cssText="color:#94a3b8;font-size:10px;min-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";lb.textContent=sl.lbl;
-var ob=document.createElement("button");ob.textContent="ON";ob.style.cssText="padding:2px 6px;font-size:9px;border-radius:2px;border:none;cursor:pointer;background:#22c55e;color:#fff;font-weight:700;";
+var r=document.createElement("div");r.className="sd-slot";r.style.cssText="display:flex;align-items:center;gap:6px;padding:7px 8px;background:rgba(15,23,42,.4);border-radius:5px;margin-bottom:4px;";
+var lb=document.createElement("span");lb.style.cssText="color:#e2e8f0;font-size:11px;min-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;";lb.textContent=sl.lbl;
+var ob=document.createElement("button");ob.textContent="ON";ob.style.cssText="padding:3px 8px;font-size:10px;border-radius:2px;border:none;cursor:pointer;background:#22c55e;color:#fff;font-weight:700;";
 ob.onclick=function(){if(ob.textContent==="ON"){ob.textContent="OFF";ob.style.background="#ef4444";r.style.opacity=".4";}else{ob.textContent="ON";ob.style.background="#22c55e";r.style.opacity="1";}calcEnemyStats(cfg,en);};
-var se=document.createElement("select");se.style.cssText="flex:1;padding:3px 4px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:3px;color:#e2e8f0;font-size:10px;min-width:0;";
+var se=document.createElement("select");se.style.cssText="flex:1;padding:5px 6px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:11px;min-width:0;";
 WEAPONS.filter(function(w){return w.sz<=sl.sz&&(w.type==="energy"||w.type==="ballistic")}).forEach(function(w){var o=document.createElement("option");o.value=w.id;o.textContent=w.name+" ("+w.dps+")";if(w.id===sl.default)o.selected=true;se.appendChild(o);});
 se.onchange=function(){calcEnemyStats(cfg,en);};
 r.appendChild(lb);r.appendChild(ob);r.appendChild(se);L.appendChild(r);});}
 if(ship.comps){var co=ship.comps;var cn=co.counts||{};
-var sep=document.createElement("div");sep.style.cssText="margin:4px 0 2px;border-top:1px solid rgba(100,116,139,.2);padding-top:2px;font-size:8px;color:#64748b;text-transform:uppercase;";sep.textContent="Components";L.appendChild(sep);
+var sep=document.createElement("div");sep.style.cssText="margin:8px 0 4px;border-top:1px solid rgba(100,116,139,.3);padding-top:6px;font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:.5px;";sep.textContent="Components";L.appendChild(sep);
 [{k:"pp",l:"PP",c:cn.pp||1},{k:"sg",l:"SG",c:cn.sg||1},{k:"cooler",l:"Cool",c:cn.cooler||1},{k:"qd",l:"QD",c:cn.qd||1}].forEach(function(t){
 if(!co[t.k]||!COMP_DB[t.k])return;
-var r=document.createElement("div");r.style.cssText="display:flex;align-items:center;gap:4px;padding:5px 6px;background:rgba(15,23,42,.4);border-radius:4px;margin-bottom:3px;";
-var lb=document.createElement("span");lb.style.cssText="color:#94a3b8;min-width:35px;font-size:10px;";lb.textContent=t.l;
-var se=document.createElement("select");se.dataset.compType=t.k;se.style.cssText="flex:1;padding:3px 4px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:3px;color:#e2e8f0;font-size:10px;min-width:0;";
+var r=document.createElement("div");r.style.cssText="display:flex;align-items:center;gap:6px;padding:7px 8px;background:rgba(15,23,42,.4);border-radius:5px;margin-bottom:4px;";
+var lb=document.createElement("span");lb.style.cssText="color:#e2e8f0;min-width:40px;font-size:11px;font-weight:600;";lb.textContent=t.l;
+var se=document.createElement("select");se.dataset.compType=t.k;se.style.cssText="flex:1;padding:5px 6px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:11px;min-width:0;";
 Object.keys(COMP_DB[t.k]).sort().forEach(function(n){var o=document.createElement("option");o.value=n;o.textContent=n;if(n===co[t.k])o.selected=true;se.appendChild(o);});
 se.onchange=function(){calcEnemyStats(cfg,en);};
 r.appendChild(lb);r.appendChild(se);
@@ -7861,7 +7861,7 @@ if(t.c>1){var cx=document.createElement("span");cx.className="xcnt";cx.style.css
 L.appendChild(r);});
 if(co.radar){var rr=document.createElement("div");rr.style.cssText="display:flex;gap:3px;padding:3px 4px;background:rgba(15,23,42,.4);border-radius:3px;margin-bottom:2px;font-size:8px;";rr.innerHTML="<span style=color:#94a3b8;min-width:30px>Radar</span><span style=color:#e2e8f0>"+co.radar+"</span>";L.appendChild(rr);}}
 grid.appendChild(L);
-var R=document.createElement("div");R.className="sd-stats";R.style.cssText="background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.25);border-radius:6px;padding:6px 8px;";
+var R=document.createElement("div");R.className="sd-stats";R.style.cssText="background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.25);border-radius:8px;padding:10px 12px;";
 grid.appendChild(R);cfg.appendChild(grid);
 var td=document.createElement("div");td.style.cssText="display:flex;justify-content:space-between;padding:5px 8px;margin-top:4px;font-size:11px;font-weight:700;color:#e2e8f0;border-top:1px solid rgba(100,116,139,.3);";
 td.innerHTML="<span>Enemy Total DPS</span><span id=sdEnemyDpsVal></span>";cfg.appendChild(td);
