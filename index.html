@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.53-DEV</title>
+<title>SC-ShipForge v6.54-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.53-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.54-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7378,7 +7378,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.53-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.54-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -7775,22 +7775,30 @@ var L=document.createElement("div");L.style.cssText="background:rgba(30,41,59,.6
 L.innerHTML="<div style=font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px>WEAPONS</div>";
 if(ship.slots){var wpnTitle=document.createElement('div');wpnTitle.style.cssText='font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;';wpnTitle.textContent='HARDPOINTS';L.appendChild(wpnTitle);
 ship.slots.forEach(function(sl){
+var gc=sl.count||1;
 var card=document.createElement('div');card.className='sd-slot';card.style.cssText='background:rgba(15,23,42,.4);border:1px solid rgba(100,116,139,.2);border-radius:6px;padding:8px;margin-bottom:6px;';
 var hrow=document.createElement('div');hrow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px;';
 var badge=document.createElement('span');badge.style.cssText='display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;color:#fff;background:#dc2626;';badge.textContent='S'+sl.sz;
-var slbl=document.createElement('span');slbl.style.cssText='color:#e2e8f0;font-size:12px;font-weight:600;flex:1;';slbl.textContent=sl.lbl;
+var slbl=document.createElement('span');slbl.style.cssText='color:#e2e8f0;font-size:12px;font-weight:600;flex:1;';slbl.textContent=sl.lbl+(gc>1?' x'+gc:'');
 var ob=document.createElement('button');ob.textContent='ON';ob.style.cssText='padding:3px 10px;font-size:9px;border-radius:10px;border:none;cursor:pointer;background:#22c55e;color:#fff;font-weight:700;';
 ob.onclick=function(){if(ob.textContent==='ON'){ob.textContent='OFF';ob.style.background='#ef4444';card.style.opacity='.4';}else{ob.textContent='ON';ob.style.background='#22c55e';card.style.opacity='1';}calcEnemyStats(cfg,en);};
 hrow.appendChild(badge);hrow.appendChild(slbl);hrow.appendChild(ob);card.appendChild(hrow);
-var se=document.createElement('select');se.style.cssText='width:100%;padding:6px 8px;background:rgba(15,23,42,.9);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:12px;margin-bottom:4px;';
-WEAPONS.filter(function(w){return w.sz<=sl.sz&&(w.type==='energy'||w.type==='ballistic')}).forEach(function(w){var o=document.createElement('option');o.value=w.id;o.textContent=w.name+' ('+w.dps+'DPS '+w.type.toUpperCase().charAt(0)+') S'+w.sz;if(w.id===sl.default)o.selected=true;se.appendChild(o);});
-var stats=document.createElement('div');stats.className='sd-wpn-stats';stats.style.cssText='display:flex;gap:8px;font-size:10px;padding:2px 0;';
-function updStats(){var w=WEAPONS.find(function(x){return x.id===se.value});if(!w)return;
+var sels=[];
+for(var gi=0;gi<gc;gi++){
+var se=document.createElement('select');se.style.cssText='width:100%;padding:5px 8px;background:rgba(15,23,42,.9);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:11px;margin-bottom:3px;';
+WEAPONS.filter(function(w){return w.sz<=sl.sz&&(w.type==='energy'||w.type==='ballistic')}).forEach(function(w){var o=document.createElement('option');o.value=w.id;o.textContent=w.name+' ('+w.dps+'DPS '+w.type.substring(0,3).toUpperCase()+') S'+w.sz;if(w.id===sl.default)o.selected=true;se.appendChild(o);});
+se.onchange=function(){updWpnInfo();calcEnemyStats(cfg,en);};
+sels.push(se);card.appendChild(se);}
+var winfo=document.createElement('div');winfo.style.cssText='font-size:10px;padding:4px 0 0;display:flex;gap:8px;';
+function updWpnInfo(){var w=WEAPONS.find(function(x){return x.id===sels[0].value});if(!w)return;
 var tc=w.type==='energy'?'#60a5fa':'#fbbf24';
-stats.innerHTML='<span style="color:'+tc+';font-weight:600;">'+w.type+'</span><span style="color:#ef4444;font-weight:600;">'+w.dps+' DPS</span><span style="color:#94a3b8;">'+w.range+'m</span><span style="color:#94a3b8;">Draw:'+w.draw+'EU</span>';}
-updStats();
-se.onchange=function(){updStats();calcEnemyStats(cfg,en);};
-card.appendChild(se);card.appendChild(stats);L.appendChild(card);
+winfo.innerHTML='<span style="background:'+tc+';color:#000;padding:1px 5px;border-radius:2px;font-weight:700;font-size:9px;">'+w.type+'</span>'+
+'<span style="color:#ef4444;font-weight:600;">'+w.dps*gc+' DPS</span>'+
+'<span style="color:#94a3b8;">'+w.range+'m</span>'+
+'<span style="color:#94a3b8;">S'+w.sz+'</span>'+
+'<span style="color:#94a3b8;">Draw:'+w.draw*gc+'EU</span>';}
+updWpnInfo();card.appendChild(winfo);
+L.appendChild(card);
 });}
 if(ship.missiles&&ship.missiles.length>0){
 var mslTitle=document.createElement('div');mslTitle.style.cssText='font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin:8px 0 6px;border-top:1px solid rgba(100,116,139,.3);padding-top:8px;';mslTitle.textContent='MISSILES';L.appendChild(mslTitle);
