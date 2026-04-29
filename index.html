@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.83-DEV</title>
+<title>SC-ShipForge v6.84-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.83-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.84-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7365,7 +7365,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.83-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.84-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -8230,6 +8230,14 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 /* FIGHT button — make it big, orange, obvious */
 #pane-sd .sd-config > button, #pane-sd #sdResult > button, #pane-sd button:not(.sd-slot button):not(.sd-role-bar button):not(.sd-role-btn):not(.ss-clear){background:linear-gradient(180deg,#ff8a3c,#b35a1c)!important;border:1px solid #ff8a3c!important;color:#0a0e15!important;padding:10px 24px!important;font-family:var(--fmono)!important;font-size:13px!important;font-weight:800!important;letter-spacing:3px!important;text-transform:uppercase!important;border-radius:5px!important;cursor:pointer!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 6px rgba(255,138,60,.4)!important;text-shadow:0 1px 0 rgba(255,255,255,.25)!important;transition:all .1s!important;margin:8px auto 4px!important;display:block!important;width:auto!important;min-width:200px!important;}
 #pane-sd .sd-config > button:hover, #pane-sd #sdResult > button:hover, #pane-sd button:not(.sd-slot button):not(.sd-role-bar button):not(.sd-role-btn):not(.ss-clear):hover{filter:brightness(1.1)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 12px rgba(255,138,60,.6)!important;}
+
+/* Verdict on top + center loadout */
+#pane-sd #sdResult{display:flex!important;flex-direction:column!important;align-items:center!important;gap:10px!important;}
+#pane-sd #sdResult > .sd-verdict{order:-1!important;width:100%!important;max-width:900px!important;text-align:center!important;font-family:var(--fmono)!important;font-size:24px!important;font-weight:800!important;letter-spacing:6px!important;text-transform:uppercase!important;padding:18px 24px!important;border-radius:8px!important;}
+#pane-sd #sdResult > .sd-verdict.sd-win{background:linear-gradient(180deg,#1a3a25,#0d2014)!important;border:1px solid #4ce0a3!important;border-left:4px solid #4ce0a3!important;color:#4ce0a3!important;text-shadow:0 0 10px rgba(76,224,163,.5)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 16px rgba(76,224,163,.2)!important;}
+#pane-sd #sdResult > .sd-verdict.sd-loss,#pane-sd #sdResult > .sd-verdict.sd-lose{background:linear-gradient(180deg,#3a1a25,#200d14)!important;border:1px solid #ff5e6c!important;border-left:4px solid #ff5e6c!important;color:#ff5e6c!important;text-shadow:0 0 10px rgba(255,94,108,.5)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 16px rgba(255,94,108,.2)!important;}
+#pane-sd #sdResult > .sd-config{width:100%!important;max-width:900px!important;}
+#pane-sd #sdResult > .sd-stats{width:100%!important;max-width:900px!important;}
 </style>
 
 <!-- FIGHT_BUTTON_FIX -->
