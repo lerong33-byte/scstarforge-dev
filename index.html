@@ -8243,6 +8243,14 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 #pane-sd .sd-config{overflow:visible!important;max-height:none!important;display:flex!important;flex-direction:column!important;}
 /* The FIGHT button (button direct child of .sd-config) goes to the TOP of the card */
 #pane-sd .sd-config > button{order:-10!important;align-self:center!important;margin:0 auto 12px!important;position:sticky!important;top:8px!important;z-index:5!important;}
+
+/* === Opponent preview image: shrink + correct 16:9 aspect ratio === */
+/* The ship image is naturally 16:9 (2672x1503) but was forced into 380x400 portrait */
+#pane-sd #sdSelectedShip{max-width:640px!important;margin:8px auto!important;}
+#pane-sd .enemy-info-card{display:grid!important;grid-template-columns:1fr 200px!important;gap:10px!important;width:100%!important;height:auto!important;align-items:start!important;}
+#pane-sd .enemy-info-card img{width:100%!important;height:auto!important;aspect-ratio:16/9!important;object-fit:cover!important;object-position:50% 50%!important;border-radius:6px!important;display:block!important;}
+/* The right-side info column (manufacturer/role/crew/etc.) — keep tight */
+#pane-sd .enemy-info-card > *:not(img){font-size:10px!important;}
 </style>
 
 <!-- FIGHT_BUTTON_FIX -->
