@@ -64,7 +64,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.14-DEV</title>
+<title>SC-ShipForge v6.15-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -922,6 +922,40 @@ option,optgroup{background:var(--bg2)}
 .sd-comp-lbl{color:#94a3b8;}
 .sd-comp-val{color:#e2e8f0;font-weight:600;}
 .sd-comp-stat{color:#64748b;font-size:10px;margin-left:8px;}
+
+/* v6.15 Enemy Comp Dropdowns */
+.sd-comp-row{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(30,41,59,.5);border-radius:4px;margin-bottom:4px;font-size:12px;}
+.sd-comp-lbl{color:#94a3b8;min-width:90px;flex-shrink:0;}
+.sd-comp-sel{flex:1;padding:5px 8px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:11px;}
+.sd-comp-sel:focus{border-color:#dc2626;outline:none;}
+.sd-comp-info{color:#64748b;font-size:10px;min-width:100px;text-align:right;flex-shrink:0;}
+.sd-comp-count{color:#94a3b8;font-size:10px;width:30px;text-align:center;flex-shrink:0;}
+.sd-radar-row{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(30,41,59,.5);border-radius:4px;margin-bottom:4px;font-size:12px;}
+.sd-radar-val{color:#e2e8f0;font-weight:600;}
+
+/* v6.15 Comp Dropdowns + Fight Stats */
+.sd-comp-section{margin-top:8px;border-top:1px solid rgba(100,116,139,.3);padding-top:8px;}
+.sd-comp-title{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.sd-comp-row{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(30,41,59,.5);border-radius:4px;margin-bottom:4px;font-size:12px;}
+.sd-comp-lbl{color:#94a3b8;min-width:85px;flex-shrink:0;}
+.sd-comp-sel{flex:1;padding:5px 6px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:11px;}
+.sd-comp-sel:focus{border-color:#dc2626;outline:none;}
+.sd-comp-info{color:#64748b;font-size:10px;min-width:80px;text-align:right;flex-shrink:0;}
+.sd-comp-count{color:#94a3b8;font-size:10px;flex-shrink:0;}
+.sd-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-top:16px;border-radius:8px;overflow:hidden;border:1px solid rgba(100,116,139,.3);}
+.sd-vs-col{padding:12px;}
+.sd-vs-you{background:rgba(34,197,94,.05);}
+.sd-vs-mid{display:flex;align-items:center;justify-content:center;background:rgba(30,41,59,.9);padding:0 12px;font-weight:700;color:#94a3b8;font-size:11px;}
+.sd-vs-them{background:rgba(239,68,68,.05);}
+.sd-vs-name{font-size:14px;font-weight:700;margin-bottom:8px;}
+.sd-vs-you .sd-vs-name{color:#22c55e;}
+.sd-vs-them .sd-vs-name{color:#ef4444;}
+.sd-vs-stat{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(100,116,139,.1);font-size:11px;}
+.sd-vs-stat-lbl{color:#94a3b8;}
+.sd-vs-stat-val{color:#e2e8f0;font-weight:600;}
+.sd-verdict{text-align:center;padding:14px;margin-top:12px;border-radius:8px;}
+.sd-verdict h3{font-size:20px;font-weight:700;margin-bottom:4px;}
+.sd-verdict-ttk{font-size:12px;color:#94a3b8;}
 </style>
 
 <div id="app">
@@ -7716,67 +7750,163 @@ if(this.value.length>0)this.dispatchEvent(new Event("input"));
 })();
 </script>
 
+
+
 <script>
-/* v6.14 Enemy System Components */
+/* v6.15 Comp Dropdowns + Comprehensive Fight Stats */
 (function(){
-var origRun = window.runShowdown;
-window.runShowdown = function(enemyName){
-origRun(enemyName);
-setTimeout(function(){
-var cfg = document.querySelector(".sd-config");
-if(!cfg || document.querySelector(".sd-comp-section")) return;
-var ship = SHIP_DATA[enemyName];
-if(!ship || !ship.comps) return;
-var sec = document.createElement("div");
-sec.className = "sd-comp-section";
-var title = document.createElement("div");
-title.className = "sd-comp-title";
-title.textContent = "SYSTEM COMPONENTS";
-sec.appendChild(title);
-var comps = ship.comps;
-var counts = comps.counts || {};
-var rows = [];
-if(comps.pp){
-var pp = COMP_DB.pp[comps.pp];
-var ppC = counts.pp || 1;
-rows.push({lbl:"Power Plant",val:comps.pp+(ppC>1?" x"+ppC:""),stat:pp?"Output: "+(pp.out*ppC)+" EU":""});
-}
-if(comps.sg){
-var sg = COMP_DB.sg[comps.sg];
-var sgC = counts.sg || 1;
-rows.push({lbl:"Shield Gen",val:comps.sg+(sgC>1?" x"+sgC:""),stat:sg?"HP: "+(sg.totalHP*sgC).toLocaleString()+" / Regen: "+(sg.regen*sgC)+"/s":""});
-}
-if(comps.cooler){
-var cl = COMP_DB.cooler[comps.cooler];
-var clC = counts.cooler || 1;
-rows.push({lbl:"Cooler",val:comps.cooler+(clC>1?" x"+clC:""),stat:cl?"Cooling: "+(cl.cool*clC):""});
-}
-if(comps.qd){
-var qd = COMP_DB.qd[comps.qd];
-rows.push({lbl:"Quantum Drive",val:comps.qd,stat:qd?"Range: "+qd.range+"Gm / Speed: "+qd.speed:""});
-}
-rows.forEach(function(r){
-var row = document.createElement("div");
-row.className = "sd-comp-row";
-var lbl = document.createElement("span");
-lbl.className = "sd-comp-lbl";
-lbl.textContent = r.lbl;
-var right = document.createElement("span");
-var val = document.createElement("span");
-val.className = "sd-comp-val";
-val.textContent = r.val;
-var stat = document.createElement("span");
-stat.className = "sd-comp-stat";
-stat.textContent = r.stat;
-right.appendChild(val);
-right.appendChild(stat);
-row.appendChild(lbl);
-row.appendChild(right);
-sec.appendChild(row);
+function buildCompSel(dbKey,curName){
+var sel=document.createElement("select");
+sel.className="sd-comp-sel";
+sel.dataset.compType=dbKey;
+var db=COMP_DB[dbKey];if(!db)return sel;
+Object.keys(db).sort().forEach(function(n){
+var o=document.createElement("option");o.value=n;o.textContent=n;
+if(n===curName)o.selected=true;sel.appendChild(o);});
+return sel;}
+function cInfo(dbKey,name){
+var db=COMP_DB[dbKey];if(!db||!db[name])return "";
+var c=db[name];
+if(dbKey==="pp")return "Out:"+c.out+"EU";
+if(dbKey==="sg")return "HP:"+c.totalHP.toLocaleString();
+if(dbKey==="cooler")return "Cool:"+c.cool;
+if(dbKey==="qd")return c.range+"Gm";
+return "";}
+function getEnemyStats(){
+var cfg=document.querySelector(".sd-config");
+if(!cfg)return null;
+var dps=0,alpha=0,draw=0,eC=0,bC=0;
+cfg.querySelectorAll(".sd-slot select").forEach(function(s){
+var sl=s.closest(".sd-slot");
+var btn=sl?sl.querySelector("button"):null;
+if(btn&&btn.textContent.trim()==="OFF")return;
+var w=WEAPONS.find(function(x){return x.id===s.value});
+if(!w)return;
+if(w.type==="energy"){dps+=w.dps;alpha+=(w.alpha||0);draw+=(w.draw||0);eC++;}
+else if(w.type==="ballistic"){dps+=w.dps;alpha+=(w.alpha||0);draw+=(w.draw||0);bC++;}
 });
-var totalEl = cfg.querySelector(".sd-enemy-total");
-if(totalEl) cfg.insertBefore(sec, totalEl);
-else cfg.appendChild(sec);
+var ppOut=0,shieldHP=0,shieldRegen=0,compDraw=0;
+var ppSel=cfg.querySelector("select[data-comp-type=pp]");
+var sgSel=cfg.querySelector("select[data-comp-type=sg]");
+var clSel=cfg.querySelector("select[data-comp-type=cooler]");
+var qdSel=cfg.querySelector("select[data-comp-type=qd]");
+var cntEls=cfg.querySelectorAll(".sd-comp-count");
+function getCnt(sel){if(!sel)return 1;var row=sel.closest(".sd-comp-row");if(!row)return 1;var c=row.querySelector(".sd-comp-count");return c?parseInt(c.textContent)||1:1;}
+if(ppSel){var pp=COMP_DB.pp[ppSel.value];if(pp)ppOut=pp.out*getCnt(ppSel);}
+if(sgSel){var sg=COMP_DB.sg[sgSel.value];var sgC=getCnt(sgSel);if(sg){shieldHP=sg.totalHP*sgC;shieldRegen=sg.regen*sgC;compDraw+=(sg.drawMax||0)*sgC;}}
+if(clSel){var cl=COMP_DB.cooler[clSel.value];if(cl)compDraw+=(cl.drawMax||0)*getCnt(clSel);}
+if(qdSel){var qd=COMP_DB.qd[qdSel.value];if(qd)compDraw+=(qd.drawMax||0);}
+return{dps:dps,alpha:alpha,draw:draw,eC:eC,bC:bC,ppOut:ppOut,shieldHP:shieldHP,shieldRegen:shieldRegen,compDraw:compDraw};
+}
+function showFightResult(enemyName){
+var resEl=document.getElementById("sdResult");
+var existing=resEl?resEl.querySelector(".sd-vs,.sd-verdict"):null;
+if(existing)existing.remove();
+var vEl=resEl?resEl.querySelector(".sd-verdict"):null;
+if(vEl)vEl.remove();
+var en=getEnemyStats();
+if(!en)return;
+var me=getUserDps();
+var myShip=SHIP_DATA[window.selShip]||{};
+var enShip=SHIP_DATA[enemyName]||{};
+var myPPOut=0,myCompDraw=0,myShieldRegen=0;
+if(myShip.comps){
+var pp=COMP_DB.pp[myShip.comps.pp];var ppC=(myShip.comps.counts&&myShip.comps.counts.pp)||1;
+if(pp)myPPOut=pp.out*ppC;
+var sg=COMP_DB.sg[myShip.comps.sg];var sgC=(myShip.comps.counts&&myShip.comps.counts.sg)||1;
+if(sg){myShieldRegen=sg.regen*sgC;myCompDraw+=(sg.drawMax||0)*sgC;}
+var cl=COMP_DB.cooler[myShip.comps.cooler];if(cl)myCompDraw+=(cl.drawMax||0)*((myShip.comps.counts&&myShip.comps.counts.cooler)||1);
+var qd=COMP_DB.qd[myShip.comps.qd];if(qd)myCompDraw+=(qd.drawMax||0);
+}
+var myDraw=0;
+document.querySelectorAll("#loContent .slot-sel").forEach(function(s){
+var sl=s.closest(".slot-row,.slot");var btn=sl?sl.querySelector(".slot-body-top button"):null;
+if(btn&&btn.textContent.trim()==="OFF")return;
+var w=WEAPONS.find(function(x){return x.id===s.value});
+if(w&&(w.type==="energy"||w.type==="ballistic"))myDraw+=(w.draw||0);
+});
+var myTTK=en.shieldHP>0&&me.dps>0?en.shieldHP/me.dps:9999;
+var oppTTK=me.shieldHP>0&&en.dps>0?me.shieldHP/en.dps:9999;
+var verdict,cls;
+if(oppTTK>myTTK*1.43){verdict="YOU WIN";cls="sd-win";}
+else if(myTTK>oppTTK*1.43){verdict="YOU LOSE";cls="sd-lose";}
+else{verdict="CLOSE FIGHT";cls="sd-close";}
+var grid=document.createElement("div");grid.className="sd-vs";
+function col(cssClass,shipName,stats,isMe){
+var d=document.createElement("div");d.className="sd-vs-col "+cssClass;
+var nm=document.createElement("div");nm.className="sd-vs-name";nm.textContent=shipName;d.appendChild(nm);
+var rows=[
+["DPS",stats.dps.toLocaleString()],
+["Weapons",stats.eC+"E + "+stats.bC+"B"],
+["Alpha",stats.alpha.toLocaleString()],
+["Shield HP",stats.shieldHP.toLocaleString()],
+["Sh. Regen",stats.shieldRegen.toLocaleString()+"/s"],
+["PP Output",stats.ppOut.toLocaleString()+" EU"],
+["Wpn Draw",stats.draw.toLocaleString()+" EU"],
+["Headroom",(stats.ppOut-stats.draw-stats.compDraw).toLocaleString()+" EU"],
+["SCM",(isMe?(myShip.scm||"--"):(enShip.scm||"--"))+" m/s"],
+["Size",isMe?(myShip.size||"--"):(enShip.size||"--")]
+];
+rows.forEach(function(r){
+var row=document.createElement("div");row.className="sd-vs-stat";
+var l=document.createElement("span");l.className="sd-vs-stat-lbl";l.textContent=r[0];
+var v=document.createElement("span");v.className="sd-vs-stat-val";v.textContent=r[1];
+row.appendChild(l);row.appendChild(v);d.appendChild(row);});
+return d;}
+var myStats={dps:me.dps,alpha:0,eC:0,bC:0,shieldHP:me.shieldHP,shieldRegen:myShieldRegen,ppOut:myPPOut,draw:myDraw,compDraw:myCompDraw};
+document.querySelectorAll("#loContent .slot-sel").forEach(function(s){
+var sl=s.closest(".slot-row,.slot");var btn=sl?sl.querySelector(".slot-body-top button"):null;
+if(btn&&btn.textContent.trim()==="OFF")return;
+var w=WEAPONS.find(function(x){return x.id===s.value});if(!w)return;
+if(w.type==="energy"){myStats.alpha+=(w.alpha||0);myStats.eC++;}
+else if(w.type==="ballistic"){myStats.alpha+=(w.alpha||0);myStats.bC++;}
+});
+grid.appendChild(col("sd-vs-you",window.selShip||"You",myStats,true));
+var mid=document.createElement("div");mid.className="sd-vs-mid";mid.textContent="VS";grid.appendChild(mid);
+grid.appendChild(col("sd-vs-them",enemyName,en,false));
+resEl.appendChild(grid);
+var vd=document.createElement("div");vd.className="sd-verdict "+cls;
+var h3=document.createElement("h3");h3.textContent=verdict;
+h3.style.color=cls==="sd-win"?"#22c55e":cls==="sd-lose"?"#ef4444":"#fbbf24";
+vd.appendChild(h3);
+var ttk=document.createElement("div");ttk.className="sd-verdict-ttk";
+ttk.textContent="You kill in "+(myTTK<9000?myTTK.toFixed(1)+"s":"N/A")+" | They kill in "+(oppTTK<9000?oppTTK.toFixed(1)+"s":"N/A");
+vd.appendChild(ttk);
+resEl.appendChild(vd);
+}
+var _prevRun=window.runShowdown;
+window.runShowdown=function(enemyName){
+_prevRun(enemyName);
+setTimeout(function(){
+var cfg=document.querySelector(".sd-config");
+if(!cfg||document.querySelector(".sd-comp-section"))return;
+var ship=SHIP_DATA[enemyName];if(!ship||!ship.comps)return;
+var sec=document.createElement("div");sec.className="sd-comp-section";
+var title=document.createElement("div");title.className="sd-comp-title";title.textContent="SYSTEM COMPONENTS";sec.appendChild(title);
+var comps=ship.comps;var counts=comps.counts||{};
+var types=[{key:"pp",lbl:"Power Plant",cnt:counts.pp||1},{key:"sg",lbl:"Shield Gen",cnt:counts.sg||1},{key:"cooler",lbl:"Cooler",cnt:counts.cooler||1},{key:"qd",lbl:"QT Drive",cnt:counts.qd||1}];
+types.forEach(function(t){
+if(!comps[t.key])return;
+var row=document.createElement("div");row.className="sd-comp-row";
+var lbl=document.createElement("span");lbl.className="sd-comp-lbl";lbl.textContent=t.lbl;row.appendChild(lbl);
+var sel=buildCompSel(t.key,comps[t.key]);row.appendChild(sel);
+if(t.cnt>1){var c=document.createElement("span");c.className="sd-comp-count";c.textContent="x"+t.cnt;row.appendChild(c);}
+var info=document.createElement("span");info.className="sd-comp-info";info.textContent=cInfo(t.key,comps[t.key]);row.appendChild(info);
+sel.addEventListener("change",function(){info.textContent=cInfo(t.key,sel.value);});
+sec.appendChild(row);});
+if(comps.radar){
+var rr=document.createElement("div");rr.className="sd-comp-row";
+var rl=document.createElement("span");rl.className="sd-comp-lbl";rl.textContent="Radar";
+var rv=document.createElement("span");rv.style.cssText="color:#e2e8f0;font-weight:600";rv.textContent=comps.radar;
+rr.appendChild(rl);rr.appendChild(rv);sec.appendChild(rr);}
+var totalEl=cfg.querySelector(".sd-enemy-total");
+if(totalEl)cfg.insertBefore(sec,totalEl);else cfg.appendChild(sec);
+var fightBtn=cfg.querySelector(".sd-fight-btn");
+if(fightBtn){
+var newBtn=fightBtn.cloneNode(true);
+fightBtn.parentNode.replaceChild(newBtn,fightBtn);
+newBtn.addEventListener("click",function(){showFightResult(enemyName);});
+}
 },150);
 };
 })();
