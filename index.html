@@ -7335,7 +7335,14 @@ function updateLiveStats(){
     var sgC=(ship.comps.counts&&ship.comps.counts.sg)||1;
     if(sg){shieldHP=sg.totalHP*sgC;shieldRegen=sg.regen*sgC;}
   }
-  var powerPct=ppOut>0?Math.round((totalDraw/ppOut)*100):0;
+  var compDraw=0;
+  if(ship.comps){
+    var sgD=COMP_DB.sg[ship.comps.sg];if(sgD)compDraw+=(sgD.drawMax||0)*((ship.comps.counts&&ship.comps.counts.sg)||1);
+    var clD=COMP_DB.cooler[ship.comps.cooler];if(clD)compDraw+=(clD.drawMax||0)*((ship.comps.counts&&ship.comps.counts.cooler)||1);
+    var qdD=COMP_DB.qd[ship.comps.qd];if(qdD)compDraw+=(qdD.drawMax||0)*((ship.comps.counts&&ship.comps.counts.qd)||1);
+  }
+  var allDraw=totalDraw+compDraw;
+  var powerPct=ppOut>0?Math.round((allDraw/ppOut)*100):0;
   document.getElementById('lsDps').textContent=totalDps.toLocaleString();
   document.getElementById('lsDpsSub').textContent=eCount+'x energy + '+bCount+'x ballistic';
   document.getElementById('lsShield').textContent=shieldHP.toLocaleString();
@@ -7356,9 +7363,9 @@ function updateLiveStats(){
   var bd=document.getElementById('lsBreakdown');
   bd.innerHTML='<div class="ls-mini"><span class="ls-mini-l">SCM</span><span class="ls-mini-v">'+(ship.scm||0)+' m/s</span></div>'
     +'<div class="ls-mini"><span class="ls-mini-l">Size</span><span class="ls-mini-v">'+(ship.size||'?')+'</span></div>'
-    +'<div class="ls-mini"><span class="ls-mini-l">Wpn draw</span><span class="ls-mini-v">'+totalDraw+' EU</span></div>'
+    +'<div class="ls-mini"><span class="ls-mini-l">Total draw</span><span class="ls-mini-v">'+allDraw+' EU</span></div>'
     +'<div class="ls-mini"><span class="ls-mini-l">PP output</span><span class="ls-mini-v">'+ppOut+'</span></div>'
-    +'<div class="ls-mini"><span class="ls-mini-l">Headroom</span><span class="ls-mini-v" style="color:'+(ppOut-totalDraw>0?'#34d399':'#ef4444')+'">'+(ppOut-totalDraw>0?'+':'')+(ppOut-totalDraw)+' EU</span></div>';
+    +'<div class="ls-mini"><span class="ls-mini-l">Headroom</span><span class="ls-mini-v" style="color:'+(ppOut-allDraw>0?'#34d399':'#ef4444')+'">'+(ppOut-allDraw>0?'+':'')+(ppOut-allDraw)+' EU</span></div>';
 }
 document.addEventListener('change',function(e){if(e.target&&e.target.classList.contains('slot-sel'))setTimeout(updateLiveStats,100);});
 setInterval(updateLiveStats,2000);
