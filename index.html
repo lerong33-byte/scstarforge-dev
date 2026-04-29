@@ -64,7 +64,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.12-DEV</title>
+<title>SC-ShipForge v6.13-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -881,12 +881,27 @@ option,optgroup{background:var(--bg2)}
 .sd-close h3{color:#fbbf24;}
 /* v6.12 OFF State */
 #loContent .slot-row.weapon-off{opacity:.4;transition:opacity .2s;}
+
+/* v6.13 PVP Loadout Config */
+.sd-config{background:rgba(30,41,59,.7);border:1px solid rgba(100,116,139,.3);border-radius:8px;padding:16px;margin-top:12px;}
+.sd-config-title{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.sd-config-ship{color:#ef4444;}
+.sd-slot{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 8px;background:rgba(15,23,42,.5);border-radius:4px;}
+.sd-slot-lbl{font-size:10px;color:#94a3b8;text-transform:uppercase;min-width:60px;}
+.sd-slot select{flex:1;background:#1e293b;color:#e2e8f0;border:1px solid rgba(100,116,139,.3);border-radius:4px;padding:4px 8px;font-size:12px;}
+.sd-slot-dps{font-size:11px;color:#64748b;min-width:50px;text-align:right;}
+.sd-slot-off{opacity:.4;}
+.sd-slot-toggle{background:none;border:1px solid rgba(100,116,139,.3);color:#34d399;border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;min-width:32px;}
+.sd-slot-toggle.off{color:#ef4444;}
+.sd-fight-btn{display:block;width:100%;padding:10px;margin-top:12px;background:#dc2626;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;}
+.sd-fight-btn:hover{background:#ef4444;}
+.sd-enemy-total{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid rgba(100,116,139,.2);font-size:12px;color:#e2e8f0;}
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.12-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.13-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7447,6 +7462,7 @@ return{dps:dps,shieldHP:shieldHP};
 }
 
 function runShowdown(enemyName){
+if(SD_MODE==="pvp"){buildPvpConfig(enemyName);return;}
 var me=getUserDps();
 var them=getShipDps(enemyName);
 var resEl=document.getElementById("sdResult");
@@ -7475,6 +7491,130 @@ window.showTab=function(id,btn){
 _origST.call(this,id,btn);
 if(id==="sd")initShowdown();
 };
+}
+
+
+/* v6.13 PVP Loadout Config */
+function buildPvpConfig(enemyName){
+var ship=SHIP_DATA[enemyName];
+if(!ship||!ship.slots)return;
+var resEl=document.getElementById("sdResult");
+if(!resEl)return;
+var wrap=document.createElement("div");
+wrap.className="sd-config";
+var title=document.createElement("div");
+title.className="sd-config-title";
+title.innerHTML="<span>ENEMY LOADOUT</span><span class=\"sd-config-ship\">"+enemyName+"</span>";
+wrap.appendChild(title);
+var slotEls=[];
+ship.slots.forEach(function(sl,idx){
+var row=document.createElement("div");
+row.className="sd-slot";
+row.dataset.on="1";
+var lbl=document.createElement("span");
+lbl.className="sd-slot-lbl";
+lbl.textContent=sl.lbl||("Slot "+(idx+1));
+row.appendChild(lbl);
+var tog=document.createElement("button");
+tog.className="sd-slot-toggle";
+tog.textContent="ON";
+tog.onclick=function(){
+if(row.dataset.on==="1"){row.dataset.on="0";tog.textContent="OFF";tog.classList.add("off");row.classList.add("sd-slot-off");}
+else{row.dataset.on="1";tog.textContent="ON";tog.classList.remove("off");row.classList.remove("sd-slot-off");}
+updatePvpTotal();
+};
+row.appendChild(tog);
+var sel=document.createElement("select");
+sel.className="sd-pvp-sel";
+var szNeeded=sl.sz;
+WEAPONS.forEach(function(w){
+if(w.sz!==szNeeded)return;
+if(w.type!=="energy"&&w.type!=="ballistic")return;
+var opt=document.createElement("option");
+opt.value=w.id;
+opt.textContent=w.name+" ("+w.dps+"DPS)";
+if(sl.default&&w.id===sl.default)opt.selected=true;
+sel.appendChild(opt);
+});
+sel.onchange=function(){updatePvpTotal();};
+row.appendChild(sel);
+var dpsSpan=document.createElement("span");
+dpsSpan.className="sd-slot-dps";
+row.appendChild(dpsSpan);
+wrap.appendChild(row);
+slotEls.push({row:row,sel:sel,dpsSpan:dpsSpan});
+});
+var totalRow=document.createElement("div");
+totalRow.className="sd-enemy-total";
+totalRow.innerHTML="<span>Enemy Total DPS</span><span id=\"sdEnemyDps\">0</span>";
+wrap.appendChild(totalRow);
+var fightBtn=document.createElement("button");
+fightBtn.className="sd-fight-btn";
+fightBtn.textContent="FIGHT";
+fightBtn.onclick=function(){runPvpShowdown(enemyName);};
+wrap.appendChild(fightBtn);
+resEl.innerHTML="";
+resEl.appendChild(wrap);
+window._pvpSlots=slotEls;
+window._pvpEnemy=enemyName;
+updatePvpTotal();
+}
+
+function updatePvpTotal(){
+if(!window._pvpSlots)return;
+var total=0;
+window._pvpSlots.forEach(function(s){
+var w=WEAPONS.find(function(x){return x.id===s.sel.value});
+var dps=0;
+if(w&&s.row.dataset.on==="1"&&(w.type==="energy"||w.type==="ballistic"))dps=w.dps;
+s.dpsSpan.textContent=dps>0?dps+"dps":"";
+total+=dps;
+});
+var el=document.getElementById("sdEnemyDps");
+if(el)el.textContent=total.toLocaleString();
+}
+function runPvpShowdown(enemyName){
+var me=getUserDps();
+var enemyDps=0;
+if(window._pvpSlots){
+window._pvpSlots.forEach(function(s){
+if(s.row.dataset.on!=="1")return;
+var w=WEAPONS.find(function(x){return x.id===s.sel.value});
+if(w&&(w.type==="energy"||w.type==="ballistic"))enemyDps+=w.dps;
+});
+}
+var enemyShip=SHIP_DATA[enemyName];
+var enemyShieldHP=0;
+if(enemyShip&&enemyShip.comps&&enemyShip.comps.sg){
+var sg=COMP_DB.sg[enemyShip.comps.sg];
+var sgC=(enemyShip.comps.counts&&enemyShip.comps.counts.sg)||1;
+if(sg)enemyShieldHP=sg.totalHP*sgC;
+}
+if(me.dps===0||enemyShieldHP===0){
+var nb=document.createElement("div");
+nb.className="sd-result sd-close";
+nb.innerHTML="<h3>NO DATA</h3><p>Select a ship and weapons first</p>";
+var resEl=document.getElementById("sdResult");
+resEl.innerHTML="";
+resEl.appendChild(nb);
+return;
+}
+var myTTK=enemyShieldHP/me.dps;
+var oppTTK=enemyDps>0?me.shieldHP/enemyDps:9999;
+var verdict,cls;
+if(oppTTK>myTTK*1.43){verdict="YOU WIN";cls="sd-win";}
+else if(myTTK>oppTTK*1.43){verdict="YOU LOSE";cls="sd-lose";}
+else{verdict="CLOSE FIGHT";cls="sd-close";}
+var rd=document.createElement("div");
+rd.className="sd-result "+cls;
+rd.innerHTML="<h3>"+verdict+" (PVP)</h3>";
+rd.innerHTML+="<div class=\"sd-ttk-row\"><span>Your TTK vs "+enemyName+"</span><span>"+myTTK.toFixed(1)+"s</span></div>";
+rd.innerHTML+="<div class=\"sd-ttk-row\"><span>"+enemyName+" TTK vs You</span><span>"+(oppTTK>9000?"N/A":oppTTK.toFixed(1)+"s")+"</span></div>";
+rd.innerHTML+="<div class=\"sd-ttk-row\"><span>Your DPS</span><span>"+me.dps.toLocaleString()+"</span></div>";
+rd.innerHTML+="<div class=\"sd-ttk-row\"><span>Enemy DPS (custom)</span><span>"+enemyDps.toLocaleString()+"</span></div>";
+var resEl=document.getElementById("sdResult");
+resEl.innerHTML="";
+resEl.appendChild(rd);
 }
 
 </script>
