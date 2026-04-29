@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.91-DEV</title>
+<title>SC-ShipForge v6.92-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.91-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.92-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7365,7 +7365,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.91-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.92-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -7984,7 +7984,15 @@ if(cfg){cfg.querySelectorAll(".sd-slot select").forEach(function(s){var row=s.cl
 var w=WEAPONS.find(function(x){return x.id===s.value});if(w&&(w.type==="energy"||w.type==="ballistic"))dps+=w.dps;});en.dps=dps;}
 var resEl=document.getElementById("sdResult");
 var old=resEl?resEl.querySelector(".sd-verdict"):null;if(old)old.remove();
-if(me.dps===0||en.shieldHP===0){return;}
+if(!resEl)return;
+if(me.dps===0||en.shieldHP===0){
+var warn=document.createElement("div");warn.className="sd-verdict sd-close";
+warn.style.cssText="text-align:center;padding:14px;margin-top:8px;border-radius:8px;background:rgba(30,41,59,.6);border:1px solid rgba(251,191,36,.4);";
+var wh=document.createElement("h3");wh.textContent=me.dps===0?"SELECT A SHIP IN LOADOUT BUILDER":"ENEMY DATA MISSING";
+wh.style.cssText="font-size:14px;font-weight:700;margin-bottom:6px;color:#fbbf24;";
+var ws=document.createElement("div");ws.style.cssText="font-size:11px;color:#94a3b8;";
+ws.textContent=me.dps===0?"Go to Loadout Builder, pick your ship and weapons, then come back to FIGHT.":"Could not load enemy ship stats.";
+warn.appendChild(wh);warn.appendChild(ws);resEl.appendChild(warn);return;}
 var myTTK=en.shieldHP/me.dps;
 var oppTTK=en.dps>0?me.shieldHP/en.dps:9999;
 var verdict,cls;
