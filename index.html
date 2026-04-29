@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.17-DEV</title>
+<title>SC-ShipForge v6.18-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -1174,14 +1174,18 @@ option,optgroup{background:var(--bg2)}
     <button class="active" onclick="sdSetMode('pve',this)">PVE</button>
     <button onclick="sdSetMode('pvp',this)">PVP</button>
   </div>
-    <div class="sd-pvp-wrap" id="sdPvpWrap">
-    <input type="text" class="sd-pvp-search" id="sdPvpSearch" placeholder="Search enemy ship..." autocomplete="off">
-    <div class="sd-pvp-list" id="sdPvpList"></div>
-    <div class="sd-pvp-selected" id="sdPvpSelected">
-      <div class="sd-pvp-selected-name" id="sdPvpName"></div>
-      <div class="sd-pvp-selected-role" id="sdPvpRole"></div>
-      <button class="sd-pvp-fight" onclick="runShowdown(window._pvpShip)">CONFIGURE PVP SHIP</button>
+    <div class="ss-wrap" id="sdSearchWrap" style="margin-bottom:12px;">
+    <span class="ss-icon">&#9876;</span>
+    <input class="ss-input" id="sdShipInput" placeholder="Search enemy ship…" autocomplete="off">
+    <button class="ss-clear" id="sdShipClear" style="display:none;">×</button>
+    <div class="ss-drop" id="sdShipDrop" style="display:none;">
+      <div class="ss-inner" id="sdShipInner"></div>
     </div>
+  </div>
+  <div id="sdSelectedShip" style="display:none;margin-bottom:12px;padding:12px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.4);border-radius:6px;text-align:center;">
+    <div id="sdSelName" style="font-size:16px;font-weight:700;color:#e2e8f0;"></div>
+    <div id="sdSelRole" style="font-size:11px;color:#94a3b8;margin-top:2px;"></div>
+    <button onclick="runShowdown(window._pvpShip)" style="margin-top:8px;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:1px;">CONFIGURE ENEMY</button>
   </div>
 <div id="sdArena"></div>
   <div id="sdResult"></div>
@@ -7825,45 +7829,58 @@ obs.observe(document.body,{childList:true,subtree:true});
 
 <script>/* v6.17 disable grid */window.initShowdown=function(){};</script>
 
+
+
 <script>
-/* v6.17b Ship search listener */
+/* v6.18 ss-wrap search for showdown */
 (function(){
 window._pvpShip=null;
-var searchEl=document.getElementById("sdPvpSearch");
-var listEl=document.getElementById("sdPvpList");
-if(searchEl){
-searchEl.addEventListener("input",function(){
+var inp=document.getElementById("sdShipInput");
+var drop=document.getElementById("sdShipDrop");
+var inner=document.getElementById("sdShipInner");
+var clrBtn=document.getElementById("sdShipClear");
+if(!inp)return;
+inp.addEventListener("input",function(){
 var q=this.value.toLowerCase().trim();
-if(q.length<1){listEl.classList.remove("open");listEl.innerHTML="";return;}
+if(q.length<1){drop.style.display="none";inner.innerHTML="";clrBtn.style.display="none";return;}
+clrBtn.style.display="block";
 var names=Object.keys(SHIP_DATA);
-var matches=names.filter(function(n){return n.toLowerCase().indexOf(q)>-1;}).slice(0,15);
-if(matches.length===0){listEl.classList.remove("open");listEl.innerHTML="";return;}
-listEl.innerHTML="";
+var matches=names.filter(function(n){return n.toLowerCase().indexOf(q)>-1;}).slice(0,12);
+if(matches.length===0){drop.style.display="none";inner.innerHTML="";return;}
+inner.innerHTML="";
+var hdr=document.createElement("div");
+hdr.style.cssText="padding:4px 10px;font-size:10px;color:#64748b;";
+hdr.textContent=matches.length+" results";
+inner.appendChild(hdr);
 matches.forEach(function(nm){
-var item=document.createElement("div");
-item.className="sd-pvp-item";
-var nameSpan=document.createElement("span");
-nameSpan.textContent=nm;
-var roleSpan=document.createElement("span");
-roleSpan.className="sd-pvp-role";
-roleSpan.textContent=SHIP_DATA[nm].role||"";
-item.appendChild(nameSpan);
-item.appendChild(roleSpan);
-item.onclick=function(){
+var row=document.createElement("div");
+row.className="ss-row";
+row.style.cssText="padding:8px 10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;";
+row.onmouseenter=function(){row.style.background="rgba(220,38,38,.15)";};
+row.onmouseleave=function(){row.style.background="";};
+var nameEl=document.createElement("span");
+nameEl.style.cssText="color:#e2e8f0;font-size:13px;font-weight:600;";
+nameEl.textContent=nm;
+var roleEl=document.createElement("span");
+roleEl.style.cssText="color:#64748b;font-size:11px;";
+roleEl.textContent=(SHIP_DATA[nm].role||"")+" "+SHIP_DATA[nm].size;
+row.appendChild(nameEl);row.appendChild(roleEl);
+row.onclick=function(){
 window._pvpShip=nm;
-searchEl.value="";
-listEl.classList.remove("open");
-listEl.innerHTML="";
-var selDiv=document.getElementById("sdPvpSelected");
-selDiv.classList.add("active");
-document.getElementById("sdPvpName").textContent=nm;
-document.getElementById("sdPvpRole").textContent=SHIP_DATA[nm].role||"";
+inp.value="";
+drop.style.display="none";
+clrBtn.style.display="none";
+document.getElementById("sdSelectedShip").style.display="block";
+document.getElementById("sdSelName").textContent=nm;
+document.getElementById("sdSelRole").textContent=SHIP_DATA[nm].role||"";
 };
-listEl.appendChild(item);
+inner.appendChild(row);
 });
-listEl.classList.add("open");
+drop.style.display="flex";
 });
-}
+clrBtn.addEventListener("click",function(){
+inp.value="";drop.style.display="none";inner.innerHTML="";clrBtn.style.display="none";
+});
 })();
 </script>
 </body>
