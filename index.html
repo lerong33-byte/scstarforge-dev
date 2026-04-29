@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.72-DEV</title>
+<title>SC-ShipForge v6.73-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.72-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.73-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7365,7 +7365,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.72-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.73-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -8144,6 +8144,24 @@ aside.rp{display:none!important;}
 </style>
 <script>
 (function(){function ensure(){var lo=document.querySelector('#loContent .lo');if(!lo)return;var hp=lo.children[2];var ms=lo.children[4];var sy=lo.children[6];if(hp && !hp.dataset.hpexpHooked){hp.dataset.hpexpHooked='1';hp.addEventListener('click',function(ev){var row=ev.target.closest('.slot-row');if(!row||row.parentNode!==hp)return;var t=ev.target;if(t.tagName==='SELECT'||t.tagName==='OPTION'||t.tagName==='BUTTON'||t.closest('select')||t.closest('button'))return;row.classList.toggle('hpexp');},true);}if(ms && !ms.dataset.mexpHooked){ms.dataset.mexpHooked='1';ms.addEventListener('click',function(ev){var row=ev.target.closest('.slot-row');if(!row||row.parentNode!==ms)return;var t=ev.target;if(t.tagName==='SELECT'||t.tagName==='OPTION'||t.tagName==='BUTTON'||t.closest('select')||t.closest('button'))return;row.classList.toggle('mexp');},true);}if(sy && !sy.dataset.cexpHooked){sy.dataset.cexpHooked='1';sy.addEventListener('click',function(ev){var row=ev.target.closest('.comp-row');if(!row||row.parentNode!==sy)return;var t=ev.target;if(t.tagName==='SELECT'||t.tagName==='OPTION'||t.tagName==='BUTTON'||t.closest('select')||t.closest('button'))return;row.classList.toggle('cexp');},true);}}var lc=document.getElementById('loContent');if(lc){var obs=new MutationObserver(ensure);obs.observe(lc,{childList:true,subtree:true});ensure();}document.addEventListener('DOMContentLoaded',ensure);})();
+</script>
+
+<!-- PHASE_2_DATA -->
+<style id="phase2Styles">
+#p2cards{position:fixed;top:160px;right:14px;width:360px;max-height:calc(100vh - 180px);overflow-y:auto;display:flex;flex-direction:column;gap:8px;z-index:50;font-family:var(--fmono);}
+#p2cards::-webkit-scrollbar{width:6px;}
+#p2cards::-webkit-scrollbar-thumb{background:var(--hud-line-bright);border-radius:3px;}
+.p2card{background:linear-gradient(180deg,#162338 0%,#0d1729 100%);border:1px solid var(--hud-line-bright);border-radius:6px;padding:8px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.5);}
+.p2card-hd{font-size:9px;font-weight:800;letter-spacing:3px;color:var(--hud-cyan);text-transform:uppercase;border-bottom:1px solid var(--hud-line);padding-bottom:5px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.p2card-hd .p2-status{font-size:8px;color:var(--hud-t3);letter-spacing:1px;font-weight:600;}
+.p2card-hd .p2-status.ok{color:var(--hud-green);}
+.p2card-hd .p2-status.err{color:var(--hud-red);}
+.p2row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;color:var(--hud-t2);line-height:1.4;}
+.p2row > span:last-child{color:var(--hud-t1);font-weight:600;}
+.p2row .p2-missing{color:var(--hud-t3);opacity:.6;}
+</style>
+<script>
+(function(){var CACHE_KEY='__p2cache_v1';var TTL=86400000;function loadCache(){try{var c=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');return c;}catch(e){return {};}}function saveCache(c){try{localStorage.setItem(CACHE_KEY,JSON.stringify(c));}catch(e){}}window.MINED=window.MINED||{};var inflight={};function parseInfobox(wt){var s=wt.indexOf('{{Vehicle');if(s<0)return null;var d=0,j=s;while(j<wt.length){if(wt.substr(j,2)==='{{'){d++;j+=2;}else if(wt.substr(j,2)==='}}'){d--;j+=2;if(d===0)break;}else j++;}var ib=wt.substring(s,j);var params={};var lines=ib.split(/\n\s*\|/);for(var i=1;i<lines.length;i++){var ln=lines[i];var eq=ln.indexOf('=');if(eq<0)continue;var k=ln.substring(0,eq).trim().toLowerCase();var v=ln.substring(eq+1).trim();v=v.replace(/\{\{[^}]*\}\}/g,'').replace(/\[\[([^\]|]*\|)?([^\]]*)\]\]/g,'$2').replace(/<!--.*?-->/g,'').trim();if(v.length>0&&v.length<200)params[k]=v;}return params;}window.loadMinedData=function(shipName){if(!shipName)return Promise.resolve(null);var cache=loadCache();var entry=cache[shipName];if(entry&&entry.t&&(Date.now()-entry.t<TTL)){window.MINED[shipName]=entry.d;renderP2(shipName);return Promise.resolve(entry.d);}if(inflight[shipName])return inflight[shipName];var url='https://starcitizen.tools/api.php?action=parse&page='+encodeURIComponent(shipName)+'&format=json&prop=wikitext&origin=*';inflight[shipName]=fetch(url).then(function(r){return r.json();}).then(function(d){var wt=(d.parse&&d.parse.wikitext&&d.parse.wikitext['*'])||'';var params=parseInfobox(wt);if(!params)throw new Error('no infobox');window.MINED[shipName]=params;cache[shipName]={t:Date.now(),d:params};saveCache(cache);renderP2(shipName);delete inflight[shipName];return params;}).catch(function(e){window.MINED[shipName]={__err:e.message};renderP2(shipName);delete inflight[shipName];return null;});return inflight[shipName];};function row(label,val){return '<div class="p2row"><span>'+label+'</span><span'+(val?'':' class=p2-missing')+'>'+(val||'—')+'</span></div>';}function renderP2(shipName){var cont=document.getElementById('p2cards');if(!cont)return;var d=window.MINED[shipName]||{};var hasData=d&&!d.__err&&Object.keys(d).length>0;var status=d&&d.__err?'<span class="p2-status err">FETCH ERR</span>':(hasData?'<span class="p2-status ok">✓ WIKI</span>':'<span class="p2-status">LOADING…</span>');var html='';html+='<div class="p2card"><div class="p2card-hd">Hull / Mass'+status+'</div>';html+=row('Mass',d.mass);html+=row('Length',d.length);html+=row('Width',d.beam||d.width);html+=row('Height',d.height);html+=row('Crew',d.crew||d['max crew']);html+=row('Cargo',d.cargo);html+=row('Hull HP',d.hp||d.hull);html+='</div>';html+='<div class="p2card"><div class="p2card-hd">Signatures'+status+'</div>';html+=row('IR',d.ir);html+=row('EM idle',d['em idle']||d.em);html+=row('EM max',d['em max']);html+=row('CS',d.cs||d['cross section']);html+=row('Distortion',d.distortion);html+='</div>';html+='<div class="p2card"><div class="p2card-hd">Flight'+status+'</div>';html+=row('SCM',d.scm||d['scm speed']);html+=row('NAV',d.nav||d['nav speed']||d.boost);html+=row('Pitch',d.pitch);html+=row('Yaw',d.yaw);html+=row('Roll',d.roll);html+='</div>';html+='<div class="p2card"><div class="p2card-hd">Defense'+status+'</div>';html+=row('Phys mod',d['phys mod']||d.physical);html+=row('Energy mod',d['energy mod']||d.energy);html+=row('Distortion mod',d['distortion mod']);html+=row('Penetration',d.penetration);html+='</div>';html+='<div class="p2card"><div class="p2card-hd">Fuel'+status+'</div>';html+=row('Hydrogen',d.hydrogen||d['hydrogen fuel']);html+=row('Quantum',d.quantum||d['quantum fuel']);html+=row('QD range',d['quantum range']||d['qd range']);html+=row('Refuel',d.refuel);html+='</div>';cont.innerHTML=html;}function ensureContainer(){if(!document.getElementById('p2cards')){var c=document.createElement('div');c.id='p2cards';document.body.appendChild(c);}}function tick(){ensureContainer();var s=window.selShip;if(s){renderP2(s);if(!window.MINED[s]||window.MINED[s].__err)window.loadMinedData(s);}}var origPick=window.pickShip;if(origPick&&!window.__p2hooked){window.__p2hooked=true;window.pickShip=function(n){var r=origPick.apply(this,arguments);setTimeout(tick,200);return r;};}document.addEventListener('DOMContentLoaded',tick);setTimeout(tick,1500);})();
 </script>
 </body>
 <!-- deploy-force --><!-- deploy -->
