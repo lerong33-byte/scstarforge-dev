@@ -7862,7 +7862,7 @@ ship.missiles.forEach(function(ml){
 var mr=document.createElement('div');mr.style.cssText='display:flex;align-items:center;gap:6px;padding:7px 8px;background:rgba(15,23,42,.4);border-radius:5px;margin-bottom:4px;';
 var mlb=document.createElement('span');mlb.style.cssText='color:#e2e8f0;font-size:11px;min-width:70px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';mlb.textContent=ml.lbl;
 var msel=document.createElement('select');msel.style.cssText='flex:1;padding:5px 6px;background:rgba(15,23,42,.8);border:1px solid rgba(100,116,139,.3);border-radius:4px;color:#e2e8f0;font-size:11px;min-width:0;';
-var mslWpns=WEAPONS.filter(function(w){return w.sz<=ml.sz&&(w.type==="missile-ir"||w.type==="missile-em"||w.type==="missile-cs");});
+var mslWpns=WEAPONS.filter(function(w){return w.sz<=ml.sz&&w.type.indexOf("missile")>-1;});
 mslWpns.forEach(function(w){var o=document.createElement('option');o.value=w.id;o.textContent=w.name;if(w.id===ml.default)o.selected=true;msel.appendChild(o);});
 var mct=document.createElement('span');mct.style.cssText='color:#60a5fa;font-size:10px;font-weight:600;';mct.textContent='x'+(ml.count||1);
 mr.appendChild(mlb);mr.appendChild(msel);mr.appendChild(mct);L.appendChild(mr);
