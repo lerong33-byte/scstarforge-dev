@@ -64,7 +64,7 @@ window.renderSpvChart = renderSpvChart;
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.6 DEV</title>
+<title>SC-ShipForge v6.7 DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -844,6 +844,19 @@ option,optgroup{background:var(--bg2)}
 #pane-sd{padding:16px}#pane-sd .sd-mode-bar{display:flex;justify-content:center;gap:8px;margin-bottom:16px}#pane-sd .sd-mode-btn{padding:8px 24px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#8892a0;cursor:pointer;font-size:13px;font-weight:600}#pane-sd .sd-mode-btn.active{background:rgba(59,130,246,.15);color:#60a5fa;border-color:rgba(59,130,246,.3)}#pane-sd .sd-enemies{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:8px}#pane-sd .sd-enemy{padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;text-align:center;cursor:pointer}#pane-sd .sd-enemy:hover{border-color:rgba(255,255,255,.15)}#pane-sd .sd-enemy.selected{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.08)}#pane-sd .sd-enemy-name{font-size:13px;font-weight:600;margin:0}#pane-sd .sd-enemy-diff{font-size:11px;margin:2px 0 0}#pane-sd .sd-sim{padding:16px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:rgba(0,0,0,.1);margin:16px 0}#pane-sd .sd-verdict{text-align:center;padding:14px;border-radius:10px;margin:12px 0}
 
 .slot-row:has(.slot-body-top button:not([style*="background"]):not([style*="rgb"])){opacity:1}/* OFF state - detected by button text */.slot-body-top button{transition:all .2s}/* When weapon is OFF, dim the entire slot card */#loContent .slot-row.weapon-off{opacity:.4}#loContent .slot-row.weapon-off .slot-body-top button{background:#3a3a3a!important;color:#888!important}/* Left pane refinements to match mockup */.lp{padding:8px!important}.lp .ship-img-wrap{border-radius:8px;overflow:hidden;margin-bottom:8px}.lp .kpi-strip{display:flex;justify-content:space-around;padding:6px 0;margin-bottom:6px}.lp .kpi-strip>div{text-align:center}.lp #pwrCard{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px;margin-bottom:6px}.lp .lp-section,.lp .col-card{background:rgba(255,255,255,.02);border-radius:6px;padding:6px 8px;margin-bottom:4px}
+
+/* === LEFT PANE REFINEMENT v6.7 === */
+.lp{padding:10px!important;gap:8px}
+.lp h2{font-size:18px!important;font-weight:700;margin:8px 0 6px!important;letter-spacing:.5px}
+.lp [class*="kpi"],.lp .ship-img-wrap+div{display:flex!important;justify-content:space-around!important;padding:6px 0 10px!important;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:8px}
+#pwrCard{background:rgba(255,255,255,.025)!important;border:1px solid rgba(255,255,255,.06)!important;border-radius:10px!important;padding:10px!important;margin-bottom:8px!important}
+.spv-modes,[class*="modes"]{display:flex!important;gap:4px!important;margin-top:8px}
+.spv-mode-btn{flex:1!important;padding:6px 8px!important;border-radius:6px!important;font-size:11px!important;font-weight:600!important;letter-spacing:.3px!important;border:1px solid rgba(255,255,255,.08)!important;background:transparent!important;color:#8892a0!important;cursor:pointer;transition:all .2s}
+.spv-mode-btn.on,.spv-mode-btn[class*="active"]{background:rgba(96,165,250,.12)!important;color:#60a5fa!important;border-color:rgba(96,165,250,.3)!important}
+.lp .lp-card{background:rgba(255,255,255,.02)!important;border:1px solid rgba(255,255,255,.04)!important;border-radius:8px!important;padding:10px!important;margin-bottom:6px!important}
+.lp .lp-card h3,.lp .lp-card .lp-section-hd{font-size:11px!important;color:#8892a0!important;font-weight:600!important;letter-spacing:.5px!important;margin:0 0 6px!important;text-transform:uppercase}
+#liveStatsPanel{position:relative}
+#liveStatsPanel::before{content:"⋯";position:absolute;top:8px;right:12px;font-size:16px;color:#8892a0;cursor:pointer;padding:2px 6px;border-radius:4px}
 </style>
 
 <div id="app">
