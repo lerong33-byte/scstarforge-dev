@@ -7316,74 +7316,46 @@ if(typeof renderShips==="function")
 
 // === LIVE STATS v6.4 ===
 function updateLiveStats(){
-  var ship = window.currentShip;
-  if(!ship || !document.getElementById('lsDps')) return;
-  var slots = ship.slots || [];
-  var totalDps=0, totalAlpha=0, totalDraw=0, wpnCount=0, wpnTypes={energy:0,ballistic:0};
-  slots.forEach(function(s,i){
-    var sel = document.getElementById('wp'+i);
-    var tog = document.getElementById('wpTog'+i);
-    if(!sel || (tog && tog.dataset.off==='1')) return;
-    var wName = sel.value;
-    var w = WEAPONS.find(function(x){return wName.indexOf(x.name)>-1});
-    if(w){totalDps+=w.dps;totalAlpha+=w.alpha;totalDraw+=w.draw;wpnCount++;if(w.type)wpnTypes[w.type]=(wpnTypes[w.type]||0)+1;}
+  if(!window.selShip || !document.getElementById('lsDps')) return;
+  var ship = SHIP_DATA[window.selShip];
+  if(!ship) return;
+  var sels = document.querySelectorAll('#loContent .slot-sel');
+  var totalDps=0,totalAlpha=0,totalDraw=0,eCount=0,bCount=0;
+  sels.forEach(function(s){
+    var w = WEAPONS.find(function(x){return x.id===s.value});
+    if(w && w.dps>0){totalDps+=w.dps;totalAlpha+=(w.alpha||0);totalDraw+=(w.draw||0);if(w.type==='energy')eCount++;else if(w.type==='ballistic')bCount++;}
   });
-  var shieldHP=0, shieldRegen=0, ppOut=0, compDraw=0;
+  var shieldHP=0,shieldRegen=0,ppOut=0;
   if(ship.comps){
-    var ppName=ship.comps.pp;if(ppName){var pp=COMP_DB.pp.find(function(x){return ppName.indexOf(x.name)>-1});if(pp){ppOut=pp.out;}}
-    var sgName=ship.comps.sg;if(sgName){var sg=COMP_DB.sg.find(function(x){return sgName.indexOf(x.name)>-1});if(sg){shieldHP=sg.totalHP*(ship.comps.sgCount||1);shieldRegen=sg.regen;}}
+    var pp=COMP_DB.pp[ship.comps.pp];if(pp){ppOut=pp.out*(ship.comps.counts&&ship.comps.counts.pp||1);}
+    var sg=COMP_DB.sg[ship.comps.sg];if(sg){var sgC=ship.comps.counts&&ship.comps.counts.sg||1;shieldHP=sg.totalHP*sgC;shieldRegen=sg.regen*sgC;}
   }
-  var powerPct = ppOut>0 ? Math.round((totalDraw/ppOut)*100) : 0;
-  document.getElementById('lsDps').textContent = totalDps.toLocaleString();
-  document.getElementById('lsDpsSub').textContent = (wpnTypes.energy||0)+'x energy + '+(wpnTypes.ballistic||0)+'x ballistic';
-  document.getElementById('lsShield').textContent = shieldHP.toLocaleString();
-  document.getElementById('lsShieldSub').textContent = 'regen '+shieldRegen+'/s';
-  document.getElementById('lsPower').textContent = powerPct+'%';
-  document.getElementById('lsPowerBar').style.width = Math.min(powerPct,100)+'%';
-  document.getElementById('lsPowerBar').style.background = powerPct>90?'#ef4444':powerPct>70?'#fbbf24':'#34d399';
-  document.getElementById('lsAlpha').textContent = totalAlpha.toLocaleString();
-  // Hardpoint SVG
-  var svg = document.getElementById('lsShipSvg');
-  var hpHtml = '<polygon points="60,8 45,28 33,42 26,72 94,72 87,42 75,28" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>';
-  var positions = [[60,18],[35,42],[85,42],[45,58],[75,58],[60,35],[50,50],[70,50]];
-  var activeGuns=0;
-  slots.forEach(function(s,i){
-    if(i>=positions.length) return;
-    var tog = document.getElementById('wpTog'+i);
-    var isOff = tog && tog.dataset.off==='1';
-    var px=positions[i][0], py=positions[i][1];
-    var col=isOff?'#8892a0':'#ef4444';
-    var op=isOff?'0.3':'0.8';
-    hpHtml+='<circle cx="'+px+'" cy="'+py+'" r="3" fill="'+col+'" opacity="'+op+'"/>';
-    if(!isOff) activeGuns++;
-  });
-  svg.innerHTML = hpHtml;
-  document.getElementById('lsHpSummary').textContent = activeGuns+'/'+slots.length+' active';
-  // Breakdown
-  var bd = document.getElementById('lsBreakdown');
-  var scm = ship.scm||0;
-  bd.innerHTML = '<div class="ls-mini"><span class="ls-mini-l">SCM</span><span class="ls-mini-v">'+scm+' m/s</span></div>'
-    +'<div class="ls-mini"><span class="ls-mini-l">Range</span><span class="ls-mini-v">mixed</span></div>'
+  var powerPct=ppOut>0?Math.round((totalDraw/ppOut)*100):0;
+  document.getElementById('lsDps').textContent=totalDps.toLocaleString();
+  document.getElementById('lsDpsSub').textContent=eCount+'x energy + '+bCount+'x ballistic';
+  document.getElementById('lsShield').textContent=shieldHP.toLocaleString();
+  document.getElementById('lsShieldSub').textContent='regen '+shieldRegen.toLocaleString()+'/s';
+  document.getElementById('lsPower').textContent=powerPct+'%';
+  var pb=document.getElementById('lsPowerBar');
+  pb.style.width=Math.min(powerPct,100)+'%';
+  pb.style.background=powerPct>90?'#ef4444':powerPct>70?'#fbbf24':'#34d399';
+  document.getElementById('lsAlpha').textContent=totalAlpha.toLocaleString();
+  var svg=document.getElementById('lsShipSvg');
+  var h='<polygon points="60,8 45,28 33,42 26,72 94,72 87,42 75,28" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>';
+  var pos=[[60,18],[35,42],[85,42],[45,58],[75,58],[60,35]];
+  var slots=ship.slots||[];
+  slots.forEach(function(s,i){if(i>=pos.length)return;h+='<circle cx="'+pos[i][0]+'" cy="'+pos[i][1]+'" r="3" fill="#ef4444" opacity=".8"/>';});
+  svg.innerHTML=h;
+  document.getElementById('lsHpSummary').textContent=slots.length+'x mounts';
+  var bd=document.getElementById('lsBreakdown');
+  bd.innerHTML='<div class="ls-mini"><span class="ls-mini-l">SCM</span><span class="ls-mini-v">'+(ship.scm||0)+' m/s</span></div>'
     +'<div class="ls-mini"><span class="ls-mini-l">Wpn draw</span><span class="ls-mini-v">'+totalDraw+' EU</span></div>'
-    +'<div class="ls-mini"><span class="ls-mini-l">PP output</span><span class="ls-mini-v">'+ppOut+'</span></div>';
+    +'<div class="ls-mini"><span class="ls-mini-l">PP out</span><span class="ls-mini-v">'+ppOut+'</span></div>'
+    +'<div class="ls-mini"><span class="ls-mini-l">Size</span><span class="ls-mini-v">'+(ship.size||'?')+'</span></div>';
 }
+document.addEventListener('change',function(e){if(e.target&&e.target.classList.contains('slot-sel'))setTimeout(updateLiveStats,100);});
+setInterval(updateLiveStats,2000);
 
-// Hook into ship selection to update live stats
-(function(){
-  var origLoadShip = window.loadShip;
-  if(origLoadShip){
-    window.loadShip = function(name){
-      origLoadShip(name);
-      setTimeout(updateLiveStats, 300);
-    };
-  }
-  // Also listen for dropdown changes in loadout
-  document.addEventListener('change', function(e){
-    if(e.target && (e.target.id||'').match(/^wp\d|^comp/)) setTimeout(updateLiveStats, 100);
-  });
-  // Periodic update
-  setInterval(updateLiveStats, 2000);
-})();
 
 setTimeout(renderShips,500);
 </script>
