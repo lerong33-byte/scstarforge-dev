@@ -1178,6 +1178,8 @@ option,optgroup{background:var(--bg2)}
 <div class="sd-opp-grid" id="sdOppGrid"></div>
 </div>
 </div>
+<div id="sdResult"></div>
+
 
 <div id="sdResults" style="display:none">
 <div class="sd-arena">
@@ -7370,6 +7372,116 @@ function updateLiveStats(){
 document.addEventListener('change',function(e){if(e.target&&e.target.classList.contains('slot-sel'))setTimeout(updateLiveStats,100);});
 setInterval(updateLiveStats,2000);
 
+
+
+// === SHIP SHOWDOWN v6.5 ===
+var SD_ENEMIES = [
+  {name:'Aurora MR',diff:'Easy',color:'#34d399'},
+  {name:'Mustang Delta',diff:'Easy',color:'#34d399'},
+  {name:'Buccaneer',diff:'Medium',color:'#fbbf24'},
+  {name:'Cutlass Black',diff:'Medium',color:'#fbbf24'},
+  {name:'Gladius',diff:'Medium',color:'#fbbf24'},
+  {name:'Vanguard Warden',diff:'Hard',color:'#ef4444'},
+  {name:'Eclipse',diff:'Hard',color:'#ef4444'},
+  {name:'Hammerhead',diff:'Boss',color:'#a32d2d'},
+  {name:'Idris-M',diff:'Boss',color:'#a32d2d'}
+];
+
+function initShowdown(){
+  var grid=document.querySelector('.sd-enemies');
+  if(!grid||grid.children.length>0) return;
+  SD_ENEMIES.forEach(function(e){
+    var card=document.createElement('div');
+    card.className='sd-enemy';
+    card.innerHTML='<p class="sd-enemy-name">'+e.name+'</p><p class="sd-enemy-diff" style="color:'+e.color+'">'+e.diff+'</p>';
+    card.onclick=function(){
+      document.querySelectorAll('.sd-enemy').forEach(function(c){c.classList.remove('selected')});
+      card.classList.add('selected');
+      runShowdown(e.name);
+    };
+    grid.appendChild(card);
+  });
+}
+
+function runShowdown(oppName){
+  var myShip=window.selShip;
+  if(!myShip){document.getElementById('sdResult').innerHTML='<p style="color:#8892a0;text-align:center;padding:20px">Load a ship first in the Loadout Builder</p>';return;}
+  var my=SHIP_DATA[myShip],opp=SHIP_DATA[oppName];
+  if(!my||!opp){return;}
+  var myDps=0,oppDps=0;
+  var sels=document.querySelectorAll('#loContent .slot-sel');
+  sels.forEach(function(s){var w=WEAPONS.find(function(x){return x.id===s.value});if(w&&(w.type==='energy'||w.type==='ballistic'))myDps+=w.dps;});
+  (opp.slots||[]).forEach(function(s){if(s.default){var w=WEAPONS.find(function(x){return x.id===s.default||x.name===s.default});if(w)oppDps+=w.dps;}});
+  if(oppDps===0)(opp.slots||[]).forEach(function(s){if(s.sz){var matches=WEAPONS.filter(function(x){return x.sz==s.sz});if(matches.length)oppDps+=matches[0].dps;}});
+  var mySg=COMP_DB.sg[my.comps&&my.comps.sg];var myHP=mySg?(mySg.totalHP*((my.comps.counts&&my.comps.counts.sg)||1)):5000;
+  var oppSg=COMP_DB.sg[opp.comps&&opp.comps.sg];var oppHP=oppSg?(oppSg.totalHP*((opp.comps.counts&&opp.comps.counts.sg)||1)):5000;
+  var myTTK=oppDps>0?(myHP/oppDps).toFixed(1):'?';
+  var oppTTK=myDps>0?(oppHP/myDps).toFixed(1):'?';
+  var myTTKn=parseFloat(myTTK)||99,oppTTKn=parseFloat(oppTTK)||99;
+  var ratio=myTTKn/oppTTKn;
+  var verdict,vColor,vBg,tip;
+  if(ratio>1.3){verdict='YOU WIN';vColor='#34d399';vBg='rgba(52,211,153,.1)';tip='You can take more hits and kill faster.';}
+  else if(ratio<0.7){verdict='YOU LOSE';vColor='#ef4444';vBg='rgba(239,68,68,.1)';tip='Opponent outguns you. Try different loadout.';}
+  else{verdict='CLOSE FIGHT';vColor='#fbbf24';vBg='rgba(251,191,36,.1)';tip='Could go either way. Piloting decides this one.';}
+  var html='<div class="sd-arena"><div class="sd-fighter you"><p class="sd-fighter-label">YOUR SHIP</p><p class="sd-ship-name" style="color:#60a5fa">'+myShip+'</p><p class="sd-ship-sub">Your loadout</p>';
+  html+='<div class="sd-stats"><div class="sd-stat"><span class="sd-stat-lbl">DPS</span><span class="sd-stat-val" style="color:#ef4444">'+myDps+'</span></div>';
+  html+='<div class="sd-stat"><span class="sd-stat-lbl">Shield</span><span class="sd-stat-val" style="color:#a78bfa">'+myHP.toLocaleString()+'</span></div>';
+  html+='<div class="sd-stat"><span class="sd-stat-lbl">SCM</span><span class="sd-stat-val">'+(my.scm||0)+'</span></div></div></div>';
+  html+='<div class="sd-vs"><div class="sd-vs-circle">VS</div></div>';
+  html+='<div class="sd-fighter"><p class="sd-fighter-label">OPPONENT</p><p class="sd-ship-name" style="color:#ef4444">'+oppName+'</p><p class="sd-ship-sub">Default loadout</p>';
+  html+='<div class="sd-stats"><div class="sd-stat"><span class="sd-stat-lbl">DPS</span><span class="sd-stat-val" style="color:#ef4444">'+oppDps+'</span></div>';
+  html+='<div class="sd-stat"><span class="sd-stat-lbl">Shield</span><span class="sd-stat-val" style="color:#a78bfa">'+oppHP.toLocaleString()+'</span></div>';
+  html+='<div class="sd-stat"><span class="sd-stat-lbl">SCM</span><span class="sd-stat-val">'+(opp.scm||0)+'</span></div></div></div></div>';
+  html+='<div class="sd-sim"><p class="sd-sim-title">ENGAGEMENT SIMULATION</p>';
+  html+='<div class="sd-ttk-row"><div class="sd-ttk"><div class="sd-ttk-label"><span style="color:#60a5fa;font-weight:600">'+myShip+'</span><span style="color:#8892a0">TTK: '+oppTTK+'s</span></div><div class="sd-ttk-bar"><div class="sd-ttk-fill" style="width:'+Math.min(100,Math.round((oppTTKn/(myTTKn+oppTTKn))*100))+'%;background:#60a5fa"></div></div></div>';
+  html+='<div class="sd-ttk"><div class="sd-ttk-label"><span style="color:#ef4444;font-weight:600">'+oppName+'</span><span style="color:#8892a0">TTK: '+myTTK+'s</span></div><div class="sd-ttk-bar"><div class="sd-ttk-fill" style="width:'+Math.min(100,Math.round((myTTKn/(myTTKn+oppTTKn))*100))+'%;background:#ef4444"></div></div></div></div>';
+  html+='<div class="sd-verdict" style="background:'+vBg+';border:1px solid '+vColor+'30"><p class="sd-verdict-text" style="color:'+vColor+'">'+verdict+'</p><p class="sd-verdict-tip" style="color:'+vColor+'99">'+tip+'</p></div></div>';
+  html+='<div class="sd-actions"><button class="sd-action-btn" onclick="showTab('lo',document.querySelector('[data-t=lo]'))">Try different loadout</button></div>';
+  document.getElementById('sdResult').innerHTML=html;
+}
+
+function initShowdownPvp(){
+  var sec=document.getElementById('sdPvpSection');
+  if(!sec) return;
+  var html='<div class="sd-opponent-select"><input class="sd-opp-search" placeholder="Search for opponent ship..." oninput="filterSdOpponents(this.value)"></div>';
+  html+='<div id="sdOppGrid" class="sd-opp-grid">';
+  Object.keys(SHIP_DATA).sort().forEach(function(name){
+    html+='<div class="sd-opp-card" onclick="selectSdOpponent(this,''+name.replace(/'/g,"\\'")+'')">'+name+'</div>';
+  });
+  html+='</div>';
+  sec.innerHTML=html;
+}
+function filterSdOpponents(q){
+  var cards=document.querySelectorAll('.sd-opp-card');
+  q=q.toLowerCase();
+  cards.forEach(function(c){c.style.display=c.textContent.toLowerCase().indexOf(q)>-1?'':'none';});
+}
+function selectSdOpponent(el,name){
+  document.querySelectorAll('.sd-opp-card').forEach(function(c){c.classList.remove('selected')});
+  el.classList.add('selected');
+  runShowdown(name);
+}
+
+// Mode toggle
+document.getElementById('sdPveBtn')&&document.getElementById('sdPveBtn').addEventListener('click',function(){
+  this.classList.add('active');document.getElementById('sdPvpBtn').classList.remove('active');
+  document.getElementById('sdPveSection').style.display='';
+  document.getElementById('sdPvpSection').style.display='none';
+});
+document.getElementById('sdPvpBtn')&&document.getElementById('sdPvpBtn').addEventListener('click',function(){
+  this.classList.add('active');document.getElementById('sdPveBtn').classList.remove('active');
+  document.getElementById('sdPveSection').style.display='none';
+  document.getElementById('sdPvpSection').style.display='';
+  initShowdownPvp();
+});
+
+// Show tab listener for showdown
+document.addEventListener('click',function(e){
+  if(e.target&&e.target.getAttribute&&e.target.getAttribute('data-t')==='sd'){
+    setTimeout(initShowdown,100);
+  }
+});
+setTimeout(initShowdown,1000);
 
 setTimeout(renderShips,500);
 </script>
