@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.79-DEV</title>
+<title>SC-ShipForge v6.80-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.79-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.80-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7365,7 +7365,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.79-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.80-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -8185,13 +8185,13 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 #dpsCard{border-left:3px solid var(--hud-cyan)!important;}
 #dpsCard #totalDPS{font-family:var(--fmono)!important;font-weight:800!important;color:var(--hud-orange)!important;font-size:22px!important;text-shadow:0 0 8px rgba(255,138,60,.5)!important;}
 #dpsCard #totalAlpha{font-family:var(--fmono)!important;font-weight:800!important;color:var(--hud-amber)!important;font-size:22px!important;text-shadow:0 0 8px rgba(255,201,77,.5)!important;}
-#defCard{border-left:3px solid var(--hud-red)!important;}
-#defCard .def-row{display:flex;justify-content:space-between;font-family:var(--fmono);font-size:10px;padding:3px 0;color:var(--hud-t2);}
-#defCard .def-row > span:last-child{color:var(--hud-t1);font-weight:600;}
-#defCard .def-row .def-missing{color:var(--hud-t3);opacity:.5;font-style:italic;}
+
+
+
+
 </style>
 <script>
-(function(){function ensureDef(){var scroll=document.querySelector('aside.lp .lp-scroll');if(!scroll)return;if(document.getElementById('defCard'))return;var card=document.createElement('div');card.id='defCard';card.className='lp-card';card.innerHTML='<div class="lp-hd">Deflection</div><div id="defRows"><div class="def-row"><span>Phys mod</span><span class="def-missing" id="defPhys">—</span></div><div class="def-row"><span>Energy mod</span><span class="def-missing" id="defEng">—</span></div><div class="def-row"><span>Distortion</span><span class="def-missing" id="defDist">—</span></div><div class="def-row"><span>Penetration</span><span class="def-missing" id="defPen">—</span></div></div>';var dpsCard=document.getElementById('dpsCard');if(dpsCard&&dpsCard.parentNode===scroll)scroll.insertBefore(card,dpsCard.nextSibling);else scroll.appendChild(card);}function pick(d){for(var i=1;i<arguments.length;i++){var k=arguments[i].toLowerCase();if(d[k])return d[k];}return null;}function refreshDef(){ensureDef();var s=window.selShip;var d=(window.MINED&&window.MINED[s])||{};var rows=[['defPhys',pick(d,'phys mod','physical','physical damage modifier')],['defEng',pick(d,'energy mod','energy','energy damage modifier')],['defDist',pick(d,'distortion mod','distortion')],['defPen',pick(d,'penetration')]];rows.forEach(function(r){var el=document.getElementById(r[0]);if(!el)return;if(r[1]){el.textContent=r[1];el.className='';}else{el.textContent='—';el.className='def-missing';}});}function tick(){refreshDef();}var orig=window.pickShip;if(orig&&!window.__lpv2hooked){window.__lpv2hooked=true;window.pickShip=function(n){var r=orig.apply(this,arguments);setTimeout(tick,300);return r;};}document.addEventListener('DOMContentLoaded',tick);setTimeout(tick,1500);setInterval(tick,3000);})();
+(function(){function ensureDef(){var ex=document.getElementById('defCard');if(ex)ex.remove();}function pick(d){for(var i=1;i<arguments.length;i++){var k=arguments[i].toLowerCase();if(d[k])return d[k];}return null;}function refreshDef(){ensureDef();var s=window.selShip;var d=(window.MINED&&window.MINED[s])||{};var rows=[['defPhys',pick(d,'phys mod','physical','physical damage modifier')],['defEng',pick(d,'energy mod','energy','energy damage modifier')],['defDist',pick(d,'distortion mod','distortion')],['defPen',pick(d,'penetration')]];rows.forEach(function(r){var el=document.getElementById(r[0]);if(!el)return;if(r[1]){el.textContent=r[1];el.className='';}else{el.textContent='—';el.className='def-missing';}});}function tick(){refreshDef();}var orig=window.pickShip;if(orig&&!window.__lpv2hooked){window.__lpv2hooked=true;window.pickShip=function(n){var r=orig.apply(this,arguments);setTimeout(tick,300);return r;};}document.addEventListener('DOMContentLoaded',tick);setTimeout(tick,1500);setInterval(tick,3000);})();
 </script>
 
 </body>
