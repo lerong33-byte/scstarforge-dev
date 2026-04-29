@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.86-DEV</title>
+<title>SC-ShipForge v6.87-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.86-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.87-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7365,7 +7365,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.86-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.87-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -8280,6 +8280,171 @@ aside.lp{overflow-y:auto!important;overflow-x:hidden!important;max-height:calc(1
 .pane::-webkit-scrollbar-thumb, aside.lp::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#1f3553,#0f1d31);border-radius:4px;}
 .pane::-webkit-scrollbar-thumb:hover, aside.lp::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#2a456b,#16263f);}
 </style>
+
+<!-- ENEMY_INFO_CARD -->
+<style id="enemyInfoCardCss">
+#sdSelectedShip{padding:0!important;overflow:hidden!important;}
+#sdSelectedShip button{display:none!important;}
+#sdSelectedShip #sdSelName,#sdSelectedShip #sdSelRole{display:none!important;}
+.enemy-info-card{display:grid!important;grid-template-columns:380px 1fr!important;gap:0!important;background:linear-gradient(180deg,#162338,#0d1729)!important;}
+.enemy-info-card .eic-img-wrap{position:relative;background:#0a0e14;display:flex;align-items:center;justify-content:center;min-height:240px;overflow:hidden;}
+.enemy-info-card .eic-img{width:100%;height:100%;object-fit:cover;display:block;}
+.enemy-info-card .eic-img-wrap.loading::after{content:'Loading…';position:absolute;font-family:var(--fmono);color:var(--hud-t3);font-size:10px;letter-spacing:2px;}
+.enemy-info-card .eic-name-overlay{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85));}
+.enemy-info-card .eic-name{font-family:var(--fmono);font-size:18px;font-weight:800;color:var(--hud-t1);letter-spacing:1.5px;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,.8);line-height:1.1;}
+.enemy-info-card .eic-role{font-family:var(--fmono);font-size:9px;color:var(--hud-cyan);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+.enemy-info-card .eic-info{padding:14px 18px;display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;align-content:start;}
+.enemy-info-card .eic-row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgba(255,255,255,.04);padding:3px 0;}
+.enemy-info-card .eic-row .eic-lbl{font-family:var(--fmono);font-size:9px;color:var(--hud-t3);letter-spacing:1.5px;text-transform:uppercase;}
+.enemy-info-card .eic-row .eic-val{font-family:var(--fmono);font-size:11px;color:var(--hud-t1);font-weight:700;text-align:right;}
+.enemy-info-card .eic-row .eic-val.eic-cost{color:var(--hud-amber);text-shadow:0 0 6px rgba(255,201,77,.4);font-size:13px;}
+.enemy-info-card .eic-actions{grid-column:1 / -1;display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.enemy-info-card .eic-action{flex:1;min-width:140px;padding:6px 10px;background:linear-gradient(180deg,#1c2c46,#11192c);border:1px solid var(--hud-line-bright);border-left:3px solid var(--hud-cyan);border-radius:3px;color:var(--hud-cyan);font-family:var(--fmono);font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;text-align:center;cursor:pointer;transition:all .1s;}
+.enemy-info-card .eic-action:hover{filter:brightness(1.2);border-left-color:var(--hud-orange);color:var(--hud-orange);}
+.enemy-info-card .eic-buy-info{grid-column:1 / -1;font-family:var(--fmono);font-size:10px;color:var(--hud-t2);padding:6px 8px;background:rgba(0,0,0,.3);border-radius:3px;margin-top:4px;line-height:1.4;}
+@media (max-width:900px){.enemy-info-card{grid-template-columns:1fr!important;}.enemy-info-card .eic-img-wrap{min-height:180px;}}
+</style>
+<script>(function(){
+if(window.__enemyInfoCardInstalled)return;window.__enemyInfoCardInstalled=true;
+var cache={};
+var KNOWN_DEALERS={
+  'Cutlass Black':'New Deal — Lorville (Hurston)',
+  'Cutlass Red':'New Deal — Lorville (Hurston)',
+  'Cutlass Blue':'Cordbase — microTech',
+  'Aurora MR':'Astro Armada — Area18 / New Deal — Lorville',
+  '300i':'Astro Armada — Area18',
+  '325a':'Astro Armada — Area18',
+  '350r':'Astro Armada — Area18',
+  '600i Touring':'Astro Armada — Area18',
+  '600i Explorer':'Astro Armada — Area18',
+  '135c':'Astro Armada — Area18',
+  'Hammerhead':'New Deal — Lorville',
+  'Constellation Andromeda':'Astro Armada — Area18',
+  'Constellation Aquila':'Astro Armada — Area18',
+  'Constellation Phoenix':'Astro Armada — Area18',
+  'Constellation Taurus':'Astro Armada — Area18',
+  'Avenger Titan':'Astro Armada — Area18',
+  'Avenger Stalker':'Astro Armada — Area18',
+  'Avenger Warlock':'Astro Armada — Area18',
+  'Caterpillar':'New Deal — Lorville',
+  'Hornet F7C':'Astro Armada — Area18 / New Deal — Lorville',
+  'Hornet F7C-M':'Astro Armada — Area18',
+  'Vanguard Warden':'Astro Armada — Area18',
+  'Vanguard Sentinel':'Astro Armada — Area18',
+  'Vanguard Hoplite':'Astro Armada — Area18',
+  'Vanguard Harbinger':'Astro Armada — Area18',
+  'Cutlass Steel':'New Deal — Lorville',
+  'Freelancer':'New Deal — Lorville',
+  'Freelancer DUR':'New Deal — Lorville',
+  'Freelancer MAX':'New Deal — Lorville',
+  'Freelancer MIS':'New Deal — Lorville',
+  'Mustang Alpha':'Astro Armada — Area18',
+  'Mustang Beta':'Astro Armada — Area18',
+  'Mustang Delta':'Astro Armada — Area18',
+  'Mustang Gamma':'Astro Armada — Area18',
+  'Reliant Kore':'New Deal — Lorville'
+};
+function fetchInfo(name){
+  if(cache[name])return Promise.resolve(cache[name]);
+  var page=name.replace(/ /g,'_');
+  return fetch('https://starcitizen.tools/api.php?action=parse&page='+encodeURIComponent(page)+'&format=json&prop=wikitext&origin=*')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var t=(d&&d.parse&&d.parse.wikitext&&d.parse.wikitext['*'])||'';
+      function pick(k){var m=t.match(new RegExp('\\|\\s*'+k+'\\s*=\\s*([^\\n|]*)','i'));return m?m[1].trim():'';}
+      var info={
+        manufacturer:pick('manufacturer'),
+        role:pick('role'),
+        size:pick('size'),
+        career:pick('career'),
+        mincrew:pick('mincrew'),
+        maxcrew:pick('maxcrew'),
+        cargo:pick('cargocapacity'),
+        length:pick('length'),
+        width:pick('width'),
+        height:pick('height'),
+        pledgecost:pick('pledgecost'),
+        warbondcost:pick('warbondcost'),
+        availability:pick('pledgeavailability'),
+        productionstate:pick('productionstate'),
+        rsistore:pick('rsistoreurl'),
+        image:pick('image')
+      };
+      cache[name]=info;return info;
+    })
+    .catch(function(){return{};});
+}
+function imgURLFromName(filename){
+  if(!filename)return null;
+  var safe=filename.replace(/ /g,'_');
+  return 'https://starcitizen.tools/Special:Redirect/file/'+encodeURIComponent(safe);
+}
+function buildCard(name){
+  var sel=document.getElementById('sdSelectedShip');
+  if(!sel)return;
+  var existing=sel.querySelector('.enemy-info-card');
+  if(existing&&existing.dataset.ship===name)return;
+  if(existing)existing.remove();
+  
+  var card=document.createElement('div');
+  card.className='enemy-info-card';
+  card.dataset.ship=name;
+  var sd=window.SHIP_DATA&&window.SHIP_DATA[name]||{};
+  var roleBasic=sd.role||'';
+  var sizeBasic=sd.size||'';
+  var crewBasic=sd.crew||'';
+  card.innerHTML='<div class="eic-img-wrap loading"><img class="eic-img" alt="" style="display:none"><div class="eic-name-overlay"><div class="eic-name">'+name+'</div><div class="eic-role">'+(roleBasic?roleBasic+' · ':'')+(sizeBasic?'Size '+sizeBasic:'')+'</div></div></div><div class="eic-info"><div class="eic-row"><span class="eic-lbl">Manufacturer</span><span class="eic-val eic-manf">—</span></div><div class="eic-row"><span class="eic-lbl">Career</span><span class="eic-val eic-career">—</span></div><div class="eic-row"><span class="eic-lbl">Role</span><span class="eic-val eic-role-detail">'+(roleBasic||'—')+'</span></div><div class="eic-row"><span class="eic-lbl">Size</span><span class="eic-val eic-size">—</span></div><div class="eic-row"><span class="eic-lbl">Crew</span><span class="eic-val eic-crew">—</span></div><div class="eic-row"><span class="eic-lbl">Cargo</span><span class="eic-val eic-cargo">—</span></div><div class="eic-row"><span class="eic-lbl">Length</span><span class="eic-val eic-length">—</span></div><div class="eic-row"><span class="eic-lbl">Width</span><span class="eic-val eic-width">—</span></div><div class="eic-row"><span class="eic-lbl">Height</span><span class="eic-val eic-height">—</span></div><div class="eic-row"><span class="eic-lbl">Status</span><span class="eic-val eic-status">—</span></div><div class="eic-row"><span class="eic-lbl">Pledge</span><span class="eic-val eic-cost eic-pledge">—</span></div><div class="eic-row"><span class="eic-lbl">Warbond</span><span class="eic-val eic-warbond">—</span></div><div class="eic-buy-info"><b>In-game:</b> <span class="eic-dealer">—</span><br><b>Availability:</b> <span class="eic-avail">—</span></div><div class="eic-actions"><a class="eic-action eic-rsi" target="_blank" href="#">RSI Pledge Store</a><a class="eic-action eic-wiki" target="_blank" href="https://starcitizen.tools/'+encodeURIComponent(name.replace(/ /g,'_'))+'">Wiki Page</a><button class="eic-action eic-configure" type="button">Configure Loadout</button></div></div>';
+  sel.appendChild(card);
+  
+  // Hook configure button — invoke runShowdown again or trigger original behaviour
+  var cfgBtn=card.querySelector('.eic-configure');
+  cfgBtn.onclick=function(){
+    // Scroll the config card into view
+    var cfg=document.querySelector('#pane-sd .sd-config');
+    if(cfg)cfg.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  
+  fetchInfo(name).then(function(info){
+    if(!card.parentNode)return;
+    function set(sel,val){var el=card.querySelector(sel);if(el)el.textContent=val||'—';}
+    set('.eic-manf',info.manufacturer);
+    set('.eic-career',info.career);
+    set('.eic-size',info.size||sizeBasic);
+    var crewTxt=(info.mincrew&&info.maxcrew)?(info.mincrew===info.maxcrew?info.mincrew:info.mincrew+'–'+info.maxcrew):(crewBasic||'');
+    set('.eic-crew',crewTxt);
+    set('.eic-cargo',info.cargo?info.cargo+' SCU':'');
+    set('.eic-length',info.length?info.length+' m':'');
+    set('.eic-width',info.width?info.width+' m':'');
+    set('.eic-height',info.height?info.height+' m':'');
+    set('.eic-status',info.productionstate);
+    set('.eic-pledge',info.pledgecost?'$'+info.pledgecost:'');
+    set('.eic-warbond',info.warbondcost?'$'+info.warbondcost:'');
+    set('.eic-avail',info.availability);
+    set('.eic-dealer',KNOWN_DEALERS[name]||'Check New Deal (Lorville) or Astro Armada (Area18)');
+    var rsi=card.querySelector('.eic-rsi');
+    if(rsi&&info.rsistore)rsi.href=info.rsistore.startsWith('http')?info.rsistore:'https://robertsspaceindustries.com/'+info.rsistore.replace(/^\//,'');
+    else if(rsi)rsi.style.display='none';
+    var imgURL=imgURLFromName(info.image);
+    var imgEl=card.querySelector('.eic-img');
+    var wrap=card.querySelector('.eic-img-wrap');
+    if(imgURL&&imgEl){
+      imgEl.onload=function(){imgEl.style.display='block';if(wrap)wrap.classList.remove('loading');};
+      imgEl.onerror=function(){if(wrap)wrap.classList.remove('loading');};
+      imgEl.src=imgURL;
+    }else if(wrap){wrap.classList.remove('loading');}
+  });
+}
+// Watch sdSelectedShip for ship name changes
+function tick(){
+  var nameEl=document.getElementById('sdSelName');
+  if(!nameEl)return;
+  var n=(nameEl.textContent||'').trim();
+  if(!n)return;
+  buildCard(n);
+}
+setInterval(tick,500);
+tick();
+})();</script>
 </body>
 <!-- deploy-force --><!-- deploy -->
 </html>
