@@ -7834,8 +7834,8 @@ window.runShowdown=function(en){
 var res=document.getElementById("sdResult");if(!res||!en)return;res.innerHTML="";
 var ship=SHIP_DATA[en];if(!ship)return;
 var cfg=document.createElement("div");cfg.className="sd-config";
-var hdr=document.createElement("div");hdr.style.cssText="display:flex;justify-content:space-between;padding:5px 8px;font-size:11px;font-weight:700;border-bottom:1px solid rgba(100,116,139,.3);margin-bottom:6px;";
-hdr.innerHTML="<span style=color:#94a3b8>ENEMY LOADOUT</span><span style=color:#ef4444>"+en+"</span>";cfg.appendChild(hdr);
+var hdr=document.createElement("div");hdr.style.cssText="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;margin-bottom:8px;background:linear-gradient(135deg,rgba(220,38,38,.15),rgba(220,38,38,.05));border:1px solid rgba(220,38,38,.3);border-radius:6px;";
+hdr.innerHTML="<span style=\"font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:linear-gradient(90deg,#ef4444,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;\">ENEMY LOADOUT</span><span style=\"font-size:13px;font-weight:700;color:#ef4444;\">"+en+"</span>";cfg.appendChild(hdr);
 var grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:8px;";
 var L=document.createElement("div");L.style.cssText="background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.25);border-radius:6px;padding:6px;overflow-y:auto;max-height:380px;scrollbar-width:thin;";
 if(ship.slots){ship.slots.forEach(function(sl){
