@@ -7789,7 +7789,7 @@ if(t.c>1){var cx=document.createElement("span");cx.style.cssText="color:#94a3b8;
 R.appendChild(r);});
 if(co.radar){var rr=document.createElement("div");rr.style.cssText="display:flex;align-items:center;gap:3px;padding:3px 5px;background:rgba(30,41,59,.5);border-radius:3px;margin-bottom:2px;font-size:9px;";rr.innerHTML="<span style=color:#94a3b8;min-width:60px>Radar</span><span style=color:#e2e8f0;font-weight:600>"+co.radar+"</span>";R.appendChild(rr);}}
 grid.appendChild(R);cfg.appendChild(grid);
-var td=document.createElement("div");td.style.cssText="display:flex;justify-content:space-between;padding:5px 8px;margin-top:4px;font-size:11px;font-weight:700;color:#e2e8f0;border-top:1px solid rgba(100,116,139,.3);";
+var td=document.createElement("div");td.style.cssText="display:flex;justify-content:space-between;padding:8px 12px;margin-top:6px;font-size:13px;font-weight:700;color:#e2e8f0;background:linear-gradient(135deg,rgba(220,38,38,.1),rgba(220,38,38,.05));border:1px solid rgba(220,38,38,.2);border-radius:6px;";
 td.innerHTML="<span>Enemy Total DPS</span><span id=sdEnemyDpsVal></span>";cfg.appendChild(td);
 var fb=document.createElement("button");fb.style.cssText="display:block;width:100%;padding:5px;margin-top:3px;background:#dc2626;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:1px;";fb.textContent="FIGHT";
 fb.onclick=function(){showFightResult(en);};cfg.appendChild(fb);
@@ -7825,8 +7825,9 @@ var emSig=0;if(ppS){var pp2=COMP_DB.pp[ppS.value];if(pp2)emSig=pp2.em||0;}
 if(ship.missiles)ship.missiles.forEach(function(m){mslCount+=m.count||1;});
 var R=cfg.querySelector(".sd-stats");if(!R)return;
 R.innerHTML="";
-[["Total DPS",dps.toLocaleString(),"#ef4444"],["Weapons",eC+"E + "+bC+"B",""],["Alpha",alpha.toLocaleString(),"#fbbf24"],["Shield HP",shHP.toLocaleString(),"#a78bfa"],["Face HP",faceHP.toLocaleString(),"#a78bfa"],["Sh Regen",shReg.toLocaleString()+"/s",""],["Missiles",mslCount>0?mslCount+"x":"None",mslCount>0?"#60a5fa":""],["Range",minRange>0?minRange.toLocaleString()+"m":"--",""],["Heat",heat.toLocaleString(),"#fbbf24"],["Cooling",cooling.toLocaleString(),"#34d399"],["Power",pp+"%",pp>90?"#ef4444":pp>70?"#fbbf24":"#34d399"],["Headroom",(ppOut-ad).toLocaleString()+" EU",(ppOut-ad)>=0?"#34d399":"#ef4444"],["IR Sig",irSig.toLocaleString(),""],["EM Sig",emSig.toLocaleString(),""],["SCM",(ship.scm||"--")+" m/s",""],["Size",ship.size||"",""],["Crew",ship.crew||1,""]].forEach(function(r){
-var d=document.createElement("div");d.style.cssText="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(100,116,139,.1);font-size:12px;";
+[["_COMBAT",""],["Total DPS",dps.toLocaleString(),"#ef4444"],["Alpha Strike",alpha.toLocaleString(),"#fbbf24"],["Weapons",eC+"E + "+bC+"B",""],["Missiles",mslCount>0?mslCount+"x":"None",mslCount>0?"#60a5fa":"#64748b"],["Range",minRange>0?minRange.toLocaleString()+"m":"--",""],["Heat Output",heat.toLocaleString(),"#fbbf24"],["_DEFENSE",""],["Shield HP",shHP.toLocaleString(),"#a78bfa"],["Face HP",faceHP.toLocaleString(),"#a78bfa"],["Sh Regen",shReg.toLocaleString()+"/s",""],["Cooling",cooling.toLocaleString(),"#34d399"],["_POWER",""],["Draw",pp+"%",pp>90?"#ef4444":pp>70?"#fbbf24":"#34d399"],["Headroom",(ppOut-ad).toLocaleString()+" EU",(ppOut-ad)>=0?"#34d399":"#ef4444"],["_SIGNATURES",""],["IR",irSig.toLocaleString(),""],["EM",emSig.toLocaleString(),""],["_SHIP INFO",""],["SCM",ship.scm+" m/s",""],["Size",ship.size||"",""],["Crew",ship.crew||1,""]].forEach(function(r){
+if(r[0].charAt(0)==="_"){var h=document.createElement("div");h.style.cssText="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:6px 0 2px;margin-top:4px;border-top:1px solid rgba(100,116,139,.15);";h.textContent=r[0].substring(1);R.appendChild(h);return;}
+var d=document.createElement("div");d.style.cssText="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;";
 d.innerHTML="<span style=color:#94a3b8>"+r[0]+"</span><span style=\"font-weight:600;color:"+(r[2]||"#e2e8f0")+"\">"+r[1]+"</span>";R.appendChild(d);});
 var dEl=document.getElementById("sdEnemyDpsVal");if(dEl)dEl.textContent=dps.toLocaleString();
 }
@@ -7865,7 +7866,7 @@ var R=document.createElement("div");R.className="sd-stats";R.style.cssText="back
 grid.appendChild(R);cfg.appendChild(grid);
 var td=document.createElement("div");td.style.cssText="display:flex;justify-content:space-between;padding:5px 8px;margin-top:4px;font-size:11px;font-weight:700;color:#e2e8f0;border-top:1px solid rgba(100,116,139,.3);";
 td.innerHTML="<span>Enemy Total DPS</span><span id=sdEnemyDpsVal></span>";cfg.appendChild(td);
-var fb=document.createElement("button");fb.style.cssText="display:block;width:100%;padding:5px;margin-top:3px;background:#dc2626;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;";fb.textContent="FIGHT";
+var fb=document.createElement("button");fb.style.cssText="display:block;width:100%;padding:10px;margin-top:6px;background:linear-gradient(90deg,#dc2626,#ef4444);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:2px;transition:all .2s;";fb.textContent="FIGHT";
 fb.onclick=function(){showFightResult(en);};cfg.appendChild(fb);
 res.appendChild(cfg);calcEnemyStats(cfg,en);
 };
