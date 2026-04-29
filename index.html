@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.29-DEV</title>
+<title>SC-ShipForge v6.30-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -7872,6 +7872,37 @@ clr.addEventListener("click",function(){inp.value="";drop.style.display="none";c
 document.addEventListener("click",function(e){if(!e.target.closest("#sdSearchWrap"))drop.style.display="none";});
 })();
 window.initShowdown=function(){};
+</script>
+
+<script>
+/* v6.30 showFightResult */
+
+function showFightResult(enemyName){
+var me=getUserDps();var en=getShipDps(enemyName);
+var cfg=document.querySelector(".sd-config");
+if(cfg){var enStats=cfg.querySelector(".sd-stats select[data-comp-type=sg]");
+if(enStats){var g=COMP_DB.sg[enStats.value];var r=enStats.closest("div");var c=r?r.querySelector(".xcnt"):null;var n=c?parseInt(c.textContent)||1:1;
+if(g)en.shieldHP=g.totalHP*n;}}
+var dps=0;
+if(cfg){cfg.querySelectorAll(".sd-slot select").forEach(function(s){var row=s.closest(".sd-slot");var b=row?row.querySelector("button"):null;if(b&&b.textContent==="OFF")return;
+var w=WEAPONS.find(function(x){return x.id===s.value});if(w&&(w.type==="energy"||w.type==="ballistic"))dps+=w.dps;});en.dps=dps;}
+var resEl=document.getElementById("sdResult");
+var old=resEl?resEl.querySelector(".sd-verdict"):null;if(old)old.remove();
+if(me.dps===0||en.shieldHP===0){return;}
+var myTTK=en.shieldHP/me.dps;
+var oppTTK=en.dps>0?me.shieldHP/en.dps:9999;
+var verdict,cls;
+if(oppTTK>myTTK*1.43){verdict="YOU WIN";cls="sd-win";}
+else if(myTTK>oppTTK*1.43){verdict="YOU LOSE";cls="sd-lose";}
+else{verdict="CLOSE FIGHT";cls="sd-close";}
+var vd=document.createElement("div");vd.className="sd-verdict "+cls;
+vd.style.cssText="text-align:center;padding:12px;margin-top:8px;border-radius:8px;background:rgba(30,41,59,.6);border:1px solid rgba(100,116,139,.25);";
+var h3=document.createElement("h3");h3.textContent=verdict;h3.style.cssText="font-size:18px;font-weight:700;margin-bottom:4px;color:"+(cls==="sd-win"?"#22c55e":cls==="sd-lose"?"#ef4444":"#fbbf24");
+vd.appendChild(h3);
+var ttk=document.createElement("div");ttk.style.cssText="font-size:11px;color:#94a3b8;";
+ttk.textContent="You kill in "+(myTTK<9000?myTTK.toFixed(1)+"s":"N/A")+" | They kill in "+(oppTTK<9000?oppTTK.toFixed(1)+"s":"N/A");
+vd.appendChild(ttk);resEl.appendChild(vd);
+}
 </script>
 </body>
 <!-- deploy-force --><!-- deploy -->
