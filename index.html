@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v6.80-DEV</title>
+<title>SC-ShipForge v6.81-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.80-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v6.81-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7365,7 +7365,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.80-DEV: Live Stats + Showdown + OFF State === */
+/* === v6.81-DEV: Live Stats + Showdown + OFF State === */
 function updateLiveStats(){
 if(!window.selShip||!document.getElementById("lsDps"))return;
 var ship=SHIP_DATA[window.selShip];
@@ -8194,6 +8194,39 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 (function(){function ensureDef(){var ex=document.getElementById('defCard');if(ex)ex.remove();}function pick(d){for(var i=1;i<arguments.length;i++){var k=arguments[i].toLowerCase();if(d[k])return d[k];}return null;}function refreshDef(){ensureDef();var s=window.selShip;var d=(window.MINED&&window.MINED[s])||{};var rows=[['defPhys',pick(d,'phys mod','physical','physical damage modifier')],['defEng',pick(d,'energy mod','energy','energy damage modifier')],['defDist',pick(d,'distortion mod','distortion')],['defPen',pick(d,'penetration')]];rows.forEach(function(r){var el=document.getElementById(r[0]);if(!el)return;if(r[1]){el.textContent=r[1];el.className='';}else{el.textContent='—';el.className='def-missing';}});}function tick(){refreshDef();}var orig=window.pickShip;if(orig&&!window.__lpv2hooked){window.__lpv2hooked=true;window.pickShip=function(n){var r=orig.apply(this,arguments);setTimeout(tick,300);return r;};}document.addEventListener('DOMContentLoaded',tick);setTimeout(tick,1500);setInterval(tick,3000);})();
 </script>
 
+
+<!-- PHASE_4_SHOWDOWN_RESKIN -->
+<style id="phase4Showdown">
+#pane-sd{padding:14px 12px 8px!important;background:transparent!important;}
+#pane-sd .sd-hero{background:linear-gradient(180deg,#162338,#0d1729)!important;border:1px solid var(--hud-line-bright)!important;border-left:3px solid var(--hud-cyan)!important;border-radius:6px!important;padding:10px 14px!important;margin:0 0 10px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.5)!important;}
+#pane-sd .sd-hero-title{font-family:var(--fmono)!important;font-size:14px!important;font-weight:800!important;color:var(--hud-cyan)!important;letter-spacing:2px!important;text-transform:uppercase!important;text-shadow:0 0 8px rgba(63,223,255,.3)!important;margin-bottom:8px!important;}
+#pane-sd .sd-role-bar{display:flex!important;gap:4px!important;flex-wrap:wrap!important;margin-top:8px!important;}
+#pane-sd .sd-role-bar > *{font-family:var(--fmono)!important;font-size:9px!important;font-weight:700!important;letter-spacing:1.5px!important;text-transform:uppercase!important;background:linear-gradient(180deg,#162338,#0d1729)!important;border:1px solid var(--hud-line)!important;color:var(--hud-t2)!important;padding:4px 10px!important;border-radius:3px!important;cursor:pointer!important;transition:all .1s!important;}
+#pane-sd .sd-role-bar > *:hover{border-color:var(--hud-cyan-dim)!important;color:var(--hud-t1)!important;}
+#pane-sd .sd-role-bar > .active,#pane-sd .sd-role-bar > .on{border-color:var(--hud-cyan)!important;color:var(--hud-cyan)!important;background:linear-gradient(180deg,#1c2c46,#11192c)!important;}
+#pane-sd .ss-wrap input,#pane-sd #sdShipInput{background:linear-gradient(180deg,#08101e,#10192e)!important;border:1px solid var(--hud-line-bright)!important;color:var(--hud-t1)!important;font-family:var(--fmono)!important;border-radius:3px!important;padding:6px 10px!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.5)!important;}
+#pane-sd .ss-wrap input:focus,#pane-sd #sdShipInput:focus{outline:none!important;border-color:var(--hud-cyan)!important;}
+#pane-sd .ss-drop,#pane-sd #sdShipDrop{background:linear-gradient(180deg,#162338,#0d1729)!important;border:1px solid var(--hud-line-bright)!important;border-radius:3px!important;box-shadow:0 4px 10px rgba(0,0,0,.5)!important;}
+#pane-sd .ss-drop > *:hover{background:#1c2c46!important;color:var(--hud-cyan)!important;}
+#pane-sd #sdResult{display:grid!important;grid-template-columns:1fr 360px!important;gap:10px!important;align-items:start!important;}
+#pane-sd .sd-config{background:linear-gradient(180deg,#162338,#0d1729)!important;border:1px solid var(--hud-line-bright)!important;border-radius:6px!important;padding:10px 12px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.5)!important;}
+#pane-sd .sd-config h3,#pane-sd .sd-config h4{font-family:var(--fmono)!important;font-size:9px!important;font-weight:800!important;letter-spacing:3px!important;color:var(--hud-cyan)!important;text-transform:uppercase!important;border-bottom:1px solid var(--hud-line)!important;padding-bottom:5px!important;margin:0 0 8px!important;}
+#pane-sd .sd-slot{background:linear-gradient(180deg,#162338,#0d1729)!important;border:1px solid var(--hud-line)!important;border-radius:4px!important;padding:6px 10px!important;margin-bottom:4px!important;display:flex!important;flex-direction:column!important;gap:4px!important;transition:border-color .1s!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)!important;}
+#pane-sd .sd-slot:hover{border-color:var(--hud-cyan-dim)!important;}
+#pane-sd .sd-slot > div:first-child{display:flex!important;align-items:center!important;gap:6px!important;font-family:var(--fmono)!important;font-size:11px!important;color:var(--hud-t1)!important;font-weight:700!important;}
+#pane-sd .sd-slot select.slot-sel,#pane-sd select.slot-sel{background:linear-gradient(180deg,#08101e,#10192e)!important;border:1px solid var(--hud-line-bright)!important;color:var(--hud-t1)!important;font-family:var(--fmono)!important;font-size:10px!important;padding:4px 8px!important;border-radius:3px!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.5)!important;}
+#pane-sd select.slot-sel:focus{outline:none!important;border-color:var(--hud-cyan)!important;}
+#pane-sd .sd-slot button{background:linear-gradient(180deg,#162338,#0d1729)!important;border:1px solid var(--hud-line-bright)!important;border-radius:3px!important;color:var(--hud-green)!important;padding:2px 8px!important;font-family:var(--fmono)!important;font-size:9px!important;font-weight:800!important;letter-spacing:1px!important;cursor:pointer!important;}
+#pane-sd .sd-slot button:hover{filter:brightness(1.15);}
+#pane-sd .sd-stats{background:linear-gradient(180deg,#162338,#0d1729)!important;border:1px solid var(--hud-line-bright)!important;border-left:3px solid var(--hud-orange)!important;border-radius:6px!important;padding:12px 14px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.5)!important;font-family:var(--fmono)!important;}
+#pane-sd .sd-stats > div, #pane-sd .sd-stats > span{font-size:11px!important;color:var(--hud-t2)!important;}
+#pane-sd .sd-stats b, #pane-sd .sd-stats strong{color:var(--hud-orange)!important;font-size:14px!important;text-shadow:0 0 6px rgba(255,138,60,.4)!important;}
+#pane-sd #sdSelectedShip{background:linear-gradient(180deg,#162338,#0d1729)!important;border:1px solid var(--hud-line-bright)!important;border-left:3px solid var(--hud-cyan)!important;border-radius:6px!important;padding:8px 14px!important;margin-bottom:10px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.5)!important;}
+#pane-sd #sdSelName{font-family:var(--fmono)!important;font-size:14px!important;font-weight:800!important;color:var(--hud-t1)!important;letter-spacing:1.5px!important;text-transform:uppercase!important;text-shadow:0 1px 0 rgba(0,0,0,.5)!important;}
+#pane-sd #sdSelRole{font-family:var(--fmono)!important;font-size:9px!important;color:var(--hud-cyan)!important;letter-spacing:2px!important;text-transform:uppercase!important;}
+#pane-sd #sdArena{background:linear-gradient(180deg,#0b1120,#070a14)!important;border:1px solid var(--hud-line)!important;border-radius:6px!important;padding:14px!important;margin-top:10px!important;}
+@media (max-width:1100px){#pane-sd #sdResult{grid-template-columns:1fr!important;}}
+</style>
 </body>
 <!-- deploy-force --><!-- deploy -->
 </html>
