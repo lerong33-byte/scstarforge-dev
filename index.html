@@ -956,6 +956,16 @@ option,optgroup{background:var(--bg2)}
 .sd-verdict{text-align:center;padding:14px;margin-top:12px;border-radius:8px;}
 .sd-verdict h3{font-size:20px;font-weight:700;margin-bottom:4px;}
 .sd-verdict-ttk{font-size:12px;color:#94a3b8;}
+
+/* v6.16 Scrollable enemy loadout + pane */
+.sd-config{max-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#475569 transparent;}
+.sd-config::-webkit-scrollbar{width:6px;}
+.sd-config::-webkit-scrollbar-track{background:transparent;}
+.sd-config::-webkit-scrollbar-thumb{background:#475569;border-radius:3px;}
+#pane-sd{max-height:calc(100vh - 160px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#475569 transparent;}
+#pane-sd::-webkit-scrollbar{width:6px;}
+#pane-sd::-webkit-scrollbar-track{background:transparent;}
+#pane-sd::-webkit-scrollbar-thumb{background:#475569;border-radius:3px;}
 </style>
 
 <div id="app">
