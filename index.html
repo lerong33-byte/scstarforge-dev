@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.58-DEV</title>
+<title>SC-ShipForge v7.59-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.58-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.59-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7894,30 +7894,37 @@ function onECompChange(sel){
 function toggleESystem(key){
   _eSysEnabled[key]=(_eSysEnabled[key]===false)?true:false;
   var on=_eSysEnabled[key]!==false;
-  /* Sync all ON/OFF buttons for this system (stats panel card + component row header) */
-  var btnIds=[{sg:'eSgToggle',pp:'ePpToggle',cooler:'eCoolerToggle',radar:'eRadarToggle',qd:'eQdToggle'}[key],'erow_toggle_'+key];
+  /* Sync named card toggle buttons (stats panel + component row header) */
+  var cardBtnMap={sg:'eSgToggle',pp:'ePpToggle',cooler:'eCoolerToggle',radar:'eRadarToggle',qd:'eQdToggle'};
+  /* For per-unit keys like sg_0, sg_1, cooler_0 — sync the spv_unit_ button in the power panel */
+  var isUnitKey=/^(sg|cooler)_\d+$/.test(key);
+  var btnIds=isUnitKey
+    ?['spv_unit_'+key]
+    :[cardBtnMap[key],'erow_toggle_'+key].filter(Boolean);
   btnIds.forEach(function(bid){
     var btn=document.getElementById(bid);
     if(btn){
       btn.textContent=on?'ON':'OFF';
-      /* Filled green when ON, dark red outline when OFF */
       btn.style.background=on?'#22c55e':'transparent';
       btn.style.borderColor=on?'#22c55e':'#7f1d1d';
       btn.style.color=on?'#000':'#f87171';
     }
   });
-  /* Bidirectional: turning system OFF sets its pip column to 0; turning ON restores to 3 (default) */
-  var pipMap={sg:'shields',pp:null,cooler:'cooler',radar:'radar',qd:'qd'};
-  var pipKey=pipMap[key];
-  if(pipKey&&typeof _pwrState!=='undefined'){
-    if(!on){
-      _eSysEnabled[key+'_savedPip']=_pwrState[pipKey]||3;
-      _pwrState[pipKey]=0;
-    } else {
-      _pwrState[pipKey]=_eSysEnabled[key+'_savedPip']||3;
+  /* Bidirectional pip sync — only for whole-system keys (not per-unit) */
+  if(!isUnitKey){
+    var pipMap={sg:'shields',pp:null,cooler:'cooler',radar:'radar',qd:'qd'};
+    var pipKey=pipMap[key];
+    if(pipKey&&typeof _pwrState!=='undefined'){
+      if(!on){
+        _eSysEnabled[key+'_savedPip']=_pwrState[pipKey]||3;
+        _pwrState[pipKey]=0;
+      } else {
+        _pwrState[pipKey]=_eSysEnabled[key+'_savedPip']||3;
+      }
     }
-    if(typeof buildPowerPanel==='function')buildPowerPanel();
   }
+  /* Always rebuild power panel and update stats */
+  if(typeof buildPowerPanel==='function')buildPowerPanel();
   _eUpdateStats();
 }
 function resetEHardpoints(){
@@ -8638,24 +8645,27 @@ function buildPowerPanel(){
     var ck=_compCntMap[k];
     _compCnts[k]=(ck&&def.comps&&def.comps.counts&&def.comps.counts[ck])||1;
   });
-  var PIP_H=10; /* px per pip */
-  var PIP_GAP=2;
-  var OC_PIPS=2; /* overclock pips above normal range */
+  /* Power panel layout constants */
+  var PIP_H=10;   /* px per individual pip */
+  var PIP_GAP=2;  /* gap between pips */
+  var OC_PIPS=2;  /* overclock pips above normal range */
   var NORM_PIPS=10;
   var TOTAL_PIPS=NORM_PIPS+OC_PIPS;
-  /* Fixed height for the normal-pip area so all columns align at baseline */
-  var NORM_AREA_H=NORM_PIPS*(PIP_H+PIP_GAP); /* 120px */
+  /* Bar height for multi-unit columns: each unit gets NORM_PIPS/unitCnt pips worth of height */
   /* NAV mode: weapons and shields are locked OFF */
   var navLockedSys={weapons:isNAV,shields:isNAV};
+  /* Multi-unit systems that get per-unit sub-columns */
+  var multiUnitSys={shields:'sg',cooler:'cooler'};
   h+='<div style="display:flex;gap:4px;margin-top:8px;box-sizing:border-box;align-items:flex-end;width:100%">';
   SYSS.forEach(function(sys){
     var val=_pwrState[sys.k]||0;
     var unitCnt=_compCnts[sys.k]||1;
-    var ppu=Math.floor(NORM_PIPS/unitCnt);
     var navLocked=navLockedSys[sys.k]||false;
     var colColor=navLocked?'rgba(255,255,255,0.15)':sys.color;
+    var baseKey=multiUnitSys[sys.k]||null; /* 'sg' or 'cooler' for multi-unit */
+    var ppu=Math.floor(NORM_PIPS/unitCnt); /* pips per unit */
     h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch">';
-    /* Overclock pips (11-12) at top — red/orange */
+    /* ── Overclock pips (11-12) at top — same for all columns ── */
     h+='<div style="display:flex;flex-direction:column;gap:'+PIP_GAP+'px;margin-bottom:3px">';
     for(var oc=TOTAL_PIPS;oc>=NORM_PIPS+1;oc--){
       var ocFilled=!navLocked&&val>=oc;
@@ -8667,29 +8677,77 @@ function buildPowerPanel(){
     h+='</div>';
     /* Separator line between overclock and normal */
     h+='<div style="width:100%;height:1px;background:rgba(255,100,0,0.3);margin-bottom:3px"></div>';
-    /* Normal pip area — always 10 individual pips, same height, grouped by thin separator line */
-    h+='<div style="display:flex;flex-direction:column;gap:'+PIP_GAP+'px;margin-bottom:3px">';
-    for(var p=NORM_PIPS;p>=1;p--){
-      var filled=!navLocked&&p<=val;
-      /* Insert a thin separator line ABOVE the top pip of each group boundary (except top group) */
-      if(unitCnt>1&&p<NORM_PIPS&&(p%ppu===0)){
-        h+='<div style="width:100%;height:1px;flex-shrink:0;background:rgba(255,255,255,0.18);border-radius:1px"></div>';
+    /* ── Normal pip area ── */
+    if(unitCnt>1&&baseKey){
+      /* MULTI-UNIT: side-by-side sub-columns, one per unit */
+      /* Each sub-column has ppu individual pips + its own ON/OFF button */
+      var unitBarH=ppu*(PIP_H+PIP_GAP); /* total height of pip area for one unit */
+      h+='<div style="display:flex;flex-direction:row;gap:2px;margin-bottom:3px;align-items:flex-end">';
+      for(var u=0;u<unitCnt;u++){
+        var uKey=baseKey+'_'+u; /* e.g. 'sg_0', 'sg_1', 'cooler_0', 'cooler_1' */
+        var uOff=_eSysEnabled[uKey]===false;
+        var uColor=uOff?'rgba(255,255,255,0.08)':colColor;
+        var pipLo=u*ppu+1;
+        var pipHi=(u+1)*ppu;
+        /* Pips for this unit */
+        h+='<div style="flex:1;display:flex;flex-direction:column;gap:'+PIP_GAP+'px">';
+        for(var p=pipHi;p>=pipLo;p--){
+          var filled=!navLocked&&!uOff&&p<=val;
+          h+='<div onclick="'+(navLocked||uOff?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+'" '
+            +'style="width:100%;height:'+PIP_H+'px;flex-shrink:0;border-radius:2px;box-sizing:border-box;cursor:'+(navLocked||uOff?'default':'pointer')+';'
+            +'background:'+(filled?uColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':(navLocked||uOff?'0.15':'0.3'))+'">'
+            +'</div>';
+        }
+        h+='</div>';
       }
-      h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+'" style="width:100%;height:'+PIP_H+'px;flex-shrink:0;border-radius:2px;box-sizing:border-box;cursor:'+(navLocked?'default':'pointer')+';background:'+(filled?colColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':(navLocked?'0.2':'0.3'))+'">'+'</div>';
-    }
-    h+='</div>';
-       /* Icon = power toggle button: click to toggle system ON/OFF */
-    var pipToSysMap={weapons:null,shields:'sg',engines:null,qd:'qd',radar:'radar',cooler:'cooler',thrusters:null};
-    var sysToggleKey=pipToSysMap[sys.k];
-    var isOff=sysToggleKey&&_eSysEnabled[sysToggleKey]===false;
-    var iconBg=isOff?'rgba(127,29,29,0.5)':'transparent';
-    var iconBorder=isOff?'1px solid #7f1d1d':'1px solid transparent';
-    var iconCol=isOff?'#f87171':sys.color;
-    var pctTxt=Math.round(val*10)+'%';
-    if(sysToggleKey){
-      h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">'        +'<button onclick="toggleESystem(\''+sysToggleKey+'\')" title="Toggle '+sysToggleKey+' ON/OFF" style="background:'+iconBg+';border:'+iconBorder+';border-radius:4px;padding:2px 3px;cursor:pointer;font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+iconCol+';transition:all .15s">'+sys.icon+'</button>'        +'<span style="font-size:8px;display:block;color:'+(isOff?'#f87171':'var(--t2)')+'">'+pctTxt+'</span>'        +'</div>';
+      h+='</div>';
+      /* Per-unit ON/OFF buttons row */
+      h+='<div style="display:flex;flex-direction:row;gap:2px;margin-bottom:2px">';
+      for(var u=0;u<unitCnt;u++){
+        var uKey=baseKey+'_'+u;
+        var uOff=_eSysEnabled[uKey]===false;
+        h+='<button id="spv_unit_'+uKey+'" onclick="toggleESystem(\''+uKey+'\')" '
+          +'style="flex:1;padding:2px 0;font-size:7px;font-weight:700;font-family:var(--fmono);border-radius:3px;cursor:pointer;letter-spacing:0.5px;transition:all .15s;'
+          +(uOff?'background:transparent;border:1px solid #7f1d1d;color:#f87171':'background:#22c55e;border:1px solid #22c55e;color:#000')+';">'
+          +(uOff?'OFF':'ON')+'</button>';
+      }
+      h+='</div>';
+      /* Single pct label centered */
+      var pctTxt=Math.round(val*10)+'%';
+      h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">'
+        +'<span style="font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+colColor+'">'+sys.icon+'</span>'
+        +'<span style="font-size:8px;display:block;color:var(--t2)">'+pctTxt+'</span>'
+        +'</div>';
     } else {
-      h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">'        +'<span style="font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+sys.color+'">'+sys.icon+'</span>'        +'<span style="font-size:8px;display:block;color:var(--t2)">'+pctTxt+'</span>'        +'</div>';
+      /* SINGLE-UNIT: 10 individual pips */
+      h+='<div style="display:flex;flex-direction:column;gap:'+PIP_GAP+'px;margin-bottom:3px">';
+      for(var p=NORM_PIPS;p>=1;p--){
+        var filled=!navLocked&&p<=val;
+        h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+'" '
+          +'style="width:100%;height:'+PIP_H+'px;flex-shrink:0;border-radius:2px;box-sizing:border-box;cursor:'+(navLocked?'default':'pointer')+';'
+          +'background:'+(filled?colColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':(navLocked?'0.2':'0.3'))+'">'
+          +'</div>';
+      }
+      h+='</div>';
+      /* Icon toggle button for single-unit systems that have a toggle key */
+      var pipToSysMap={weapons:null,shields:'sg',engines:null,qd:'qd',radar:'radar',cooler:'cooler',thrusters:null};
+      var sysToggleKey=pipToSysMap[sys.k];
+      var isOff=sysToggleKey&&_eSysEnabled[sysToggleKey]===false;
+      var iconBg=isOff?'rgba(127,29,29,0.5)':'transparent';
+      var iconBorder=isOff?'1px solid #7f1d1d':'1px solid transparent';
+      var iconCol=isOff?'#f87171':sys.color;
+      var pctTxt=Math.round(val*10)+'%';
+      if(sysToggleKey){
+        h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">'
+          +'<button onclick="toggleESystem(\''+sysToggleKey+'\')" title="Toggle '+sysToggleKey+' ON/OFF" style="background:'+iconBg+';border:'+iconBorder+';border-radius:4px;padding:2px 3px;cursor:pointer;font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+iconCol+';transition:all .15s">'+sys.icon+'</button>'
+          +'<span style="font-size:8px;display:block;color:'+(isOff?'#f87171':'var(--t2)')+'">'+pctTxt+'</span>'
+          +'</div>';
+      } else {
+        h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">'
+          +'<span style="font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+sys.color+'">'+sys.icon+'</span>'
+          +'<span style="font-size:8px;display:block;color:var(--t2)">'+pctTxt+'</span>'
+          +'</div>';
+      }
     }
     h+='</div>';
   });
