@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.84-DEV</title>
+<title>SC-ShipForge v7.85-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.84-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.85-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -1081,7 +1081,7 @@ option,optgroup{background:var(--bg2)}
   <!-- 3-column body -->
   <div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">
     <!-- LEFT PANEL: ship image + ship info + power panel -->
-    <div id="sbLeftPanel" style="width:172px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg2)">
+    <div id="sbLeftPanel" style="width:172px;flex-shrink:0;display:none;flex-direction:column;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg2)">
       <!-- Ship image -->
       <div id="sbImgStrip" style="flex-shrink:0;position:relative;height:110px;background:#0a0f1a;overflow:hidden">
         <span id="sbShipPh" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--t3);font-family:var(--fmono)">Select a ship</span>
@@ -8674,6 +8674,9 @@ function buildShipBuilder(shipName){
   buildEnemyLoadout(shipName,'sbResult');
   /* Build power panel into sbPowerPanel */
   if(window.buildPowerPanel) window.buildPowerPanel();
+  /* Show left panel */
+  var lp=document.getElementById('sbLeftPanel');
+  if(lp) lp.style.display='flex';
   /* Populate left panel */
   var def=SHIP_DATA&&SHIP_DATA[shipName];
   /* Ship name bar */
