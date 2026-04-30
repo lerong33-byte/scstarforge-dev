@@ -8900,7 +8900,7 @@ tick();
 (function(){
   function fmt(n,dec){if(n==null||n===''||isNaN(n))return '—';return Number(n).toLocaleString(undefined,{maximumFractionDigits:dec||0});}
   function el(id){return document.getElementById(id);}
-  function set(id,val){var e=el(id);if(e)e.textContent=(val!=null&&val!==''&&val!=='—')?val:'—';}
+  function set(id,val){var e=el(id);if(e){if(val!=null&&val!==''&&val!=='—'){if(/<[a-z]/i.test(String(val))){e.innerHTML=val;}else{e.textContent=val;}}else{e.textContent='—';}}}
 
   window.renderShipStats=function(shipName){
     if(!shipName){
