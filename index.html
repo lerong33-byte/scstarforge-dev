@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.18-DEV</title>
+<title>SC-ShipForge v7.19-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -912,7 +912,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.18-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.19-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -1073,6 +1073,7 @@ option,optgroup{background:var(--bg2)}
         <button class="tab" data-t="pn" onclick="showTab('pn',this);loadPatchNotes()">PATCH NOTES</button>
         <button class="tab" data-t="cmp" onclick="showTab('cmp',this);populateCompareSelects();if(selShip){document.getElementById('cmpSelA').value=selShip;renderComparison();}">⬡ COMPARE</button>
         <div class="tab" onclick="showTab('sd',this)">⚔ SHOWDOWN</div>
+        <button class="tab" data-t="ss" onclick="showTab('ss',this);if(window.selShip)renderShipStats(window.selShip);">📊 SHIP STATS</button>
       <button class="tab" id="feedbackBtn" onclick="toggleFeedback()" style="color:var(--accent);border-left:1px solid var(--border)">&#10022; FEEDBACK</button>
         <button class="tab" id="quickSaveBtn" onclick="quickSave();showTab('sv',this)" style="color:var(--green);border-left:1px solid var(--border)">&#9672; SAVE</button>
       </div>
@@ -1205,6 +1206,114 @@ option,optgroup{background:var(--bg2)}
             <button class="ships-filter-btn" data-role="Capital" onclick="setShipFilter('Capital',this)">Capital</button>
           </div>
           <div class="ships-grid" id="shipsGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANE: SHIP STATS -->
+    <div class="pane" id="pane-ss" style="flex-direction:column;overflow-y:auto;padding:12px 16px;gap:12px">
+      <div id="ssNoShip" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px">
+        <div style="font-family:var(--fmono);font-size:13px;color:var(--t3);letter-spacing:2px">NO SHIP SELECTED</div>
+        <div style="font-size:11px;color:var(--t3)">Select a ship in the Loadout Builder to view full stats</div>
+      </div>
+      <div id="ssContent" style="display:none">
+        <div id="ssHeader" style="display:flex;align-items:center;gap:14px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;margin-bottom:10px">
+          <img id="ssThumb" src="" style="width:90px;height:56px;object-fit:cover;border:1px solid var(--border);border-radius:2px;background:#1a2030" onerror="this.style.display='none'">
+          <div>
+            <div id="ssShipName" style="font-size:20px;font-weight:700;font-family:var(--fmono);letter-spacing:2px"></div>
+            <div id="ssShipSub" style="font-size:10px;color:var(--t2);font-family:var(--fmono);letter-spacing:1px;margin-top:2px"></div>
+          </div>
+          <div id="ssBadges" style="display:flex;gap:6px;margin-left:auto;flex-wrap:wrap"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="ss-card"><div class="ss-card-hd">ABOUT</div><div class="ss-card-body">
+              <div id="ssDesc" style="font-size:11px;color:var(--t2);line-height:1.6;padding:6px 8px;background:rgba(0,0,0,0.2);border-radius:2px;border-left:2px solid var(--accent);margin-bottom:6px"></div>
+              <div class="ss-row"><span class="ss-lbl">Manufacturer</span><span class="ss-val" style="color:var(--accent)" id="ssMfr">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Role</span><span class="ss-val" id="ssRole">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Size</span><span class="ss-val" id="ssSize">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Crew</span><span class="ss-val" id="ssCrew">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Cargo</span><span class="ss-val" style="color:var(--cyan)" id="ssCargo">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Pledge Price</span><span class="ss-val" style="color:var(--warn)" id="ssPledge">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Warbond</span><span class="ss-val" style="color:var(--warn)" id="ssWarbond">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">In-game Price</span><span class="ss-val" style="color:var(--cyan)" id="ssIngame">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Status</span><span class="ss-val" style="color:var(--green)" id="ssStatus">—</span></div>
+            </div></div>
+            <div class="ss-card"><div class="ss-card-hd">HULL</div><div class="ss-card-body">
+              <div class="ss-row"><span class="ss-lbl">Dimensions</span><span class="ss-val" id="ssDims" style="font-size:9px">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Mass</span><span class="ss-val" id="ssMass">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Total HP</span><span class="ss-val" style="color:var(--green)" id="ssTotalHP">—</span></div>
+            </div></div>
+            <div class="ss-card"><div class="ss-card-hd">SIGNATURES</div><div class="ss-card-body">
+              <div style="display:flex;gap:8px;margin-bottom:8px">
+                <div class="ss-sig-item"><div style="font-size:14px">🔥</div><div class="ss-sig-val" id="ssIR">—</div><div class="ss-sig-lbl">IR</div></div>
+                <div class="ss-sig-item"><div style="font-size:14px">⚡</div><div class="ss-sig-val" id="ssEM">—</div><div class="ss-sig-lbl">EM IDLE</div></div>
+                <div class="ss-sig-item"><div style="font-size:14px">⚡</div><div class="ss-sig-val" id="ssEMmax">—</div><div class="ss-sig-lbl">EM MAX</div></div>
+              </div>
+              <div class="ss-sec">CROSS SECTION</div>
+              <div style="display:flex;gap:6px">
+                <div class="ss-cs-item"><div class="ss-cs-val" id="ssCSFront">—</div><div class="ss-cs-lbl">FRONT</div></div>
+                <div class="ss-cs-item"><div class="ss-cs-val" id="ssCSSide">—</div><div class="ss-cs-lbl">SIDE</div></div>
+                <div class="ss-cs-item"><div class="ss-cs-val" id="ssCSTop">—</div><div class="ss-cs-lbl">TOP</div></div>
+              </div>
+            </div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="ss-card"><div class="ss-card-hd">WEAPONRY</div><div class="ss-card-body">
+              <div style="display:flex;gap:6px;margin-bottom:8px">
+                <div class="ss-big-stat"><div class="ss-big-val" style="color:var(--warn)" id="ssPilotDPS">—</div><div class="ss-big-lbl">PILOT DPS</div></div>
+                <div class="ss-big-stat"><div class="ss-big-val" style="color:var(--red)" id="ssBurstDPS">—</div><div class="ss-big-lbl">BURST DPS</div></div>
+                <div class="ss-big-stat"><div class="ss-big-val" id="ssAlpha">—</div><div class="ss-big-lbl">ALPHA</div></div>
+              </div>
+              <div class="ss-row"><span class="ss-lbl">Missile Alpha</span><span class="ss-val" style="color:var(--red)" id="ssMissileAlpha">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Shield HP</span><span class="ss-val" style="color:var(--green)" id="ssShieldHP">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Face HP</span><span class="ss-val" style="color:var(--green)" id="ssFaceHP">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Shield Regen</span><span class="ss-val" style="color:var(--cyan)" id="ssShRegen">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Hull HP</span><span class="ss-val" style="color:var(--green)" id="ssHullHP">—</span></div>
+            </div></div>
+            <div class="ss-card"><div class="ss-card-hd">HARDPOINTS</div><div class="ss-card-body" id="ssHardpoints"><div style="color:var(--t3);font-size:10px">No weapons data</div></div></div>
+            <div class="ss-card" id="ssMissileCard" style="display:none"><div class="ss-card-hd">MISSILES &amp; BOMBS</div><div class="ss-card-body" id="ssMissiles"></div></div>
+            <div class="ss-card"><div class="ss-card-hd">FUEL</div><div class="ss-card-body">
+              <div class="ss-row"><span class="ss-lbl">H₂ Fuel</span><span class="ss-val" style="color:var(--cyan)" id="ssH2">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">QT Fuel</span><span class="ss-val" style="color:var(--cyan)" id="ssQT">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">QD Range</span><span class="ss-val" id="ssQDRange">—</span></div>
+            </div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="ss-card"><div class="ss-card-hd">FLIGHT PERFORMANCE</div><div class="ss-card-body">
+              <div style="display:flex;gap:12px;margin-bottom:8px;align-items:flex-end">
+                <div><div style="font-size:8px;color:var(--t2);font-family:var(--fmono);letter-spacing:1px;margin-bottom:2px">SCM / BOOST</div>
+                  <div style="display:flex;align-items:baseline;gap:4px">
+                    <span style="font-family:var(--fmono);font-size:22px;font-weight:700;color:var(--accent)" id="ssSCM">—</span>
+                    <span style="font-family:var(--fmono);font-size:14px;color:var(--warn)" id="ssBoost"></span>
+                    <span style="font-size:10px;color:var(--t2)">m/s</span>
+                  </div>
+                </div>
+                <div><div style="font-size:8px;color:var(--t2);font-family:var(--fmono);letter-spacing:1px;margin-bottom:2px">NAV</div>
+                  <div style="display:flex;align-items:baseline;gap:4px">
+                    <span style="font-family:var(--fmono);font-size:18px;font-weight:700;color:var(--green)" id="ssNAV">—</span>
+                    <span style="font-size:10px;color:var(--t2)">m/s</span>
+                  </div>
+                </div>
+              </div>
+              <div class="ss-sec">ANGULAR VELOCITY</div>
+              <div class="ss-row"><span class="ss-lbl">Pitch / Yaw / Roll (SCM)</span><span class="ss-val" id="ssPYR">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Pitch / Yaw / Roll (Boost)</span><span class="ss-val" style="color:var(--cyan)" id="ssPYRB">—</span></div>
+            </div></div>
+            <div class="ss-card"><div class="ss-card-hd">ACCELERATIONS</div><div class="ss-card-body">
+              <div class="ss-row"><span class="ss-lbl">Main</span><span class="ss-val" id="ssAccMain">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Retro</span><span class="ss-val" id="ssAccRetro">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Up</span><span class="ss-val" id="ssAccUp">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Down</span><span class="ss-val" id="ssAccDown">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Strafe</span><span class="ss-val" id="ssAccStrafe">—</span></div>
+            </div></div>
+            <div class="ss-card"><div class="ss-card-hd">SYSTEMS</div><div class="ss-card-body" id="ssSystems"></div></div>
+            <div class="ss-card"><div class="ss-card-hd">INSURANCE</div><div class="ss-card-body">
+              <div class="ss-row"><span class="ss-lbl">Claim Time</span><span class="ss-val" id="ssClaimTime">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Expedite Time</span><span class="ss-val" style="color:var(--cyan)" id="ssExpTime">—</span></div>
+              <div class="ss-row"><span class="ss-lbl">Expedite Cost</span><span class="ss-val" style="color:var(--warn)" id="ssExpCost">—</span></div>
+            </div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -8267,6 +8376,33 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 </script>
 
 
+<!-- SHIP_STATS_CSS -->
+<style>
+/* ── SHIP STATS TAB ── */
+.ss-card{background:var(--bg3);border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.ss-card-hd{background:rgba(0,170,255,0.06);border-bottom:1px solid var(--border);padding:5px 10px;font-family:var(--fmono);font-size:10px;letter-spacing:2px;color:var(--accent);font-weight:700;}
+.ss-card-body{padding:8px 10px;display:flex;flex-direction:column;gap:3px;}
+.ss-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+.ss-row:last-child{border-bottom:none;}
+.ss-lbl{color:var(--t2);font-size:10px;}
+.ss-val{font-family:var(--fmono);font-size:11px;color:var(--text);font-weight:600;}
+.ss-sec{font-family:var(--fmono);font-size:9px;letter-spacing:2px;color:var(--t3);padding:4px 0 2px;border-bottom:1px solid var(--border);margin:4px 0 2px;}
+.ss-big-stat{flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:2px;padding:6px;text-align:center;}
+.ss-big-val{font-family:var(--fmono);font-size:16px;font-weight:700;color:var(--text);}
+.ss-big-lbl{font-size:8px;color:var(--t2);font-family:var(--fmono);letter-spacing:1px;margin-top:2px;}
+.ss-sig-item{flex:1;text-align:center;padding:6px 4px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:2px;}
+.ss-sig-val{font-family:var(--fmono);font-size:14px;font-weight:700;color:var(--red);}
+.ss-sig-lbl{font-size:8px;color:var(--t2);font-family:var(--fmono);letter-spacing:1px;}
+.ss-cs-item{flex:1;text-align:center;padding:4px;background:rgba(0,0,0,0.2);border-radius:2px;}
+.ss-cs-val{font-family:var(--fmono);font-size:12px;color:var(--warn);font-weight:700;}
+.ss-cs-lbl{font-size:8px;color:var(--t2);}
+.ss-wp-row{background:rgba(0,170,255,0.04);border:1px solid rgba(0,170,255,0.1);border-radius:2px;padding:5px 8px;margin-bottom:4px;}
+.ss-wp-name{font-family:var(--fmono);font-size:11px;color:var(--text);font-weight:600;}
+.ss-wp-meta{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap;}
+.ss-wp-tag{font-size:9px;color:var(--t2);font-family:var(--fmono);}
+.ss-wp-tag span{color:var(--accent);}
+#pane-ss{background:var(--bg);}
+</style>
 <!-- PHASE_4_SHOWDOWN_RESKIN -->
 <style id="phase4Showdown">
 /* ═══════════════════════════════════════════════
@@ -8758,3 +8894,201 @@ tick();
 <!-- v5.5-DEV filled blocks at top -->
 <!-- v5.6-DEV ships tab -->
 <!-- v5.7-DEV fix ships pane nesting -->
+<!-- SHIP_STATS_JS -->
+<script>
+(function(){
+  function fmt(n,dec){if(n==null||n===''||isNaN(n))return '—';return Number(n).toLocaleString(undefined,{maximumFractionDigits:dec||0});}
+  function el(id){return document.getElementById(id);}
+  function set(id,val){var e=el(id);if(e)e.textContent=(val!=null&&val!==''&&val!=='—')?val:'—';}
+
+  window.renderShipStats=function(shipName){
+    if(!shipName){
+      if(el('ssNoShip'))el('ssNoShip').style.display='flex';
+      if(el('ssContent'))el('ssContent').style.display='none';
+      return;
+    }
+    if(el('ssNoShip'))el('ssNoShip').style.display='none';
+    if(el('ssContent'))el('ssContent').style.display='block';
+
+    var ship=(window.SHIP_DATA&&window.SHIP_DATA[shipName])||{};
+    var live=(window.liveShipData&&window.liveShipData[shipName])||{};
+    var COMP=window.COMP_DB||{};
+    var WEAP=window.WEAPONS||{};
+
+    // ── HEADER ──
+    set('ssShipName', shipName.toUpperCase());
+    var sub=[ship.career||'', ship.role||'', 'SIZE '+(ship.size||'?')].filter(Boolean).join(' · ');
+    set('ssShipSub', sub);
+    var thumb=el('ssThumb');
+    if(thumb){
+      var img=ship.img||ship.image||'';
+      if(!img&&live.media&&live.media[0])img=live.media[0].source_url||'';
+      thumb.src=img;
+      thumb.style.display=img?'block':'none';
+    }
+    // badges
+    var badges=el('ssBadges');
+    if(badges){
+      var bs='';
+      var scm=ship.scm||(live.speed&&live.speed.scm)||'';
+      if(scm)bs+='<span style="padding:2px 7px;border-radius:2px;font-size:9px;font-family:var(--fmono);font-weight:700;background:rgba(0,170,255,0.12);color:var(--accent);border:1px solid rgba(0,170,255,0.25)">SCM '+scm+' m/s</span>';
+      if(ship.status)bs+='<span style="padding:2px 7px;border-radius:2px;font-size:9px;font-family:var(--fmono);font-weight:700;background:rgba(56,210,130,0.12);color:var(--green);border:1px solid rgba(56,210,130,0.25)">'+ship.status+'</span>';
+      badges.innerHTML=bs;
+    }
+
+    // ── ABOUT ──
+    var desc=el('ssDesc');
+    if(desc)desc.textContent=ship.description||ship.lore||'';
+    set('ssMfr', ship.mfr||ship.manufacturer||'—');
+    set('ssRole', ship.role||'—');
+    set('ssSize', ship.size||'—');
+    set('ssCrew', ship.crew||(ship.mincrew&&ship.maxcrew?(ship.mincrew+' – '+ship.maxcrew):null)||'—');
+    set('ssCargo', ship.cargo?(ship.cargo+' SCU'):'—');
+    set('ssPledge', ship.pledge?('$'+ship.pledge):'—');
+    set('ssWarbond', ship.warbond?('$'+ship.warbond):'—');
+    set('ssIngame', ship.ingame?(fmt(ship.ingame)+' aUEC'):'—');
+    set('ssStatus', ship.status||'—');
+
+    // ── HULL ──
+    var l=ship.length||'?', w=ship.width||ship.beam||'?', h=ship.height||'?';
+    set('ssDims', l+'L × '+w+'W × '+h+'H m');
+    set('ssMass', ship.mass?(fmt(ship.mass)+' kg'):'—');
+    var hullHP=live.health?fmt(live.health):(ship.hullHP?fmt(ship.hullHP):null);
+    set('ssTotalHP', hullHP||'—');
+    set('ssHullHP', hullHP||'—');
+
+    // ── SIGNATURES ──
+    var em=live.emission||{};
+    set('ssIR', em.ir?fmt(em.ir):'—');
+    set('ssEM', em.em_idle?fmt(em.em_idle):'—');
+    set('ssEMmax', em.em_max?fmt(em.em_max):'—');
+    var cs=live.cross_section||{};
+    set('ssCSFront', cs.front?fmt(cs.front):'—');
+    set('ssCSSide', cs.side?fmt(cs.side):'—');
+    set('ssCSTop', cs.top?fmt(cs.top):'—');
+
+    // ── WEAPONRY ──
+    // Calculate DPS from hardpoints
+    var totalDPS=0, totalAlpha=0, totalBurst=0;
+    var hpHtml='';
+    var guns=ship.hardpoints||ship.guns||[];
+    guns.forEach(function(hp){
+      var wname=hp.default||hp.weapon||hp.name||'';
+      var w=WEAP[wname]||COMP[wname]||{};
+      var dps=w.dps||hp.dps||0;
+      var alpha=w.alpha||hp.alpha||0;
+      var burst=w.burst||hp.burst||dps;
+      var count=hp.count||1;
+      totalDPS+=dps*count;
+      totalAlpha+=alpha*count;
+      totalBurst+=burst*count;
+      hpHtml+='<div class="ss-wp-row"><div style="display:flex;justify-content:space-between"><span class="ss-wp-name">';
+      if(hp.slot)hpHtml+='<span style="font-size:9px;background:rgba(0,170,255,0.2);color:var(--accent);padding:1px 4px;border-radius:1px;font-family:var(--fmono);margin-right:4px">'+hp.slot+'</span>';
+      hpHtml+=(wname||hp.label||'Unknown')+'</span>';
+      if(dps)hpHtml+='<span style="font-family:var(--fmono);font-size:10px;color:var(--warn)">'+fmt(dps*count,1)+' DPS</span>';
+      hpHtml+='</div>';
+      if(hp.count>1)hpHtml+='<div class="ss-wp-meta"><span class="ss-wp-tag">×<span>'+hp.count+'</span></span></div>';
+      hpHtml+='</div>';
+    });
+    if(el('ssHardpoints'))el('ssHardpoints').innerHTML=hpHtml||'<div style="color:var(--t3);font-size:10px">No hardpoints data</div>';
+    if(totalDPS>0){set('ssPilotDPS',fmt(totalDPS,0));set('ssBurstDPS',fmt(totalBurst,0));set('ssAlpha',fmt(totalAlpha,1));}
+
+    // Missiles
+    var missiles=ship.missiles||[];
+    var missHtml='', missAlpha=0;
+    missiles.forEach(function(m){
+      var mname=m.default||m.name||'';
+      var mc=COMP[mname]||{};
+      var dmg=mc.damage||m.damage||0;
+      var cnt=m.count||1;
+      missAlpha+=dmg*cnt;
+      missHtml+='<div class="ss-wp-row" style="border-color:rgba(255,68,85,0.2);background:rgba(255,68,85,0.03)">';
+      missHtml+='<div style="display:flex;justify-content:space-between"><span class="ss-wp-name">';
+      if(m.slot)missHtml+='<span style="font-size:9px;background:rgba(255,68,85,0.2);color:var(--red);padding:1px 4px;border-radius:1px;font-family:var(--fmono);margin-right:4px">'+m.slot+'</span>';
+      missHtml+=(mname||'Missile Rack')+'</span>';
+      if(dmg)missHtml+='<span style="font-family:var(--fmono);font-size:10px;color:var(--red)">'+fmt(dmg*cnt)+' dmg</span>';
+      missHtml+='</div>';
+      if(cnt>1)missHtml+='<div class="ss-wp-meta"><span class="ss-wp-tag">×<span>'+cnt+'</span></span></div>';
+      missHtml+='</div>';
+    });
+    var mc=el('ssMissileCard');
+    if(mc)mc.style.display=missiles.length?'block':'none';
+    if(el('ssMissiles'))el('ssMissiles').innerHTML=missHtml;
+    if(missAlpha>0)set('ssMissileAlpha',fmt(missAlpha));
+
+    // Shield from COMP_DB
+    var sgName=(ship.comps&&ship.comps.sg)||'';
+    var sg=COMP[sgName]||{};
+    var shHP=(sg.shieldHP||sg.hp||0)*(ship.sgCount||1);
+    var faceHP=shHP/4;
+    var shRegen=sg.regen||0;
+    if(shHP){set('ssShieldHP',fmt(shHP));set('ssFaceHP',fmt(faceHP));set('ssShRegen',fmt(shRegen)+'/s');}
+
+    // ── FLIGHT ──
+    var spd=live.speed||{};
+    var ag=live.agility||{};
+    var scmSpd=spd.scm||ship.scm||'';
+    var boostSpd=spd.boost_forward||spd.boost||ship.boost||'';
+    var navSpd=spd.max||ship.nav||'';
+    if(el('ssSCM'))el('ssSCM').textContent=scmSpd||'—';
+    if(el('ssBoost'))el('ssBoost').textContent=boostSpd?('/ '+boostSpd):'';
+    if(el('ssNAV'))el('ssNAV').textContent=navSpd||'—';
+    var p=ag.pitch||'', y=ag.yaw||'', r=ag.roll||'';
+    var pb=ag.pitch_boosted||'', yb=ag.yaw_boosted||'', rb=ag.roll_boosted||'';
+    if(p||y||r)set('ssPYR',[p,y,r].map(function(v){return v?fmt(v,1):'—';}).join(' / ')+' °/s');
+    if(pb||yb||rb)set('ssPYRB',[pb,yb,rb].map(function(v){return v?fmt(v,1):'—';}).join(' / ')+' °/s');
+
+    // Accelerations
+    var acc=live.acceleration||{};
+    if(acc.main)set('ssAccMain',fmt(acc.main,1)+' G');
+    if(acc.retro)set('ssAccRetro',fmt(acc.retro,1)+' G');
+    if(acc.up)set('ssAccUp',fmt(acc.up,1)+' G');
+    if(acc.down)set('ssAccDown',fmt(acc.down,1)+' G');
+    if(acc.strafe)set('ssAccStrafe',fmt(acc.strafe,1)+' G');
+
+    // ── FUEL ──
+    set('ssH2', ship.h2?(fmt(ship.h2)+' units'):'—');
+    set('ssQT', ship.qt?(fmt(ship.qt)+' units'):'—');
+    set('ssQDRange', ship.qdRange||'—');
+
+    // ── SYSTEMS ──
+    var sysHtml='';
+    var sysKeys=['pp','sg','cool','qd','radar'];
+    var sysLabels={'pp':'Power Plant','sg':'Shield Gen','cool':'Cooler','qd':'Quantum Drive','radar':'Radar'};
+    sysKeys.forEach(function(k){
+      var cname=(ship.comps&&ship.comps[k])||'';
+      if(!cname)return;
+      var c=COMP[cname]||{};
+      sysHtml+='<div class="ss-row"><span class="ss-lbl">'+sysLabels[k]+'</span><span class="ss-val" style="color:var(--accent)">'+cname+'</span></div>';
+    });
+    if(el('ssSystems'))el('ssSystems').innerHTML=sysHtml||'<div style="color:var(--t3);font-size:10px">No systems data</div>';
+  };
+
+  // Hook into pickShip so stats update when ship is selected
+  var origPS=window.pickShip;
+  if(origPS&&!window.__ssHooked){
+    window.__ssHooked=true;
+    window.pickShip=function(n){
+      var r=origPS.apply(this,arguments);
+      setTimeout(function(){
+        if(window.selShip){
+          // Fetch live data if not cached, then render
+          if(window.fetchLiveShipData){
+            window.fetchLiveShipData(window.selShip).then(function(){
+              renderShipStats(window.selShip);
+            });
+          } else {
+            renderShipStats(window.selShip);
+          }
+        }
+      },400);
+      return r;
+    };
+  }
+
+  // Also re-render when SHIP STATS tab is clicked (handled in onclick already)
+  document.addEventListener('DOMContentLoaded',function(){
+    if(window.selShip)renderShipStats(window.selShip);
+  });
+})();
+</script>
