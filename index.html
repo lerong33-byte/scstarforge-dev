@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.39-DEV</title>
+<title>SC-ShipForge v7.40-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.39-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.40-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3379,7 +3379,7 @@ function generate(){
       wHTML+='<div style="border-left:2px solid var(--border);margin-left:4px;padding-left:8px;margin-top:4px">'
         +'<div onclick="toggleTurretTree(\''+tExpandId+'\')" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:3px 0;user-select:none">'
         +'<span style="font-size:9px;color:var(--t3);font-family:var(--fmono)">&#9660;</span>'
-        +'<span style="font-size:10px;color:var(--t2);font-family:var(--fmono);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(allSame?gunSummary[0]+' ×'+gunCount:gunSummary.join(', '))+'</span>'
+        +'<span id="tsumm'+i+'" style="font-size:10px;color:var(--t2);font-family:var(--fmono);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(allSame?gunSummary[0]+' ×'+gunCount:gunSummary.join(', '))+'</span>'
         +'<button onclick="linkAllTurretGuns(event,'+i+','+gunCount+')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:0 6px;font-size:8px;font-family:var(--fmono);color:var(--t3);cursor:pointer;line-height:16px">SYNC</button>'
         +'</div>'
         +'<div id="'+tExpandId+'" style="display:none;padding-top:4px">';
@@ -6155,14 +6155,14 @@ function onTurretGunChange(sel) {
   var info = document.getElementById('tgi_'+slotIdx+'_'+gunIdx);
   if(info) { var w=WEAPONS.find(function(x){return x.id===sel.value;}); info.innerHTML=wepInfo(sel.value); }
   // Update summary
-  var tExpandId = 'texp'+slotIdx;
-  var lbl = document.getElementById(tExpandId+'_arr');
-  if(lbl && lbl.previousSibling) {
+  var tSummEl = document.getElementById('tsumm'+slotIdx);
+  if(tSummEl) {
     var sl = def && def.slots[slotIdx];
     var cnt = sl ? (sl.count||1) : 1;
     var parts=[];
-    for(var gi=0;gi<cnt;gi++){var v=curSlots['sl'+slotIdx+'_gun'+gi]||sl.default;parts.push((v||'—').split(' ')[0]);}
-    if(lbl.previousSibling) lbl.previousSibling.textContent = parts.join(' / ');
+    for(var gi=0;gi<cnt;gi++){var v=curSlots['sl'+slotIdx+'_gun'+gi]||sl.default;var ww=WEAPONS.find(function(x){return x.id===v;});parts.push(ww?ww.name.split(' ').slice(0,2).join(' '):'—');}
+    var allSame=parts.every(function(x){return x===parts[0];});
+    tSummEl.textContent = allSame ? parts[0]+' ×'+cnt : parts.join(', ');
   }
   updatePower();
   updateTargetAnalysis();
@@ -7685,23 +7685,50 @@ function onEWepChange(sel){
   /* Update slot-info for single-gun slots */
   if(gi<0){var el=document.getElementById('esi'+i);if(el)el.innerHTML=_eWepInfo(sel.value);}
   /* Update header row with new weapon name/subtype/dps/alpha */
-  var wid=gi>=0?(_eSlots['sl'+i+'_gun0']||sel.value):sel.value;
-  var wn=WEAPONS.find(function(x){return x.id===wid;});
-  if(wn){
-    var nameEl=document.getElementById('ewname'+i);
-    var subEl=document.getElementById('ewsub'+i);
-    var alphaEl=document.getElementById('ewalpha'+i);
-    var dpsEl=document.getElementById('ewdps'+i);
-    var ship=_eShipName&&SHIP_DATA[_eShipName];
-    var sl2=ship&&ship.slots&&ship.slots[i];
-    var gc=sl2?(sl2.count||1):1;
-    if(nameEl)nameEl.innerHTML=wn.name+(gc>1?' <span style="color:#4a5568;font-size:11px">&times;'+gc+'</span>':'');
-    var n=wn.name.toLowerCase(),t=wn.type;
-    var sub=n.includes('neutron')?'Neutron Repeater':n.includes('gatling')?'Ballistic Gatling':n.includes('scatter')?'Scatter Gun':n.includes('cannon')?(t==='ballistic'?'Ballistic Cannon':'Laser Cannon'):n.includes('repeater')?(t==='ballistic'?'Ballistic Repeater':'Laser Repeater'):(t==='ballistic'?'Ballistic Repeater':'Laser Repeater');
-    var sc=sub.includes('Cannon')?'#f97316':sub.includes('Gatling')?'#facc15':sub.includes('Scatter')?'#e879f9':sub.includes('Neutron')?'#34d399':sub.includes('Ballistic')?'#f59e0b':'#60a5fa';
-    if(subEl)subEl.innerHTML=sub?' &middot; <span style="background:rgba(0,0,0,.4);border:1px solid '+sc+';border-radius:20px;padding:1px 8px;font-size:11px;color:'+sc+'">'+sub+'</span>':'';
-    if(alphaEl)alphaEl.innerHTML=wn.alpha?wn.alpha+' <span style="font-size:10px;color:var(--t3)">α</span>':'';
-    if(dpsEl)dpsEl.innerHTML=wn.dps?wn.dps+' <span style="font-size:10px;color:var(--t3);font-weight:400">DPS</span>':'';
+  var nameEl=document.getElementById('ewname'+i);
+  var subEl=document.getElementById('ewsub'+i);
+  var alphaEl=document.getElementById('ewalpha'+i);
+  var dpsEl=document.getElementById('ewdps'+i);
+  var ship=_eShipName&&SHIP_DATA[_eShipName];
+  var sl2=ship&&ship.slots&&ship.slots[i];
+  var gc=sl2?(sl2.count||1):1;
+  var isTurret=sl2&&sl2.type==='turret'&&gc>1;
+  if(isTurret){
+    /* Collect all gun values and build mixed summary */
+    var gunNames=[];var totalDps=0;var totalAlpha=0;
+    for(var ggi=0;ggi<gc;ggi++){
+      var gv=_eSlots['sl'+i+'_gun'+ggi]||sl2.default;
+      var gwn=WEAPONS.find(function(x){return x.id===gv;});
+      gunNames.push(gwn?gwn.name.split(' ').slice(0,2).join(' '):'—');
+      if(gwn){totalDps+=(gwn.dps||0);totalAlpha+=(gwn.alpha||0);}
+    }
+    var allSame=gunNames.every(function(x){return x===gunNames[0];});
+    var dispName=allSame?gunNames[0]:gunNames.join(', ');
+    var RED_DIM='#4a2030';
+    if(nameEl)nameEl.innerHTML=dispName+(allSame?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+gc+'</span>':'');
+    /* Subtype based on gun0 */
+    var g0id=_eSlots['sl'+i+'_gun0']||sl2.default;
+    var wn0=WEAPONS.find(function(x){return x.id===g0id;});
+    if(subEl&&wn0){
+      var n0=wn0.name.toLowerCase(),t0=wn0.type;
+      var sub0=n0.includes('neutron')?'Neutron Repeater':n0.includes('gatling')?'Ballistic Gatling':n0.includes('scatter')?'Scatter Gun':n0.includes('cannon')?(t0==='ballistic'?'Ballistic Cannon':'Laser Cannon'):n0.includes('repeater')?(t0==='ballistic'?'Ballistic Repeater':'Laser Repeater'):(t0==='ballistic'?'Ballistic Repeater':'Laser Repeater');
+      var sc0=sub0.includes('Cannon')?'#f97316':sub0.includes('Gatling')?'#facc15':sub0.includes('Scatter')?'#e879f9':sub0.includes('Neutron')?'#34d399':sub0.includes('Ballistic')?'#f59e0b':'#60a5fa';
+      subEl.innerHTML=sub0?' &middot; <span style="background:rgba(0,0,0,.4);border:1px solid '+sc0+';border-radius:20px;padding:1px 8px;font-size:11px;color:'+sc0+'">'+sub0+'</span>':'';
+    }
+    if(alphaEl)alphaEl.innerHTML=totalAlpha?totalAlpha+' <span style="font-size:10px;color:var(--t3)">α</span>':'';
+    if(dpsEl)dpsEl.innerHTML=totalDps?totalDps+' <span style="font-size:10px;color:var(--t3);font-weight:400">DPS</span>':'';
+  } else {
+    /* Single gun */
+    var wn=WEAPONS.find(function(x){return x.id===sel.value;});
+    if(wn){
+      if(nameEl)nameEl.innerHTML=wn.name;
+      var n=wn.name.toLowerCase(),t=wn.type;
+      var sub=n.includes('neutron')?'Neutron Repeater':n.includes('gatling')?'Ballistic Gatling':n.includes('scatter')?'Scatter Gun':n.includes('cannon')?(t==='ballistic'?'Ballistic Cannon':'Laser Cannon'):n.includes('repeater')?(t==='ballistic'?'Ballistic Repeater':'Laser Repeater'):(t==='ballistic'?'Ballistic Repeater':'Laser Repeater');
+      var sc=sub.includes('Cannon')?'#f97316':sub.includes('Gatling')?'#facc15':sub.includes('Scatter')?'#e879f9':sub.includes('Neutron')?'#34d399':sub.includes('Ballistic')?'#f59e0b':'#60a5fa';
+      if(subEl)subEl.innerHTML=sub?' &middot; <span style="background:rgba(0,0,0,.4);border:1px solid '+sc+';border-radius:20px;padding:1px 8px;font-size:11px;color:'+sc+'">'+sub+'</span>':'';
+      if(alphaEl)alphaEl.innerHTML=wn.alpha?wn.alpha+' <span style="font-size:10px;color:var(--t3)">α</span>':'';
+      if(dpsEl)dpsEl.innerHTML=wn.dps?wn.dps+' <span style="font-size:10px;color:var(--t3);font-weight:400">DPS</span>':'';
+    }
   }
   _eUpdateStats();
 }
