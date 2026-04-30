@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.16-DEV</title>
+<title>SC-ShipForge v7.17-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -912,7 +912,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.16-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.17-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -1000,7 +1000,9 @@ option,optgroup{background:var(--bg2)}
             <div class="sig-row"><span class="sig-lbl">Shield HP</span><span class="sig-val" id="shpTotal" style="color:var(--green)">&#8212;</span></div>
             <div class="sig-row"><span class="sig-lbl">Regen/s</span><span class="sig-val" id="shpRegen" style="color:var(--cyan)">&#8212;</span></div>
             <div class="sig-row"><span class="sig-lbl">Face HP</span><span class="sig-val" id="shpFace">&#8212;</span></div>
+            <div class="sig-row"><span class="sig-lbl">Hull HP</span><span class="sig-val" id="statHullHP" style="color:var(--t2)">&#8212;</span></div>
           </div>
+          <div class="sig-row" id="missAlphaRow" style="display:none"><span class="sig-lbl">Missile Alpha</span><span class="sig-val" id="statMissAlpha" style="color:var(--cyan)">&#8212;</span></div>
           <div class="sig-row"><span class="sig-lbl">QD Range</span><span class="sig-val" id="qdRange">&#8212;</span></div>
           <div class="sig-row"><span class="sig-lbl">Spool</span><span class="sig-val" id="qdSpool">&#8212;</span></div>
         </div>
@@ -1010,6 +1012,7 @@ option,optgroup{background:var(--bg2)}
           <div class="sig-row"><span class="sig-lbl">Pitch</span><span class="sig-val" id="statPitch" style="color:var(--t2)">&#8212;</span></div>
           <div class="sig-row"><span class="sig-lbl">Roll</span><span class="sig-val" id="statRoll" style="color:var(--t2)">&#8212;</span></div>
           <div class="sig-row"><span class="sig-lbl">Yaw</span><span class="sig-val" id="statYaw" style="color:var(--t2)">&#8212;</span></div>
+          <div class="sig-row" id="crossSecRow" style="display:none"><span class="sig-lbl">Cross Section</span><span class="sig-val" id="statCrossSection" style="color:var(--t2)">&#8212;</span></div>
         </div>
         <div class="lp-card" id="vesselStatsCard" style="display:none">
           <div class="lp-card-hd"><span class="lp-card-title">VESSEL</span></div>
@@ -4247,6 +4250,42 @@ function updatePower() {
     U('shpFace', sgDb ? sgDb.faceHP.toLocaleString() : '—');
   }
 
+  // ── Hull HP (from wiki API) ──
+  var wikiData = liveShipData[selShip];
+  if (wikiData && wikiData.health) {
+    var hullHP = wikiData.health;
+    U('statHullHP', hullHP.toLocaleString());
+  } else {
+    U('statHullHP', '—');
+  }
+
+  // ── Missile Alpha ──
+  var missAlpha = 0;
+  if (def.missiles && def.missiles.length > 0) {
+    def.missiles.forEach(function(ml) {
+      var mw = WEAPONS.find(function(w){ return w.id === ml.default; });
+      if (mw && mw.alpha) missAlpha += mw.alpha * (ml.count || 1);
+    });
+  }
+  if (missAlpha > 0) {
+    U('statMissAlpha', missAlpha.toLocaleString());
+    var mar = document.getElementById('missAlphaRow');
+    if (mar) mar.style.display = '';
+  } else {
+    var mar = document.getElementById('missAlphaRow');
+    if (mar) mar.style.display = 'none';
+  }
+
+  // ── Cross Section (from wiki API) ──
+  if (wikiData && wikiData.cross_section) {
+    U('statCrossSection', wikiData.cross_section.toLocaleString());
+    var csr = document.getElementById('crossSecRow');
+    if (csr) csr.style.display = '';
+  } else {
+    var csr = document.getElementById('crossSecRow');
+    if (csr) csr.style.display = 'none';
+  }
+
   // ── Signatures ──
   if (live && live.emission) {
     var irVal  = isNAV ? live.emission.ir  : live.emission.ir;
@@ -6283,13 +6322,26 @@ function _applyLiveStats(d) {
     if (el) el.style.display = '';
   }
 
-  // FLIGHT card
-  if (d.speeds) {
-    var abVal = d.speeds.scmSpeedBoosted || d.speeds.afterburnerSpeed || d.speeds.maxSpeed || null;
+  // FLIGHT card — use Fleetyards data first, fall back to wiki API (liveShipData)
+  var wikiShip = window.liveShipData && window.selShip ? window.liveShipData[window.selShip] : null;
+  var hasFlightData = d.speeds || (wikiShip && (wikiShip.speed || wikiShip.agility));
+  if (hasFlightData) {
+    // AB Speed: Fleetyards scmSpeedBoosted → wiki speed.boost_forward
+    var abVal = (d.speeds && (d.speeds.scmSpeedBoosted || d.speeds.afterburnerSpeed || d.speeds.maxSpeed))
+      || (wikiShip && wikiShip.speed && wikiShip.speed.boost_forward) || null;
     set('statAB', abVal ? Math.round(abVal) + ' m/s' : '—');
-    set('statPitch', d.speeds.pitchBoosted ? d.speeds.pitchBoosted.toFixed(1) + '°/s' : (d.speeds.pitch ? d.speeds.pitch.toFixed(1) + '°/s' : '—'));
-    set('statRoll', d.speeds.rollBoosted ? d.speeds.rollBoosted.toFixed(1) + '°/s' : (d.speeds.roll ? d.speeds.roll.toFixed(1) + '°/s' : '—'));
-    set('statYaw', d.speeds.yawBoosted ? d.speeds.yawBoosted.toFixed(1) + '°/s' : (d.speeds.yaw ? d.speeds.yaw.toFixed(1) + '°/s' : '—'));
+    // Pitch: Fleetyards → wiki agility.pitch_boosted
+    var pitchVal = (d.speeds && (d.speeds.pitchBoosted || d.speeds.pitch))
+      || (wikiShip && wikiShip.agility && (wikiShip.agility.pitch_boosted || wikiShip.agility.pitch)) || null;
+    set('statPitch', pitchVal ? pitchVal.toFixed(1) + '°/s' : '—');
+    // Roll: Fleetyards → wiki agility.roll_boosted
+    var rollVal = (d.speeds && (d.speeds.rollBoosted || d.speeds.roll))
+      || (wikiShip && wikiShip.agility && (wikiShip.agility.roll_boosted || wikiShip.agility.roll)) || null;
+    set('statRoll', rollVal ? rollVal.toFixed(1) + '°/s' : '—');
+    // Yaw: Fleetyards → wiki agility.yaw_boosted
+    var yawVal = (d.speeds && (d.speeds.yawBoosted || d.speeds.yaw))
+      || (wikiShip && wikiShip.agility && (wikiShip.agility.yaw_boosted || wikiShip.agility.yaw)) || null;
+    set('statYaw', yawVal ? yawVal.toFixed(1) + '°/s' : '—');
     show('liveStatsCard');
   }
 
