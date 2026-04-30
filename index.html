@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.46-DEV</title>
+<title>SC-ShipForge v7.47-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.46-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.47-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3633,8 +3633,9 @@ function onCompChange(sel){
   }
   updatePower();
   updateTargetAnalysis();
+  /* Refresh Showdown power panel if the player's ship matches the Showdown ship */
+  if(window.buildPowerPanel && window._pvpShip && window._pvpShip === selShip) window.buildPowerPanel();
 }
-
 function linkAllComps(e,k,cnt){
   e.preventDefault();
   // Get value from first slot
@@ -3654,6 +3655,7 @@ function linkAllComps(e,k,cnt){
   curComps[k]=val;
   updatePower();
   updateTargetAnalysis();
+  if(window.buildPowerPanel && window._pvpShip && window._pvpShip === selShip) window.buildPowerPanel();
   // Flash button to confirm
   var btn=e.target;
   btn.textContent='LINKED ✓';
@@ -8405,8 +8407,8 @@ function buildPowerPanel(){
   var def=SHIP_DATA&&SHIP_DATA[shipName];
   if(!def){panel.style.display='none';return;}
 
-  /* Derive max EU from ship's power plant */
-  var ppKey=(def.comps&&def.comps.pp)||'';
+  /* Derive max EU from ship's power plant — use player's current selection if available */
+  var ppKey=(window.curComps&&window.curComps.pp)||(def.comps&&def.comps.pp)||'';
   var ppCnt=(def.comps&&def.comps.counts&&def.comps.counts.pp)||1;
   var ppDb=COMP_DB&&COMP_DB.pp&&COMP_DB.pp[ppKey];
   var maxEU=ppDb?(parseFloat(ppDb.out)||0)*ppCnt:0;
