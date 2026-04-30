@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.63-DEV</title>
+<title>SC-ShipForge v7.64-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.63-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.64-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7889,6 +7889,8 @@ function onECompChange(sel){
     }
     subEl.innerHTML=sub2;
   }
+  /* Rebuild power panel so EU totals update when PP/shield/cooler/QD/radar changes */
+  if(typeof buildPowerPanel==='function'&&typeof window._pvpShip!=='undefined'&&window._pvpShip)buildPowerPanel();
   _eUpdateStats();
 }
 function toggleESystem(key){
@@ -8168,6 +8170,8 @@ function _eUpdateStats(){
   if(radarCard)radarCard.style.opacity=radarOn?'1':'0.4';
   window._enemyDps=totalDps;
   window._enemyShieldHP=shieldHP;
+  /* Keep power panel in sync whenever stats update */
+  if(typeof buildPowerPanel==='function'&&typeof window._pvpShip!=='undefined'&&window._pvpShip)buildPowerPanel();
 }
 
 /* ── Main builder ── */
@@ -8588,11 +8592,13 @@ function buildPowerPanel(){
   var def=SHIP_DATA&&SHIP_DATA[shipName];
   if(!def){panel.style.display='none';return;}
 
-   /* Derive max EU from the Showdown ship's own power plant (never from the loadout builder curComps) */
-  var ppKey=(def.comps&&def.comps.pp)||'';
+  /* Derive max EU from the enemy loadout's currently selected PP (falls back to ship default) */
+  var ppKey=(typeof _eComps!=='undefined'&&_eComps['pp'])||(def.comps&&def.comps.pp)||'';
   var ppCnt=(def.comps&&def.comps.counts&&def.comps.counts.pp)||1;
   var ppDb=COMP_DB&&COMP_DB.pp&&COMP_DB.pp[ppKey];
   var maxEU=ppDb?(parseFloat(ppDb.out)||0)*ppCnt:0;
+  /* If PP is toggled OFF, max EU is 0 */
+  if(typeof _eSysEnabled!=='undefined'&&_eSysEnabled['pp']===false)maxEU=0;
   /* Consumption: each system pip draws (maxEU / (numSystems * 10)) EU
      Total used = sumOfPips * drawPerPip; pct = used/maxEU*100 */
   var numSys=_pwrSystems.length; /* 7 */
