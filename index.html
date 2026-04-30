@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.67-DEV</title>
+<title>SC-ShipForge v7.68-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.67-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.68-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -8690,20 +8690,17 @@ function buildPowerPanel(){
     h+='<div style="width:100%;height:2px;background:rgba(255,100,0,0.4);border-radius:1px;margin-bottom:4px"></div>';
     /* Normal pips (1-10) */
     if(unitCnt>1){
-      /* Individual pips per unit, grouped by a thin separator line between units */
+      /* Individual pips per unit — NO separator div (would add height). Use opacity to distinguish groups. */
       h+='<div style="display:flex;flex-direction:column;align-items:center;gap:'+PIP_GAP+'px;width:100%;margin-bottom:4px">';
       /* Render from top (highest pip) to bottom (pip 1) */
       for(var p=NORM_PIPS;p>=1;p--){
         var unitIdx=Math.floor((p-1)/ppu); /* 0 = unit 1 (pips 1..ppu), 1 = unit 2 (pips ppu+1..2*ppu) */
         var filled=!navLocked&&p<=val;
-        /* Insert a thin separator between unit groups (after the last pip of each unit boundary, going top-down) */
-        var isBoundary=(p<NORM_PIPS)&&(p%ppu===0);
-        if(isBoundary){
-          h+='<div style="width:100%;height:2px;background:rgba(255,255,255,0.15);border-radius:1px"></div>';
-        }
+        /* Alternate opacity between unit groups so boundary is visible without adding height */
+        var groupOpacity=(unitIdx%2===0)?'0.9':'0.65';
         h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+' " '
           +'style="width:100%;height:'+PIP_H+'px;min-height:'+PIP_H+'px;border-radius:2px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(navLocked?'not-allowed':'pointer')+';'
-          +'background:'+(filled?sysColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':'0.35')+'">'
+          +'background:'+(filled?sysColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?groupOpacity:'0.35')+'">'
           +'</div>';
       }
       h+='</div>';
@@ -8720,11 +8717,20 @@ function buildPowerPanel(){
       }
       h+='</div>';
     }
-    /* Icon + % label — show NAV lock indicator on locked columns */
-    h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">'
-      +'<span style="font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+sysColor+'">'+sys.icon+'</span>'
-      +'<span style="font-size:8px;display:block;color:'+(navLocked?'#f87171':'var(--t2)')+'">'
-      +(navLocked?'NAV':Math.round(val*10)+'%')+'</span>'
+    /* Icon = power toggle button for toggleable systems (shields, cooler, qd, radar); weapons/engines/thrusters are non-toggle */
+    var toggleSysMap={shields:'sg',cooler:'cooler',qd:'qd',radar:'radar'};
+    var toggleSysKey=toggleSysMap[sys.k];
+    var sysIsOff=toggleSysKey&&typeof _eSysEnabled!=='undefined'&&_eSysEnabled[toggleSysKey]===false;
+    h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">';
+    if(toggleSysKey){
+      /* Clickable power toggle icon button */
+      h+='<button onclick="toggleESystem(\''+toggleSysKey+'\')" '
+        +'style="background:none;border:none;padding:0;cursor:pointer;font-size:14px;line-height:1;display:block;margin-bottom:1px;color:'+(sysIsOff?'rgba(255,80,80,0.5)':sysColor)+';filter:'+(sysIsOff?'grayscale(1)':'none')+'">'+sys.icon+'</button>';
+    } else {
+      h+='<span style="font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+sysColor+'">'+sys.icon+'</span>';
+    }
+    h+='<span style="font-size:8px;display:block;color:'+(navLocked||sysIsOff?'#f87171':'var(--t2)')+'">'
+      +(navLocked?'NAV':sysIsOff?'OFF':Math.round(val*10)+'%')+'</span>'
       +'</div>';
     h+='</div>';
   });
