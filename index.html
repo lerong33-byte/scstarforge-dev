@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.40-DEV</title>
+<title>SC-ShipForge v7.41-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.40-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.41-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7742,17 +7742,24 @@ function onEMisItemChange(sel){
   /* Update header row */
   var mw=WEAPONS.find(function(x){return x.id===sel.value;});
   if(mw){
+    var ship=_eShipName&&SHIP_DATA[_eShipName];
+    var ms=ship&&ship.missiles&&ship.missiles[i];
+    var rackCnt=ms?(ms.count||1):1;
     var nameEl=document.getElementById('emname_'+i+'_'+mi);
     var typeEl=document.getElementById('emtype_'+i+'_'+mi);
     var alphaEl=document.getElementById('emalpha_'+i+'_'+mi);
-    if(nameEl)nameEl.textContent=mw.name;
+    if(nameEl){
+      var RED_DIM='#4a2030';
+      nameEl.innerHTML=mw.name+(rackCnt>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+rackCnt+'</span>':'');
+    }
     if(typeEl){
       var mtr=mw.type||'';
       var mtc=mtr.includes('emp')?'#cc88ff':mtr.includes('cs')?'#44aaff':mtr==='torpedo'?'#ff4444':'#f59e0b';
       typeEl.style.color=mtc;
       typeEl.textContent=mtr.replace('missile-','').replace('missile','IR').toUpperCase()||'—';
     }
-    if(alphaEl)alphaEl.innerHTML=mw.alpha?mw.alpha.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span>':'';
+    var alphaTotal=(mw.alpha||0)*rackCnt;
+    if(alphaEl)alphaEl.innerHTML=alphaTotal?alphaTotal.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span>':'';
   }
 }
 function onERackChange(sel){
@@ -7792,13 +7799,66 @@ function onECompChange(sel){
   }
   if(statEl&&cEntry2){
     var sv='',su='',sc='#e2e8f0';
-    if(baseKey==='pp'){sv=(cEntry2.out||'');su='EU';sc='#f59e0b';}
-    else if(baseKey==='sg'){sv=(cEntry2.totalHP?cEntry2.totalHP.toLocaleString():'');su='HP';sc='#60a5fa';}
-    else if(baseKey==='cooler'){sv=(cEntry2.cool||'');su='cool';sc='#22d3ee';}
+    var ship3=_eShipName&&SHIP_DATA[_eShipName];
+    var cnt3=ship3&&ship3.comps&&ship3.comps.counts?(ship3.comps.counts[baseKey]||1):1;
+    if(baseKey==='pp'){var ppR=parseFloat(cEntry2.out)||0;sv=ppR?(ppR*cnt3).toLocaleString():'';su='EU';sc='#f59e0b';}
+    else if(baseKey==='sg'){var sgR=cEntry2.totalHP||0;sv=sgR?(sgR*cnt3).toLocaleString():'';su='HP';sc='#60a5fa';}
+    else if(baseKey==='cooler'){var coolR=parseFloat(cEntry2.cool)||0;sv=coolR?(coolR*cnt3).toLocaleString():'';su='cool';sc='#22d3ee';}
     else if(baseKey==='qd'){sv=(cEntry2.range||'');su='Gm';sc='#a78bfa';}
     else if(baseKey==='radar'){sv=(cEntry2.dist||'');su='m';sc='#34d399';}
     statEl.innerHTML=sv?'<span style="font-size:14px;font-weight:700;font-family:var(--fmono);color:'+sc+'">'+sv+' <span style="font-size:10px;color:var(--t3);font-weight:400">'+su+'</span></span>':'';
   }
+  _eUpdateStats();
+}
+function resetEHardpoints(){
+  var ship=_eShipName&&SHIP_DATA[_eShipName];if(!ship)return;
+  (ship.slots||[]).forEach(function(sl,i){
+    var gc=sl.count||1;
+    if(gc>1&&sl.type==='turret'){
+      for(var gi=0;gi<gc;gi++){
+        _eSlots['sl'+i+'_gun'+gi]=sl.default;
+        var sel=document.querySelector('select[data-slotidx="'+i+'"][data-gunidx="'+gi+'"]');
+        if(sel){sel.value=sl.default;onEWepChange(sel);}
+      }
+    } else {
+      _eSlots['sl'+i]=sl.default;
+      var sel=document.querySelector('select[data-slotidx="'+i+'"]:not([data-gunidx])');
+      if(sel){sel.value=sl.default;onEWepChange(sel);}
+    }
+  });
+  _eUpdateStats();
+}
+function resetEMissiles(){
+  var ship=_eShipName&&SHIP_DATA[_eShipName];if(!ship)return;
+  (ship.missiles||[]).forEach(function(ms,i){
+    var rc=ms.count||1;
+    for(var ri=0;ri<rc;ri++){
+      _eMissiles['ms'+i+'_'+ri]=ms.default;
+      var sel=document.querySelector('select[data-missidx="'+i+'"][data-misgidx="'+ri+'"]');
+      if(sel){sel.value=ms.default;onEMisItemChange(sel);}
+    }
+  });
+  _eUpdateStats();
+}
+function resetESystems(){
+  var ship=_eShipName&&SHIP_DATA[_eShipName];if(!ship)return;
+  var COMP_KEYS=['pp','sg','cooler','qd','radar'];
+  COMP_KEYS.forEach(function(k){
+    var def=ship.comps&&ship.comps[k]||'';
+    var cnt=(ship.comps&&ship.comps.counts&&ship.comps.counts[k])||1;
+    if(cnt===1){
+      _eComps[k]=def;
+      var sel=document.querySelector('select[data-compkey="'+k+'"]');
+      if(sel){sel.value=def;onECompChange(sel);}
+    } else {
+      for(var si=0;si<cnt;si++){
+        var sk=k+'_'+si;
+        _eComps[sk]=def;
+        var sel=document.querySelector('select[data-compkey="'+sk+'"]');
+        if(sel){sel.value=def;onECompChange(sel);}
+      }
+    }
+  });
   _eUpdateStats();
 }
 function toggleESlot(btn,i){
@@ -7939,9 +7999,10 @@ function buildEnemyLoadout(enemyName){
   var PILL_R='14px';   /* outer card radius */
   var INNER_R='10px';  /* inner body radius */
 
-  function secHd(label){
-    return '<div style="font-size:10px;font-weight:800;letter-spacing:3px;color:'+RED+';font-family:var(--fmono);'
-      +'padding:10px 0 10px;border-bottom:1px solid '+RED_BORDER2+';margin-bottom:10px;text-transform:uppercase">'+label+'</div>';
+  function secHd(label,resetFn){
+    var resetBtn=resetFn?'<button onclick="'+resetFn+'()" style="margin-left:auto;background:none;border:1px solid '+RED_BORDER+';border-radius:20px;padding:1px 10px;font-size:9px;font-family:var(--fmono);color:'+RED+';cursor:pointer;letter-spacing:1px;opacity:.7;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">RESET</button>':'';
+    return '<div style="display:flex;align-items:center;font-size:10px;font-weight:800;letter-spacing:3px;color:'+RED+';font-family:var(--fmono);'
+      +'padding:10px 0 10px;border-bottom:1px solid '+RED_BORDER2+';margin-bottom:10px;text-transform:uppercase">'+label+resetBtn+'</div>';
   }
 
   /* ── buy location pill ── */
@@ -8042,6 +8103,7 @@ function buildEnemyLoadout(enemyName){
       var mTypeColor=mTypeRaw.includes('emp')?'#cc88ff':mTypeRaw.includes('cs')?'#44aaff':mTypeRaw==='torpedo'?'#ff4444':'#f59e0b';
       var mTypeName=mTypeRaw.replace('missile-','').replace('missile','IR').toUpperCase()||'—';
       var mAlpha=mw?(mw.alpha||0):0;
+      var mAlphaTotal=mAlpha*rackCount;
       var mRange=mw?mw.range.toLocaleString():'—';
       var mSz=mw?mw.sz:szNum;
       var rackName=_eRacks['ms'+i]||ms.lbl;
@@ -8054,10 +8116,10 @@ function buildEnemyLoadout(enemyName){
         +'<span style="font-size:10px;color:'+RED_DIM+';font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'
         +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0;font-size:11px;padding:2px 7px">S'+szNum+'</span>'
         +'<span style="flex:1;min-width:0">'
-          +'<span id="emname_'+i+'_'+ri+'" style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(mw?mw.name:rackName)+'</span>'
+          +'<span id="emname_'+i+'_'+ri+'" style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(mw?mw.name:rackName)+(rackCount>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+rackCount+'</span>':'')+'</span>'
           +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+rackName+' &middot; <span id="emtype_'+i+'_'+ri+'" style="color:'+mTypeColor+'">'+mTypeName+'</span></span>'
         +'</span>'
-        +'<span id="emalpha_'+i+'_'+ri+'" style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0">'+(mAlpha?mAlpha.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span>':'')+'</span>'
+        +'<span id="emalpha_'+i+'_'+ri+'" style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0">'+(mAlphaTotal?mAlphaTotal.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span>':'')+'</span>'
         +'</div>'
         +'<div id="'+expandId+'" style="display:none;padding:10px 14px;background:'+DARK3+';border-top:1px solid '+RED_BORDER2+'">'
         +'<select class="slot-sel" data-missidx="'+i+'" data-misgidx="'+ri+'" data-maxsz="'+szNum+'" onchange="onEMisItemChange(this)" style="width:100%;font-size:12px;padding:5px 8px;border-color:'+RED_BORDER+';border-radius:8px;background:var(--bg3)">'+_eMisOpts(szNum,curMid)+'</select>'
@@ -8091,9 +8153,9 @@ function buildEnemyLoadout(enemyName){
     var compStatCol='#e2e8f0';
     var compStatVal='';var compStatUnit='';
     if(cEntry){
-      if(k==='pp'){compStatVal=(cEntry.out||'—');compStatUnit='EU';compStatCol='#f59e0b';}
-      else if(k==='sg'){compStatVal=(cEntry.totalHP?cEntry.totalHP.toLocaleString():'—');compStatUnit='HP';compStatCol='#60a5fa';}
-      else if(k==='cooler'){compStatVal=(cEntry.cool||'—');compStatUnit='cool';compStatCol='#22d3ee';}
+      if(k==='pp'){var ppRaw=parseFloat(cEntry.out)||0;compStatVal=ppRaw?(ppRaw*cnt).toLocaleString():'—';compStatUnit='EU';compStatCol='#f59e0b';}
+      else if(k==='sg'){var sgRaw=cEntry.totalHP||0;compStatVal=sgRaw?(sgRaw*cnt).toLocaleString():'—';compStatUnit='HP';compStatCol='#60a5fa';}
+      else if(k==='cooler'){var coolRaw=parseFloat(cEntry.cool)||0;compStatVal=coolRaw?(coolRaw*cnt).toLocaleString():'—';compStatUnit='cool';compStatCol='#22d3ee';}
       else if(k==='qd'){compStatVal=(cEntry.range||'—');compStatUnit='Gm';compStatCol='#a78bfa';}
       else if(k==='radar'){compStatVal=(cEntry.dist||'—');compStatUnit='m';compStatCol='#34d399';}
     }
@@ -8180,9 +8242,9 @@ function buildEnemyLoadout(enemyName){
   cols.style.cssText='display:flex;flex-direction:row;gap:12px;align-items:flex-start;width:100%';
   var leftCol=document.createElement('div');
   leftCol.style.cssText='flex:1;min-width:0;display:flex;flex-direction:column;gap:0';
-  if(ship.slots&&ship.slots.length){leftCol.innerHTML+=secHd('HARDPOINTS')+'<div>'+wHTML+'</div>';}
-  if(ship.missiles&&ship.missiles.length){leftCol.innerHTML+=secHd('MISSILES')+'<div>'+mHTML+'</div>';}
-  leftCol.innerHTML+=secHd('SYSTEMS')+'<div>'+cHTML+'</div>';
+  if(ship.slots&&ship.slots.length){leftCol.innerHTML+=secHd('HARDPOINTS','resetEHardpoints')+'<div>'+wHTML+'</div>';}
+  if(ship.missiles&&ship.missiles.length){leftCol.innerHTML+=secHd('MISSILES','resetEMissiles')+'<div>'+mHTML+'</div>';}
+  leftCol.innerHTML+=secHd('SYSTEMS','resetESystems')+'<div>'+cHTML+'</div>';
   cols.appendChild(leftCol);
   cols.innerHTML+=statsHTML;
   wrap.appendChild(cols);
