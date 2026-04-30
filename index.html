@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.5-DEV</title>
+<title>SC-ShipForge v8.6-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -5871,23 +5871,26 @@ function putSavedLoadouts(arr) {
   try { localStorage.setItem(SV_KEY, JSON.stringify(arr)); } catch(e) {}
 }
 
+function _activeShip() { return selShip || window._sbShip || ''; }
 function _autoSaveName() {
-  if (!selShip) return 'Unnamed Build';
+  var ship = _activeShip();
+  if (!ship) return 'Unnamed Build';
   var arr = getSavedLoadouts();
-  var count = arr.filter(function(x){ return x.ship === selShip; }).length + 1;
-  return selShip + ' Build ' + count;
+  var count = arr.filter(function(x){ return x.ship === ship; }).length + 1;
+  return ship + ' Build ' + count;
 }
 function saveLoadout() {
-  if (!selShip) { showToast('Select a ship first'); return; }
+  var ship = _activeShip();
+  if (!ship) { showToast('Select a ship first'); return; }
   var nameEl = document.getElementById('svName');
   var name = (nameEl ? nameEl.value.trim() : '') || _autoSaveName();
   if (!name) name = _autoSaveName();
-  var loadout = { id: Date.now(), name: name, ship: selShip, act: selAct,
+  var loadout = { id: Date.now(), name: name, ship: ship, act: selAct,
     slots: JSON.parse(JSON.stringify(curSlots)),
     missiles: JSON.parse(JSON.stringify(curMissiles)),
     comps: JSON.parse(JSON.stringify(curComps)) };
   var arr = getSavedLoadouts();
-  var existing = arr.findIndex(function(x) { return x.name === name && x.ship === selShip; });
+  var existing = arr.findIndex(function(x) { return x.name === name && x.ship === ship; });
   if (existing >= 0) arr[existing] = loadout; else arr.unshift(loadout);
   putSavedLoadouts(arr);
   if (nameEl) nameEl.value = '';
@@ -6434,8 +6437,9 @@ function buildExportData(lo) {
 
 /* ── Export current loadout ── */
 function exportLoadoutAs(fmt) {
-  if (!selShip) { showToast('Select a ship first'); return; }
-  var lo = { name: selShip + ' Build', ship: selShip, slots: JSON.parse(JSON.stringify(curSlots)),
+  var ship = _activeShip();
+  if (!ship) { showToast('Select a ship first'); return; }
+  var lo = { name: ship + ' Build', ship: ship, slots: JSON.parse(JSON.stringify(curSlots)),
     missiles: JSON.parse(JSON.stringify(curMissiles)), comps: JSON.parse(JSON.stringify(curComps)) };
   _doExport(lo, fmt);
 }
@@ -6536,14 +6540,15 @@ function _exportPDF(lo, rows, fname) {
 window._autoSaveName = _autoSaveName;
 window.saveLoadout = saveLoadout;
 function updateSvCurrentShip() {
+  var ship = _activeShip();
   var el = document.getElementById('svCurrentShip');
   if (el) {
-    el.textContent = selShip ? 'Current ship: ' + selShip : 'No ship selected';
-    el.style.color = selShip ? '#38bdf8' : '#2a4a60';
+    el.textContent = ship ? 'Current ship: ' + ship : 'No ship selected';
+    el.style.color = ship ? '#38bdf8' : '#2a4a60';
   }
   /* Update placeholder with auto-generated name */
   var inp = document.getElementById('svName');
-  if (inp) inp.placeholder = selShip ? _autoSaveName() : 'Select a ship first…';
+  if (inp) inp.placeholder = ship ? _autoSaveName() : 'Select a ship first…';
 }
 window.updateSvCurrentShip = updateSvCurrentShip;
 
