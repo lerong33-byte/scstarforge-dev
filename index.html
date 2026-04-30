@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.33-DEV</title>
+<title>SC-ShipForge v7.34-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.33-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.34-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7756,6 +7756,33 @@ function toggleETurretTree(id){
   var arr=document.getElementById(id+'_arr');
   if(arr)arr.textContent=open?'▼':'▶';
 }
+  function toggleEWepTree(id){
+    var el=document.getElementById(id);
+    var arr=document.getElementById(id+'_arr');
+    if(!el)return;
+    var open=el.style.display==='none';
+    el.style.display=open?'block':'none';
+    if(arr)arr.innerHTML=open?'&#9660;':'&#9658;';
+  }
+  function toggleESlotById(ev,idx){
+    ev.stopPropagation();
+    var btn=ev.target;
+    var on=btn.textContent.trim()==='ON';
+    btn.textContent=on?'OFF':'ON';
+    btn.style.background=on?'var(--bg4)':'var(--green)';
+    btn.style.borderColor=on?'var(--border)':'var(--green)';
+    btn.style.color=on?'var(--t3)':'#fff';
+    _eSlotEnabled['sl'+idx]=!on;
+    _eUpdateStats();
+  }
+  function toggleECompTree(id){
+    var el=document.getElementById(id);
+    var arr=document.getElementById(id+'_arr');
+    if(!el)return;
+    var open=el.style.display==='none';
+    el.style.display=open?'block':'none';
+    if(arr)arr.innerHTML=open?'&#9660;':'&#9658;';
+  }
 function syncETurretGuns(event,i,count){
   event.stopPropagation();
   var firstSel=document.querySelector('[data-slotidx="'+i+'"][data-gunidx="0"]');
@@ -7839,73 +7866,45 @@ function buildEnemyLoadout(enemyName){
     return 'style="margin-left:auto;background:'+(on?'var(--green)':'var(--bg4)')+';border:1px solid '+(on?'var(--green)':'var(--border)')+';border-radius:10px;padding:1px 8px;font-size:9px;font-family:var(--fmono);color:'+(on?'#fff':'var(--t3)')+';cursor:pointer;transition:all .2s"';
   }
 
-  /* ── HARDPOINTS ── */
+  /* ── HARDPOINTS (flat collapsible rows) ── */
   var wHTML='';
   (ship.slots||[]).forEach(function(sl,i){
     _eSlotEnabled['sl'+i]=true;
     var gunCount=sl.count||1;
     var szNum=sl.sz||1;
-    var szCls='sz-s'+szNum;
-
+    var expandId='ewexp'+i;
     if(gunCount>1&&sl.type==='turret'){
-      /* Init all gun slots */
       for(var gi=0;gi<gunCount;gi++){_eSlots['sl'+i+'_gun'+gi]=sl.default;}
-      /* Build summary */
-      var wn=WEAPONS.find(function(x){return x.id===sl.default;});
-      var sumName=wn?wn.name.split(' ').slice(0,2).join(' '):'—';
-      var treeId='etexp'+i;
-      wHTML+='<div class="slot-row" id="erow'+i+'" data-on="1" style="border-color:'+RED_BORDER2+';background:'+DARK2+';margin-bottom:4px">'
-        +'<div class="slot-top">'
-        +'<div class="slot-thumb" style="background:'+DARK3+';border-right:1px solid '+RED_BORDER2+'"></div>'
-        +'<div class="slot-body">'
-        +'<div class="slot-body-top">'
-        +'<span class="sz-chip '+szCls+'">S'+szNum+'</span>'
-        +'<span class="slot-lbl">'+sl.lbl+'</span>'
-        +'<span class="slot-note"> ×'+gunCount+'</span>'
-        +'<button onclick="toggleESlot(this,'+i+')" '+toggleBtn(true)+'>ON</button>'
-        +'</div>'
-        /* Turret tree */
-        +'<div style="border-left:2px solid var(--border);margin-left:4px;padding-left:8px;margin-top:4px">'
-        +'<div onclick="toggleETurretTree(\''+treeId+'\')" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:3px 0;user-select:none">'
-        +'<span style="font-size:9px;color:var(--t3);font-family:var(--fmono)">▼</span>'
-        +'<span style="font-size:10px;color:var(--t2);font-family:var(--fmono);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+sumName+' ×'+gunCount+'</span>'
-        +'<button onclick="syncETurretGuns(event,'+i+','+gunCount+')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:0 6px;font-size:8px;font-family:var(--fmono);color:var(--t3);cursor:pointer;line-height:16px">SYNC</button>'
-        +'</div>'
-        +'<div id="'+treeId+'" style="display:none;padding-top:4px">';
+    } else {
+      _eSlots['sl'+i]=sl.default;
+    }
+    var wn=WEAPONS.find(function(x){return x.id===sl.default;});
+    var sumName=wn?wn.name:'—';
+    var sumDps=wn?(wn.dps||0):0;
+    wHTML+='<div style="background:'+DARK2+';border:1px solid '+RED_BORDER2+';border-radius:4px;margin-bottom:4px;overflow:hidden">';
+    wHTML+='<div onclick="toggleEWepTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;user-select:none;border-bottom:1px solid '+RED_BORDER2+';background:rgba(0,0,0,.25)">'
+      +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'
+      +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0">S'+szNum+'</span>'
+      +'<span style="font-size:11px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);flex:1">'+sl.lbl+(gunCount>1?' <span style="color:var(--t3);font-size:9px">&times;'+gunCount+'</span>':'')+'</span>'
+      +(sumDps?'<span style="font-size:11px;font-weight:700;font-family:var(--fmono);color:'+RED+'">'+sumDps+' <span style="font-size:9px;color:var(--t3);font-weight:400">DPS</span></span>':'')
+      +'<button onclick="toggleESlotById(event,'+i+')" id="etoggle'+i+'" style="margin-left:8px;background:var(--green);border:1px solid var(--green);border-radius:10px;padding:1px 8px;font-size:9px;font-family:var(--fmono);color:#fff;cursor:pointer;flex-shrink:0">ON</button>'
+      +'</div>';
+    wHTML+='<div id="'+expandId+'" style="display:none;padding:8px 10px">';
+    if(gunCount>1&&sl.type==='turret'){
       for(var gi=0;gi<gunCount;gi++){
         var isLast=(gi===gunCount-1);
-        wHTML+='<div style="display:flex;align-items:flex-start;gap:4px;margin-bottom:'+(isLast?'0':'4px')+'">'
-          +'<div style="display:flex;flex-direction:column;align-items:center;padding-top:6px;flex-shrink:0">'
-          +'<span style="font-size:9px;color:var(--border);font-family:monospace">'+(isLast?'└':'├')+'</span>'
-          +'</div>'
-          +'<div style="flex:1;min-width:0">'
-          +'<select class="slot-sel" data-slotidx="'+i+'" data-gunidx="'+gi+'" data-sz="'+szNum+'" onchange="onEWepChange(this)" style="font-size:11px;padding:3px 6px;border-color:'+RED_BORDER2+'">'+_eWepOpts(szNum,sl.default,sl.fixed)+'</select>'
-          +'</div></div>';
+        wHTML+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:'+(isLast?'0':'4px')+'">'
+          +'<span style="font-size:9px;color:var(--border);font-family:monospace;flex-shrink:0">'+(isLast?'&#9492;':'&#9500;')+'</span>'
+          +'<select class="slot-sel" data-slotidx="'+i+'" data-gunidx="'+gi+'" data-sz="'+szNum+'" onchange="onEWepChange(this)" style="flex:1;font-size:11px;padding:3px 6px;border-color:'+RED_BORDER2+'">'+_eWepOpts(szNum,sl.default,sl.fixed)+'</select>'
+          +'</div>';
       }
-      wHTML+='</div></div>'
-        +'</div></div>'
-        +'<div class="slot-info" id="esi'+i+'" style="border-top:1px solid '+RED_BORDER2+'">'+_eWepInfo(sl.default)+'</div>'
-        +'</div>';
+      wHTML+='<div id="esi'+i+'" style="margin-top:6px;border-top:1px solid '+RED_BORDER2+';padding-top:6px">'+_eWepInfo(sl.default)+'</div>';
     } else {
-      /* Single-gun slot */
-      _eSlots['sl'+i]=sl.default;
-      wHTML+='<div class="slot-row" id="erow'+i+'" data-on="1" style="border-color:'+RED_BORDER2+';background:'+DARK2+';margin-bottom:4px">'
-        +'<div class="slot-top">'
-        +'<div class="slot-thumb" style="background:'+DARK3+';border-right:1px solid '+RED_BORDER2+'"></div>'
-        +'<div class="slot-body">'
-        +'<div class="slot-body-top">'
-        +'<span class="sz-chip '+szCls+'">S'+szNum+'</span>'
-        +'<span class="slot-lbl">'+sl.lbl+'</span>'
-        +(sl.note?'<span class="slot-note"> · '+sl.note+'</span>':'')
-        +'<button onclick="toggleESlot(this,'+i+')" '+toggleBtn(true)+'>ON</button>'
-        +'</div>'
-        +'<select class="slot-sel" data-slotidx="'+i+'" data-sz="'+szNum+'" onchange="onEWepChange(this)" style="border-color:'+RED_BORDER2+'"'+(sl.fixed?' disabled':'')+'>'+_eWepOpts(szNum,sl.default,sl.fixed)+'</select>'
-        +'</div></div>'
-        +'<div class="slot-info" id="esi'+i+'" style="border-top:1px solid '+RED_BORDER2+'">'+_eWepInfo(sl.default)+'</div>'
-        +'</div>';
+      wHTML+='<select class="slot-sel" data-slotidx="'+i+'" data-sz="'+szNum+'" onchange="onEWepChange(this)" style="width:100%;border-color:'+RED_BORDER2+'"'+(sl.fixed?' disabled':'')+'>'+_eWepOpts(szNum,sl.default,sl.fixed)+'</select>'
+        +'<div id="esi'+i+'" style="margin-top:6px;border-top:1px solid '+RED_BORDER2+';padding-top:6px">'+_eWepInfo(sl.default)+'</div>';
     }
+    wHTML+='</div></div>';
   });
-
   /* ── MISSILES: one row per rack unit ── */
   var mHTML='';
   var _eFlatRackIdx=0; // global index across all M() entries for unique IDs
@@ -7969,7 +7968,7 @@ function buildEnemyLoadout(enemyName){
     }
   });
 
-  /* ── SYSTEMS ── */
+  /* ── SYSTEMS (flat collapsible rows) ── */
   var COMP_ICONS={pp:'&#9889;',sg:'&#11041;',cooler:'&#10052;',qd:'&#9678;',radar:'&#128225;'};
   var COMP_LABELS={pp:'Power Plant',sg:'Shield Generator',cooler:'Cooler',qd:'Quantum Drive',radar:'Radar'};
   var cHTML='';
@@ -7978,52 +7977,38 @@ function buildEnemyLoadout(enemyName){
     var ico=COMP_ICONS[k]||'&#9672;';
     var lbl=COMP_LABELS[k]||k;
     var expandId='ecompexp_'+k;
+    var cur=ship.comps[k]||'';
+    if(cnt===1){_eComps[k]=cur;}
+    else{for(var si=0;si<cnt;si++){_eComps[k+'_'+si]=cur;}}
+    var cEntry=null;
+    if(COMP_DB&&COMP_DB[k]){cEntry=COMP_DB[k].find(function(x){return x.id===cur;});}
+    var sumText=cEntry?(cEntry.name||cur.split('|')[0].trim()):(cur.split('|')[0].trim()||'—');
+    cHTML+='<div style="background:'+DARK2+';border:1px solid '+RED_BORDER2+';border-radius:4px;margin-bottom:4px;overflow:hidden">';
+    cHTML+='<div onclick="toggleECompTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;user-select:none;border-bottom:1px solid '+RED_BORDER2+';background:rgba(0,0,0,.25)">'
+      +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'
+      +'<span style="font-size:14px;flex-shrink:0">'+ico+'</span>'
+      +'<span style="font-size:11px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);flex:1">'+lbl+(cnt>1?' <span style="color:var(--t3);font-size:9px">&times;'+cnt+'</span>':'')+'</span>'
+      +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="'+expandId+'_lbl">'+sumText+'</span>'
+      +'<span style="font-size:9px;color:var(--t3);font-family:var(--fmono);flex-shrink:0;margin-left:4px">'+csz+(cnt>1?' &times;'+cnt:'')+'</span>'
+      +'</div>';
+    cHTML+='<div id="'+expandId+'" style="display:none;padding:8px 10px">';
     if(cnt===1){
-      var cur=ship.comps[k]||'';
-      _eComps[k]=cur;
-      cHTML+='<div class="comp-row" style="border-color:'+RED_BORDER2+';background:'+DARK2+';margin-bottom:6px">'
-        +'<div class="comp-row-hd" style="border-bottom:1px solid '+RED_BORDER2+'">'
-        +'<div class="comp-icon-box" style="background:'+DARK3+';border-right:1px solid '+RED_BORDER2+'">'+ico+'</div>'
-        +'<div class="comp-meta"><span class="comp-type-lbl">'+lbl+'</span><span class="comp-sz-lbl">'+csz+'</span></div>'
-        +'</div>'
-        +'<div class="comp-body">'
-        +'<div class="comp-sel-wrap"><select class="slot-sel" data-compkey="'+k+'" onchange="onECompChange(this)" style="border-color:'+RED_BORDER2+'">'+_eCompOpts(k,csz,cur)+'</select></div>'
-        +'<div id="eci_'+k+'">'+_eCompStat(k,cur)+'</div>'
-        +'</div></div>';
+      cHTML+='<select class="slot-sel" data-compkey="'+k+'" onchange="onECompChange(this)" style="width:100%;border-color:'+RED_BORDER2+'">'+_eCompOpts(k,csz,cur)+'</select>'
+        +'<div id="eci_'+k+'" style="margin-top:6px;border-top:1px solid '+RED_BORDER2+';padding-top:6px">'+_eCompStat(k,cur)+'</div>';
     } else {
-      /* Multi-slot accordion */
-      var slotSummary=[];
-      for(var si=0;si<cnt;si++){
-        var sk=k+'_'+si;
-        var sv=ship.comps[k]||'';
-        _eComps[sk]=sv;
-        slotSummary.push(sv.split(' ')[0]||'—');
-      }
-      cHTML+='<div class="comp-row" style="border-color:'+RED_BORDER2+';background:'+DARK2+';margin-bottom:6px">'
-        +'<div class="comp-row-hd" onclick="toggleECompExpand(\''+expandId+'\')" style="cursor:pointer;user-select:none;border-bottom:1px solid '+RED_BORDER2+'">'
-        +'<div class="comp-icon-box" style="background:'+DARK3+';border-right:1px solid '+RED_BORDER2+'">'+ico+'</div>'
-        +'<div class="comp-meta"><span class="comp-type-lbl">'+lbl+'</span><span class="comp-sz-lbl">'+csz+' ×'+cnt+'</span></div>'
-        +'<div style="margin-left:auto;font-size:10px;color:var(--t3);font-family:var(--fmono);display:flex;align-items:center;gap:6px">'
-        +'<span id="'+expandId+'_lbl" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+slotSummary.join(' / ')+'</span>'
-        +'<span id="'+expandId+'_arr" style="transition:transform .2s">&#9660;</span>'
-        +'</div></div>'
-        +'<div id="'+expandId+'" style="display:none;padding:8px 0 4px">'
-        +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;padding:0 2px">'
-        +'<span style="font-size:9px;letter-spacing:1px;color:var(--t3);font-family:var(--fmono)">'+cnt+' SLOTS</span>'
-        +'</div>';
       for(var si=0;si<cnt;si++){
         var slotKey=k+'_'+si;
-        var cur=ship.comps[k]||'';
-        cHTML+='<div style="margin-bottom:6px">'
-          +'<div style="font-size:9px;color:var(--t3);font-family:var(--fmono);letter-spacing:.5px;margin-bottom:3px">SLOT '+(si+1)+'</div>'
-          +'<div class="comp-sel-wrap"><select class="slot-sel" data-compkey="'+slotKey+'" onchange="onECompChange(this)" style="border-color:'+RED_BORDER2+'">'+_eCompOpts(k,csz,cur)+'</select></div>'
-          +'<div id="eci_'+slotKey+'">'+_eCompStat(k,cur)+'</div>'
-          +'</div>';
+        var isLast=(si===cnt-1);
+        cHTML+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:'+(isLast?'0':'6px')+'">'
+          +'<span style="font-size:9px;color:var(--border);font-family:monospace;flex-shrink:0">'+(isLast?'&#9492;':'&#9500;')+'</span>'
+          +'<div style="flex:1;min-width:0">'
+          +'<select class="slot-sel" data-compkey="'+slotKey+'" onchange="onECompChange(this)" style="width:100%;border-color:'+RED_BORDER2+'">'+_eCompOpts(k,csz,cur)+'</select>'
+          +'<div id="eci_'+slotKey+'" style="margin-top:4px">'+_eCompStat(k,cur)+'</div>'
+          +'</div></div>';
       }
-      cHTML+='</div></div>';
     }
+    cHTML+='</div></div>';
   });
-
   /* ── STATS PANEL ── */
   var statsHTML='<div style="display:flex;flex-direction:column;gap:8px;width:220px;min-width:220px;flex-shrink:0">'
     +'<div style="background:'+DARK2+';border:1px solid '+RED_BORDER+';border-radius:var(--r);padding:12px">'
