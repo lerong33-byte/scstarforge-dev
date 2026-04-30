@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.6-DEV</title>
+<title>SC-ShipForge v8.7-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -7190,17 +7190,20 @@ window.addEventListener('load', function() {
     window._sbShip=null;
     selShip=null;
     var res=document.getElementById('sbResult');
-    /* Save dashboard BEFORE clearing sbResult (it lives inside sbResult) */
+    /* Detach dashboard FIRST so innerHTML='' doesn't destroy it */
     var _dash=document.getElementById('sbDashboard');
-    if(_dash) _dash.parentNode.removeChild(_dash);
+    if(_dash && _dash.parentNode) _dash.parentNode.removeChild(_dash);
+    /* Now safe to wipe sbResult */
     if(res){res.innerHTML='';res.style.padding='0';}
     var pp=document.getElementById('sbPowerPanel');
     if(pp){pp.style.display='none';pp.innerHTML='';}
     /* Re-attach and show dashboard */
-    if(_dash){
+    if(_dash && res){
       _dash.style.display='flex';
       res.appendChild(_dash);
     }
+    /* Call renderDashboard to refresh counts */
+    if(typeof renderDashboard==='function') renderDashboard();
     /* Hide left panel */
     var lp=document.getElementById('sbLeftPanel');
     if(lp)lp.style.display='none';
@@ -7209,6 +7212,9 @@ window.addEventListener('load', function() {
     if(_rdb)_rdb.style.display='none';
     var _tsb=document.getElementById('testShowdownBtn');
     if(_tsb)_tsb.style.display='none';
+    /* Clear ship input display name */
+    var shipTag=document.getElementById('sbShipTag');
+    if(shipTag) shipTag.textContent='';
   };
   document.addEventListener('click',function(e){
     if(!e.target.closest('#sbSearchWrap')) close('ss_drop_sb');
