@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.14-DEV</title>
+<title>SC-ShipForge v7.15-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -912,7 +912,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.14-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.15-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -2904,7 +2904,7 @@ function loadPatchNotes(){
 
   // Fetch patch notes from Star Citizen tools RSS / wiki API
   var url='https://api.star-citizen.wiki/api/changelogs?limit=5&locale=en_EN';
-  fetch('/.netlify/functions/proxy?url='+encodeURIComponent(url),{headers:{Accept:'application/json'}})
+  fetch(url,{headers:{Accept:'application/json'}})
     .then(function(r){return r.json();})
     .then(function(d){
       var logs=d.data||[];
@@ -3116,22 +3116,7 @@ function onActChange(val){selAct=val;if(selShip)generate();}
   });
   var total=Object.values(SHIPS).reduce(function(a,b){return a+b.length;},0);
   document.getElementById('hpatch').textContent='● '+total+' HULLS · PU 4.7.2 LIVE';
-  // Auto-fetch current SC live version from scfocus.org
-  (function fetchSCVersion(){
-    fetch('/.netlify/functions/proxy?url='+encodeURIComponent('https://scfocus.org/release-dates/'))
-      .then(function(r){return r.text();})
-      .then(function(html){
-        // scfocus lists most recent LIVE version first
-        var matches=[...html.matchAll(/Alpha\s+([\d.]+)\s+(?:was released|released)\s+(?:LIVE|onto\s+the\s+LIVE)/gi)];
-        if(matches.length){
-          var ver=matches[0][1];
-          _liveSync._scVer = ver;
-          var hp=document.getElementById('hpatch');
-          if(hp) hp.textContent='\u25cf '+total+' HULLS \u00b7 PU '+ver+' LIVE';
-        }
-      })
-      .catch(function(){/* silently keep hardcoded fallback */});
-  })();
+  // SC version shown from hardcoded fallback (scfocus.org has CORS restrictions)
   var as=document.getElementById('actSel');
   if(as){ACTS.forEach(function(a){var o=document.createElement('option');o.value=a;o.textContent=a;if(a===selAct)o.selected=true;as.appendChild(o);});}
   document.addEventListener('click',function(e){
@@ -3696,7 +3681,7 @@ async function fetchLiveShipData(shipName) {
 // (class map now at module level as SHIP_CLASS_MAP)
     var slug = (classMap[shipName] || shipName.replace(/ /g,'_')).toLowerCase();
     var url = 'https://api.star-citizen.wiki/api/vehicles?locale=en_EN&limit=1&filter[class_name]=' + encodeURIComponent(classMap[shipName] || shipName);
-    var resp = await fetch('/.netlify/functions/proxy?url=' + encodeURIComponent(url), {headers:{Accept:'application/json'}});
+    var resp = await fetch(url, {headers:{Accept:'application/json'}});
     var json = await resp.json();
     var ship = json.data && json.data[0];
     if (!ship) throw new Error('not found');
@@ -4894,7 +4879,7 @@ async function syncWikiData() {
     // Grab patch version from meta
     var patchVer = '4.7.2';
     try {
-      var stats = await fetch('/.netlify/functions/proxy?url=' + encodeURIComponent('https://api.star-citizen.wiki/api/stats'), {headers:{'Accept':'application/json'}}).then(function(r){return r.json();});
+      var stats = await fetch('https://api.star-citizen.wiki/api/stats', {headers:{'Accept':'application/json'}}).then(function(r){return r.json();}); 
       if (stats && stats.data && stats.data.live_version) patchVer = stats.data.live_version;
     } catch(e) {}
 
@@ -6277,10 +6262,11 @@ function _applyLiveStats(d) {
 
   // FLIGHT card
   if (d.speeds) {
-    set('statAB', d.speeds.scmSpeedBoosted ? Math.round(d.speeds.scmSpeedBoosted) + ' m/s' : '—');
-    set('statPitch', d.speeds.pitchBoosted ? d.speeds.pitchBoosted.toFixed(1) + '°/s' : '—');
-    set('statRoll', d.speeds.rollBoosted ? d.speeds.rollBoosted.toFixed(1) + '°/s' : '—');
-    set('statYaw', d.speeds.yawBoosted ? d.speeds.yawBoosted.toFixed(1) + '°/s' : '—');
+    var abVal = d.speeds.scmSpeedBoosted || d.speeds.afterburnerSpeed || d.speeds.maxSpeed || null;
+    set('statAB', abVal ? Math.round(abVal) + ' m/s' : '—');
+    set('statPitch', d.speeds.pitchBoosted ? d.speeds.pitchBoosted.toFixed(1) + '°/s' : (d.speeds.pitch ? d.speeds.pitch.toFixed(1) + '°/s' : '—'));
+    set('statRoll', d.speeds.rollBoosted ? d.speeds.rollBoosted.toFixed(1) + '°/s' : (d.speeds.roll ? d.speeds.roll.toFixed(1) + '°/s' : '—'));
+    set('statYaw', d.speeds.yawBoosted ? d.speeds.yawBoosted.toFixed(1) + '°/s' : (d.speeds.yaw ? d.speeds.yaw.toFixed(1) + '°/s' : '—'));
     show('liveStatsCard');
   }
 
