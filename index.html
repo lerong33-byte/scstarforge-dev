@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.92-DEV</title>
+<title>SC-ShipForge v7.93-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -964,7 +964,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v7.92-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v7.93-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -10110,7 +10110,19 @@ function openShowdownWithBuild(){
   /* Use the Builder's ship (_sbShip) if available, fall back to selShip */
   var shipName = window._sbShip || window.selShip || '';
   if(!shipName){
-    alert('Select a ship in the Builder first.');
+    /* Show a friendly inline hint instead of a browser alert */
+    var _hint = document.getElementById('sdWorkflowHint');
+    if(!_hint){
+      _hint = document.createElement('div');
+      _hint.id = 'sdWorkflowHint';
+      _hint.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#1a1e1c;border:1px solid rgba(77,255,110,.35);border-left:3px solid #4dff6e;border-radius:8px;padding:20px 28px;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 30px rgba(77,255,110,.08);font-family:var(--fmono,monospace)';
+      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#4dff6e;margin-bottom:10px;text-shadow:0 0 8px rgba(77,255,110,.4)">&#9872; HOW TO USE</div>'
+        + '<div style="font-size:13px;color:#e8f4e8;line-height:1.7;margin-bottom:16px">Build your ship in the <strong style="color:#4dff6e">SC ShipForge Builder</strong>, then click <strong style="color:#f87171">&#9876; TEST IN SHOWDOWN</strong> to test your loadout against other ships.</div>'
+        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#4dff6e;cursor:pointer">GOT IT</button>';
+      document.body.appendChild(_hint);
+    } else {
+      _hint.style.display = 'block';
+    }
     return;
   }
   /* Sync selShip so getUserDps works correctly */
