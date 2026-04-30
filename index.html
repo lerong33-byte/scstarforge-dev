@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.38-DEV</title>
+<title>SC-ShipForge v7.39-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.38-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.39-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7684,6 +7684,25 @@ function onEWepChange(sel){
   else{_eSlots['sl'+i]=sel.value;}
   /* Update slot-info for single-gun slots */
   if(gi<0){var el=document.getElementById('esi'+i);if(el)el.innerHTML=_eWepInfo(sel.value);}
+  /* Update header row with new weapon name/subtype/dps/alpha */
+  var wid=gi>=0?(_eSlots['sl'+i+'_gun0']||sel.value):sel.value;
+  var wn=WEAPONS.find(function(x){return x.id===wid;});
+  if(wn){
+    var nameEl=document.getElementById('ewname'+i);
+    var subEl=document.getElementById('ewsub'+i);
+    var alphaEl=document.getElementById('ewalpha'+i);
+    var dpsEl=document.getElementById('ewdps'+i);
+    var ship=_eShipName&&SHIP_DATA[_eShipName];
+    var sl2=ship&&ship.slots&&ship.slots[i];
+    var gc=sl2?(sl2.count||1):1;
+    if(nameEl)nameEl.innerHTML=wn.name+(gc>1?' <span style="color:#4a5568;font-size:11px">&times;'+gc+'</span>':'');
+    var n=wn.name.toLowerCase(),t=wn.type;
+    var sub=n.includes('neutron')?'Neutron Repeater':n.includes('gatling')?'Ballistic Gatling':n.includes('scatter')?'Scatter Gun':n.includes('cannon')?(t==='ballistic'?'Ballistic Cannon':'Laser Cannon'):n.includes('repeater')?(t==='ballistic'?'Ballistic Repeater':'Laser Repeater'):(t==='ballistic'?'Ballistic Repeater':'Laser Repeater');
+    var sc=sub.includes('Cannon')?'#f97316':sub.includes('Gatling')?'#facc15':sub.includes('Scatter')?'#e879f9':sub.includes('Neutron')?'#34d399':sub.includes('Ballistic')?'#f59e0b':'#60a5fa';
+    if(subEl)subEl.innerHTML=sub?' &middot; <span style="background:rgba(0,0,0,.4);border:1px solid '+sc+';border-radius:20px;padding:1px 8px;font-size:11px;color:'+sc+'">'+sub+'</span>':'';
+    if(alphaEl)alphaEl.innerHTML=wn.alpha?wn.alpha+' <span style="font-size:10px;color:var(--t3)">α</span>':'';
+    if(dpsEl)dpsEl.innerHTML=wn.dps?wn.dps+' <span style="font-size:10px;color:var(--t3);font-weight:400">DPS</span>':'';
+  }
   _eUpdateStats();
 }
 function onEMisItemChange(sel){
@@ -7693,6 +7712,21 @@ function onEMisItemChange(sel){
   /* Update slot-info with first missile */
   var el=document.getElementById('emi'+i);
   if(el)el.innerHTML=_eMisInfo(_eMissiles['ms'+i+'_0']||sel.value);
+  /* Update header row */
+  var mw=WEAPONS.find(function(x){return x.id===sel.value;});
+  if(mw){
+    var nameEl=document.getElementById('emname_'+i+'_'+mi);
+    var typeEl=document.getElementById('emtype_'+i+'_'+mi);
+    var alphaEl=document.getElementById('emalpha_'+i+'_'+mi);
+    if(nameEl)nameEl.textContent=mw.name;
+    if(typeEl){
+      var mtr=mw.type||'';
+      var mtc=mtr.includes('emp')?'#cc88ff':mtr.includes('cs')?'#44aaff':mtr==='torpedo'?'#ff4444':'#f59e0b';
+      typeEl.style.color=mtc;
+      typeEl.textContent=mtr.replace('missile-','').replace('missile','IR').toUpperCase()||'—';
+    }
+    if(alphaEl)alphaEl.innerHTML=mw.alpha?mw.alpha.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span>':'';
+  }
 }
 function onERackChange(sel){
   var i=parseInt(sel.dataset.rackidx);
@@ -7718,6 +7752,25 @@ function onECompChange(sel){
         lblEl.textContent=parts.join(' / ');
       }
     }
+  }
+  /* Update header row name and stat */
+  var cEntry2=COMP_DB&&COMP_DB[baseKey]?COMP_DB[baseKey][sel.value]:null;
+  var nameEl=document.getElementById('ecname_'+baseKey);
+  var statEl=document.getElementById('ecstat_'+baseKey);
+  if(nameEl&&cEntry2){
+    var ship2=_eShipName&&SHIP_DATA[_eShipName];
+    var cnt2=ship2&&ship2.comps&&ship2.comps.counts?((ship2.comps.counts[baseKey])||1):1;
+    var RED='#e85060',RED_DIM='#4a2030';
+    nameEl.innerHTML=(cEntry2.name||sel.value.split('|')[0].trim())+(cnt2>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+cnt2+'</span>':'');
+  }
+  if(statEl&&cEntry2){
+    var sv='',su='',sc='#e2e8f0';
+    if(baseKey==='pp'){sv=(cEntry2.out||'');su='EU';sc='#f59e0b';}
+    else if(baseKey==='sg'){sv=(cEntry2.totalHP?cEntry2.totalHP.toLocaleString():'');su='HP';sc='#60a5fa';}
+    else if(baseKey==='cooler'){sv=(cEntry2.cool||'');su='cool';sc='#22d3ee';}
+    else if(baseKey==='qd'){sv=(cEntry2.range||'');su='Gm';sc='#a78bfa';}
+    else if(baseKey==='radar'){sv=(cEntry2.dist||'');su='m';sc='#34d399';}
+    statEl.innerHTML=sv?'<span style="font-size:14px;font-weight:700;font-family:var(--fmono);color:'+sc+'">'+sv+' <span style="font-size:10px;color:var(--t3);font-weight:400">'+su+'</span></span>':'';
   }
   _eUpdateStats();
 }
@@ -7913,11 +7966,11 @@ function buildEnemyLoadout(enemyName){
       +'<span style="font-size:10px;color:'+RED_DIM+';font-family:var(--fmono);flex-shrink:0;transition:transform .2s" id="'+expandId+'_arr">&#9658;</span>'
       +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0;font-size:11px;padding:2px 7px">S'+szNum+'</span>'
       +'<span style="flex:1;min-width:0">'
-        +'<span style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sumName+(gunCount>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+gunCount+'</span>':'')+'</span>'
-        +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+sl.lbl+(wSubtype?' &middot; <span style="background:rgba(0,0,0,.4);border:1px solid '+subtypeCol+';border-radius:20px;padding:1px 8px;font-size:11px;color:'+subtypeCol+'">'+wSubtype+'</span>':'')+'</span>'
+        +'<span id="ewname'+i+'" style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sumName+(gunCount>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+gunCount+'</span>':'')+'</span>'
+        +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+sl.lbl+'<span id="ewsub'+i+'">'+( wSubtype?' &middot; <span style="background:rgba(0,0,0,.4);border:1px solid '+subtypeCol+';border-radius:20px;padding:1px 8px;font-size:11px;color:'+subtypeCol+'">'+wSubtype+'</span>':'')+'</span></span>'
       +'</span>'
-      +(sumAlpha?'<span style="font-size:12px;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0;margin-right:10px">'+sumAlpha+' <span style="font-size:10px;color:var(--t3)">α</span></span>':'')
-      +(sumDps?'<span style="font-size:14px;font-weight:700;font-family:var(--fmono);color:'+RED+';flex-shrink:0">'+sumDps+' <span style="font-size:10px;color:var(--t3);font-weight:400">DPS</span></span>':'')
+      +'<span id="ewalpha'+i+'" style="font-size:12px;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0;margin-right:10px">'+(sumAlpha?sumAlpha+' <span style="font-size:10px;color:var(--t3)">α</span>':'')+'</span>'
+      +'<span id="ewdps'+i+'" style="font-size:14px;font-weight:700;font-family:var(--fmono);color:'+RED+';flex-shrink:0">'+(sumDps?sumDps+' <span style="font-size:10px;color:var(--t3);font-weight:400">DPS</span>':'')+'</span>'
       +'<button onclick="toggleESlotById(event,'+i+')" id="etoggle'+i+'" style="margin-left:10px;background:var(--green);border:1px solid var(--green);border-radius:20px;padding:2px 10px;font-size:10px;font-family:var(--fmono);color:#fff;cursor:pointer;flex-shrink:0">ON</button>'
       +'</div>';
     /* Expanded body */
@@ -7974,10 +8027,10 @@ function buildEnemyLoadout(enemyName){
         +'<span style="font-size:10px;color:'+RED_DIM+';font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'
         +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0;font-size:11px;padding:2px 7px">S'+szNum+'</span>'
         +'<span style="flex:1;min-width:0">'
-          +'<span style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(mw?mw.name:rackName)+'</span>'
-          +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+rackName+' &middot; <span style="color:'+mTypeColor+'">'+mTypeName+'</span></span>'
+          +'<span id="emname_'+i+'_'+ri+'" style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(mw?mw.name:rackName)+'</span>'
+          +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+rackName+' &middot; <span id="emtype_'+i+'_'+ri+'" style="color:'+mTypeColor+'">'+mTypeName+'</span></span>'
         +'</span>'
-        +(mAlpha?'<span style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0">'+mAlpha.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span></span>':'')
+        +'<span id="emalpha_'+i+'_'+ri+'" style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0">'+(mAlpha?mAlpha.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span>':'')+'</span>'
         +'</div>'
         +'<div id="'+expandId+'" style="display:none;padding:10px 14px;background:'+DARK3+';border-top:1px solid '+RED_BORDER2+'">'
         +'<select class="slot-sel" data-missidx="'+i+'" data-misgidx="'+ri+'" data-maxsz="'+szNum+'" onchange="onEMisItemChange(this)" style="width:100%;font-size:12px;padding:5px 8px;border-color:'+RED_BORDER+';border-radius:8px;background:var(--bg3)">'+_eMisOpts(szNum,curMid)+'</select>'
@@ -8025,10 +8078,10 @@ function buildEnemyLoadout(enemyName){
       +'<span style="font-size:10px;color:'+RED_DIM+';font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'
       +'<span style="font-size:16px;flex-shrink:0">'+ico+'</span>'
       +'<span style="flex:1;min-width:0">'
-        +'<span style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sumText+(cnt>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+cnt+'</span>':'')+'</span>'
+        +'<span id="ecname_'+k+'" style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sumText+(cnt>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+cnt+'</span>':'')+'</span>'
         +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+lbl+' '+csz+'</span>'
       +'</span>'
-      +compStatRight
+      +'<span id="ecstat_'+k+'">'+compStatRight+'</span>'
       +'</div>';
     cHTML+='<div id="'+expandId+'" style="display:none;padding:10px 14px;background:'+DARK3+';border-top:1px solid '+RED_BORDER2+'">';
     if(cnt===1){
