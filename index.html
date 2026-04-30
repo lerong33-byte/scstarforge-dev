@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.95-DEV</title>
+<title>SC-ShipForge v7.96-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -964,7 +964,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v7.95-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v7.96-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -10429,14 +10429,106 @@ function loadModalShipImg(containerId, shipName){
     }).catch(function(){});
 }
 
-/* Keyboard close */
-document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeShowdownModal(); });
-window.openShowdownModal = openShowdownModal;
-window.closeShowdownModal = closeShowdownModal;
+/* Keyboard close — delegated via window refs set below */
 
 </script>
 
 <script>
+/* ══ Showdown Modal + Workflow (standalone global scope) ══ */
+window.closeShowdownModal = function(){
+  var modal = document.getElementById('sdModal');
+  if(modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
+};
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && window.closeShowdownModal) window.closeShowdownModal(); });
+
+window._setBar = function(id, pct){
+  var el = document.getElementById(id);
+  if(el) el.style.width = Math.max(0, Math.min(100, pct)).toFixed(1) + '%';
+};
+
+window._loadModalShipImg = function(containerId, shipName){
+  var el = document.getElementById(containerId);
+  if(!el) return;
+  var prev = el.querySelector('img');
+  if(prev) prev.remove();
+  var cached = window._shipImgCache = window._shipImgCache || {};
+  var inject = function(src){
+    var img = document.createElement('img');
+    img.src = src; img.alt = shipName;
+    img.onerror = function(){ img.style.display='none'; };
+    el.insertBefore(img, el.firstChild);
+  };
+  if(cached[shipName]){ inject(cached[shipName]); return; }
+  var wikiMap = window._WIKIMAP || {};
+  var title = wikiMap[shipName] || shipName.replace(/ /g,'_');
+  fetch('https://starcitizen.tools/api.php?action=query&titles='+encodeURIComponent(title)+'&prop=pageimages&format=json&pithumbsize=600&pilimit=1&origin=*')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var pages=d.query&&d.query.pages; if(!pages)return;
+      var p=pages[Object.keys(pages)[0]];
+      var src=p&&p.thumbnail&&p.thumbnail.source;
+      if(src){cached[shipName]=src;inject(src);}
+    }).catch(function(){});
+};
+
+window.openShowdownModal = function(myShip, enemyShip, me, them, myTTK, oppTTK, verdict){
+  var modal = document.getElementById('sdModal');
+  if(!modal) return;
+  var badge = document.getElementById('sdmVerdictBadge');
+  var summary = document.getElementById('sdmTtkSummary');
+  if(badge){
+    badge.className = 'sdm-verdict-badge ' + (verdict==='YOU WIN'?'win':verdict==='YOU LOSE'?'lose':'close');
+    badge.textContent = verdict;
+  }
+  if(summary){
+    var faster = myTTK < oppTTK ? 'You kill the enemy '+(oppTTK-myTTK).toFixed(1)+'s faster'
+                                 : 'Enemy kills you '+(myTTK-oppTTK).toFixed(1)+'s faster';
+    summary.textContent = faster + (oppTTK>9000?' — enemy has no weapons':'');
+  }
+  var myDef = window.SHIP_DATA && window.SHIP_DATA[myShip];
+  var enDef = window.SHIP_DATA && window.SHIP_DATA[enemyShip];
+  document.getElementById('sdmMyName').textContent    = myShip.toUpperCase();
+  document.getElementById('sdmMyRole').textContent    = (myDef&&myDef.role?myDef.role.toUpperCase()+' · ':'')+' YOUR BUILD';
+  document.getElementById('sdmMyDps').textContent     = me.dps.toLocaleString();
+  document.getElementById('sdmMyShield').textContent  = me.shieldHP.toLocaleString()+' HP';
+  document.getElementById('sdmMyTtk').textContent     = myTTK.toFixed(1)+'s';
+  document.getElementById('sdmEnemyName').textContent = enemyShip.toUpperCase();
+  document.getElementById('sdmEnemyRole').textContent = (enDef&&enDef.role?enDef.role.toUpperCase()+' · ':'')+'ENEMY';
+  document.getElementById('sdmEnemyDps').textContent  = them.dps.toLocaleString();
+  document.getElementById('sdmEnemyShield').textContent = them.shieldHP.toLocaleString()+' HP';
+  document.getElementById('sdmEnemyTtk').textContent  = oppTTK>9000?'N/A':oppTTK.toFixed(1)+'s';
+  var maxDps=Math.max(me.dps,them.dps,1);
+  var maxShield=Math.max(me.shieldHP,them.shieldHP,1);
+  var maxTtk=Math.max(myTTK,oppTTK>9000?myTTK:oppTTK,1);
+  setTimeout(function(){
+    window._setBar('sdmMyDpsBar',    me.dps/maxDps*100);
+    window._setBar('sdmEnemyDpsBar', them.dps/maxDps*100);
+    window._setBar('sdmMyShieldBar', me.shieldHP/maxShield*100);
+    window._setBar('sdmEnemyShieldBar', them.shieldHP/maxShield*100);
+    window._setBar('sdmMyTtkBar',    (1-myTTK/maxTtk)*100);
+    window._setBar('sdmEnemyTtkBar', oppTTK>9000?0:(1-oppTTK/maxTtk)*100);
+  },80);
+  window._loadModalShipImg('sdmMyImg',    myShip);
+  window._loadModalShipImg('sdmEnemyImg', enemyShip);
+  var reasons=[];
+  if(me.dps>them.dps*1.2) reasons.push({type:'good',icon:'⚡',text:'Your <strong>DPS ('+me.dps.toLocaleString()+')</strong> significantly outguns the enemy <strong>('+them.dps.toLocaleString()+')</strong> — you deal damage faster.'});
+  else if(them.dps>me.dps*1.2) reasons.push({type:'bad',icon:'⚡',text:'Enemy <strong>DPS ('+them.dps.toLocaleString()+')</strong> outguns yours <strong>('+me.dps.toLocaleString()+')</strong> — consider upgrading weapons.'});
+  else reasons.push({type:'neutral',icon:'⚡',text:'DPS is roughly equal — <strong>'+me.dps.toLocaleString()+'</strong> vs <strong>'+them.dps.toLocaleString()+'</strong>. Positioning and skill will decide this fight.'});
+  if(me.shieldHP>them.shieldHP*1.2) reasons.push({type:'good',icon:'🛡',text:'Your <strong>shields ('+me.shieldHP.toLocaleString()+' HP)</strong> are stronger than the enemy’s <strong>('+them.shieldHP.toLocaleString()+' HP)</strong>.'});
+  else if(them.shieldHP>me.shieldHP*1.2) reasons.push({type:'bad',icon:'🛡',text:'Enemy <strong>shields ('+them.shieldHP.toLocaleString()+' HP)</strong> are tougher than yours <strong>('+me.shieldHP.toLocaleString()+' HP)</strong>.'});
+  else reasons.push({type:'neutral',icon:'🛡',text:'Shield HP is comparable — <strong>'+me.shieldHP.toLocaleString()+'</strong> vs <strong>'+them.shieldHP.toLocaleString()+'</strong>.'});
+  if(verdict==='YOU WIN') reasons.push({type:'good',icon:'🎯',text:'You kill the enemy in <strong>'+myTTK.toFixed(1)+'s</strong>'+(oppTTK<9000?', while they need <strong>'+oppTTK.toFixed(1)+'s</strong> to kill you':'')+'. Stay aggressive.'});
+  else if(verdict==='YOU LOSE') reasons.push({type:'bad',icon:'🎯',text:'The enemy kills you in <strong>'+(oppTTK<9000?oppTTK.toFixed(1)+'s':'N/A')+'</strong> before you finish them in <strong>'+myTTK.toFixed(1)+'s</strong>. Try higher DPS weapons or better shields.'});
+  else reasons.push({type:'neutral',icon:'🎯',text:'This is a close fight — TTK is within 43% of each other. Pilot skill and first-shot advantage will decide.'});
+  if(window._pwrState&&window._pwrState.weapons<5) reasons.push({type:'bad',icon:'⚙',text:'Your weapons power is below 100% — increasing it in the power panel will boost your DPS.'});
+  var rHtml='';
+  reasons.forEach(function(r){rHtml+='<div class="sdm-reason '+r.type+'"><span class="sdm-reason-icon">'+r.icon+'</span><span class="sdm-reason-text">'+r.text+'</span></div>';});
+  document.getElementById('sdmReasons').innerHTML=rHtml;
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+};
+
 /* ══ Builder → Showdown Workflow (standalone global scope) ══ */
 window.openShowdownWithBuild = function(){
   var shipName = window._sbShip || window.selShip || '';
