@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.86-DEV</title>
+<title>SC-ShipForge v7.87-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.86-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.87-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -1089,8 +1089,8 @@ option,optgroup{background:var(--bg2)}
       </div>
       <!-- Ship name + size badge -->
       <div id="sbShipNameBar" style="display:none;padding:6px 8px;border-bottom:1px solid var(--border);background:var(--bg3)">
-        <div id="sbShipImgName" style="font-size:11px;font-weight:700;font-family:var(--fmono);color:#f1f5f9;letter-spacing:.5px"></div>
-        <div id="sbShipSizeBadge" style="font-size:9px;color:var(--t3);font-family:var(--fmono);margin-top:2px"></div>
+        <div id="sbShipImgName" style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#ffffff;letter-spacing:1px;text-shadow:0 0 8px rgba(0,200,255,.4)"></div>
+        <div id="sbShipSizeBadge" style="font-size:10px;color:var(--accent);font-family:var(--fmono);margin-top:3px;letter-spacing:.5px"></div>
       </div>
       <!-- Ship info rows -->
       <div id="sbShipInfo" style="flex-shrink:0;padding:6px 8px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border)"></div>
@@ -8704,9 +8704,9 @@ function buildShipBuilder(shipName){
       ['HARDPOINTS',def.slots?def.slots.length:'—']
     ];
     infoEl.innerHTML=rows.map(function(r){
-      return '<div style="display:flex;justify-content:space-between;font-size:9px;font-family:var(--fmono)">'
-        +'<span style="color:var(--t3)">'+r[0]+'</span>'
-        +'<span style="color:#e2e8f0;text-align:right;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r[1]+'</span>'
+      return '<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:10px;font-family:var(--fmono);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
+        +'<span style="color:#8ba0b8;letter-spacing:.5px">'+r[0]+'</span>'
+        +'<span style="color:#e8edf2;font-weight:600;text-align:right;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r[1]+'</span>'
         +'</div>';
     }).join('');
   }
