@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.73-DEV</title>
+<title>SC-ShipForge v7.74-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,19 +895,8 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.73-DEV</span></div>
-    <div class="ss-wrap" id="ss_wrap_ship">
-      <span class="ss-icon">⚡</span>
-      <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
-        oninput="ss_type_ship(this)"
-        onfocus="ss_open_ship('')"
-        onkeydown="ss_key_ship(event)"/>
-      <button class="ss-clear" id="ss_clr_ship" onclick="ss_clear_ship()" title="Clear">&times;</button>
-      <div class="ss-drop" id="ss_drop_ship">
-        <div class="ss-inner"></div>
-        <div class="ss-foot"><kbd>&uarr;&darr;</kbd>navigate &nbsp;<kbd>Enter</kbd>select &nbsp;<kbd>Esc</kbd>close</div>
-      </div>
-    </div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.74-DEV</span></div>
+<!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
     <div class="nav-ship" style="display:none">
@@ -1049,38 +1038,51 @@ option,optgroup{background:var(--bg2)}
       padding:0 2px;line-height:1;flex-shrink:0" title="Dismiss">×</button>
   </div>
       <div class="tabs">
-        <button class="tab on" data-t="lo" onclick="showTab('lo',this)">LOADOUT BUILDER</button>
-        <button class="tab" data-t="ships" onclick="showTab('ships',this)">SHIPS</button>
-        <button class="tab" data-t="wp" onclick="showTab('wp',this)">WEAPONS &amp; COMPS</button>
-        <button class="tab" data-t="lc" onclick="showTab('lc',this)">BUY LOCATIONS</button>
-        <button class="tab" data-t="pn" onclick="showTab('pn',this);loadPatchNotes()">PATCH NOTES</button>
-        <button class="tab" data-t="cmp" onclick="showTab('cmp',this);populateCompareSelects();if(selShip){document.getElementById('cmpSelA').value=selShip;renderComparison();}">⬡ COMPARE</button>
-        <div class="tab" onclick="showTab('sd',this)">⚔ SHOWDOWN</div>
-        <button class="tab" data-t="ss" onclick="showTab('ss',this);if(window.selShip)renderShipStats(window.selShip);">📊 SHIP STATS</button>
+        <button class="tab on" data-t="lo" onclick="showTab('lo',this);toggleBuilderAside(true)">SC SHIPFORGE BUILDER</button>
+        <button class="tab" data-t="ships" onclick="showTab('ships',this);toggleBuilderAside(false)">SHIPS</button>
+        <button class="tab" data-t="wp" onclick="showTab('wp',this);toggleBuilderAside(false)">WEAPONS &amp; COMPS</button>
+        <button class="tab" data-t="lc" onclick="showTab('lc',this);toggleBuilderAside(false)">BUY LOCATIONS</button>
+        <button class="tab" data-t="pn" onclick="showTab('pn',this);loadPatchNotes();toggleBuilderAside(false)">PATCH NOTES</button>
+        <button class="tab" data-t="cmp" onclick="showTab('cmp',this);populateCompareSelects();if(selShip){document.getElementById('cmpSelA').value=selShip;renderComparison();}toggleBuilderAside(false)">⬡ COMPARE</button>
+        <div class="tab" onclick="showTab('sd',this);toggleBuilderAside(false)">⚔ SHOWDOWN</div>
+        <button class="tab" data-t="ss" onclick="showTab('ss',this);if(window.selShip)renderShipStats(window.selShip);toggleBuilderAside(false)">📊 SHIP STATS</button>
       <button class="tab" id="feedbackBtn" onclick="toggleFeedback()" style="color:var(--accent);border-left:1px solid var(--border)">&#10022; FEEDBACK</button>
         <button class="tab" id="quickSaveBtn" onclick="quickSave();showTab('sv',this)" style="color:var(--green);border-left:1px solid var(--border)">&#9672; SAVE</button>
       </div>
 
-      <div class="pane on" id="pane-lo">
-        <div id="mobiDash" style="flex:1;min-height:0;overflow:hidden;padding:8px 10px;display:grid;grid-template-rows:auto auto minmax(120px,1fr) auto auto;gap:6px">
-  <div style="padding-bottom:4px;border-bottom:1px solid var(--border)">
-    <div style="font-size:18px;font-weight:700;font-family:var(--fhud);letter-spacing:2px;color:var(--text)">&#9652; SC-ShipForge LIVE</div>
-    
+      <div class="pane on" id="pane-lo" style="flex-direction:column;overflow-y:auto;padding:16px;gap:12px">
+  <!-- SC ShipForge Builder header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(56,189,248,.03));border:1px solid rgba(56,189,248,.2);border-radius:10px;flex-shrink:0">
+    <div style="font-size:18px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);background:linear-gradient(90deg,#38bdf8,#7dd3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent">&#9672; SC SHIPFORGE BUILDER</div>
+    <div style="font-size:9px;color:var(--t3);font-family:var(--fmono);letter-spacing:1px" id="sbPatchVer"></div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;cursor:pointer;transition:border-color .15s" onclick="document.getElementById('sSearch').focus();buildSrbox('');" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:18px;font-weight:700;font-family:var(--fmono);color:var(--accent)" id="dKpiHulls">--</div><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-top:3px">HULLS</div><div style="font-size:8px;color:var(--accent);font-family:var(--fmono);margin-top:4px;letter-spacing:.5px">SEARCH ›</div></div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;cursor:pointer;transition:border-color .15s" onclick="showTab('wp')" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:18px;font-weight:700;font-family:var(--fmono);color:var(--green)" id="dKpiGuns">--</div><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-top:3px">WEAPONS</div><div style="font-size:8px;color:var(--green);font-family:var(--fmono);margin-top:4px;letter-spacing:.5px">VIEW DB ›</div></div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;cursor:pointer;transition:border-color .15s" onclick="document.getElementById('dMfrBars').scrollIntoView({behavior:'smooth'})" onmouseover="this.style.borderColor='var(--warn)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:18px;font-weight:700;font-family:var(--fmono);color:var(--warn)" id="dKpiMfr">--</div><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-top:3px">MFR</div><div style="font-size:8px;color:var(--warn);font-family:var(--fmono);margin-top:4px;letter-spacing:.5px">FILTER ›</div></div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;cursor:pointer;transition:border-color .15s" onclick="showTab('sv')" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:18px;font-weight:700;font-family:var(--fmono);color:var(--cyan)" id="dKpiSaved">0</div><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-top:3px">SAVED</div><div style="font-size:8px;color:var(--cyan);font-family:var(--fmono);margin-top:4px;letter-spacing:.5px">MY BUILDS ›</div></div>
+  <!-- Dashboard KPI strip -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0">
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:18px;font-weight:700;font-family:var(--fmono);color:var(--accent)" id="dKpiHulls">--</div><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-top:3px">HULLS</div></div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;cursor:pointer;transition:border-color .15s" onclick="showTab('wp',document.querySelector('[data-t=wp]'));toggleBuilderAside(false)" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:18px;font-weight:700;font-family:var(--fmono);color:var(--green)" id="dKpiGuns">--</div><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-top:3px">WEAPONS</div><div style="font-size:8px;color:var(--green);font-family:var(--fmono);margin-top:4px;letter-spacing:.5px">VIEW DB ›</div></div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--warn)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:18px;font-weight:700;font-family:var(--fmono);color:var(--warn)" id="dKpiMfr">--</div><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-top:3px">MFR</div></div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center;cursor:pointer;transition:border-color .15s" onclick="showTab('sv',document.querySelector('[data-t=sv]'));toggleBuilderAside(false)" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:18px;font-weight:700;font-family:var(--fmono);color:var(--cyan)" id="dKpiSaved">0</div><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-top:3px">SAVED</div><div style="font-size:8px;color:var(--cyan);font-family:var(--fmono);margin-top:4px;letter-spacing:.5px">MY BUILDS ›</div></div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0;overflow:hidden">
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;flex-direction:column"><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-bottom:10px">BY MANUFACTURER</div><div id="dMfrBars" style="flex:1" style="display:flex;flex-direction:column;gap:6px"></div></div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;flex-direction:column"><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-bottom:10px">BY SIZE CLASS</div><div id="dSizeBars" style="flex:1" style="display:flex;flex-direction:column;gap:8px"></div></div>
+  <!-- Ship search -->
+  <div style="flex-shrink:0">
+    <div class="ss-wrap" id="sbSearchWrap" style="max-width:500px;margin:0 auto;border:1px solid rgba(56,189,248,.3);border-radius:8px;background:rgba(30,41,59,.8)">
+      <span class="ss-icon" style="color:#38bdf8">&#9672;</span>
+      <input class="ss-input" id="sbShipInput" placeholder="Select a ship to build…" autocomplete="off"
+        oninput="ss_type_sb(this)"
+        onfocus="ss_open_sb('')"
+        onkeydown="ss_key_sb(event)"
+        style="font-size:14px;padding:10px 14px 10px 32px"/>
+      <button class="ss-clear" id="sbShipClear" onclick="ss_clear_sb()" title="Clear">&times;</button>
+      <div class="ss-drop" id="ss_drop_sb">
+        <div class="ss-inner"></div>
+        <div class="ss-foot"><kbd>&uarr;&darr;</kbd>navigate &nbsp;<kbd>Enter</kbd>select &nbsp;<kbd>Esc</kbd>close</div>
+      </div>
+    </div>
   </div>
-  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px"><div style="font-size:9px;letter-spacing:1.5px;color:var(--t3);font-family:var(--fmono);margin-bottom:6px">QUICK LAUNCH</div><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px" id="dQuickLaunch"></div></div>
-  <div style="background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:var(--r);padding:6px 10px;text-align:center"><div style="font-size:9px;font-family:var(--fmono);color:var(--accent);margin-bottom:5px;letter-spacing:1.5px">&#9672; FILTER BY ROLE</div><div style="display:flex;gap:3px;justify-content:center;flex-wrap:wrap" id="dRoleFilters"></div></div>
-</div>
-<div id="loContent" style="flex:1;overflow-y:auto;padding:16px"></div>
+  <!-- Power panel (above loadout) -->
+  <div id="sbPowerPanel" style="display:none;flex-shrink:0"></div>
+  <!-- Loadout result -->
+  <div id="sbResult" style="flex:1;min-width:0"></div>
       </div>
 
       
@@ -8202,9 +8204,9 @@ function _eUpdateStats(){
 }
 
 /* ── Main builder ── */
-function buildEnemyLoadout(enemyName){
+function buildEnemyLoadout(enemyName,_targetId){
   var ship=SHIP_DATA[enemyName];
-  var resEl=document.getElementById('sdResult');
+  var resEl=document.getElementById(_targetId||'sdResult');
   if(!resEl)return;
   if(!ship){resEl.innerHTML='<div class="sd-result sd-close"><h3>NO DATA</h3><p>Ship not found.</p></div>';return;}
   _eShipName=enemyName;
@@ -8533,8 +8535,7 @@ function buildEnemyLoadout(enemyName){
       +'<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">Crew</span><span style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#e2e8f0">'+(ship.crew||'—')+'</span></div>'
       +'<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">SCM</span><span style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#22d3ee">'+(ship.scm||'—')+' m/s</span></div>'
     +'</div></div>';
-  /* FIGHT button */
-  statsHTML+='<button onclick="runPvpShowdown()" style="width:100%;padding:14px;background:'+RED+';border:none;border-radius:'+PILL_R+';font-size:14px;font-weight:800;font-family:var(--fmono);color:#fff;cursor:pointer;letter-spacing:2px;transition:opacity .2s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'">&#9876; FIGHT</button>';
+  /* FIGHT button removed */
   statsHTML+='</div>';
 
   /* ── ASSEMBLE ── */
@@ -8542,7 +8543,7 @@ function buildEnemyLoadout(enemyName){
   wrap.style.cssText='display:flex;flex-direction:column;gap:12px;width:100%';
   var titleBar=document.createElement('div');
   titleBar.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:'+RED_BG+';border:1px solid '+RED_BORDER+';border-radius:'+PILL_R;
-  titleBar.innerHTML='<span style="font-size:11px;font-weight:800;letter-spacing:3px;color:'+RED+';font-family:var(--fmono)">ENEMY LOADOUT</span>'
+  titleBar.innerHTML='<span style="font-size:11px;font-weight:800;letter-spacing:3px;color:'+RED+';font-family:var(--fmono)">'+(_targetId==='sbResult'?'SHIP LOADOUT':'ENEMY LOADOUT')+'</span>'
     +'<span style="font-size:15px;font-weight:700;color:#f1f5f9;font-family:var(--fmono)">'+enemyName+'</span>';
   wrap.appendChild(titleBar);
   var cols=document.createElement('div');
@@ -8561,6 +8562,58 @@ function buildEnemyLoadout(enemyName){
 }
 
 function buildPvpConfig(enemyName){buildEnemyLoadout(enemyName);}
+/* ── SC ShipForge Builder search ── */
+(function(){
+  window.ss_open_sb  = function(q){ update('ss_drop_sb',q,false,true); };
+  window.ss_type_sb  = function(inp){ inp.classList.toggle('has-val',inp.value!==''); update('ss_drop_sb',inp.value,false,true); };
+  window.ss_key_sb   = function(e){ ssNav(e,'ss_drop_sb','sb',false); };
+  window.ss_pick_sb  = function(name){
+    close('ss_drop_sb');
+    var inp=document.getElementById('sbShipInput');
+    if(inp){inp.value=name;inp.classList.add('has-val');}
+    var clr=document.getElementById('sbShipClear');
+    if(clr) clr.classList.add('show');
+    window._sbShip=name;
+    buildShipBuilder(name);
+  };
+  window.ss_clear_sb = function(){
+    var inp=document.getElementById('sbShipInput');
+    if(inp){inp.value='';inp.classList.remove('has-val');}
+    document.getElementById('sbShipClear')?.classList.remove('show');
+    window._sbShip=null;
+    var res=document.getElementById('sbResult');
+    if(res) res.innerHTML='';
+    var pp=document.getElementById('sbPowerPanel');
+    if(pp){pp.style.display='none';pp.innerHTML='';}
+    setTimeout(function(){
+      var i=document.getElementById('sbShipInput');
+      if(i){i.focus();}
+      update('ss_drop_sb','',false,true);
+    },10);
+  };
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('#sbSearchWrap')) close('ss_drop_sb');
+  });
+  _hi['sb'] = -1;
+})();
+
+function buildShipBuilder(shipName){
+  /* Reuse buildEnemyLoadout engine targeting sbResult */
+  window._pvpShip = shipName;
+  buildEnemyLoadout(shipName,'sbResult');
+  /* Build power panel in sbPowerPanel */
+  var pp=document.getElementById('sbPowerPanel');
+  if(pp){
+    pp.style.display='block';
+    if(window.buildPowerPanel) window.buildPowerPanel();
+  }
+}
+
+function toggleBuilderAside(show){
+  var aside=document.querySelector('aside.lp');
+  if(aside) aside.style.display=show?'none':'';
+}
+
 function updatePvpTotal(){}
 
 function updatePvpTotal(){}
@@ -8839,6 +8892,8 @@ window.getShipDps=getShipDps;
 window.sdSetMode=sdSetMode;
 window.initShowdown=initShowdown;
 window.buildEnemyLoadout=buildEnemyLoadout;
+  /* Hide aside for builder tab on load */
+  toggleBuilderAside(true);
 window.onEWepChange=onEWepChange;
 window.onEMisItemChange=onEMisItemChange;
 window.onERackChange=onERackChange;
