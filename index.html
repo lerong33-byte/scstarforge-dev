@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.15-DEV</title>
+<title>SC-ShipForge v7.16-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -912,7 +912,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.15-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.16-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -3670,21 +3670,44 @@ var SHIP_CLASS_MAP = {
 
 // liveShipData: cached per-ship data from api.star-citizen.wiki
 var liveShipData = {};
+var _scwikiAllShips = null; // cached full vehicle list
 
-// Fetch live ship data from wiki API and store in cache
+// Fuzzy match: strip manufacturer prefix words and compare
+function _scwikiFuzzyMatch(apiName, shipName) {
+  var a = apiName.toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();
+  var b = shipName.toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();
+  if (a === b) return true;
+  // Check if all words of shipName appear in apiName
+  var bWords = b.split(' ');
+  return bWords.every(function(w){ return a.indexOf(w) > -1; });
+}
+
+// Fetch live ship data from star-citizen.wiki API using fuzzy name match
 async function fetchLiveShipData(shipName) {
   if (liveShipData[shipName]) return liveShipData[shipName];
   var rpPatch = document.getElementById('rpPatch');
   if (rpPatch && !rpPatch.textContent) rpPatch.textContent = 'LIVE 4.7.2';
   try {
-    var classMap = SHIP_CLASS_MAP;
-// (class map now at module level as SHIP_CLASS_MAP)
-    var slug = (classMap[shipName] || shipName.replace(/ /g,'_')).toLowerCase();
-    var url = 'https://api.star-citizen.wiki/api/vehicles?locale=en_EN&limit=1&filter[class_name]=' + encodeURIComponent(classMap[shipName] || shipName);
-    var resp = await fetch(url, {headers:{Accept:'application/json'}});
-    var json = await resp.json();
-    var ship = json.data && json.data[0];
-    if (!ship) throw new Error('not found');
+    // Load full vehicle list once and cache it
+    if (!_scwikiAllShips) {
+      var resp = await fetch('https://api.star-citizen.wiki/api/vehicles?locale=en_EN&limit=300', {headers:{Accept:'application/json'}});
+      var json = await resp.json();
+      _scwikiAllShips = json.data || [];
+    }
+    // Find best match by fuzzy name
+    var ship = null;
+    var ships = _scwikiAllShips;
+    // Exact match first
+    for (var i=0; i<ships.length; i++) {
+      if (ships[i].name && ships[i].name.toLowerCase() === shipName.toLowerCase()) { ship = ships[i]; break; }
+    }
+    // Fuzzy match fallback
+    if (!ship) {
+      for (var i=0; i<ships.length; i++) {
+        if (ships[i].name && _scwikiFuzzyMatch(ships[i].name, shipName)) { ship = ships[i]; break; }
+      }
+    }
+    if (!ship) throw new Error('not found: ' + shipName);
     liveShipData[shipName] = ship;
     if (rpPatch) rpPatch.textContent = (ship.version || '').replace('LIVE.','').replace('-PTU','').replace(/-[0-9]+$/,'') || 'LIVE 4.7.2';
     return ship;
