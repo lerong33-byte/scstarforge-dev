@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.62-DEV</title>
+<title>SC-ShipForge v7.63-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.62-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.63-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -8659,18 +8659,23 @@ function buildPowerPanel(){
   var NORM_PIPS=10;
   var TOTAL_PIPS=NORM_PIPS+OC_PIPS;
   /* Total column height = (TOTAL_PIPS * PIP_H) + (TOTAL_PIPS-1)*PIP_GAP + separator(4) + icon area(32) */
+  /* NAV mode: weapons and shields are unavailable — locked/dimmed */
+  var NAV_LOCKED={weapons:isNAV, shields:isNAV};
   h+='<div style="display:flex;gap:3px;margin-top:8px;box-sizing:border-box">';
   SYSS.forEach(function(sys){
     var val=_pwrState[sys.k]||0;
     var unitCnt=_compCnts[sys.k]||1;
     var ppu=Math.floor(NORM_PIPS/unitCnt);
-    h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center">';
-    /* Overclock pips (11-12) at top — red/orange */
+    var navLocked=NAV_LOCKED[sys.k]||false;
+    var sysColor=navLocked?'rgba(255,255,255,0.15)':sys.color;
+    var colOpacity=navLocked?'0.4':'1';
+    h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;opacity:'+colOpacity+'">';
+    /* Overclock pips (11-12) at top — red/orange; locked in NAV mode */
     h+='<div style="display:flex;flex-direction:column;align-items:center;gap:'+PIP_GAP+'px;width:100%;margin-bottom:4px">';
     for(var oc=TOTAL_PIPS;oc>=NORM_PIPS+1;oc--){
-      var ocFilled=val>=oc;
-      h+='<div onclick="sdSetPwrPip(\''+sys.k+'\','+oc+')" '
-        +'style="width:100%;height:'+PIP_H+'px;min-height:'+PIP_H+'px;border-radius:2px;border:1px solid rgba(255,80,0,0.4);box-sizing:border-box;cursor:pointer;'
+      var ocFilled=!navLocked&&val>=oc;
+      h+='<div '+(navLocked?'':('onclick="sdSetPwrPip(\''+sys.k+'\','+oc+')"'))+' '
+        +'style="width:100%;height:'+PIP_H+'px;min-height:'+PIP_H+'px;border-radius:2px;border:1px solid rgba(255,80,0,0.4);box-sizing:border-box;cursor:'+(navLocked?'not-allowed':'pointer')+';'
         +'background:'+(ocFilled?'linear-gradient(180deg,#ff6600,#cc3300)':'rgba(255,80,0,0.12)')+'">'
         +'</div>';
     }
@@ -8684,15 +8689,16 @@ function buildPowerPanel(){
       for(var g=unitCnt-1;g>=0;g--){
         var pipLo=g*ppu+1;
         var pipHi=(g+1)*ppu;
-        var groupFilled=val>=pipHi;
-        var groupPartial=val>=pipLo&&val<pipHi;
+        var groupFilled=!navLocked&&val>=pipHi;
+        var groupPartial=!navLocked&&val>=pipLo&&val<pipHi;
         var fillPct=groupFilled?100:groupPartial?Math.round((val-pipLo+1)/ppu*100):0;
         var bh=Math.max(PIP_H,Math.round(ppu*PIP_H*0.7+Math.max(0,ppu-1)*PIP_GAP));
-        var isMinGrp=(g===0);
+        var isMinGrp=(g===0)||navLocked;
         h+='<div onclick="'+(isMinGrp?'':'sdSetPwrPip(\''+sys.k+'\','+pipHi+')')+' " '
-          +'style="width:100%;height:'+bh+'px;min-height:'+bh+'px;border-radius:3px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(isMinGrp?'default':'pointer')+';overflow:hidden;position:relative;background:rgba(255,255,255,0.08)">'
-          +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+fillPct+'%;background:'+sys.color+';transition:height .2s;border-radius:2px"></div>'
+          +'style="width:100%;height:'+bh+'px;min-height:'+bh+'px;border-radius:3px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(isMinGrp?'not-allowed':'pointer')+';overflow:hidden;position:relative;background:rgba(255,255,255,0.08)">'
+          +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+fillPct+'%;background:'+sysColor+';transition:height .2s;border-radius:2px"></div>'
           +(g===unitCnt-1?'<span style="position:absolute;top:1px;right:2px;font-size:8px;font-weight:700;color:rgba(255,255,255,0.7);font-family:var(--fmono)">'+unitCnt+'</span>':'')
+          +(navLocked?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="font-size:9px;color:rgba(255,255,255,0.4);font-family:var(--fmono)">NAV</span></div>':'')
           +'</div>';
       }
       h+='</div>';
@@ -8700,19 +8706,20 @@ function buildPowerPanel(){
       /* Individual pips */
       h+='<div style="display:flex;flex-direction:column;align-items:center;gap:'+PIP_GAP+'px;width:100%;margin-bottom:4px">';
       for(var p=NORM_PIPS;p>=1;p--){
-        var filled=p<=val;
-        var isMin=p===1;
+        var filled=!navLocked&&p<=val;
+        var isMin=(p===1)||navLocked;
         h+='<div onclick="'+(isMin?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+' " '
-          +'style="width:100%;height:'+PIP_H+'px;min-height:'+PIP_H+'px;border-radius:2px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(isMin?'default':'pointer')+';'
-          +'background:'+(filled?sys.color:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':'0.35')+'">'
+          +'style="width:100%;height:'+PIP_H+'px;min-height:'+PIP_H+'px;border-radius:2px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(isMin?'not-allowed':'pointer')+';'
+          +'background:'+(filled?sysColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':'0.35')+'">'
           +'</div>';
       }
       h+='</div>';
     }
-    /* Icon + % label */
+    /* Icon + % label — show NAV lock indicator on locked columns */
     h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">'
-      +'<span style="font-size:12px;line-height:1;display:block;margin-bottom:1px">'+sys.icon+'</span>'
-      +'<span style="font-size:8px;display:block;color:var(--t2)">'+Math.round(val*10)+'%</span>'
+      +'<span style="font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+sysColor+'">'+sys.icon+'</span>'
+      +'<span style="font-size:8px;display:block;color:'+(navLocked?'#f87171':'var(--t2)')+'">'
+      +(navLocked?'NAV':Math.round(val*10)+'%')+'</span>'
       +'</div>';
     h+='</div>';
   });
