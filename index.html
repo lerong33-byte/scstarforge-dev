@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.04-DEV</title>
+<title>SC-ShipForge v7.05-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -944,7 +944,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.04-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.05-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -1198,13 +1198,15 @@ option,optgroup{background:var(--bg2)}
     </div>
   </div>
     
-<div id="sdSelectedShip" style="display:none;margin-bottom:8px;margin-top:8px;padding:6px 12px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.4);border-radius:6px;text-align:center;max-width:550px;margin-left:auto;margin-right:auto;">
+<div id="sd-content-row" style="display:flex;flex-direction:row;align-items:flex-start;gap:12px;width:100%;">
+<div id="sdSelectedShip" style="display:none;width:280px;min-width:280px;flex-shrink:0;box-sizing:border-box;">
     <div id="sdSelName" style="font-size:11px;font-weight:700;color:#e2e8f0;"></div>
     <div id="sdSelRole" style="font-size:9px;color:#94a3b8;margin-top:1px;"></div>
     <button onclick="runShowdown(window._pvpShip)" style="margin-top:4px;padding:5px;background:#dc2626;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:.5px;">CONFIGURE ENEMY</button>
   </div>
 <div id="sdArena"></div>
-  <div id="sdResult"></div>
+  <div id="sdResult" style="flex:1;min-width:0;"></div>
+</div>
 </div>
 </div>
 <div class="pane" id="pane-ships">
@@ -8197,7 +8199,7 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
 <!-- PHASE_4_SHOWDOWN_RESKIN -->
 <style id="phase4Showdown">
 /* ═══════════════════════════════════════════════
-   SHOWDOWN LAYOUT  v7.03
+   SHOWDOWN LAYOUT  v7.05
    #pane-sd > .sd-hero children (in order):
      1. .sd-hero-title
      2. #sdSearchWrap
@@ -8214,28 +8216,27 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
   box-sizing: border-box !important;
 }
 
-/* ── TOP STRIP: title + search ── */
+/* ── sd-hero: flex column — title, search, then content row ── */
 #pane-sd .sd-hero {
-  display: block !important;
+  display: flex !important;
+  flex-direction: column !important;
   margin: 0 !important;
   padding: 0 !important;
   background: none !important;
   border: none !important;
+  gap: 8px !important;
 }
 
 #pane-sd .sd-hero-title {
-  display: inline-block !important;
-  vertical-align: middle !important;
-  margin: 0 12px 8px 0 !important;
+  flex-shrink: 0 !important;
   white-space: nowrap !important;
 }
 
 #pane-sd #sdSearchWrap {
-  display: inline-block !important;
-  vertical-align: middle !important;
-  width: calc(100% - 260px) !important;
-  max-width: 640px !important;
-  margin-bottom: 8px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
 }
 
 /* ── HIDE ARENA ── */
@@ -8243,22 +8244,35 @@ aside.lp .lp-card .lp-hd,aside.lp .lp-card .card-hd,aside.lp .lp-card h3,aside.l
   display: none !important;
 }
 
-/* ── SIDE-BY-SIDE ROW: ship card + loadout/stats ── */
-#pane-sd #sdSelectedShip,
-#pane-sd #sdResult {
-  display: inline-block !important;
-  vertical-align: top !important;
-  box-sizing: border-box !important;
+/* ── CONTENT ROW: flex row container ── */
+#pane-sd #sd-content-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
 }
 
+/* Ship card: fixed 280px left column */
 #pane-sd #sdSelectedShip {
   width: 280px !important;
-  margin-right: 12px !important;
+  min-width: 280px !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  text-align: left !important;
+  max-width: none !important;
 }
 
+/* Loadout+stats: fill remaining width */
 #pane-sd #sdResult {
-  width: calc(100% - 296px) !important;
+  flex: 1 !important;
   min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 /* ── ENEMY INFO CARD ── */
