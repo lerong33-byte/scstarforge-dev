@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.47-DEV</title>
+<title>SC-ShipForge v7.48-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.47-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.48-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -8454,22 +8454,49 @@ function buildPowerPanel(){
     +'</div>'
     +'<div class="con-bar-wrap"><div style="height:100%;width:'+pct+'%;background:'+barCol+';border-radius:2px;transition:width .3s"></div></div>';
 
-  /* SPV block chart — fixed height container, pips render top-to-bottom (10 at top, 1 at bottom) */
+  /* SPV block chart — merged unit-group blocks when count > 1 */
+  var _compCntMap={weapons:0,shields:'sg',engines:0,qd:'qd',radar:'radar',cooler:'cooler',thrusters:0};
+  var _compCnts={};
+  _pwrSystems.forEach(function(k){
+    var ck=_compCntMap[k];
+    _compCnts[k]=(ck&&def.comps&&def.comps.counts&&def.comps.counts[ck])||1;
+  });
   h+='<div style="display:flex;gap:3px;height:240px;overflow:hidden;margin-top:8px;box-sizing:border-box">';
   SYSS.forEach(function(sys){
     var val=_pwrState[sys.k]||0;
     var maxPips=10;
-    h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">';
-    h+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;margin-bottom:4px">';
-    for(var p=maxPips;p>=1;p--){
-      var filled=p<=val;
-      var isMin=p===1;
-      h+='<div onclick="'+(isMin?'':'sdSetPwrPip(\''+sys.k+'\','+p+')'+'"')+' '
-        +'style="width:100%;height:16px;min-height:16px;max-height:16px;border-radius:3px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(isMin?'default':'pointer')+';'
-        +'background:'+(filled?sys.color:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':'0.35')+'">'
-        +'</div>';
+    var unitCnt=_compCnts[sys.k]||1;
+    var ppu=Math.floor(maxPips/unitCnt);
+    h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative">';
+    if(unitCnt>1){
+      h+='<div style="display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;margin-bottom:4px">';
+      for(var g=unitCnt-1;g>=0;g--){
+        var pipLo=g*ppu+1;
+        var pipHi=(g+1)*ppu;
+        var groupFilled=val>=pipHi;
+        var groupPartial=val>=pipLo&&val<pipHi;
+        var fillPct=groupFilled?100:groupPartial?Math.round((val-pipLo+1)/ppu*100):0;
+        var bh=Math.max(18,Math.round(ppu*18+Math.max(0,ppu-1)*2));
+        var isMinGrp=(g===0);
+        h+='<div onclick="'+(isMinGrp?'':'sdSetPwrPip(\''+sys.k+'\','+pipHi+')')+'" '
+          +'style="width:100%;height:'+bh+'px;min-height:'+bh+'px;border-radius:4px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(isMinGrp?'default':'pointer')+';overflow:hidden;position:relative;background:rgba(255,255,255,0.08)">'
+          +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+fillPct+'%;background:'+sys.color+';transition:height .2s;border-radius:3px"></div>'
+          +(g===unitCnt-1?'<span style="position:absolute;top:2px;right:3px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.7);font-family:var(--fmono)">'+unitCnt+'</span>':'')
+          +'</div>';
+      }
+      h+='</div>';
+    } else {
+      h+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;margin-bottom:4px">';
+      for(var p=maxPips;p>=1;p--){
+        var filled=p<=val;
+        var isMin=p===1;
+        h+='<div onclick="'+(isMin?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+'" '
+          +'style="width:100%;height:16px;min-height:16px;max-height:16px;border-radius:3px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(isMin?'default':'pointer')+';'
+          +'background:'+(filled?sys.color:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':'0.35')+'">'
+          +'</div>';
+      }
+      h+='</div>';
     }
-    h+='</div>';
     h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">'
       +'<span style="font-size:13px;line-height:1;display:block;margin-bottom:1px">'+sys.icon+'</span>'
       +'<span style="font-size:9px;display:block;color:var(--t2)">'+Math.round(val*10)+'%</span>'
