@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.31-DEV</title>
+<title>SC-ShipForge v7.32-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.31-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.32-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7753,6 +7753,8 @@ function toggleETurretTree(id){
   var el=document.getElementById(id);if(!el)return;
   var open=el.style.display==='none';
   el.style.display=open?'block':'none';
+  var arr=document.getElementById(id+'_arr');
+  if(arr)arr.textContent=open?'▼':'▶';
 }
 function syncETurretGuns(event,i,count){
   event.stopPropagation();
@@ -7904,35 +7906,29 @@ function buildEnemyLoadout(enemyName){
     }
   });
 
-  /* ── MISSILES flat rack+child layout ── */
+  /* ── MISSILES: one row per rack unit ── */
   var mHTML='';
+  var _eFlatRackIdx=0; // global index across all M() entries for unique IDs
   (ship.missiles||[]).forEach(function(ms,i){
     _eMisEnabled['ms'+i]=true;
-    var misCount=ms.count||1;
+    var rackCount=ms.count||1;  // number of individual rack units
     var szNum=ms.sz||1;
-    /* Init missile slots */
-    for(var mi=0;mi<misCount;mi++){_eMissiles['ms'+i+'_'+mi]=ms.default;}
+    /* Init one missile slot per rack unit */
+    for(var ri=0;ri<rackCount;ri++){_eMissiles['ms'+i+'_'+ri]=ms.default;}
     /* Auto-select best rack */
     if(!_eRacks['ms'+i]){
       var bestRack=null,bestDiff=999;
       Object.keys(RACK_DB).forEach(function(rk){
         var rd=RACK_DB[rk];
-        if(rd.sz===szNum){var diff=Math.abs(rd.cap-misCount);if(diff<bestDiff){bestDiff=diff;bestRack=rk;}}
+        if(rd.sz===szNum){var diff=Math.abs(rd.cap-1);if(diff<bestDiff){bestDiff=diff;bestRack=rk;}}
       });
       if(bestRack)_eRacks['ms'+i]=bestRack;
     }
-    var curRackName=_eRacks['ms'+i]||ms.lbl;
-    /* Rack parent row */
-    mHTML+='<div id="emisrow'+i+'" data-on="1" style="background:'+DARK2+';border:1px solid '+RED_BORDER2+';border-radius:4px;margin-bottom:6px;overflow:hidden">'
-      /* Rack header */
-      +'<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid '+RED_BORDER2+';background:rgba(0,0,0,.25)">'
-      +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0">S'+szNum+'</span>'
-      +'<select class="slot-sel" data-rackidx="'+i+'" data-racksz="'+szNum+'" onchange="onERackChange(this)" style="flex:1;font-size:11px;padding:3px 6px;border-color:'+RED_BORDER2+';background:var(--bg3)">'+_eRackOpts(szNum,_eRacks['ms'+i])+'</select>'
-      +'<button onclick="toggleEMis(this,'+i+')" '+toggleBtn(true)+'>ON</button>'
-      +'</div>';
-    /* Missile child rows */
-    for(var mi=0;mi<misCount;mi++){
-      var curMid=_eMissiles['ms'+i+'_'+mi]||ms.default;
+    /* One row per rack unit */
+    for(var ri=0;ri<rackCount;ri++){
+      var flatId='emflat_'+i+'_'+ri;
+      var expandId='emexp_'+i+'_'+ri;
+      var curMid=_eMissiles['ms'+i+'_'+ri]||ms.default;
       var mw=WEAPONS.find(function(x){return x.id===curMid;});
       var mTypeRaw=mw?mw.type:'';
       var mTypeColor=mTypeRaw.includes('emp')?'#cc88ff':mTypeRaw.includes('cs')?'#44aaff':mTypeRaw==='torpedo'?'#ff4444':'#f59e0b';
@@ -7940,26 +7936,37 @@ function buildEnemyLoadout(enemyName){
       var mAlpha=mw?mw.alpha.toLocaleString():'—';
       var mRange=mw?mw.range.toLocaleString():'—';
       var mSz=mw?mw.sz:szNum;
-      var isLast=(mi===misCount-1);
-      mHTML+='<div style="border-bottom:'+(isLast?'none':'1px solid rgba(239,68,68,.1)')+'">'
-        /* Top row: size + icon + select + type + alpha */
+      var rackName=_eRacks['ms'+i]||ms.lbl;
+      /* Rack row (collapsible) */
+      mHTML+='<div style="background:'+DARK2+';border:1px solid '+RED_BORDER2+';border-radius:4px;margin-bottom:4px;overflow:hidden">'
+        /* Rack header — click to expand */
+        +'<div onclick="toggleETurretTree(''+expandId+'')" style="display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;user-select:none;border-bottom:1px solid '+RED_BORDER2+';background:rgba(0,0,0,.25)">'
+        +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">▶</span>'
+        +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0">S'+szNum+'</span>'
+        +'<span style="font-size:11px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);flex:1">'+rackName+'</span>'
+        /* Missile summary in header */
+        +'<span style="font-size:9px;font-family:var(--fmono);color:'+mTypeColor+';flex-shrink:0">'+mTypeName+'</span>'
+        +'<span style="font-size:11px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0;margin-left:8px">'+mAlpha+' <span style="font-size:9px;color:var(--t3);font-weight:400">dmg</span></span>'
+        +'</div>'
+        /* Expandable missile slot */
+        +'<div id="'+expandId+'" style="display:none">'
+        /* Missile child row */
         +'<div style="display:flex;align-items:center;gap:8px;padding:7px 10px 4px;background:'+DARK3+'">'
         +'<span class="sz-chip sz-s'+mSz+'" style="flex-shrink:0">S'+mSz+'</span>'
         +'<span style="font-size:13px;color:#f59e0b;flex-shrink:0">✈</span>'
         +'<div style="flex:1;min-width:0">'
-        +'<select class="slot-sel" data-missidx="'+i+'" data-misgidx="'+mi+'" data-maxsz="'+szNum+'" onchange="onEMisItemChange(this)" style="font-size:11px;padding:3px 6px;border-color:'+RED_BORDER2+';width:100%;background:var(--bg3)">'+_eMisOpts(szNum,curMid)+'</select>'
+        +'<select class="slot-sel" data-missidx="'+i+'" data-misgidx="'+ri+'" data-maxsz="'+szNum+'" onchange="onEMisItemChange(this)" style="font-size:11px;padding:3px 6px;border-color:'+RED_BORDER2+';width:100%;background:var(--bg3)">'+_eMisOpts(szNum,curMid)+'</select>'
         +'</div>'
         +'<span style="font-size:9px;font-family:var(--fmono);color:'+mTypeColor+';flex-shrink:0;min-width:60px;text-align:right">'+mTypeName+'</span>'
         +'<span style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0;min-width:55px;text-align:right">'+mAlpha+' <span style="font-size:9px;color:var(--t3);font-weight:400">dmg</span></span>'
         +'</div>'
-        /* Bottom row: range */
         +'<div style="padding:2px 10px 6px;background:'+DARK3+'">'
         +'<span style="font-size:9px;font-family:var(--fmono);color:var(--t3)">range </span>'
         +'<span style="font-size:9px;font-family:var(--fmono);color:#f59e0b">'+mRange+' m</span>'
         +'</div>'
+        +'</div>'
         +'</div>';
     }
-    mHTML+='</div>';
   });
 
   /* ── SYSTEMS ── */
