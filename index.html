@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.17-DEV</title>
+<title>SC-ShipForge v7.18-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -912,7 +912,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.17-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.18-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -1000,9 +1000,7 @@ option,optgroup{background:var(--bg2)}
             <div class="sig-row"><span class="sig-lbl">Shield HP</span><span class="sig-val" id="shpTotal" style="color:var(--green)">&#8212;</span></div>
             <div class="sig-row"><span class="sig-lbl">Regen/s</span><span class="sig-val" id="shpRegen" style="color:var(--cyan)">&#8212;</span></div>
             <div class="sig-row"><span class="sig-lbl">Face HP</span><span class="sig-val" id="shpFace">&#8212;</span></div>
-            <div class="sig-row"><span class="sig-lbl">Hull HP</span><span class="sig-val" id="statHullHP" style="color:var(--t2)">&#8212;</span></div>
           </div>
-          <div class="sig-row" id="missAlphaRow" style="display:none"><span class="sig-lbl">Missile Alpha</span><span class="sig-val" id="statMissAlpha" style="color:var(--cyan)">&#8212;</span></div>
           <div class="sig-row"><span class="sig-lbl">QD Range</span><span class="sig-val" id="qdRange">&#8212;</span></div>
           <div class="sig-row"><span class="sig-lbl">Spool</span><span class="sig-val" id="qdSpool">&#8212;</span></div>
         </div>
@@ -1020,6 +1018,8 @@ option,optgroup{background:var(--bg2)}
           <div class="sig-row"><span class="sig-lbl">Crew</span><span class="sig-val" id="statCrew" style="color:var(--text)">&#8212;</span></div>
           <div class="sig-row"><span class="sig-lbl">Cargo</span><span class="sig-val" id="statCargo" style="color:var(--warn)">&#8212;</span></div>
           <div class="sig-row"><span class="sig-lbl">Mass</span><span class="sig-val" id="statMass" style="color:var(--t2)">&#8212;</span></div>
+          <div class="sig-row" id="hullHPRow" style="display:none"><span class="sig-lbl">Hull HP</span><span class="sig-val" id="statHullHP" style="color:var(--t2)">&#8212;</span></div>
+          <div class="sig-row" id="missAlphaRow" style="display:none"><span class="sig-lbl">Missile Alpha</span><span class="sig-val" id="statMissAlpha" style="color:var(--cyan)">&#8212;</span></div>
         </div>
         <div class="lp-card" id="dimensionsCard" style="display:none">
           <div class="lp-card-hd"><span class="lp-card-title">DIMENSIONS</span></div>
@@ -4252,11 +4252,17 @@ function updatePower() {
 
   // ── Hull HP (from wiki API) ──
   var wikiData = liveShipData[selShip];
+  var hullHPRow = document.getElementById('hullHPRow');
   if (wikiData && wikiData.health) {
     var hullHP = wikiData.health;
     U('statHullHP', hullHP.toLocaleString());
+    if (hullHPRow) hullHPRow.style.display = '';
+    // Also ensure vesselStatsCard is visible
+    var vsc = document.getElementById('vesselStatsCard');
+    if (vsc) vsc.style.display = '';
   } else {
     U('statHullHP', '—');
+    if (hullHPRow) hullHPRow.style.display = 'none';
   }
 
   // ── Missile Alpha ──
