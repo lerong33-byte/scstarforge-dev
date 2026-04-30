@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.78-DEV</title>
+<title>SC-ShipForge v7.79-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -176,7 +176,7 @@ option,optgroup{background:var(--bg2)}
 
 /* ── CENTER ── */
 .cp{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg);overflow:visible}
-.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;padding:0 16px}
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;padding:0 16px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
 .tab{padding:14px 16px;font-size:13px;font-weight:500;color:var(--t2);border:none;border-bottom:2px solid transparent;background:transparent;cursor:pointer;transition:all .15s;font-family:var(--fhud);outline:none}
 .tab:hover{color:var(--text)}
 .tab.on{color:var(--accent);border-bottom-color:var(--accent)}
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.78-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.79-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -8281,17 +8281,29 @@ function buildEnemyLoadout(enemyName,_targetId){
 
   /* ── HARDPOINTS ── */
   var wHTML='';
+  /* Group identical weapon slots by default weapon */
+  var _hpGroups=[];
   (ship.slots||[]).forEach(function(sl,i){
     _eSlotEnabled['sl'+i]=true;
     var gunCount=sl.count||1;
     var szNum=sl.sz||1;
-    var expandId='ewexp'+i;
     if(gunCount>1&&sl.type==='turret'){
       for(var gi=0;gi<gunCount;gi++){_eSlots['sl'+i+'_gun'+gi]=sl.default;}
     } else {
       _eSlots['sl'+i]=sl.default;
     }
-    var wn=WEAPONS.find(function(x){return x.id===sl.default;});
+    /* Find existing group with same default weapon and same sz */
+    var grp=_hpGroups.find(function(g){return g.default===sl.default&&g.sz===szNum;});
+    if(grp){grp.slots.push({sl:sl,i:i});}
+    else{_hpGroups.push({default:sl.default,sz:szNum,slots:[{sl:sl,i:i}]});}
+  });
+  _hpGroups.forEach(function(grp,gi){
+    var firstSl=grp.slots[0].sl;
+    var firstI=grp.slots[0].i;
+    var szNum=grp.sz;
+    var groupCount=grp.slots.length;
+    var expandId='ehpgrp'+gi;
+    var wn=WEAPONS.find(function(x){return x.id===grp.default;});
     var sumName=wn?wn.name:'—';
     var sumDps=wn?(wn.dps||0):0;
     var sumAlpha=wn?(wn.alpha||0):0;
@@ -8310,41 +8322,54 @@ function buildEnemyLoadout(enemyName,_targetId){
       return t==='ballistic'?'Ballistic Repeater':'Laser Repeater';
     })();
     var subtypeCol=wSubtype.includes('Cannon')?'#f97316':wSubtype.includes('Gatling')?'#facc15':wSubtype.includes('Scatter')?'#e879f9':wSubtype.includes('Neutron')?'#34d399':wSubtype.includes('Ballistic')?'#f59e0b':'#60a5fa';
-
+    var totalDps=sumDps*(groupCount*(firstSl.count||1));
     wHTML+='<div style="background:'+DARK2+';border:1px solid '+RED_BORDER+';border-radius:'+PILL_R+';margin-bottom:8px;overflow:hidden">';
-    /* Header row */
+    /* Parent header row */
     wHTML+='<div onclick="toggleEWepTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none;background:'+RED_BG+'">'
       +'<span style="font-size:10px;color:'+RED_DIM+';font-family:var(--fmono);flex-shrink:0;transition:transform .2s" id="'+expandId+'_arr">&#9658;</span>'
       +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0;font-size:11px;padding:2px 7px">S'+szNum+'</span>'
       +'<span style="flex:1;min-width:0">'
-        +'<span id="ewname'+i+'" style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sumName+(gunCount>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+gunCount+'</span>':'')+'</span>'
-        +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+sl.lbl+'<span id="ewsub'+i+'">'+( wSubtype?' &middot; <span style="background:rgba(0,0,0,.4);border:1px solid '+subtypeCol+';border-radius:20px;padding:1px 8px;font-size:11px;color:'+subtypeCol+'">'+wSubtype+'</span>':'')+'</span></span>'
+        +'<span style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sumName+(groupCount>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+groupCount+'</span>':'')+'</span>'
+        +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+firstSl.lbl+'<span>'+(wSubtype?' &middot; <span style="background:rgba(0,0,0,.4);border:1px solid '+subtypeCol+';border-radius:20px;padding:1px 8px;font-size:11px;color:'+subtypeCol+'">'+wSubtype+'</span>':'')+'</span></span>'
       +'</span>'
-      +'<span id="ewalpha'+i+'" style="font-size:12px;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0;margin-right:10px">'+(sumAlpha?sumAlpha+' <span style="font-size:10px;color:var(--t3)">α</span>':'')+'</span>'
-      +'<span id="ewdps'+i+'" style="font-size:14px;font-weight:700;font-family:var(--fmono);color:'+RED+';flex-shrink:0">'+(sumDps?sumDps+' <span style="font-size:10px;color:var(--t3);font-weight:400">DPS</span>':'')+'</span>'
-      +'<button onclick="toggleESlotById(event,'+i+')" id="etoggle'+i+'" style="margin-left:10px;background:var(--green);border:1px solid var(--green);border-radius:20px;padding:2px 10px;font-size:10px;font-family:var(--fmono);color:#fff;cursor:pointer;flex-shrink:0">ON</button>'
+      +'<span style="font-size:12px;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0;margin-right:10px">'+(sumAlpha?sumAlpha+' <span style="font-size:10px;color:var(--t3)">α</span>':'')+'</span>'
+      +'<span id="ehpgrpdps'+gi+'" style="font-size:14px;font-weight:700;font-family:var(--fmono);color:'+RED+';flex-shrink:0">'+(totalDps?totalDps+' <span style="font-size:10px;color:var(--t3);font-weight:400">DPS</span>':'')+'</span>'
+      +'<button onclick="event.stopPropagation();toggleESlotById(event,'+firstI+')" id="etoggle'+firstI+'" style="margin-left:10px;background:var(--green);border:1px solid var(--green);border-radius:20px;padding:2px 10px;font-size:10px;font-family:var(--fmono);color:#fff;cursor:pointer;flex-shrink:0">ON</button>'
       +'</div>';
-    /* Expanded body */
+    /* Expanded children */
     wHTML+='<div id="'+expandId+'" style="display:none;padding:10px 14px;background:'+DARK3+';border-top:1px solid '+RED_BORDER2+'">';
-    if(gunCount>1&&sl.type==='turret'){
-      for(var gi=0;gi<gunCount;gi++){
-        var isLast=(gi===gunCount-1);
-        wHTML+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:'+(isLast?'0':'6px')+'">'
+    grp.slots.forEach(function(gs,gsi){
+      var sl=gs.sl,i=gs.i;
+      var isLast=(gsi===grp.slots.length-1);
+      var gunCount=sl.count||1;
+      wHTML+='<div style="margin-bottom:'+(isLast?'0':'10px')+';padding-bottom:'+(isLast?'0':'10px')+';border-bottom:'+(isLast?'none':'1px solid '+RED_BORDER2)+'">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
           +'<span style="font-size:11px;color:var(--border);font-family:monospace;flex-shrink:0">'+(isLast?'&#9492;':'&#9500;')+'</span>'
-          +'<select class="slot-sel" data-slotidx="'+i+'" data-gunidx="'+gi+'" data-sz="'+szNum+'" onchange="onEWepChange(this)" style="flex:1;font-size:12px;padding:5px 8px;border-color:'+RED_BORDER+';border-radius:8px">'+_eWepOpts(szNum,sl.default,sl.fixed)+'</select>'
-          +'</div>';
+          +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+sl.lbl+(gunCount>1?' &times;'+gunCount:'')+'</span>'
+        +'</div>';
+      if(gunCount>1&&sl.type==='turret'){
+        for(var gi2=0;gi2<gunCount;gi2++){
+          var isLastGun=(gi2===gunCount-1);
+          wHTML+='<div style="display:flex;align-items:center;gap:8px;margin-left:16px;margin-bottom:'+(isLastGun?'0':'6px')+'">'
+            +'<span style="font-size:11px;color:var(--border);font-family:monospace;flex-shrink:0">'+(isLastGun?'&#9492;':'&#9500;')+'</span>'
+            +'<select class="slot-sel" data-slotidx="'+i+'" data-gunidx="'+gi2+'" data-sz="'+szNum+'" onchange="onEWepChange(this)" style="flex:1;font-size:12px;padding:5px 8px;border-color:'+RED_BORDER+';border-radius:8px">'+_eWepOpts(szNum,sl.default,sl.fixed)+'</select>'
+            +'</div>';
+        }
+      } else {
+        wHTML+='<select class="slot-sel" data-slotidx="'+i+'" data-sz="'+szNum+'" onchange="onEWepChange(this)" style="width:100%;font-size:12px;padding:5px 8px;border-color:'+RED_BORDER+';border-radius:8px"'+(sl.fixed?' disabled':'')+'>'+_eWepOpts(szNum,sl.default,sl.fixed)+'</select>';
       }
       wHTML+='<div id="esi'+i+'" style="margin-top:8px;padding-top:8px;border-top:1px solid '+RED_BORDER2+'">'+_eWepInfo(sl.default)+'</div>';
-    } else {
-      wHTML+='<select class="slot-sel" data-slotidx="'+i+'" data-sz="'+szNum+'" onchange="onEWepChange(this)" style="width:100%;font-size:12px;padding:5px 8px;border-color:'+RED_BORDER+';border-radius:8px"'+(sl.fixed?' disabled':'')+'>'+_eWepOpts(szNum,sl.default,sl.fixed)+'</select>'
-        +'<div id="esi'+i+'" style="margin-top:8px;padding-top:8px;border-top:1px solid '+RED_BORDER2+'">'+_eWepInfo(sl.default)+'</div>';
-    }
+      wHTML+='</div>';
+    });
     wHTML+=buyPill(wLoc);
     wHTML+='</div></div>';
   });
 
+
   /* ── MISSILES ── */
   var mHTML='';
+  /* Group missile entries by default missile type */
+  var _misGroups=[];
   (ship.missiles||[]).forEach(function(ms,i){
     _eMisEnabled['ms'+i]=true;
     var rackCount=ms.count||1;
@@ -8358,43 +8383,61 @@ function buildEnemyLoadout(enemyName,_targetId){
       });
       if(bestRack)_eRacks['ms'+i]=bestRack;
     }
-    for(var ri=0;ri<rackCount;ri++){
-      var expandId='emexp_'+i+'_'+ri;
-      var curMid=_eMissiles['ms'+i+'_'+ri]||ms.default;
-      var mw=WEAPONS.find(function(x){return x.id===curMid;});
-      var mTypeRaw=mw?mw.type:'';
-      var mTypeColor=mTypeRaw.includes('emp')?'#cc88ff':mTypeRaw.includes('cs')?'#44aaff':mTypeRaw==='torpedo'?'#ff4444':'#f59e0b';
-      var mTypeName=mTypeRaw.replace('missile-','').replace('missile','IR').toUpperCase()||'—';
-      var mAlpha=mw?(mw.alpha||0):0;
-      var mAlphaTotal=mAlpha*rackCount;
-      var mRange=mw?mw.range.toLocaleString():'—';
-      var mSz=mw?mw.sz:szNum;
-      var rackName=_eRacks['ms'+i]||ms.lbl;
-      var rackEntry=RACK_DB?RACK_DB[rackName]:null;
-      var rackLoc=rackEntry?(rackEntry.loc||''):'';
-      var misLoc=mw?(mw.loc||''):'';
-
-      mHTML+='<div style="background:'+DARK2+';border:1px solid '+RED_BORDER+';border-radius:'+PILL_R+';margin-bottom:8px;overflow:hidden">'
-        +'<div onclick="toggleETurretTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none;background:'+RED_BG+'">'
-        +'<span style="font-size:10px;color:'+RED_DIM+';font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'
-        +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0;font-size:11px;padding:2px 7px">S'+szNum+'</span>'
-        +'<span style="flex:1;min-width:0">'
-          +'<span id="emname_'+i+'_'+ri+'" style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(mw?mw.name:rackName)+(rackCount>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+rackCount+'</span>':'')+'</span>'
-          +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+rackName+' &middot; <span id="emtype_'+i+'_'+ri+'" style="color:'+mTypeColor+'">'+mTypeName+'</span></span>'
-        +'</span>'
-        +'<span id="emalpha_'+i+'_'+ri+'" style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0">'+(mAlphaTotal?mAlphaTotal.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span>':'')+'</span>'
+    /* Group by default missile */
+    var grp=_misGroups.find(function(g){return g.default===ms.default&&g.sz===szNum;});
+    if(grp){grp.entries.push({ms:ms,i:i});}
+    else{_misGroups.push({default:ms.default,sz:szNum,entries:[{ms:ms,i:i}]});}
+  });
+  _misGroups.forEach(function(grp,mgi){
+    var firstMs=grp.entries[0].ms;
+    var firstI=grp.entries[0].i;
+    var szNum=grp.sz;
+    var groupCount=grp.entries.length;
+    var expandId='emisgrp'+mgi;
+    var curMid=grp.default;
+    var mw=WEAPONS.find(function(x){return x.id===curMid;});
+    var mTypeRaw=mw?mw.type:'';
+    var mTypeColor=mTypeRaw.includes('emp')?'#cc88ff':mTypeRaw.includes('cs')?'#44aaff':mTypeRaw==='torpedo'?'#ff4444':'#f59e0b';
+    var mTypeName=mTypeRaw.replace('missile-','').replace('missile','IR').toUpperCase()||'—';
+    var mAlpha=mw?(mw.alpha||0):0;
+    var mAlphaTotal=mAlpha*groupCount*(firstMs.count||1);
+    var mRange=mw?mw.range.toLocaleString():'—';
+    var rackName=_eRacks['ms'+firstI]||firstMs.lbl;
+    var rackEntry=RACK_DB?RACK_DB[rackName]:null;
+    var rackLoc=rackEntry?(rackEntry.loc||''):'';
+    var misLoc=mw?(mw.loc||''):'';
+    mHTML+='<div style="background:'+DARK2+';border:1px solid '+RED_BORDER+';border-radius:'+PILL_R+';margin-bottom:8px;overflow:hidden">'
+      +'<div onclick="toggleETurretTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none;background:'+RED_BG+'">'
+      +'<span style="font-size:10px;color:'+RED_DIM+';font-family:var(--fmono);flex-shrink:0;transition:transform .2s" id="'+expandId+'_arr">&#9658;</span>'
+      +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0;font-size:11px;padding:2px 7px">S'+szNum+'</span>'
+      +'<span style="flex:1;min-width:0">'
+        +'<span style="font-size:14px;font-weight:700;color:#f1f5f9;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(mw?mw.name:rackName)+(groupCount>1?' <span style="color:'+RED_DIM+';font-size:11px">&times;'+groupCount+'</span>':'')+'</span>'
+        +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+rackName+' &middot; <span style="color:'+mTypeColor+'">'+mTypeName+'</span></span>'
+      +'</span>'
+      +'<span style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0">'+(mAlphaTotal?mAlphaTotal.toLocaleString()+' <span style="font-size:10px;color:var(--t3);font-weight:400">dmg</span>':'')+'</span>'
+      +'</div>'
+      +'<div id="'+expandId+'" style="display:none;padding:10px 14px;background:'+DARK3+';border-top:1px solid '+RED_BORDER2+'">';
+    grp.entries.forEach(function(ge,gei){
+      var ms=ge.ms,i=ge.i;
+      var rackCount=ms.count||1;
+      var isLast=(gei===grp.entries.length-1);
+      var rackN=_eRacks['ms'+i]||ms.lbl;
+      mHTML+='<div style="margin-bottom:'+(isLast?'0':'10px')+';padding-bottom:'+(isLast?'0':'10px')+';border-bottom:'+(isLast?'none':'1px solid '+RED_BORDER2)+'">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+          +'<span style="font-size:11px;color:var(--border);font-family:monospace;flex-shrink:0">'+(isLast?'&#9492;':'&#9500;')+'</span>'
+          +'<span style="font-size:12px;color:var(--t2);font-family:var(--fmono)">'+ms.lbl+(rackCount>1?' &times;'+rackCount:'')+'</span>'
         +'</div>'
-        +'<div id="'+expandId+'" style="display:none;padding:10px 14px;background:'+DARK3+';border-top:1px solid '+RED_BORDER2+'">'
-        +'<select class="slot-sel" data-missidx="'+i+'" data-misgidx="'+ri+'" data-maxsz="'+szNum+'" onchange="onEMisItemChange(this)" style="width:100%;font-size:12px;padding:5px 8px;border-color:'+RED_BORDER+';border-radius:8px;background:var(--bg3)">'+_eMisOpts(szNum,curMid)+'</select>'
+        +'<select class="slot-sel" data-missidx="'+i+'" data-misgidx="0" data-maxsz="'+szNum+'" onchange="onEMisItemChange(this)" style="width:100%;font-size:12px;padding:5px 8px;border-color:'+RED_BORDER+';border-radius:8px;background:var(--bg3)">'+_eMisOpts(szNum,curMid)+'</select>'
         +'<div style="display:flex;gap:16px;margin-top:8px;padding-top:6px;border-top:1px solid '+RED_BORDER2+'">'
           +'<span style="font-size:12px;font-family:var(--fmono);color:var(--t2)">range <span style="color:#f59e0b">'+mRange+' m</span></span>'
           +(mAlpha?'<span style="font-size:12px;font-family:var(--fmono);color:var(--t2)">alpha <span style="color:#e2e8f0">'+mAlpha.toLocaleString()+' dmg</span></span>':'')
         +'</div>'
         +buyPill(misLoc||rackLoc)
-        +'</div>'
         +'</div>';
-    }
+    });
+    mHTML+='</div></div>';
   });
+
 
   /* ── SYSTEMS ── */
   var cHTML='';
@@ -8617,7 +8660,7 @@ function buildShipBuilder(shipName){
 
 function toggleBuilderAside(show){
   var aside=document.querySelector('aside.lp');
-  if(aside) aside.style.display=show?'none':'';
+  if(aside) aside.style.display=show?'none':'flex';
 }
 
 function updatePvpTotal(){}
