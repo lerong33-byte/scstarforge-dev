@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.57-DEV</title>
+<title>SC-ShipForge v7.58-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.57-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.58-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -8667,19 +8667,15 @@ function buildPowerPanel(){
     h+='</div>';
     /* Separator line between overclock and normal */
     h+='<div style="width:100%;height:1px;background:rgba(255,100,0,0.3);margin-bottom:3px"></div>';
-    /* Normal pip area — always 10 individual pips, grouped visually by separator */
+    /* Normal pip area — always 10 individual pips, same height, grouped by thin separator line */
     h+='<div style="display:flex;flex-direction:column;gap:'+PIP_GAP+'px;margin-bottom:3px">';
     for(var p=NORM_PIPS;p>=1;p--){
       var filled=!navLocked&&p<=val;
-      /* Determine which group this pip belongs to (for multi-unit columns) */
-      var grp=unitCnt>1?Math.floor((p-1)/ppu):0;
-      var isGrpBoundary=unitCnt>1&&p>1&&(p-1)%ppu===0;
-      /* Group separator: slightly larger gap before first pip of each new group */
-      var extraTop=isGrpBoundary?'margin-top:4px;':''; 
-      h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+'" '
-        +'style="width:100%;height:'+PIP_H+'px;flex-shrink:0;border-radius:2px;box-sizing:border-box;cursor:'+(navLocked?'default':'pointer')+';'+extraTop
-        +'background:'+(filled?colColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':(navLocked?'0.2':'0.3'))+'">'
-        +'</div>';
+      /* Insert a thin separator line ABOVE the top pip of each group boundary (except top group) */
+      if(unitCnt>1&&p<NORM_PIPS&&(p%ppu===0)){
+        h+='<div style="width:100%;height:1px;flex-shrink:0;background:rgba(255,255,255,0.18);border-radius:1px"></div>';
+      }
+      h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+'" style="width:100%;height:'+PIP_H+'px;flex-shrink:0;border-radius:2px;box-sizing:border-box;cursor:'+(navLocked?'default':'pointer')+';background:'+(filled?colColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':(navLocked?'0.2':'0.3'))+'">'+'</div>';
     }
     h+='</div>';
        /* Icon = power toggle button: click to toggle system ON/OFF */
