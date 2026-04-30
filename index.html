@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.35-DEV</title>
+<title>SC-ShipForge v7.36-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.35-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.36-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -7885,8 +7885,11 @@ function buildEnemyLoadout(enemyName){
     wHTML+='<div onclick="toggleEWepTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;user-select:none;border-bottom:1px solid '+RED_BORDER2+';background:rgba(0,0,0,.25)">'
       +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'
       +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0">S'+szNum+'</span>'
-      +'<span style="font-size:11px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);flex:1">'+sl.lbl+(gunCount>1?' <span style="color:var(--t3);font-size:9px">&times;'+gunCount+'</span>':'')+'</span>'
-      +(sumDps?'<span style="font-size:11px;font-weight:700;font-family:var(--fmono);color:'+RED+'">'+sumDps+' <span style="font-size:9px;color:var(--t3);font-weight:400">DPS</span></span>':'')
+      +'<span style="flex:1;min-width:0;overflow:hidden">'
+        +'<span style="font-size:12px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sumName+(gunCount>1?' <span style="color:var(--t3);font-size:9px">&times;'+gunCount+'</span>':'')+'</span>'
+        +'<span style="font-size:9px;color:var(--t3);font-family:var(--fmono)">'+sl.lbl+'</span>'
+      +'</span>'
+      +(sumDps?'<span style="font-size:12px;font-weight:700;font-family:var(--fmono);color:'+RED+';flex-shrink:0">'+sumDps+' <span style="font-size:9px;color:var(--t3);font-weight:400">DPS</span></span>':'')
       +'<button onclick="toggleESlotById(event,'+i+')" id="etoggle'+i+'" style="margin-left:8px;background:var(--green);border:1px solid var(--green);border-radius:10px;padding:1px 8px;font-size:9px;font-family:var(--fmono);color:#fff;cursor:pointer;flex-shrink:0">ON</button>'
       +'</div>';
     wHTML+='<div id="'+expandId+'" style="display:none;padding:8px 10px">';
@@ -7942,10 +7945,12 @@ function buildEnemyLoadout(enemyName){
         +'<div onclick="toggleETurretTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;user-select:none;border-bottom:1px solid '+RED_BORDER2+';background:rgba(0,0,0,.25)">'
         +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">▶</span>'
         +'<span class="sz-chip sz-s'+szNum+'" style="flex-shrink:0">S'+szNum+'</span>'
-        +'<span style="font-size:11px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);flex:1">'+rackName+'</span>'
-        /* Missile summary in header */
+        +'<span style="flex:1;min-width:0;overflow:hidden">'
+          +'<span style="font-size:12px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(mw?mw.name:rackName)+'</span>'
+          +'<span style="font-size:9px;color:var(--t3);font-family:var(--fmono)">'+rackName+'</span>'
+        +'</span>'
         +'<span style="font-size:9px;font-family:var(--fmono);color:'+mTypeColor+';flex-shrink:0">'+mTypeName+'</span>'
-        +'<span style="font-size:11px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0;margin-left:8px">'+mAlpha+' <span style="font-size:9px;color:var(--t3);font-weight:400">dmg</span></span>'
+        +'<span style="font-size:12px;font-weight:700;font-family:var(--fmono);color:#e2e8f0;flex-shrink:0;margin-left:8px">'+mAlpha+' <span style="font-size:9px;color:var(--t3);font-weight:400">dmg</span></span>'
         +'</div>'
         /* Expandable missile slot */
         +'<div id="'+expandId+'" style="display:none">'
@@ -7984,13 +7989,15 @@ function buildEnemyLoadout(enemyName){
     if(COMP_DB&&COMP_DB[k]){cEntry=COMP_DB[k][cur]||null;}
     var sumText=cEntry?(cEntry.name||cur.split('|')[0].trim()):(cur.split('|')[0].trim()||'—');
     cHTML+='<div style="background:'+DARK2+';border:1px solid '+RED_BORDER2+';border-radius:4px;margin-bottom:4px;overflow:hidden">';
-    cHTML+='<div onclick="toggleECompTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;user-select:none;border-bottom:1px solid '+RED_BORDER2+';background:rgba(0,0,0,.25)">'
-      +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'
-      +'<span style="font-size:14px;flex-shrink:0">'+ico+'</span>'
-      +'<span style="font-size:11px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);flex:1">'+lbl+(cnt>1?' <span style="color:var(--t3);font-size:9px">&times;'+cnt+'</span>':'')+'</span>'
-      +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="'+expandId+'_lbl">'+sumText+'</span>'
-      +'<span style="font-size:9px;color:var(--t3);font-family:var(--fmono);flex-shrink:0;margin-left:4px">'+csz+(cnt>1?' &times;'+cnt:'')+'</span>'
-      +'</div>';
+    var compStatRight='';
+    if(cEntry){
+      if(k==='pp')compStatRight='<span style="font-size:12px;font-weight:700;font-family:var(--fmono);color:#f59e0b;flex-shrink:0">'+(cEntry.out||'—')+' <span style="font-size:9px;color:var(--t3);font-weight:400">EU</span></span>';
+      else if(k==='sg')compStatRight='<span style="font-size:12px;font-weight:700;font-family:var(--fmono);color:#60a5fa;flex-shrink:0">'+(cEntry.totalHP?cEntry.totalHP.toLocaleString():'—')+' <span style="font-size:9px;color:var(--t3);font-weight:400">HP</span></span>';
+      else if(k==='cooler')compStatRight='<span style="font-size:12px;font-weight:700;font-family:var(--fmono);color:#22d3ee;flex-shrink:0">'+(cEntry.cool||'—')+' <span style="font-size:9px;color:var(--t3);font-weight:400">cool</span></span>';
+      else if(k==='qd')compStatRight='<span style="font-size:12px;font-weight:700;font-family:var(--fmono);color:#a78bfa;flex-shrink:0">'+(cEntry.range||'—')+' <span style="font-size:9px;color:var(--t3);font-weight:400">Gm</span></span>';
+      else if(k==='radar')compStatRight='<span style="font-size:12px;font-weight:700;font-family:var(--fmono);color:#34d399;flex-shrink:0">'+(cEntry.dist||'—')+' <span style="font-size:9px;color:var(--t3);font-weight:400">m</span></span>';
+    }
+    cHTML+='<div onclick="toggleECompTree(\''+expandId+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;user-select:none;border-bottom:1px solid '+RED_BORDER2+';background:rgba(0,0,0,.25)">'      +'<span style="font-size:10px;color:var(--t3);font-family:var(--fmono);flex-shrink:0" id="'+expandId+'_arr">&#9658;</span>'      +'<span style="font-size:14px;flex-shrink:0">'+ico+'</span>'      +'<span style="flex:1;min-width:0;overflow:hidden">'        +'<span style="font-size:12px;font-weight:700;color:#e2e8f0;font-family:var(--fmono);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sumText+(cnt>1?' <span style="color:var(--t3);font-size:9px">&times;'+cnt+'</span>':'')+'</span>'        +'<span style="font-size:9px;color:var(--t3);font-family:var(--fmono)">'+lbl+' '+csz+'</span>'      +'</span>'      +compStatRight      +'</div>';
     cHTML+='<div id="'+expandId+'" style="display:none;padding:8px 10px">';
     if(cnt===1){
       cHTML+='<select class="slot-sel" data-compkey="'+k+'" onchange="onECompChange(this)" style="width:100%;border-color:'+RED_BORDER2+'">'+_eCompOpts(k,csz,cur)+'</select>'
