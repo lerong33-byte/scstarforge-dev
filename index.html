@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.60-DEV</title>
+<title>SC-ShipForge v7.61-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.60-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.61-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -8645,14 +8645,13 @@ function buildPowerPanel(){
     var ck=_compCntMap[k];
     _compCnts[k]=(ck&&def.comps&&def.comps.counts&&def.comps.counts[ck])||1;
   });
-  /* Power panel layout constants
-     Reference style: large solid bar blocks, multi-unit = stacked blocks with badge,
-     single-unit = one tall bar. No buttons inside columns. Icon + % at bottom only. */
-  var TOTAL_H=140;   /* total height of the bar area in px (OC + separator + normal) */
-  var OC_H=22;       /* height of the 2 overclock blocks combined (incl gap) */
-  var SEP_H=5;       /* separator between OC and normal */
-  var NORM_H=TOTAL_H-OC_H-SEP_H; /* height of the normal bar area */
-  var BLOCK_GAP=3;   /* gap between stacked unit blocks */
+  /* Power panel: 7 display blocks per column (2 OC + 5 normal)
+     Each normal block represents 2 pips. Multi-unit columns split each block side-by-side. */
+  var BLOCK_H=18;    /* height of each display block in px */
+  var BLOCK_GAP=3;   /* gap between blocks */
+  var NORM_BLOCKS=5; /* number of normal blocks (each = 2 pips) */
+  var OC_BLOCKS=2;   /* overclock blocks (pips 11-12) */
+  var TOTAL_BLOCKS=NORM_BLOCKS+OC_BLOCKS; /* 7 */
   /* NAV mode: weapons and shields are locked OFF */
   var navLockedSys={weapons:isNAV,shields:isNAV};
   h+='<div style="display:flex;gap:4px;margin-top:8px;box-sizing:border-box;align-items:flex-end;width:100%">';
@@ -8662,51 +8661,85 @@ function buildPowerPanel(){
     var navLocked=navLockedSys[sys.k]||false;
     var colColor=navLocked?'rgba(255,255,255,0.12)':sys.color;
     var pctTxt=Math.round(val*10)+'%';
-    /* Height of each unit block in the normal area */
-    var unitH=unitCnt>1?Math.floor((NORM_H-(unitCnt-1)*BLOCK_GAP)/unitCnt):NORM_H;
-    /* Pips per unit (for click targets) */
-    var ppu=Math.floor(10/unitCnt);
 
-    h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch">';
+    h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:'+BLOCK_GAP+'px">';
 
-    /* ── Overclock blocks (2) at top — always 2 equal blocks ── */
-    var ocBlockH=Math.floor((OC_H-BLOCK_GAP)/2);
-    h+='<div style="display:flex;flex-direction:column;gap:'+BLOCK_GAP+'px;margin-bottom:'+SEP_H+'px">';
-    for(var oc=12;oc>=11;oc--){
-      var ocFilled=!navLocked&&val>=oc;
-      h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+oc+')')+'" '
-        +'style="width:100%;height:'+ocBlockH+'px;border-radius:3px;border:1px solid rgba(255,80,0,0.45);box-sizing:border-box;cursor:'+(navLocked?'default':'pointer')+';'
-        +'background:'+(ocFilled?'linear-gradient(180deg,#ff6600,#cc3300)':'rgba(255,80,0,0.10)')+'">'
-        +'</div>';
-    }
-    h+='</div>';
-
-    /* ── Normal bar area: one block per unit, stacked ── */
-    /* Unit count badge — only for multi-unit */
-    h+='<div style="position:relative;display:flex;flex-direction:column;gap:'+BLOCK_GAP+'px;margin-bottom:3px">';
+    /* Unit count badge for multi-unit columns */
     if(unitCnt>1){
-      h+='<span style="position:absolute;top:-1px;right:1px;font-size:8px;font-weight:700;color:rgba(255,255,255,0.65);font-family:var(--fmono);z-index:1;line-height:1">'+unitCnt+'</span>';
-    }
-    for(var u=unitCnt-1;u>=0;u--){
-      /* pip range for this unit */
-      var pipLo=u*ppu+1;
-      var pipHi=(u===unitCnt-1)?10:(u+1)*ppu;
-      /* click target: clicking the block sets pips to pipHi for that unit */
-      var clickVal=pipHi;
-      /* fill fraction: how full is this unit block */
-      var unitFill=0;
-      if(val>=pipHi) unitFill=1;
-      else if(val>=pipLo) unitFill=(val-pipLo+1)/(pipHi-pipLo+1);
-      var fillH=Math.round(unitH*unitFill);
-      h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+clickVal+')')+'" '
-        +'style="width:100%;height:'+unitH+'px;border-radius:4px;box-sizing:border-box;cursor:'+(navLocked?'default':'pointer')+';'
-        +'background:rgba(255,255,255,0.07);overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.08)">'
-        +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+fillH+'px;background:'+colColor+';border-radius:3px;transition:height .2s"></div>'
+      h+='<div style="position:relative;height:0">'
+        +'<span style="position:absolute;top:2px;right:1px;font-size:8px;font-weight:700;color:rgba(255,255,255,0.7);font-family:var(--fmono);z-index:2;line-height:1">'+unitCnt+'</span>'
         +'</div>';
     }
-    h+='</div>';
 
-    /* ── Icon + % label at bottom ── */
+    /* Render blocks from top (block 7=OC2) to bottom (block 1=normal1) */
+    for(var b=TOTAL_BLOCKS;b>=1;b--){
+      var isOC=(b>NORM_BLOCKS); /* blocks 6,7 are overclock */
+      /* pip value this block represents:
+         OC block 7 = pip 12, OC block 6 = pip 11
+         Normal block 5 = pips 9-10, block 4 = pips 7-8, block 3 = pips 5-6,
+         block 2 = pips 3-4, block 1 = pips 1-2 */
+      var pipHi, pipLo;
+      if(isOC){
+        pipHi=10+(b-NORM_BLOCKS); /* 11 or 12 */
+        pipLo=pipHi;
+      } else {
+        pipHi=b*2;   /* 2,4,6,8,10 */
+        pipLo=b*2-1; /* 1,3,5,7,9 */
+      }
+      /* Click sets val to pipHi */
+      var clickVal=pipHi;
+      /* Is this block filled? */
+      var blockFilled=!navLocked&&val>=pipHi;
+      var blockPartial=!navLocked&&!blockFilled&&val>=pipLo;
+
+      if(isOC){
+        /* Overclock block: red/orange outline when empty, filled orange when active */
+        var ocBg=blockFilled?'linear-gradient(180deg,#ff8800,#cc4400)':'rgba(255,80,0,0.10)';
+        var ocBorder='1px solid rgba(255,80,0,'+(blockFilled?'0.8':'0.4')+')';
+        h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+clickVal+')')+'" '
+          +'style="width:100%;height:'+BLOCK_H+'px;border-radius:3px;border:'+ocBorder+';box-sizing:border-box;cursor:'+(navLocked?'default':'pointer')+';background:'+ocBg+'">'
+          +'</div>';
+      } else {
+        /* Normal block: solid color when filled, dark when empty */
+        /* For multi-unit: split into unitCnt side-by-side sub-blocks */
+        if(unitCnt>1){
+          /* Each sub-block covers pipLo..pipHi for its unit range */
+          var ppu=Math.floor(10/unitCnt); /* pips per unit */
+          h+='<div style="display:flex;flex-direction:row;gap:2px;width:100%;height:'+BLOCK_H+'px">';
+          for(var u=0;u<unitCnt;u++){
+            var uPipLo=u*ppu+1;
+            var uPipHi=(u===unitCnt-1)?10:(u+1)*ppu;
+            /* Is this block's pip range within this unit's range? */
+            var uBlockFilled=!navLocked&&val>=pipHi&&pipLo>=uPipLo;
+            /* Simpler: block b is filled for unit u if val covers pipHi AND this unit is active */
+            /* Actually: for multi-unit, each unit covers half the pips.
+               Unit 0 covers pips 1-5, unit 1 covers pips 6-10.
+               Block b (pipLo-pipHi) belongs to unit u if pipLo >= uPipLo && pipHi <= uPipHi */
+            var blockInUnit=(pipLo>=uPipLo&&pipHi<=uPipHi);
+            var uFilled=blockInUnit?(!navLocked&&val>=pipHi):false;
+            var uPartial=blockInUnit?(!navLocked&&!uFilled&&val>=pipLo):false;
+            var uBg=uFilled?colColor:(uPartial?colColor:'rgba(255,255,255,0.07)');
+            var uOpacity=uFilled?'1':(uPartial?'0.6':(navLocked?'0.15':'1'));
+            var uClick=blockInUnit&&!navLocked?'sdSetPwrPip(\''+sys.k+'\','+clickVal+')':'';
+            h+='<div onclick="'+uClick+'" '
+              +'style="flex:1;height:100%;border-radius:3px;box-sizing:border-box;cursor:'+(uClick?'pointer':'default')+';'
+              +'background:'+uBg+';opacity:'+uOpacity+';border:1px solid rgba(255,255,255,0.06)">'
+              +'</div>';
+          }
+          h+='</div>';
+        } else {
+          /* Single unit: one full-width block */
+          var bg=blockFilled?colColor:(blockPartial?colColor:'rgba(255,255,255,0.07)');
+          var op=blockFilled?'1':(blockPartial?'0.6':(navLocked?'0.15':'1'));
+          h+='<div onclick="'+(navLocked?'':'sdSetPwrPip(\''+sys.k+'\','+clickVal+')')+'" '
+            +'style="width:100%;height:'+BLOCK_H+'px;border-radius:3px;box-sizing:border-box;cursor:'+(navLocked?'default':'pointer')+';'
+            +'background:'+bg+';opacity:'+op+';border:1px solid rgba(255,255,255,0.06)">'
+            +'</div>';
+        }
+      }
+    }
+
+    /* Icon + % label at bottom */
     h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%;margin-top:1px">'
       +'<span style="font-size:13px;line-height:1;display:block;margin-bottom:1px;color:'+colColor+'">'+sys.icon+'</span>'
       +'<span style="font-size:8px;display:block;color:var(--t2)">'+pctTxt+'</span>'
