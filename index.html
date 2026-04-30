@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v7.70-DEV</title>
+<title>SC-ShipForge v7.71-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -895,7 +895,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.70-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#38d282;font-family:var(--fmono);font-weight:400;letter-spacing:1px">v7.71-DEV</span></div>
     <div class="ss-wrap" id="ss_wrap_ship">
       <span class="ss-icon">⚡</span>
       <input id="honfocus="ss_ohpen_ship(this.value)"    onfocus="ss_open_ship('')"" class="ss-input" type="text" placeholder="Search ships…" autocomplete="off"
@@ -8657,6 +8657,7 @@ function buildPowerPanel(){
     {k:'radar',    icon:'📡', color:'#44ccff', label:'Radar'},
     {k:'cooler',   icon:'❄', color:'#00ccff', label:'Cooler'},
     {k:'thrusters',icon:'⊕', color:'#ff6622', label:'Flight'},
+    {k:'pp',       icon:'⚡', color:'#f59e0b', label:'PP', ppCol:true},
   ];
 
   var h='<div class="lp-card" style="margin-top:0">';
@@ -8677,20 +8678,14 @@ function buildPowerPanel(){
 
   /* SPV block chart — 12 pips total: 10 normal + 2 overclock above */
   /* Overclock pips (11-12) shown in red above a separator line */
-  var _compCntMap={weapons:0,shields:'sg',engines:0,qd:'qd',radar:'radar',cooler:'cooler',thrusters:0};
+  var _compCntMap={weapons:0,shields:'sg',engines:0,qd:'qd',radar:'radar',cooler:'cooler',thrusters:0,pp:'pp'};
   var _compCnts={};
   _pwrSystems.forEach(function(k){
     var ck=_compCntMap[k];
     _compCnts[k]=(ck&&def.comps&&def.comps.counts&&def.comps.counts[ck])||1;
   });
-  /* SPV block chart — 12 pips total: 10 normal + 2 overclock above */
-  /* Overclock pips (11-12) shown in red above a separator line */
-  var _compCntMap={weapons:0,shields:'sg',engines:0,qd:'qd',radar:'radar',cooler:'cooler',thrusters:0};
-  var _compCnts={};
-  _pwrSystems.forEach(function(k){
-    var ck=_compCntMap[k];
-    _compCnts[k]=(ck&&def.comps&&def.comps.counts&&def.comps.counts[ck])||1;
-  });
+  /* Also count pp for the PP column */
+  _compCnts['pp']=(def.comps&&def.comps.counts&&def.comps.counts['pp'])||1;
   var PIP_H=11; /* px per pip */
   var PIP_GAP=2;
   var OC_PIPS=2; /* overclock pips above normal range */
@@ -8701,13 +8696,17 @@ function buildPowerPanel(){
   var NAV_LOCKED={weapons:isNAV, shields:isNAV};
   h+='<div style="display:flex;gap:3px;margin-top:8px;box-sizing:border-box">';
   SYSS.forEach(function(sys){
-    var val=_pwrState[sys.k]||0;
+    var isPPCol=sys.k==='pp';
+    /* PP column: val = fully on (NORM_PIPS) when PP is enabled, 0 when off */
+    var ppIsOff=isPPCol&&typeof _eSysEnabled!=='undefined'&&_eSysEnabled['pp']===false;
+    var val=isPPCol?(ppIsOff?0:NORM_PIPS):(_pwrState[sys.k]||0);
     var unitCnt=_compCnts[sys.k]||1;
     var ppu=Math.floor(NORM_PIPS/unitCnt);
     var navLocked=NAV_LOCKED[sys.k]||false;
     var sysColor=navLocked?'rgba(255,255,255,0.15)':sys.color;
-    var colOpacity=navLocked?'0.4':'1';
-    h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;opacity:'+colOpacity+'">';
+    var colOpacity=(navLocked&&!isPPCol)?'0.4':'1';
+    var colBorderLeft=isPPCol?'border-left:1px solid rgba(245,158,11,0.2);padding-left:2px;':'';
+    h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;opacity:'+colOpacity+';'+colBorderLeft+'">';
     /* Overclock pips (11-12) at top — red/orange; locked in NAV mode */
     h+='<div style="display:flex;flex-direction:column;align-items:center;gap:'+PIP_GAP+'px;width:100%;margin-bottom:4px">';
     for(var oc=TOTAL_PIPS;oc>=NORM_PIPS+1;oc--){
@@ -8725,7 +8724,7 @@ function buildPowerPanel(){
       /* 1 solid block per unit — each block = ppu pips tall, clicking sets power to that unit's pip threshold */
       /* Block height = ppu*PIP_H + (ppu-1)*PIP_GAP to exactly match the height of ppu individual pips */
       var blockH=ppu*PIP_H+(ppu-1)*PIP_GAP;
-      var unitSysBase=sys.k==='shields'?'sg':'cooler';
+      var unitSysBase=sys.k==='shields'?'sg':(sys.k==='pp'?'pp':'cooler');
       h+='<div style="display:flex;flex-direction:column;align-items:center;gap:'+PIP_GAP+'px;width:100%;margin-bottom:4px">';
       /* Render from top unit (highest) to bottom unit (unit 0) */
       for(var ui=unitCnt-1;ui>=0;ui--){
@@ -8760,7 +8759,7 @@ function buildPowerPanel(){
       h+='</div>';
     }
     /* Icon = power toggle button for toggleable systems (shields, cooler, qd, radar); weapons/engines/thrusters are non-toggle */
-    var toggleSysMap={shields:'sg',cooler:'cooler',qd:'qd',radar:'radar'};
+    var toggleSysMap={shields:'sg',cooler:'cooler',qd:'qd',radar:'radar',pp:'pp'};
     var toggleSysKey=toggleSysMap[sys.k];
     var sysIsOff=toggleSysKey&&typeof _eSysEnabled!=='undefined'&&_eSysEnabled[toggleSysKey]===false;
     h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">';
