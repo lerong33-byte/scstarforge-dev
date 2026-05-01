@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.62-DEV</title>
+<title>SC-ShipForge v8.61-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -1033,7 +1033,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.62-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.61-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -5143,14 +5143,14 @@ function sendAI(){
 var _aii=document.getElementById('aiInput');if(_aii)_aii.addEventListener('keydown',function(e){if(e.key==='Enter')sendAI();});
 
 // ═══ WEAPONS DB ═══
-// Sort state — window-scoped so always accessible from any closure
-window._wpSortKey = 'dps';
-window._wpSortDir = -1; // -1 = desc, 1 = asc
-window._wpSearchQ = '';
-window._wpCollapsed = {}; // track collapsed size sections
+// Sort state
+var _wpSortKey = 'dps';
+var _wpSortDir = -1; // -1 = desc, 1 = asc
+var _wpSearchQ = '';
+var _wpCollapsed = {}; // track collapsed size sections
 
 function wpFilterSearch(q) {
-  window._wpSearchQ = (q || '').toLowerCase();
+  _wpSearchQ = (q || '').toLowerCase();
   var cat = (document.querySelector('.wp-cat-btn.on') || {}).dataset && document.querySelector('.wp-cat-btn.on').dataset.cat;
   if (!cat || cat === 'weapons') {
     buildWeaponsDB(
@@ -5167,8 +5167,8 @@ function buildWeaponsDB(szF, tyF) {
   var ws = WEAPONS.filter(function(w){ return !w.type.includes('missile') && w.type !== 'torpedo'; });
   if (szF !== 'all') ws = ws.filter(function(w){ return w.sz === parseInt(szF); });
   if (tyF !== 'all') ws = ws.filter(function(w){ return w.type === tyF; });
-  if (window._wpSearchQ) ws = ws.filter(function(w){
-    return w.name.toLowerCase().indexOf(window._wpSearchQ) > -1 || (w.mfr||'').toLowerCase().indexOf(window._wpSearchQ) > -1 || (w.loc||'').toLowerCase().indexOf(window._wpSearchQ) > -1;
+  if (_wpSearchQ) ws = ws.filter(function(w){
+    return w.name.toLowerCase().indexOf(_wpSearchQ) > -1 || (w.mfr||'').toLowerCase().indexOf(_wpSearchQ) > -1 || (w.loc||'').toLowerCase().indexOf(_wpSearchQ) > -1;
   });
 
   // Build filter bar once
@@ -5192,9 +5192,9 @@ function buildWeaponsDB(szF, tyF) {
 
   // Sort
   ws.sort(function(a, b){
-    var av = a[window._wpSortKey] || 0, bv = b[window._wpSortKey] || 0;
-    if (typeof av === 'string') return window._wpSortDir * av.localeCompare(bv);
-    return window._wpSortDir * (bv - av);
+    var av = a[_wpSortKey] || 0, bv = b[_wpSortKey] || 0;
+    if (typeof av === 'string') return _wpSortDir * av.localeCompare(bv);
+    return _wpSortDir * (bv - av);
   });
 
   // Group by size
@@ -5223,27 +5223,27 @@ function buildWeaponsDB(szF, tyF) {
 
     // Section header
     var hdr = document.createElement('div');
-    hdr.className = 'wsz-hdr' + (window._wpCollapsed[sz] ? ' collapsed' : '');
+    hdr.className = 'wsz-hdr' + (_wpCollapsed[sz] ? ' collapsed' : '');
     hdr.innerHTML = '<span class="wsz-hdr-badge">' + sz + '</span><span class="wsz-hdr-label">Weapons</span><span class="wsz-hdr-count">' + items.length + ' items</span><span class="wsz-hdr-arrow">&#9660;</span>';
     hdr.onclick = function(){
-      window._wpCollapsed[sz] = !window._wpCollapsed[sz];
-      hdr.classList.toggle('collapsed', !!window._wpCollapsed[sz]);
+      _wpCollapsed[sz] = !_wpCollapsed[sz];
+      hdr.classList.toggle('collapsed', !!_wpCollapsed[sz]);
       body.style.display = _wpCollapsed[sz] ? 'none' : '';
     };
     section.appendChild(hdr);
 
-    if (window._wpCollapsed[sz]) { wg.appendChild(section); return; }
+    if (_wpCollapsed[sz]) { wg.appendChild(section); return; }
 
     // Column headers
     var colHdr = document.createElement('div');
     colHdr.className = 'wlist-cols wep-cols';
     cols.forEach(function(c, i){
       var span = document.createElement('span');
-      span.className = 'wlist-col-hdr' + (window._wpSortKey === colKeys[i] ? (window._wpSortDir < 0 ? ' sort-desc' : ' sort-asc') : '');
+      span.className = 'wlist-col-hdr' + (_wpSortKey === colKeys[i] ? (_wpSortDir < 0 ? ' sort-desc' : ' sort-asc') : '');
       span.textContent = c;
       var ck = colKeys[i];
       span.onclick = function(){
-        if (window._wpSortKey === ck) window._wpSortDir *= -1; else { window._wpSortKey = ck; window._wpSortDir = (ck === 'name' || ck === 'mfr' || ck === 'type' || ck === 'loc') ? 1 : -1; }
+        if (_wpSortKey === ck) _wpSortDir *= -1; else { _wpSortKey = ck; _wpSortDir = (ck === 'name' || ck === 'mfr' || ck === 'type' || ck === 'loc') ? 1 : -1; }
         buildWeaponsDB(szF, tyF);
       };
       colHdr.appendChild(span);
@@ -8067,7 +8067,7 @@ function switchWpCat(cat, btn) {
   btn.classList.add('on');
   // Clear search
   var si = document.getElementById('wpSearchInput');
-  if (si) { si.value = ''; window._wpSearchQ = ''; }
+  if (si) { si.value = ''; _wpSearchQ = ''; }
   var wf = document.getElementById('wfiltBar');
   var wg = document.getElementById('wgrid');
   var cg = document.getElementById('compGrid');
@@ -8083,20 +8083,6 @@ function switchWpCat(cat, btn) {
     buildCompGrid(cat);
   }
 }
-// Auto-init weapons list when the tab becomes active
-(function() {
-  function _initWpTab() {
-    var pane = document.getElementById('pane-wp');
-    if (pane && pane.style.display !== 'none') {
-      buildWeaponsDB('all', 'all');
-    }
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() { setTimeout(_initWpTab, 200); });
-  } else {
-    setTimeout(_initWpTab, 200);
-  }
-})();
 function buildCompGrid(cat) {
   var grid = document.getElementById('compGrid');
   if (!grid || typeof COMP_DB === 'undefined') return;
@@ -8132,8 +8118,8 @@ function buildCompGrid(cat) {
   });
 
   // Apply search filter
-  if (window._wpSearchQ) {
-    entries = entries.filter(function(e){ return e.name.toLowerCase().indexOf(window._wpSearchQ) > -1; });
+  if (_wpSearchQ) {
+    entries = entries.filter(function(e){ return e.name.toLowerCase().indexOf(_wpSearchQ) > -1; });
   }
 
   // Sort
@@ -8163,16 +8149,16 @@ function buildCompGrid(cat) {
     // Header
     var hdr = document.createElement('div');
     var collKey = 'comp_' + cat + '_' + sz;
-    hdr.className = 'wsz-hdr' + (window._wpCollapsed[collKey] ? ' collapsed' : '');
+    hdr.className = 'wsz-hdr' + (_wpCollapsed[collKey] ? ' collapsed' : '');
     hdr.innerHTML = '<span class="wsz-hdr-badge">' + sz + '</span><span class="wsz-hdr-label">' + catLabel + '</span><span class="wsz-hdr-count">' + items.length + ' items</span><span class="wsz-hdr-arrow">&#9660;</span>';
     hdr.onclick = function(){
-      window._wpCollapsed[collKey] = !window._wpCollapsed[collKey];
-      hdr.classList.toggle('collapsed', !!window._wpCollapsed[collKey]);
+      _wpCollapsed[collKey] = !_wpCollapsed[collKey];
+      hdr.classList.toggle('collapsed', !!_wpCollapsed[collKey]);
       body.style.display = _wpCollapsed[collKey] ? 'none' : '';
     };
     section.appendChild(hdr);
 
-    if (window._wpCollapsed[collKey]) { grid.appendChild(section); return; }
+    if (_wpCollapsed[collKey]) { grid.appendChild(section); return; }
 
     // Column headers
     var colHdr = document.createElement('div');
