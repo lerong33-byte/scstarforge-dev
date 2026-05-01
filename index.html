@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.71</title>
+<title>SC-ShipForge v8.72</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -1000,12 +1000,37 @@ option,optgroup{background:var(--bg2)}
 .wep-search-inp:focus{border-color:var(--red);}
 .wep-search-inp::placeholder{color:var(--t3);}
 
+
+/* ── Weapons & Comps list layout ── */
+.wfilt-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;}
+.wep-search-inp{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;padding:4px 10px;border-radius:4px;font-size:11px;width:220px;}
+.wep-search-inp:focus{outline:none;border-color:rgba(56,189,248,0.5);}
+#wgrid{display:block!important;}
+.wl-section{margin-bottom:8px;}
+.wl-sec-hd{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:4px;cursor:pointer;user-select:none;}
+.wl-sec-hd:hover{background:rgba(56,189,248,0.08);}
+.wl-sz-badge{background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3);padding:1px 7px;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:.5px;}
+.wl-sec-count{color:#8a94a3;font-size:11px;flex:1;}
+.wl-arr{color:#8a94a3;font-size:11px;}
+.wl-hdr,.wl-row{display:grid;grid-template-columns:220px 120px 90px 70px 70px 70px 55px 1fr;align-items:center;padding:4px 10px;gap:4px;font-size:11px;}
+.wl-hdr{color:#8a94a3;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:5px;margin-bottom:2px;}
+.wl-h{cursor:default;}
+.wl-h[onclick]{cursor:pointer;}
+.wl-h[onclick]:hover{color:#38bdf8;}
+.wl-row{border-bottom:1px solid rgba(255,255,255,0.04);color:#c8d0dc;}
+.wl-row:hover{background:rgba(56,189,248,0.06);color:#e2e8f0;}
+.wl-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wl-mfr{color:#8a94a3;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wl-type{font-size:10px;}
+.wl-num{text-align:right;font-variant-numeric:tabular-nums;}
+.wl-loc{color:#8a94a3;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.71</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.72</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -5006,41 +5031,146 @@ function sendAI(){
 var _aii=document.getElementById('aiInput');if(_aii)_aii.addEventListener('keydown',function(e){if(e.key==='Enter')sendAI();});
 
 // ═══ WEAPONS DB ═══
+// ═══ WEAPONS TAB GLOBALS ═══
+window._wpSortKey = 'dps';
+window._wpSortDir = -1;
+window._wpSearch  = '';
+window._wpSzFilt  = 'all';
+window._wpTyFilt  = 'all';
 function buildWeaponsDB(szF,tyF){
-  var ws=WEAPONS.filter(function(w){return !w.type.includes('missile')&&w.type!=='torpedo';});
-  if(szF!=='all')ws=ws.filter(function(w){return w.sz===parseInt(szF);});
-  if(tyF!=='all')ws=ws.filter(function(w){return w.type===tyF;});
-  ws.sort(function(a,b){return b.dps-a.dps;});
-  var fb=document.getElementById('wfiltBar');
-  if(fb && !fb.children.length){
+  szF = szF || window._wpSzFilt || 'all';
+  tyF = tyF || window._wpTyFilt || 'all';
+  window._wpSzFilt = szF;
+  window._wpTyFilt = tyF;
+  var sq = (window._wpSearch||'').toLowerCase();
+
+  // Filter
+  var ws = WEAPONS.filter(function(w){ return !w.type.includes('missile') && w.type !== 'torpedo'; });
+  if(szF !== 'all') ws = ws.filter(function(w){ return w.sz === parseInt(szF); });
+  if(tyF !== 'all') ws = ws.filter(function(w){
+    if(tyF === 'cannon')   return w.name.toLowerCase().includes('cannon') || w.name.toLowerCase().includes('mass driver');
+    if(tyF === 'repeater') return w.name.toLowerCase().includes('repeater') || w.name.toLowerCase().includes('gatling') || w.name.toLowerCase().includes('scattergun');
+    return w.type === tyF;
+  });
+  if(sq) ws = ws.filter(function(w){ return w.name.toLowerCase().includes(sq) || w.mfr.toLowerCase().includes(sq); });
+
+  // Sort
+  var sk = window._wpSortKey || 'dps';
+  var sd = window._wpSortDir || -1;
+  ws.sort(function(a,b){
+    var av = a[sk], bv = b[sk];
+    if(typeof av === 'string') return sd * av.localeCompare(bv);
+    return sd * ((bv||0) - (av||0));
+  });
+
+  // Build filter bar (only once)
+  var fb = document.getElementById('wfiltBar');
+  if(fb){
+    fb.innerHTML = '';
+    // Size pills
+    var szDiv = document.createElement('div'); szDiv.className = 'wfilt-row';
     [['all','ALL'],['1','S1'],['2','S2'],['3','S3'],['4','S4'],['5','S5+']].forEach(function(sz){
-      var b=document.createElement('button');b.className='wfb'+(szF===sz[0]?' on':'');b.textContent=sz[1];b.dataset.sz=sz[0];
-      b.onclick=function(){document.querySelectorAll('[data-sz]').forEach(function(x){x.classList.remove('on');});b.classList.add('on');buildWeaponsDB(sz[0],document.querySelector('[data-ty].on')&&document.querySelector('[data-ty].on').dataset.ty||'all');};
-      fb.appendChild(b);
+      var b = document.createElement('button');
+      b.className = 'wfb' + (szF === sz[0] ? ' on' : '');
+      b.textContent = sz[1]; b.dataset.sz = sz[0];
+      b.onclick = function(){
+        window._wpSzFilt = sz[0];
+        buildWeaponsDB(sz[0], window._wpTyFilt);
+      };
+      szDiv.appendChild(b);
     });
-    var sep=document.createElement('span');sep.style.cssText='width:1px;background:var(--border);display:inline-block;height:14px;margin:0 5px;';fb.appendChild(sep);
-    [['all','ALL TYPES'],['ballistic','BALLISTIC'],['energy','ENERGY']].forEach(function(ty){
-      var b=document.createElement('button');b.className='wfb'+(tyF===ty[0]?' on':'');b.textContent=ty[1];b.dataset.ty=ty[0];
-      b.onclick=function(){document.querySelectorAll('[data-ty]').forEach(function(x){x.classList.remove('on');});b.classList.add('on');buildWeaponsDB(document.querySelector('[data-sz].on')&&document.querySelector('[data-sz].on').dataset.sz||'all',ty[0]);};
-      fb.appendChild(b);
+    fb.appendChild(szDiv);
+    // Type pills
+    var tyDiv = document.createElement('div'); tyDiv.className = 'wfilt-row';
+    [['all','ALL'],['ballistic','BALLISTIC'],['energy','ENERGY'],['distortion','DISTORTION'],['cannon','CANNON'],['repeater','REPEATER']].forEach(function(ty){
+      var b = document.createElement('button');
+      b.className = 'wfb' + (tyF === ty[0] ? ' on' : '');
+      b.textContent = ty[1]; b.dataset.ty = ty[0];
+      b.onclick = function(){
+        window._wpTyFilt = ty[0];
+        buildWeaponsDB(window._wpSzFilt, ty[0]);
+      };
+      tyDiv.appendChild(b);
     });
-  }else{
-    document.querySelectorAll('[data-sz]').forEach(function(b){b.classList.toggle('on',b.dataset.sz===szF);});
-    document.querySelectorAll('[data-ty]').forEach(function(b){b.classList.toggle('on',b.dataset.ty===tyF);});
+    fb.appendChild(tyDiv);
+    // Search
+    var srDiv = document.createElement('div'); srDiv.className = 'wfilt-row';
+    var sr = document.createElement('input');
+    sr.type = 'text'; sr.placeholder = '🔍 Search weapons…';
+    sr.className = 'wep-search-inp'; sr.value = window._wpSearch || '';
+    sr.oninput = function(){ window._wpSearch = sr.value; buildWeaponsDB(window._wpSzFilt, window._wpTyFilt); };
+    srDiv.appendChild(sr);
+    fb.appendChild(srDiv);
   }
-  var _wg=document.getElementById('wgrid');if(_wg)_wg.innerHTML=ws.map(function(w){
-    var tc=w.type==='ballistic'?'wc-b':'wc-e';
-    return '<div class="wcard"><div class="wc-top"><span class="wc-name">'+w.name+'</span><span class="wc-sz">S'+w.sz+'</span></div>'
-      +'<div class="wc-mfr">'+w.mfr+' <span class="'+tc+'">'+w.type+'</span>'+(w.new?'&nbsp;<span class="wc-new">4.7 NEW</span>':'')+'</div>'
-      +'<div class="wc-stats">'
-      +'<span class="wcs"><span class="wcs-k">DPS</span><span class="wcs-v">'+w.dps+'</span></span>'
-      +'<span class="wcs"><span class="wcs-k">ALPHA</span><span class="wcs-v">'+w.alpha+'</span></span>'
-      +'<span class="wcs"><span class="wcs-k">RANGE</span><span class="wcs-v">'+w.range+'m</span></span>'
-      +'<span class="wcs"><span class="wcs-k">DRAW</span><span class="wcs-v">'+w.draw+'EU</span></span>'
-      +'<span class="wcs"><span class="wcs-k">HEAT</span><span class="wcs-v">'+w.heat+'/s</span></span>'
-      +'</div><div class="wc-loc">'+(w.loc.startsWith('⭐')?'<span style="color:var(--green)">⭐ </span>':'')+w.loc.replace('⭐ ','')+'</div></div>';
-  }).join('');
+
+  // Group by size
+  var sizes = [];
+  ws.forEach(function(w){ if(sizes.indexOf(w.sz) < 0) sizes.push(w.sz); });
+  sizes.sort(function(a,b){ return b - a; });
+
+  var _wg = document.getElementById('wgrid');
+  if(!_wg) return;
+  _wg.innerHTML = '';
+  _wg.style.display = 'block';
+
+  if(!ws.length){
+    _wg.innerHTML = '<div style="color:#8a94a3;padding:32px;text-align:center;">No weapons match the current filters.</div>';
+    return;
+  }
+
+  // Sort header click handler (global so onclick= works)
+  window._wpSort = function(key){
+    if(window._wpSortKey === key) window._wpSortDir *= -1;
+    else { window._wpSortKey = key; window._wpSortDir = -1; }
+    buildWeaponsDB(window._wpSzFilt, window._wpTyFilt);
+  };
+
+  // Column headers
+  var hdr = '<div class="wl-hdr">'
+    + '<span class="wl-h wl-name" onclick="window._wpSort(\'name\')" title="Sort by name">WEAPON ' + (window._wpSortKey==='name'?(window._wpSortDir>0?'▲':'▼'):'') + '</span>'
+    + '<span class="wl-h wl-mfr">MFR</span>'
+    + '<span class="wl-h wl-type">TYPE</span>'
+    + '<span class="wl-h wl-num" onclick="window._wpSort(\'dps\')" title="Sort by DPS">DPS ' + (window._wpSortKey==='dps'?(window._wpSortDir>0?'▲':'▼'):'▼') + '</span>'
+    + '<span class="wl-h wl-num" onclick="window._wpSort(\'alpha\')" title="Sort by Alpha">ALPHA ' + (window._wpSortKey==='alpha'?(window._wpSortDir>0?'▲':'▼'):'') + '</span>'
+    + '<span class="wl-h wl-num" onclick="window._wpSort(\'range\')" title="Sort by Range">RANGE ' + (window._wpSortKey==='range'?(window._wpSortDir>0?'▲':'▼'):'') + '</span>'
+    + '<span class="wl-h wl-num">DRAW</span>'
+    + '<span class="wl-h wl-loc">LOCATION</span>'
+    + '</div>';
+
+  sizes.forEach(function(sz){
+    var group = ws.filter(function(w){ return w.sz === sz; });
+    var label = sz >= 5 ? 'S' + sz : 'S' + sz;
+    var secId = 'wl-sec-s' + sz;
+
+    var sec = document.createElement('div');
+    sec.className = 'wl-section';
+    sec.innerHTML = '<div class="wl-sec-hd" onclick="var b=document.getElementById(\'' + secId + '\');b.style.display=b.style.display===\'none\'?\'\':\' none\';this.querySelector(\'.wl-arr\').textContent=b.style.display===\'none\'?\'▶\':\'▼\';">'
+      + '<span class="wl-sz-badge">S' + sz + '</span>'
+      + '<span class="wl-sec-count">' + group.length + ' weapons</span>'
+      + '<span class="wl-arr">▼</span>'
+      + '</div>'
+      + '<div id="' + secId + '">' + hdr
+      + group.map(function(w){
+          var tc = w.type === 'ballistic' ? 'wc-b' : w.type === 'distortion' ? 'wc-d' : 'wc-e';
+          var locStr = w.loc || '';
+          var isExcl = locStr.startsWith('⭐');
+          var locDisp = isExcl ? '<span style="color:var(--green)">⭐</span> ' + locStr.replace('⭐ ','') : locStr;
+          return '<div class="wl-row">'
+            + '<span class="wl-name">' + w.name + (w.new ? ' <span class="wc-new">NEW</span>' : '') + '</span>'
+            + '<span class="wl-mfr">' + w.mfr + '</span>'
+            + '<span class="wl-type"><span class="' + tc + '">' + w.type + '</span></span>'
+            + '<span class="wl-num">' + w.dps + '</span>'
+            + '<span class="wl-num">' + w.alpha + '</span>'
+            + '<span class="wl-num">' + w.range + 'm</span>'
+            + '<span class="wl-num">' + w.draw + 'EU</span>'
+            + '<span class="wl-loc">' + locDisp + '</span>'
+            + '</div>';
+        }).join('')
+      + '</div>';
+    _wg.appendChild(sec);
+  });
 }
+
 
 // ═══ LOCATIONS ═══
 function buildLocations(){
@@ -7834,79 +7964,65 @@ function buildCompGrid(cat) {
   grid.innerHTML = '';
   var db = COMP_DB[cat];
   if (!db) return;
-  var labels = {pp:{h1:'OUTPUT',h2:'HEAT',h3:'EM SIG'},sg:{h1:'TOTAL HP',h2:'FACE HP',h3:'REGEN/s'},cooler:{h1:'COOLING',h2:'DRAW MIN',h3:'IR SIG'},qd:{h1:'RANGE',h2:'SPEED',h3:'SPOOL'}};
-  var icons = {
-    pp:'<svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-    sg:'<svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-    cooler:'<svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>',
-    qd:'<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>'
+
+  var labels = {
+    pp:     {h1:'OUTPUT',    h2:'HEAT',     h3:'EM SIG'},
+    sg:     {h1:'TOTAL HP',  h2:'FACE HP',  h3:'REGEN/s'},
+    cooler: {h1:'COOLING',   h2:'DRAW MIN', h3:'IR SIG'},
+    qd:     {h1:'RANGE',     h2:'SPEED',    h3:'SPOOL'}
   };
-  var lbl = labels[cat] || {h1:'STAT1',h2:'STAT2',h3:'STAT3'};
-  var icon = icons[cat] || '';
-  var names = Object.keys(db).sort(function(a,b){ return (db[b].sz||0)-(db[a].sz||0) || a.localeCompare(b); });
-  names.forEach(function(name) {
+  var lbl = labels[cat] || {h1:'STAT1', h2:'STAT2', h3:'STAT3'};
+
+  // Group by size
+  var bySize = {};
+  Object.keys(db).forEach(function(name){
     var c = db[name];
-    var card = document.createElement('div');
-    card.className = 'wcard';
-    card.setAttribute('data-cat', cat);
-    var sz = c.sz || '?';
-    var v1, v2, v3;
-    if (cat === 'pp') { v1 = c.out; v2 = c.heat; v3 = c.em; }
-    else if (cat === 'sg') { v1 = c.totalHP; v2 = c.faceHP; v3 = c.regen; }
-    else if (cat === 'cooler') { v1 = c.cool; v2 = c.drawMin; v3 = c.ir; }
-    else if (cat === 'qd') { v1 = c.range + ' Mkm'; v2 = c.speed + ' Mm/s'; v3 = c.spool + 's'; }
-    card.innerHTML = '<div class="wcard-icon">' + icon + '</div>' +
-      '<div class="wc-hd"><span class="wc-nm">' + name + '</span><span class="wc-sz">S' + sz + '</span></div>' +
-      '<div class="wc-sub">' + (cat==='pp'?'Power Plant':cat==='sg'?'Shield Generator':cat==='cooler'?'Cooler':'Quantum Drive') + '</div>' +
-      '<div class="wc-stats"><div class="wc-st"><span class="wc-sl">' + lbl.h1 + '</span><span class="wc-sv">' + v1 + '</span></div>' +
-      '<div class="wc-st"><span class="wc-sl">' + lbl.h2 + '</span><span class="wc-sv">' + v2 + '</span></div>' +
-      '<div class="wc-st"><span class="wc-sl">' + lbl.h3 + '</span><span class="wc-sv">' + v3 + '</span></div></div>';
-    grid.appendChild(card);
+    var sz = c.sz || 0;
+    if(!bySize[sz]) bySize[sz] = [];
+    bySize[sz].push({name:name, c:c});
+  });
+  var sizes = Object.keys(bySize).map(Number).sort(function(a,b){ return b-a; });
+
+  // Column header
+  var hdr = '<div class="wl-hdr">'
+    + '<span class="wl-h wl-name">NAME</span>'
+    + '<span class="wl-h wl-num">' + lbl.h1 + '</span>'
+    + '<span class="wl-h wl-num">' + lbl.h2 + '</span>'
+    + '<span class="wl-h wl-num">' + lbl.h3 + '</span>'
+    + '</div>';
+
+  sizes.forEach(function(sz){
+    var group = bySize[sz];
+    group.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    var secId = 'cl-sec-' + cat + sz;
+    var sec = document.createElement('div');
+    sec.className = 'wl-section';
+    sec.innerHTML = '<div class="wl-sec-hd" onclick="var b=document.getElementById(\'' + secId + '\');b.style.display=b.style.display===\'none\'?\'\':\' none\';this.querySelector(\'.wl-arr\').textContent=b.style.display===\'none\'?\'▶\':\'▼\';">'
+      + '<span class="wl-sz-badge">S' + sz + '</span>'
+      + '<span class="wl-sec-count">' + group.length + ' items</span>'
+      + '<span class="wl-arr">▼</span>'
+      + '</div>'
+      + '<div id="' + secId + '">' + hdr
+      + group.map(function(item){
+          var c = item.c;
+          var v1, v2, v3;
+          if(cat==='pp')     { v1=c.out||'—'; v2=c.heat||'—'; v3=c.em||'—'; }
+          else if(cat==='sg'){ v1=c.totalHP||'—'; v2=c.faceHP||'—'; v3=c.regen||'—'; }
+          else if(cat==='cooler'){ v1=c.cool||'—'; v2=c.drawMin||'—'; v3=c.ir||'—'; }
+          else if(cat==='qd'){ v1=(c.range||'—')+' Mkm'; v2=(c.speed||'—')+' Mm/s'; v3=(c.spool||'—')+'s'; }
+          else { v1=v2=v3='—'; }
+          return '<div class="wl-row">'
+            + '<span class="wl-name">' + item.name + '</span>'
+            + '<span class="wl-num">' + v1 + '</span>'
+            + '<span class="wl-num">' + v2 + '</span>'
+            + '<span class="wl-num">' + v3 + '</span>'
+            + '</div>';
+        }).join('')
+      + '</div>';
+    grid.appendChild(sec);
   });
 }
 
-// Tag weapon cards with data-wtype after they render
-var _origBuildWpn = buildWeaponsDB;
-buildWeaponsDB = function() {
-  _origBuildWpn.apply(this, arguments);
-  var cards = document.querySelectorAll('#wgrid .wcard');
-  cards.forEach(function(c) {
-    var typeEl = c.querySelector('.wc-b');
-    if (typeEl) {
-      var t = typeEl.textContent.trim().toLowerCase();
-      c.setAttribute('data-wtype', t);
-    }
-  });
-};
-// Patch buildCompGrid to add data-cat
-var _origBuildComp = buildCompGrid;
-buildCompGrid = function(cat) {
-  _origBuildComp(cat);
-  var cards = document.querySelectorAll('#compGrid .wcard');
-  cards.forEach(function(c) { c.setAttribute('data-cat', cat); });
-};
-// Run the weapon tagger now if cards already exist
-setTimeout(function() {
-  var cards = document.querySelectorAll('#wgrid .wcard');
-  cards.forEach(function(c) {
-    var typeEl = c.querySelector('.wc-b');
-    if (typeEl) c.setAttribute('data-wtype', typeEl.textContent.trim().toLowerCase());
-  });
-
-    // Add weapon icons
-    cards.forEach(function(c) {
-      if (!c.querySelector('.wcard-icon')) {
-        var type = c.getAttribute('data-wtype') || '';
-        var iconSvg = type === 'ballistic' 
-          ? '<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>'
-          : '<svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
-        var iconDiv = document.createElement('div');
-        iconDiv.className = 'wcard-icon';
-        iconDiv.innerHTML = iconSvg;
-        c.insertBefore(iconDiv, c.firstChild);
-      }
-    });
-  }, 500);
 
 function closeWpModal(){document.getElementById('wpModal').classList.remove('open')}
 function openWpModal(type, name, data) {
