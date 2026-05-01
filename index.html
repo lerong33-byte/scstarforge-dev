@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.38-DEV</title>
+<title>SC-ShipForge v8.39-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -989,7 +989,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.38-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.39-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -10823,7 +10823,7 @@ function openShowdownModal(myShip, enemyShip, me, them, myTTK, oppTTK, verdict){
   }
   /* Shield comparison */
   if(me.shieldHP > them.shieldHP * 1.2){
-    reasons.push({type:'good', icon:'🛡', text:'Your <strong>shields (' + me.shieldHP.toLocaleString() + ' HP)</strong> are stronger than the enemy's <strong>(' + them.shieldHP.toLocaleString() + ' HP)</strong> — you can absorb more damage.'});
+    reasons.push({type:'good', icon:'🛡', text:'Your <strong>shields (' + me.shieldHP.toLocaleString() + ' HP)</strong> are stronger than the enemy&#39;s <strong>(' + them.shieldHP.toLocaleString() + ' HP)</strong> — you can absorb more damage.'});
   } else if(them.shieldHP > me.shieldHP * 1.2){
     reasons.push({type:'bad', icon:'🛡', text:'Enemy <strong>shields (' + them.shieldHP.toLocaleString() + ' HP)</strong> are tougher than yours <strong>(' + me.shieldHP.toLocaleString() + ' HP)</strong> — it will take longer to break through.'});
   } else {
@@ -11008,7 +11008,7 @@ window.openShowdownModal = function(myShip, enemyShip, me, them, myTTK, oppTTK, 
   if(me.dps>them.dps*1.2) reasons.push({type:'good',icon:'⚡',text:'Your <strong>DPS ('+me.dps.toLocaleString()+')</strong> significantly outguns the enemy <strong>('+them.dps.toLocaleString()+')</strong> — you deal damage faster.'});
   else if(them.dps>me.dps*1.2) reasons.push({type:'bad',icon:'⚡',text:'Enemy <strong>DPS ('+them.dps.toLocaleString()+')</strong> outguns yours <strong>('+me.dps.toLocaleString()+')</strong> — consider upgrading weapons.'});
   else reasons.push({type:'neutral',icon:'⚡',text:'DPS is roughly equal — <strong>'+me.dps.toLocaleString()+'</strong> vs <strong>'+them.dps.toLocaleString()+'</strong>. Positioning and skill will decide this fight.'});
-  if(me.shieldHP>them.shieldHP*1.2) reasons.push({type:'good',icon:'🛡',text:'Your <strong>shields ('+me.shieldHP.toLocaleString()+' HP)</strong> are stronger than the enemy’s <strong>('+them.shieldHP.toLocaleString()+' HP)</strong>.'});
+  if(me.shieldHP>them.shieldHP*1.2) reasons.push({type:'good',icon:'🛡',text:'Your <strong>shields ('+me.shieldHP.toLocaleString()+' HP)</strong> are stronger than the enemy\'s <strong>('+them.shieldHP.toLocaleString()+' HP)</strong>.'});
   else if(them.shieldHP>me.shieldHP*1.2) reasons.push({type:'bad',icon:'🛡',text:'Enemy <strong>shields ('+them.shieldHP.toLocaleString()+' HP)</strong> are tougher than yours <strong>('+me.shieldHP.toLocaleString()+' HP)</strong>.'});
   else reasons.push({type:'neutral',icon:'🛡',text:'Shield HP is comparable — <strong>'+me.shieldHP.toLocaleString()+'</strong> vs <strong>'+them.shieldHP.toLocaleString()+'</strong>.'});
   if(verdict==='YOU WIN') reasons.push({type:'good',icon:'🎯',text:'You kill the enemy in <strong>'+myTTK.toFixed(1)+'s</strong>'+(oppTTK<9000?', while they need <strong>'+oppTTK.toFixed(1)+'s</strong> to kill you':'')+'. Stay aggressive.'});
