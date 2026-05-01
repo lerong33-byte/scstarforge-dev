@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.51-DEV</title>
+<title>SC-ShipForge v8.52-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -989,7 +989,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.51-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.52-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -8400,6 +8400,7 @@ var _eSlotEnabled={};
 var _eMisEnabled={};
 var _eShipName=null;
 var _eActiveTargetId='sdResult'; // tracks which container is currently active
+var _compCnts={};  // component counts per system key — populated by buildPowerPanel
 /* ── Helpers ── */
 function _eWepOpts(sz,curId,fixed){
   if(fixed)return '<option value="'+curId+'">'+(WEAPONS.find(function(w){return w.id===curId;})||{name:curId}).name+' ⚠ FIXED</option>';
@@ -9574,7 +9575,7 @@ function buildPowerPanel(){
   /* SPV block chart — 12 pips total: 10 normal + 2 overclock above */
   /* Overclock pips (11-12) shown in red above a separator line */
   var _compCntMap={weapons:0,shields:'sg',engines:0,qd:'qd',radar:'radar',cooler:'cooler',thrusters:0,pp:'pp'};
-  var _compCnts={};
+  _compCnts={};  /* update the module-level global so sdSetPwrPip can read unit counts */
   _pwrSystems.forEach(function(k){
     var ck=_compCntMap[k];
     _compCnts[k]=(ck&&def.comps&&def.comps.counts&&def.comps.counts[ck])||1;
@@ -9695,8 +9696,27 @@ function buildPowerPanel(){
   panel.style.display='block';
 }
 function sdSetPwrPip(key,val){
+  val=Math.min(12,Math.max(0,val));
+  /* When val=0 for a multi-unit column, toggle the lowest active unit OFF */
+  if(val===0&&(key==='cooler'||key==='shields')){
+    var uBase2=key==='shields'?'sg':'cooler';
+    var uCnt2=(_compCnts&&_compCnts[key])||1;
+    if(uCnt2>1){
+      /* Find the lowest-indexed unit that is still ON and toggle it OFF */
+      for(var ui2=0;ui2<uCnt2;ui2++){
+        var uKey2=uBase2+'_'+ui2;
+        if(_eSysEnabled[uKey2]!==false){
+          toggleESystem(uKey2);
+          return;
+        }
+      }
+      return; /* all units already off */
+    }
+    /* Single unit: fall through to toggle the whole system */
+    toggleESystem(uBase2);
+    return;
+  }
   if(val<1)return;
-  val=Math.min(12,Math.max(1,val));
   _pwrState[key]=val;
   /* Bidirectional: if pip column is wired to a system toggle, sync the ON/OFF button */
   var pipToSys={shields:'sg',cooler:'cooler',radar:'radar',qd:'qd'};
