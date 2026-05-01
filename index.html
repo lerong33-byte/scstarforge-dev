@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.85</title>
+<title>SC-ShipForge v8.86</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -1580,21 +1580,23 @@ option,optgroup{background:var(--bg2)}
 
     
 <div class="pane" id="pane-fleet" style="flex-direction:column;background:var(--bg1);overflow:hidden">
-  <div style="flex-shrink:0;padding:10px 16px 8px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
-    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 10px rgba(77,255,110,.5)">&#9673; MY FLEET</div>
-    <div id="fleetStats" style="font-family:var(--fmono);font-size:10px;color:var(--t3);letter-spacing:1px"></div>
-    <div style="flex:1"></div>
-    <button onclick="openFleetImport()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#38bdf8;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(56,189,248,.18)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">&#8659; IMPORT FROM RSI</button>
-    <button onclick="clearFleet()" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,.16)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">&#10005; CLEAR</button>
-  </div>
-  <!-- Detail panel (shown when a card is selected) -->
-  <div id="fleetDetail" style="display:none;flex:0 0 260px;background:var(--bg2);border-bottom:1px solid var(--border);position:relative;overflow:hidden">
-    <img id="fdImg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.5" src="" alt="">
-    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(10,14,20,.97) 0%,rgba(10,14,20,.75) 45%,rgba(10,14,20,.15) 100%)"></div>
-    <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 36px;gap:36px">
+  <!-- Detail panel fills top area when a card is selected -->
+  <div id="fleetDetail" style="display:none;flex:0 0 340px;position:relative;overflow:hidden;background:#0a0d12">
+    <img id="fdImg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.55" src="" alt="">
+    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(10,13,18,.97) 0%,rgba(10,13,18,.8) 40%,rgba(10,13,18,.2) 100%)"></div>
+    <!-- header bar inside detail panel -->
+    <div style="position:absolute;top:0;left:0;right:0;padding:10px 16px 8px;display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.3);z-index:2">
+      <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 10px rgba(77,255,110,.5)">&#9673; MY FLEET</div>
+      <div id="fleetStats" style="font-family:var(--fmono);font-size:10px;color:var(--t3);letter-spacing:1px"></div>
+      <div style="flex:1"></div>
+      <button onclick="openFleetImport()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#38bdf8;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(56,189,248,.18)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">&#8659; IMPORT FROM RSI</button>
+      <button onclick="clearFleet()" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,.16)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">&#10005; CLEAR</button>
+    </div>
+    <!-- ship info centred in panel -->
+    <div style="position:absolute;inset:0;display:flex;align-items:center;padding:44px 36px 16px;gap:36px">
       <div style="flex:1;min-width:0">
-        <div id="fdName" style="font-family:'Rajdhani',var(--fhud);font-size:38px;font-weight:800;color:#fff;line-height:1;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:1px"></div>
-        <div id="fdMfr" style="font-family:var(--fmono);font-size:11px;color:#38bdf8;letter-spacing:3px;margin-bottom:18px;text-transform:uppercase"></div>
+        <div id="fdName" style="font-family:'Rajdhani',var(--fhud);font-size:44px;font-weight:800;color:#fff;line-height:1;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:1px"></div>
+        <div id="fdMfr" style="font-family:var(--fmono);font-size:11px;color:#38bdf8;letter-spacing:3px;margin-bottom:20px;text-transform:uppercase"></div>
         <div id="fdStats" style="display:flex;gap:28px;flex-wrap:wrap"></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0">
@@ -1602,6 +1604,14 @@ option,optgroup{background:var(--bg2)}
         <button id="fdRemoveBtn" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:10px 28px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(239,68,68,.16)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">&#10005; REMOVE</button>
       </div>
     </div>
+  </div>
+  <!-- Default header bar (shown when no ship selected) -->
+  <div id="fleetHeader" style="flex-shrink:0;padding:10px 16px 8px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 10px rgba(77,255,110,.5)">&#9673; MY FLEET</div>
+    <div id="fleetStats2" style="font-family:var(--fmono);font-size:10px;color:var(--t3);letter-spacing:1px"></div>
+    <div style="flex:1"></div>
+    <button onclick="openFleetImport()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#38bdf8;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(56,189,248,.18)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">&#8659; IMPORT FROM RSI</button>
+    <button onclick="clearFleet()" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,.16)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">&#10005; CLEAR</button>
   </div>
   <!-- Empty state -->
   <div id="fleetEmpty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;padding:40px">
@@ -11635,6 +11645,9 @@ function showFleetDetail(name) {
   var removeBtn = document.getElementById('fdRemoveBtn');
   if (buildBtn) buildBtn.onclick = function(){ openShipInBuilder(name); };
   if (removeBtn) removeBtn.onclick = function(){ removeFromFleet(name); detail.style.display='none'; };
+  // Hide default header, show detail panel
+  var hdr = document.getElementById('fleetHeader');
+  if (hdr) hdr.style.display = 'none';
   detail.style.display = 'flex';
   detail.style.alignItems = 'stretch';
 }
@@ -11654,7 +11667,10 @@ function renderFleetTab() {
   }
   if (empty) empty.style.display = 'none';
   grid.style.display = 'grid';
-  if (stats) stats.textContent = fleet.length + ' SHIP' + (fleet.length !== 1 ? 'S' : '');
+  var statsText = fleet.length + ' SHIP' + (fleet.length !== 1 ? 'S' : '');
+  if (stats) stats.textContent = statsText;
+  var stats2 = document.getElementById('fleetStats2');
+  if (stats2) stats2.textContent = statsText;
 
   grid.innerHTML = '';
   fleet.forEach(function(name) {
