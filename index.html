@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.64-DEV-DEV</title>
+<title>SC-ShipForge v8.65-DEV-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -986,12 +986,19 @@ option,optgroup{background:var(--bg2)}
 #sbDashboard .d-pn-text{font-size:12px;color:#b0c8b0;line-height:1.6}
 #sbDashboard .d-pn-date{font-size:10px;color:#4a5a70;font-family:var(--fmono);margin-left:auto;flex-shrink:0;align-self:flex-start;margin-top:2px}
 
+
+/* Weapon type filter pills in loadout builder */
+.wep-type-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 0 2px 0;}
+.wtp-btn{padding:3px 10px;border-radius:10px;border:1px solid var(--border);background:var(--dark2);color:var(--t2);font-size:10px;font-family:var(--font);cursor:pointer;text-transform:uppercase;letter-spacing:.05em;transition:background .15s,color .15s,border-color .15s;}
+.wtp-btn.on{background:var(--red);border-color:var(--red);color:#fff;}
+.wtp-btn:hover:not(.on){background:var(--dark3);border-color:var(--t3);}
+
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.64-DEV-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.65-DEV-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -1985,6 +1992,99 @@ var WEAPONS=[
   {id:"m9acannon",name:"M9A Cannon",mfr:"Behring",sz:7,type:"energy",dps:2306.3,alpha:2306.3,range:3999,draw:56,heat:70,price:450000,loc:"CenterMass Area18 / Orison"},
   {id:"sf7ecannon",name:"SF7E Cannon",mfr:"Behring",sz:7,type:"energy",dps:5150.0,alpha:5150.0,range:3999,draw:56,heat:70,price:450000,loc:"Behring stores / CenterMass"},
 ];
+var WID_ALIAS={
+  "att1":"attrition1re",
+  "cf117":"cf117bulldog",
+  "omni3":"omniskyiiica",
+  "m3a":"omniskyiiica",
+  "ls1":"lightstrikei",
+  "db1":"deadboltican",
+  "yj210":"yellowjacket",
+  "sc215":"scorpiongt21",
+  "nn13":"nn13cannon",
+  "laser1":"attrition1re",
+  "cf227":"cf227badgerr",
+  "att2":"attrition2re",
+  "omni6":"omniskyvican",
+  "m4a":"omniskyvican",
+  "ls2":"lightstrikei2",
+  "db2":"deadboltiica",
+  "gt220":"mantisgt220g",
+  "tar2":"tarantulagt82",
+  "saw":"cf227badgerr",
+  "nn14":"nn14cannon",
+  "cf337":"cf337panther",
+  "att3":"attrition3re",
+  "omni9":"omniskyixcan",
+  "m6a":"m6acannon",
+  "ls3":"lightstrikei4",
+  "rl21":"relentlessl2",
+  "tar3":"tarantulagt83",
+  "db3":"deadboltiiic",
+  "c788":"c788cannon",
+  "nn15":"nn15cannon",
+  "gt220s3":"mantisgt220g",
+  "cf447":"cf447rhinore",
+  "att4":"attrition4re",
+  "m7a":"m7acannon",
+  "ad4b":"ad4bballisti",
+  "bnk":"breaknecks4g",
+  "rev":"revenantgatl",
+  "tar4":"tarantulagt83",
+  "db4":"deadboltivca",
+  "att5":"attrition5re",
+  "ksb":"deadboltvcan",
+  "db5":"deadboltvcan",
+  "ad5b":"ad5bballisti",
+  "m5a":"m5acannon",
+  "db6":"deadboltvica",
+  "ad6b":"ad6bballisti",
+  "att6":"attrition6re",
+  "cf557":"cf557galdere",
+  "sf7b":"sf7bgatling",
+  "sf7e":"sf7ecannon",
+  "s8bc":"sf7bgatling",
+  "omni5":"omniskyixcan",
+  "terra":"deadboltvcan",
+  "crossbow":"cf227badgerr",
+  "m8a":"m8acannon",
+  "m9a":"m9acannon",
+};
+
+function resolveWepId(id){return WID_ALIAS[id]||id;}
+var _wepTypeFilter='all';
+function setWepTypeFilter(t,btn){
+  _wepTypeFilter=t;
+  // Update pill active state
+  document.querySelectorAll('.wtp-btn').forEach(function(b){b.classList.toggle('on',b.dataset.wtp===t);});
+  // Re-render all weapon selects
+  document.querySelectorAll('select.slot-sel:not([disabled])').forEach(function(sel){
+    var sz=parseInt(sel.dataset.sz)||3;
+    var curVal=sel.value;
+    sel.innerHTML=wepOpts(sz,curVal,false);
+    // Restore selection if still available
+    if(curVal&&sel.querySelector('option[value="'+curVal+'"]')){sel.value=curVal;}
+  });
+}
+var _origWepOpts=wepOpts;
+wepOpts=function(sz,curId,fixed){
+  var resolvedId=resolveWepId(curId);
+  if(fixed)return '<option value="'+resolvedId+'">'+(WEAPONS.find(function(w){return w.id===resolvedId;})||{name:resolvedId}).name+' ⚠ FIXED</option>';
+  var o='<option value="">[Empty]</option>';
+  WEAPONS.filter(function(w){
+    if(w.sz>sz||w.type.includes('missile')||w.type==='torpedo')return false;
+    if(_wepTypeFilter==='all')return true;
+    if(_wepTypeFilter==='ballistic')return w.type==='ballistic';
+    if(_wepTypeFilter==='energy')return w.type==='energy';
+    if(_wepTypeFilter==='distortion')return w.type==='distortion';
+    return true;
+  }).sort(function(a,b){return b.dps-a.dps;}).forEach(function(w){
+    var sub=w.sub?(' ['+w.sub+']'):'';
+    o+='<option value="'+w.id+'"'+(w.id===resolvedId?' selected':'')+'>'+w.name+sub+' ('+w.dps+'DPS'+( w.type==='ballistic'?' BAL':w.type==='distortion'?' DIST':'')+') S'+w.sz+'</option>';
+  });
+  return o;
+};
+
 // ═══ SHIP DATA ═══
 var SHIPS={};var SHIP_DATA={};
 function S(name,mfr,role,size,crew,scm,csz,slots,missiles,comps,tips){
@@ -9226,7 +9326,7 @@ function buildEnemyLoadout(enemyName,_targetId){
   cols.style.cssText='display:flex;flex-direction:row;gap:12px;align-items:flex-start;width:100%';
   var leftCol=document.createElement('div');
   leftCol.style.cssText='flex:1;min-width:0;display:flex;flex-direction:column;gap:0';
-  if(ship.slots&&ship.slots.length){leftCol.innerHTML+=secHd('HARDPOINTS','resetEHardpoints')+'<div>'+wHTML+'</div>';}
+  if(ship.slots&&ship.slots.length){leftCol.innerHTML+=secHd('HARDPOINTS','resetEHardpoints')+"<div class='wep-type-pills'><button class='wtp-btn on' data-wtp='all' onclick='setWepTypeFilter(\"all\",this)'>ALL</button><button class='wtp-btn' data-wtp='ballistic' onclick='setWepTypeFilter(\"ballistic\",this)'>BALLISTIC</button><button class='wtp-btn' data-wtp='energy' onclick='setWepTypeFilter(\"energy\",this)'>ENERGY</button><button class='wtp-btn' data-wtp='distortion' onclick='setWepTypeFilter(\"distortion\",this)'>DISTORTION</button></div>"+'<div>'+wHTML+'</div>';}
   if(ship.missiles&&ship.missiles.length){leftCol.innerHTML+=secHd('MISSILES','resetEMissiles')+'<div>'+mHTML+'</div>';}
   leftCol.innerHTML+=secHd('SYSTEMS','resetESystems')+'<div>'+cHTML+'</div>';
   cols.appendChild(leftCol);
