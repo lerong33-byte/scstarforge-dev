@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.83</title>
+<title>SC-ShipForge v8.84</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -1586,6 +1586,22 @@ option,optgroup{background:var(--bg2)}
     <div style="flex:1"></div>
     <button onclick="openFleetImport()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#38bdf8;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(56,189,248,.18)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">&#8659; IMPORT FROM RSI</button>
     <button onclick="clearFleet()" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,.16)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">&#10005; CLEAR</button>
+  </div>
+  <!-- Detail panel (shown when a card is selected) -->
+  <div id="fleetDetail" style="display:none;flex-shrink:0;height:200px;background:var(--bg2);border-bottom:1px solid var(--border);position:relative;overflow:hidden">
+    <img id="fdImg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45" src="" alt="">
+    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(10,14,20,.98) 0%,rgba(10,14,20,.7) 50%,rgba(10,14,20,.1) 100%)"></div>
+    <div style="position:relative;display:flex;align-items:center;height:100%;padding:0 28px;gap:32px">
+      <div style="flex:1;min-width:0">
+        <div id="fdName" style="font-family:var(--rajdhani,'Rajdhani',sans-serif);font-size:32px;font-weight:800;color:#fff;line-height:1;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="fdMfr" style="font-family:var(--fmono);font-size:11px;color:#38bdf8;letter-spacing:2px;margin-bottom:14px"></div>
+        <div id="fdStats" style="display:flex;gap:20px;flex-wrap:wrap"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+        <button id="fdBuildBtn" style="background:rgba(77,255,110,.12);border:1px solid rgba(77,255,110,.4);border-radius:4px;padding:9px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#4dff6e;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(77,255,110,.22)'" onmouseout="this.style.background='rgba(77,255,110,.12)'">&#9658; BUILD</button>
+        <button id="fdRemoveBtn" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:9px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(239,68,68,.16)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">&#10005; REMOVE</button>
+      </div>
+    </div>
   </div>
   <!-- Empty state -->
   <div id="fleetEmpty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;padding:40px">
@@ -11585,6 +11601,44 @@ function refreshFleetBadges() {
   }
 }
 
+function showFleetDetail(name) {
+  var detail = document.getElementById('fleetDetail');
+  if (!detail) return;
+  var sd = window.SHIP_DATA && window.SHIP_DATA[name];
+  // Image
+  var img = document.getElementById('fdImg');
+  var imgUrl = window.COMPLETE_SHIP_IMAGE_MAP && window.COMPLETE_SHIP_IMAGE_MAP[name];
+  if (img) img.src = imgUrl || '';
+  // Name & mfr
+  var nameEl = document.getElementById('fdName');
+  var mfrEl = document.getElementById('fdMfr');
+  if (nameEl) nameEl.textContent = name.toUpperCase();
+  if (mfrEl) mfrEl.textContent = (sd && sd.mfr) ? sd.mfr.toUpperCase() : '';
+  // Stats
+  var statsEl = document.getElementById('fdStats');
+  if (statsEl) {
+    var stats = [];
+    if (sd) {
+      if (sd.role) stats.push(['ROLE', sd.role]);
+      if (sd.size) stats.push(['SIZE', sd.size]);
+      if (sd.dps) stats.push(['DPS', sd.dps.toLocaleString()]);
+      if (sd.shp) stats.push(['SHIELD', sd.shp.toLocaleString() + ' HP']);
+      if (sd.cargo) stats.push(['CARGO', sd.cargo + ' SCU']);
+      if (sd.crew) stats.push(['CREW', sd.crew]);
+    }
+    statsEl.innerHTML = stats.map(function(s){
+      return '<div style="display:flex;flex-direction:column;gap:2px"><div style="font-family:var(--fmono);font-size:9px;color:var(--t3);letter-spacing:1.5px">' + s[0] + '</div><div style="font-family:var(--rajdhani,sans-serif);font-size:18px;font-weight:700;color:#fff;line-height:1">' + s[1] + '</div></div>';
+    }).join('');
+  }
+  // Buttons
+  var buildBtn = document.getElementById('fdBuildBtn');
+  var removeBtn = document.getElementById('fdRemoveBtn');
+  if (buildBtn) buildBtn.onclick = function(){ openShipInBuilder(name); };
+  if (removeBtn) removeBtn.onclick = function(){ removeFromFleet(name); detail.style.display='none'; };
+  detail.style.display = 'flex';
+  detail.style.alignItems = 'stretch';
+}
+
 function renderFleetTab() {
   var fleet = getFleet();
   var empty = document.getElementById('fleetEmpty');
@@ -11681,11 +11735,14 @@ function renderFleetTab() {
     body.appendChild(footer);
     card.appendChild(imgWrap);
     card.appendChild(body);
-    card.onclick = function(e) {
+    card.onclick = (function(n){ return function(e) {
       if (!e.target.classList.contains('fleet-card-builder') && !e.target.classList.contains('fleet-card-remove')) {
-        if (typeof openShipModal === 'function') openShipModal(name);
+        showFleetDetail(n);
+        // Highlight selected card
+        document.querySelectorAll('.fleet-card').forEach(function(c){ c.style.borderColor=''; });
+        e.currentTarget.style.borderColor = 'rgba(77,255,110,.7)';
       }
-    };
+    }; })(name);
     grid.appendChild(card);
   });
 }
