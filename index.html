@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.39-DEV</title>
+<title>SC-ShipForge v8.40-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -989,7 +989,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.39-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.40-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -1220,14 +1220,14 @@ option,optgroup{background:var(--bg2)}
   <div>
     <div class="d-sec-hd"><span>BROWSE BY ROLE</span></div>
     <div class="d-role-grid">
-      <div class="d-role-card" onclick="document.getElementById('sbShipInput').focus();ss_type_sb({target:{value:''}});"><div class="d-role-icon">&#9876;</div><div class="d-role-name">FIGHTER</div><div class="d-role-count" id="dRoleFighter">—</div></div>
-      <div class="d-role-card" onclick="document.getElementById('sbShipInput').focus();"><div class="d-role-icon">&#128163;</div><div class="d-role-name">BOMBER</div><div class="d-role-count" id="dRoleBomber">—</div></div>
-      <div class="d-role-card" onclick="document.getElementById('sbShipInput').focus();"><div class="d-role-icon">&#128230;</div><div class="d-role-name">FREIGHTER</div><div class="d-role-count" id="dRoleFreighter">—</div></div>
-      <div class="d-role-card" onclick="document.getElementById('sbShipInput').focus();"><div class="d-role-icon">&#9935;</div><div class="d-role-name">MINING</div><div class="d-role-count" id="dRoleMining">—</div></div>
-      <div class="d-role-card" onclick="document.getElementById('sbShipInput').focus();"><div class="d-role-icon">&#128301;</div><div class="d-role-name">EXPLORATION</div><div class="d-role-count" id="dRoleExploration">—</div></div>
-      <div class="d-role-card" onclick="document.getElementById('sbShipInput').focus();"><div class="d-role-icon">&#128657;</div><div class="d-role-name">MEDICAL</div><div class="d-role-count" id="dRoleMedical">—</div></div>
-      <div class="d-role-card" onclick="document.getElementById('sbShipInput').focus();"><div class="d-role-icon">&#128737;</div><div class="d-role-name">CAPITAL</div><div class="d-role-count" id="dRoleCapital">—</div></div>
-      <div class="d-role-card" onclick="document.getElementById('sbShipInput').focus();ss_open_sb('');"><div class="d-role-icon">&#128674;</div><div class="d-role-name">ALL SHIPS</div><div class="d-role-count" id="dRoleAll" style="color:var(--t1)">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Fighter',document.querySelector('[data-role=Fighter]'));"><div class="d-role-icon">&#9876;</div><div class="d-role-name">FIGHTER</div><div class="d-role-count" id="dRoleFighter">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Bomber',document.querySelector('[data-role=Bomber]'));"><div class="d-role-icon">&#128163;</div><div class="d-role-name">BOMBER</div><div class="d-role-count" id="dRoleBomber">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Cargo',document.querySelector('[data-role=Cargo]'));"><div class="d-role-icon">&#128230;</div><div class="d-role-name">FREIGHTER</div><div class="d-role-count" id="dRoleFreighter">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Mining',document.querySelector('[data-role=Mining]'));"><div class="d-role-icon">&#9935;</div><div class="d-role-name">MINING</div><div class="d-role-count" id="dRoleMining">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Exploration',document.querySelector('[data-role=Exploration]'));"><div class="d-role-icon">&#128301;</div><div class="d-role-name">EXPLORATION</div><div class="d-role-count" id="dRoleExploration">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Support',document.querySelector('[data-role=Support]'));"><div class="d-role-icon">&#128657;</div><div class="d-role-name">MEDICAL</div><div class="d-role-count" id="dRoleMedical">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('All',document.querySelector('[data-role=All]'));"><div class="d-role-icon">&#128737;</div><div class="d-role-name">CAPITAL</div><div class="d-role-count" id="dRoleCapital">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('All',document.querySelector('[data-role=All]'));"><div class="d-role-icon">&#128674;</div><div class="d-role-name">ALL SHIPS</div><div class="d-role-count" id="dRoleAll" style="color:var(--t1)">—</div></div>
     </div>
   </div>
   <div class="d-two-col">
