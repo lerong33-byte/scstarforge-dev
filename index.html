@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.47-DEV</title>
+<title>SC-ShipForge v8.48-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -989,7 +989,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.47-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.48-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -8399,7 +8399,7 @@ var _eSysEnabled={};  // 'sg','pp','cooler','radar' → true/false
 var _eSlotEnabled={};
 var _eMisEnabled={};
 var _eShipName=null;
-
+var _eActiveTargetId='sdResult'; // tracks which container is currently active
 /* ── Helpers ── */
 function _eWepOpts(sz,curId,fixed){
   if(fixed)return '<option value="'+curId+'">'+(WEAPONS.find(function(w){return w.id===curId;})||{name:curId}).name+' ⚠ FIXED</option>';
@@ -8823,6 +8823,7 @@ function syncEMissiles(event,i,count){
 /* ── Stats updater ── */
 function _eUpdateStats(){
   var ship=_eShipName&&SHIP_DATA[_eShipName];if(!ship)return;
+  var _eContainer=document.getElementById(_eActiveTargetId||'sdResult')||document;
   var totalDps=0,totalAlpha=0,totalWepDraw=0;
   (ship.slots||[]).forEach(function(sl,i){
     if(_eSlotEnabled['sl'+i]===false)return;
@@ -8839,7 +8840,7 @@ function _eUpdateStats(){
       if(w&&(w.type==='energy'||w.type==='ballistic')){totalDps+=w.dps;totalAlpha+=w.alpha||0;totalWepDraw+=w.draw||0;}
     }
   });
-  function setE(id,val){var e=document.getElementById(id);if(e)e.textContent=val;}
+  function setE(id,val){var e=_eContainer.querySelector('#'+id);if(e)e.textContent=val;}
   /* ── Power pip ratios (5 pips = 100% baseline) ── */
   var wepRatio=(_pwrState&&_pwrState.weapons!=null)?Math.max(0.1,_pwrState.weapons/5):1;
   var shRatio=(_pwrState&&_pwrState.shields!=null)?Math.max(0,_pwrState.shields/5):1;
@@ -8882,7 +8883,7 @@ function _eUpdateStats(){
   setE('eDfShield',shieldHP>0?shieldHP.toLocaleString()+' HP':'—');
   setE('eDfRegen',shieldRegen>0?'+'+shieldRegen.toLocaleString()+'/s':'—');
   setE('eDfDraw',shieldDraw>0?shieldDraw+' EU':'—');
-  var sgCard=document.getElementById('eSgCard');
+  var sgCard=_eContainer.querySelector('#eSgCard');
   if(sgCard)sgCard.style.opacity=sgOn?'1':'0.4';
   /* ── POWER ── */
   var ppActiveCount=activeSlotCount('pp');
@@ -8909,7 +8910,7 @@ function _eUpdateStats(){
   setE('eSysPp',ppOut>0?ppOut.toLocaleString()+' EU':'—');
   setE('eSysPpDraw',totalSysDraw>0?totalSysDraw+' EU draw':'—');
   setE('eSysPpPct',ppOut>0?(ppUsedPct+'% used'):'—');
-  var ppCard=document.getElementById('ePpCard');
+  var ppCard=_eContainer.querySelector('#ePpCard');
   if(ppCard)ppCard.style.opacity=ppOn?'1':'0.4';
   /* ── COOLER ── */
   var coolOn=coolCount>0;
@@ -8917,7 +8918,7 @@ function _eUpdateStats(){
   var coolOutScaled=Math.round(coolOut*coolRatio);
   setE('eSysCooler',coolOut>0?coolOut.toLocaleString()+'/s':'—');
   setE('eSysCoolerDraw',coolDrawMin>0?coolDrawMin+' EU':'—');
-  var coolCard=document.getElementById('eCoolerCard');
+  var coolCard=_eContainer.querySelector('#eCoolerCard');
   if(coolCard)coolCard.style.opacity=coolOn?'1':'0.4';
   /* ── QUANTUM DRIVE ── */
   var qdOn=activeSlotCount('qd')>0;
@@ -8928,7 +8929,7 @@ function _eUpdateStats(){
   setE('eSysQdSpeed',qdSpeedScaled>0?qdSpeedScaled.toLocaleString()+' Mm/s':'—');
   setE('eSysQdRange',qdRange>0?qdRange+' Gm':'—');
   setE('eSysQdSpool',qdSpool>0?qdSpool+'s spool':'—');
-  var qdCard=document.getElementById('eQdCard');
+  var qdCard=_eContainer.querySelector('#eQdCard');
   if(qdCard)qdCard.style.opacity=qdOn?'1':'0.4';
   /* ── RADAR ── */
   var radarOn=activeSlotCount('radar')>0;
@@ -8936,7 +8937,7 @@ function _eUpdateStats(){
   var radarDistScaled=Math.round(radarDist*radarRatio);
   setE('eSysRadar',radarDistScaled>0?radarDistScaled.toLocaleString()+' m':'—');
   setE('eSysRadarDraw',radarDraw>0?radarDraw+' EU':'—');
-  var radarCard=document.getElementById('eRadarCard');
+  var radarCard=_eContainer.querySelector('#eRadarCard');
   if(radarCard)radarCard.style.opacity=radarOn?'1':'0.4';
   window._enemyDps=totalDps;
   window._enemyShieldHP=shieldHP;
@@ -8951,6 +8952,7 @@ function buildEnemyLoadout(enemyName,_targetId){
   if(!resEl)return;
   if(!ship){resEl.innerHTML='<div class="sd-result sd-close"><h3>NO DATA</h3><p>Ship not found.</p></div>';return;}
   _eShipName=enemyName;
+  _eActiveTargetId=_targetId||'sdResult'; // remember which panel is active
   _eSlots={};_eMissiles={};_eRacks={};_eComps={};_eSysEnabled={};
   _eSlotEnabled={};_eMisEnabled={};
   var csz=ship.compSz||'S1';
