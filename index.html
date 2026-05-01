@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.72</title>
+<title>SC-ShipForge v8.73</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -733,6 +733,22 @@ option,optgroup{background:var(--bg2)}
 .wpm-ship{font-family:'JetBrains Mono',monospace;font-size:11px;color:#c0cee0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .15s}
 .wpm-ship:hover{background:rgba(79,195,247,0.1);border-color:rgba(77,255,110,0.3);color:#4dff6e}
 .wpm-ship-sz{font-size:9px;color:#5a6577;margin-left:4px}
+.wpm-img-wrap{width:100%;height:160px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:16px;border:1px solid rgba(79,195,247,0.1)}
+.wpm-img-wrap img{max-width:100%;max-height:160px;object-fit:contain;display:block}
+.wpm-img-placeholder{color:#2a3240;font-family:Rajdhani,sans-serif;font-size:48px;font-weight:700}
+.wpm-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.wpm-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em}
+.wpm-badge-sz{background:rgba(79,195,247,0.15);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3)}
+.wpm-badge-ballistic{background:rgba(255,180,0,0.12);color:#ffb400;border:1px solid rgba(255,180,0,0.3)}
+.wpm-badge-energy{background:rgba(79,195,247,0.12);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3)}
+.wpm-badge-distortion{background:rgba(180,100,255,0.12);color:#b464ff;border:1px solid rgba(180,100,255,0.3)}
+.wpm-badge-pp{background:rgba(255,180,0,0.12);color:#ffb400;border:1px solid rgba(255,180,0,0.3)}
+.wpm-badge-sg{background:rgba(79,195,247,0.12);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3)}
+.wpm-badge-cooler{background:rgba(100,220,255,0.12);color:#64dcff;border:1px solid rgba(100,220,255,0.3)}
+.wpm-badge-qd{background:rgba(77,255,110,0.12);color:#4dff6e;border:1px solid rgba(77,255,110,0.3)}
+.wpm-loc{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8a94a3;margin-bottom:16px}
+.wpm-loc-star{color:#4dff6e}
+.wl-row{cursor:pointer}
 
 #shipModal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center}
 #shipModal.open{display:flex}
@@ -1002,35 +1018,75 @@ option,optgroup{background:var(--bg2)}
 
 
 /* ── Weapons & Comps list layout ── */
-.wfilt-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;}
-.wep-search-inp{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;padding:4px 10px;border-radius:4px;font-size:11px;width:220px;}
-.wep-search-inp:focus{outline:none;border-color:rgba(56,189,248,0.5);}
+.wfilt-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.wep-search-inp{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.14);
+  color:#e2e8f0;padding:6px 14px;border-radius:6px;
+  font-size:13px;width:260px;
+  font-family:'JetBrains Mono',monospace;
+  transition:border-color .15s;
+}
+.wep-search-inp:focus{outline:none;border-color:rgba(56,189,248,0.5);background:rgba(56,189,248,0.04);}
 #wgrid{display:block!important;}
-.wl-section{margin-bottom:8px;}
-.wl-sec-hd{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:4px;cursor:pointer;user-select:none;}
-.wl-sec-hd:hover{background:rgba(56,189,248,0.08);}
-.wl-sz-badge{background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3);padding:1px 7px;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:.5px;}
-.wl-sec-count{color:#8a94a3;font-size:11px;flex:1;}
-.wl-arr{color:#8a94a3;font-size:11px;}
-.wl-hdr,.wl-row{display:grid;grid-template-columns:220px 120px 90px 70px 70px 70px 55px 1fr;align-items:center;padding:4px 10px;gap:4px;font-size:11px;}
-.wl-hdr{color:#8a94a3;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:5px;margin-bottom:2px;}
+/* ── Weapons & Comps list layout ── */
+.wl-section{margin-bottom:10px;}
+.wl-sec-hd{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;
+  background:linear-gradient(90deg,rgba(56,189,248,0.08),rgba(56,189,248,0.02));
+  border:1px solid rgba(56,189,248,0.18);
+  border-radius:6px;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.wl-sec-hd:hover{background:linear-gradient(90deg,rgba(56,189,248,0.14),rgba(56,189,248,0.04));}
+.wl-sz-badge{
+  background:rgba(56,189,248,0.18);color:#38bdf8;
+  border:1px solid rgba(56,189,248,0.4);
+  padding:3px 10px;border-radius:4px;
+  font-size:13px;font-weight:700;letter-spacing:1px;
+  font-family:'Rajdhani',sans-serif;
+}
+.wl-sec-count{color:#6a7f96;font-size:12px;flex:1;font-family:'JetBrains Mono',monospace;}
+.wl-arr{color:#38bdf8;font-size:12px;}
+/* Weapons grid: Name | MFR | TYPE | DPS | ALPHA | RANGE | DRAW | LOCATION */
+#wgrid .wl-hdr,#wgrid .wl-row{
+  display:grid;
+  grid-template-columns:minmax(180px,2fr) 130px 110px 80px 80px 80px 60px 1fr;
+  align-items:center;padding:7px 14px;gap:6px;font-size:13px;
+}
+/* Components grid: Name | STAT1 | STAT2 | STAT3 */
+#compGrid .wl-hdr,#compGrid .wl-row{
+  display:grid;
+  grid-template-columns:minmax(200px,3fr) 1fr 1fr 1fr;
+  align-items:center;padding:7px 14px;gap:6px;font-size:13px;
+}
+.wl-hdr{
+  color:#4a5a6a;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding-bottom:6px;margin-bottom:3px;
+  font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.8px;
+}
 .wl-h{cursor:default;}
-.wl-h[onclick]{cursor:pointer;}
+.wl-h[onclick]{cursor:pointer;transition:color .12s;}
 .wl-h[onclick]:hover{color:#38bdf8;}
-.wl-row{border-bottom:1px solid rgba(255,255,255,0.04);color:#c8d0dc;}
-.wl-row:hover{background:rgba(56,189,248,0.06);color:#e2e8f0;}
-.wl-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.wl-mfr{color:#8a94a3;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.wl-type{font-size:10px;}
-.wl-num{text-align:right;font-variant-numeric:tabular-nums;}
-.wl-loc{color:#8a94a3;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wl-row{
+  border-bottom:1px solid rgba(255,255,255,0.035);
+  color:#c8d4e0;transition:background .1s;
+}
+.wl-row:hover{background:rgba(56,189,248,0.07);color:#e8f0f8;}
+.wl-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Rajdhani',sans-serif;letter-spacing:.3px;}
+.wl-mfr{color:#6a7f96;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wl-type{font-size:11px;}
+.wl-num{text-align:right;font-variant-numeric:tabular-nums;font-family:'JetBrains Mono',monospace;font-size:13px;color:#c8d4e0;}
+.wl-loc{color:#6a7f96;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.72</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.73</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -1401,9 +1457,9 @@ option,optgroup{background:var(--bg2)}
           <button class="wp-cat-btn" data-cat="qd" onclick="switchWpCat('qd',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,.08);color:#8a94a3;background:transparent;cursor:pointer">Quantum Drives</button>
         </div>
         <div class="wf" id="wfiltBar"></div>
-        <div class="wgrid" id="wgrid"></div>
+        <div class="wgrid" id="wgrid" style="padding:8px;overflow-y:auto;max-height:100%;"></div>
       
-        <div id="compGrid" class="wgrid" style="display:none"></div>
+        <div id="compGrid" style="display:none;padding:8px;overflow-y:auto;max-height:100%;"></div>
       </div>
 
       <div class="pane" id="pane-lc">
@@ -5155,7 +5211,8 @@ function buildWeaponsDB(szF,tyF){
           var locStr = w.loc || '';
           var isExcl = locStr.startsWith('⭐');
           var locDisp = isExcl ? '<span style="color:var(--green)">⭐</span> ' + locStr.replace('⭐ ','') : locStr;
-          return '<div class="wl-row">'
+          var wData = JSON.stringify({sz:w.sz,mfr:w.mfr,badgeType:w.type,badgeLabel:w.type,loc:w.loc||'',stats:[{label:'DPS',value:String(w.dps)},{label:'ALPHA',value:String(w.alpha)},{label:'RANGE',value:w.range+'m'},{label:'DRAW',value:w.draw+'EU'},{label:'HEAT',value:String(w.heat||'—')},{label:'PRICE',value:w.price?w.price.toLocaleString()+' aUEC':'—'}]}).replace(/'/g,"&#39;");
+          return '<div class="wl-row" onclick="openWpModal(\'weapon\',\'' + w.name.replace(/'/g,"&#39;") + '\',' + wData + ')" title="Click for details">'
             + '<span class="wl-name">' + w.name + (w.new ? ' <span class="wc-new">NEW</span>' : '') + '</span>'
             + '<span class="wl-mfr">' + w.mfr + '</span>'
             + '<span class="wl-type"><span class="' + tc + '">' + w.type + '</span></span>'
@@ -8011,7 +8068,10 @@ function buildCompGrid(cat) {
           else if(cat==='cooler'){ v1=c.cool||'—'; v2=c.drawMin||'—'; v3=c.ir||'—'; }
           else if(cat==='qd'){ v1=(c.range||'—')+' Mkm'; v2=(c.speed||'—')+' Mm/s'; v3=(c.spool||'—')+'s'; }
           else { v1=v2=v3='—'; }
-          return '<div class="wl-row">'
+          var catLabel = {pp:'Power Plant',sg:'Shield Generator',cooler:'Cooler',qd:'Quantum Drive'}[cat]||cat;
+          var cStats = [{label:lbl.h1,value:String(v1)},{label:lbl.h2,value:String(v2)},{label:lbl.h3,value:String(v3)}];
+          var cData = JSON.stringify({sz:c.sz||0,mfr:'',badgeType:cat,badgeLabel:catLabel,loc:'',stats:cStats}).replace(/'/g,"&#39;");
+          return '<div class="wl-row" onclick="openWpModal(\'comp\',\'' + item.name.replace(/'/g,"&#39;") + '\',' + cData + ')" title="Click for details">'
             + '<span class="wl-name">' + item.name + '</span>'
             + '<span class="wl-num">' + v1 + '</span>'
             + '<span class="wl-num">' + v2 + '</span>'
@@ -8027,11 +8087,30 @@ function buildCompGrid(cat) {
 function closeWpModal(){document.getElementById('wpModal').classList.remove('open')}
 function openWpModal(type, name, data) {
   var mc = document.getElementById('wpModalContent');
-  var html = '<h2 class="wpm-title">' + name + '</h2>';
-  html += '<div class="wpm-sub">' + (data.sub || '') + '</div>';
+  var html = '';
+  // Image
+  var imgUrl = data.imgUrl || '';
+  if (imgUrl) {
+    html += '<div class="wpm-img-wrap"><img src="' + imgUrl + '" alt="' + name + '" onerror="this.parentNode.innerHTML=\'<span class=wpm-img-placeholder>' + (type==='weapon'?'⚔':'⚙') + '</span>\'"></div>';
+  } else {
+    html += '<div class="wpm-img-wrap"><span class="wpm-img-placeholder">' + (type==='weapon'?'⚔':'⚙') + '</span></div>';
+  }
+  // Title + badges
+  html += '<h2 class="wpm-title">' + name + '</h2>';
+  // Badges row
+  html += '<div class="wpm-badges">';
+  if (data.sz) html += '<span class="wpm-badge wpm-badge-sz">S' + data.sz + '</span>';
+  if (data.badgeType) html += '<span class="wpm-badge wpm-badge-' + data.badgeType + '">' + data.badgeLabel + '</span>';
+  if (data.mfr) html += '<span class="wpm-badge" style="background:rgba(255,255,255,0.05);color:#8a94a3;border:1px solid rgba(255,255,255,0.08)">' + data.mfr + '</span>';
+  html += '</div>';
+  // Location
+  if (data.loc) {
+    var locDisp = data.loc.startsWith('⭐') ? '<span class="wpm-loc-star">⭐</span> ' + data.loc.replace('⭐ ','') : data.loc;
+    html += '<div class="wpm-loc">📍 ' + locDisp + '</div>';
+  }
   // Stats grid
   html += '<div class="wpm-stats">';
-  if (data.stats) {
+  if (data.stats && data.stats.length) {
     data.stats.forEach(function(s) {
       html += '<div class="wpm-stat"><span class="wpm-stat-label">' + s.label + '</span><span class="wpm-stat-val">' + s.value + '</span></div>';
     });
