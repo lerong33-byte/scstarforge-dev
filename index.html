@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.9</title>
+<title>SC-ShipForge v8.10-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -989,7 +989,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.9</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.10-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -5909,7 +5909,7 @@ function saveLoadout() {
   var existing = arr.findIndex(function(x) { return x.name === name && x.ship === ship; });
   if (existing >= 0) arr[existing] = loadout; else arr.unshift(loadout);
   putSavedLoadouts(arr);
-  if (nameEl) nameEl.value = '';
+  if (nameEl) { nameEl.value = ''; }  /* updateSvCurrentShip will re-populate below */
   updateSvCurrentShip();
   renderSavedList();
   showToast('\u2713 Saved: ' + name);
@@ -6564,9 +6564,13 @@ function updateSvCurrentShip() {
     el.textContent = ship ? 'Current ship: ' + ship : 'No ship selected';
     el.style.color = ship ? '#38bdf8' : '#2a4a60';
   }
-  /* Update placeholder with auto-generated name */
+  /* Auto-populate name input with generated name if empty */
   var inp = document.getElementById('svName');
-  if (inp) inp.placeholder = ship ? _autoSaveName() : 'Select a ship first…';
+  if (inp) {
+    inp.placeholder = ship ? _autoSaveName() : 'Select a ship first…';
+    if (ship && !inp.value.trim()) inp.value = _autoSaveName();
+    if (!ship) inp.value = '';
+  }
 }
 window.updateSvCurrentShip = updateSvCurrentShip;
 
@@ -8209,7 +8213,7 @@ if(typeof renderShips==="function")setTimeout(renderShips,500);
   </div>
 
 <script>
-/* === v6.91: Live Stats + Showdown + OFF State === */
+/* === v6.91-DEV: Live Stats + Showdown + OFF State === */
 
 /* Power panel vars — declared early so buildShipBuilder/buildPowerPanel can always access them */
 var _pwrState={mode:'scm',weapons:5,shields:5,engines:5,qd:3,radar:3,cooler:3,thrusters:5};
@@ -10296,11 +10300,11 @@ tick();
 <!-- deploy-force --><!-- deploy -->
 </html>
 
-<!-- v3.5 -->
-<!-- v3.6 -->
-<!-- v3.7 -->
-<!-- v3.8 -->
-<!-- v3.9 -->
+<!-- v3.5-DEV -->
+<!-- v3.6-DEV -->
+<!-- v3.7-DEV -->
+<!-- v3.8-DEV -->
+<!-- v3.9-DEV -->
 <script>
 (function(){
   function fmt(n,dec){if(n==null||n===''||isNaN(n))return '—';return Number(n).toLocaleString(undefined,{maximumFractionDigits:dec||0});}
