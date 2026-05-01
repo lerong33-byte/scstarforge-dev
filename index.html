@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.58-DEV</title>
+<title>SC-ShipForge v8.59-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -938,7 +938,7 @@ option,optgroup{background:var(--bg2)}
 #sbDashboard .d-btn-secondary:hover{border-color:var(--warn);color:var(--warn);text-shadow:0 0 6px rgba(255,213,79,.3)}
 #sbDashboard .d-sec-hd{font-size:11px;letter-spacing:2.5px;color:var(--green);font-family:var(--fmono);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;text-shadow:0 0 8px rgba(77,255,110,.4)}
 #sbDashboard .d-sec-link{color:var(--warn);cursor:pointer;font-size:9px;letter-spacing:1px;text-shadow:0 0 5px rgba(255,213,79,.3)}
-#sbDashboard .d-role-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+#sbDashboard .d-role-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}
 #sbDashboard .d-role-card{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:9px 5px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
 #sbDashboard .d-role-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);opacity:0;transition:opacity .15s}
 #sbDashboard .d-role-card:hover{border-color:var(--border);background:var(--bg4);box-shadow:0 2px 10px rgba(77,255,110,.07)}
@@ -991,7 +991,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.58-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.59-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -1226,6 +1226,7 @@ option,optgroup{background:var(--bg2)}
       <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Bomber',document.querySelector('[data-role=Bomber]'));"><div class="d-role-icon">&#128163;</div><div class="d-role-name">BOMBER</div><div class="d-role-count" id="dRoleBomber">—</div></div>
       <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Cargo',document.querySelector('[data-role=Cargo]'));"><div class="d-role-icon">&#128230;</div><div class="d-role-name">FREIGHTER</div><div class="d-role-count" id="dRoleFreighter">—</div></div>
       <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Mining',document.querySelector('[data-role=Mining]'));"><div class="d-role-icon">&#9935;</div><div class="d-role-name">MINING</div><div class="d-role-count" id="dRoleMining">—</div></div>
+      <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Salvage',document.querySelector('[data-role=Salvage]'));"><div class="d-role-icon">&#9874;</div><div class="d-role-name">SALVAGE</div><div class="d-role-count" id="dRoleSalvage">—</div></div>
       <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Exploration',document.querySelector('[data-role=Exploration]'));"><div class="d-role-icon">&#128301;</div><div class="d-role-name">EXPLORATION</div><div class="d-role-count" id="dRoleExploration">—</div></div>
       <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('Support',document.querySelector('[data-role=Support]'));"><div class="d-role-icon">&#128657;</div><div class="d-role-name">MEDICAL</div><div class="d-role-count" id="dRoleMedical">—</div></div>
       <div class="d-role-card" onclick="showTab('ships',document.querySelector('[data-t=ships]'));setShipFilter('All',document.querySelector('[data-role=All]'));"><div class="d-role-icon">&#128737;</div><div class="d-role-name">CAPITAL</div><div class="d-role-count" id="dRoleCapital">—</div></div>
@@ -1469,6 +1470,7 @@ option,optgroup{background:var(--bg2)}
             <button class="ships-filter-btn" data-role="Support" onclick="setShipFilter('Support',this)">Support</button>
             <button class="ships-filter-btn" data-role="Exploration" onclick="setShipFilter('Exploration',this)">Exploration</button>
             <button class="ships-filter-btn" data-role="Mining" onclick="setShipFilter('Mining',this)">Mining</button>
+            <button class="ships-filter-btn" data-role="Salvage" onclick="setShipFilter('Salvage',this)">Salvage</button>
             <button class="ships-filter-btn" data-role="Cargo" onclick="setShipFilter('Cargo',this)">Cargo</button>
             <button class="ships-filter-btn" data-role="Starter" onclick="setShipFilter('Starter',this)">Starter</button>
             <button class="ships-filter-btn" data-role="Racing" onclick="setShipFilter('Racing',this)">Racing</button>
@@ -2179,7 +2181,7 @@ S("Redeemer","Aegis Dynamics","Gunship","L",5,130,"S2",
   {pp:"Regulus S2",sg:"Rampart S2",cooler:"Arctic S2",qd:"Drift S2",counts:{pp:2,sg:2,cooler:2,qd:1}},
   ["2x S4 wing + 2x S3 chin turrets + 16x S2 missiles","Carries 8 Marines — true gunship/dropship","Upgrade wing turrets to Revenant Gatling"]);
 
-S("Reclaimer","Aegis Dynamics","Support","XL",5,90,"S3",
+S("Reclaimer","Aegis Dynamics","Salvage","XL",5,90,"S3",
   [T("S2 Front (Port)",2,"cf227","CF-227 Badger"),T("S2 Front (Stbd)",2,"cf227","CF-227 Badger"),T("S2 Rear Turret",2,"cf227","CF-227 Badger")],
   [],{pp:"Regulus S3",sg:"Rampart S3",cooler:"Blizzard S3",qd:"Drift S3",counts:{pp:2,sg:2,cooler:2,qd:1}},
   ["Dual salvage tractor arms — 420 SCU capacity","4-5 crew: 2 salvage operators, pilot, engineer, gunner","No offensive weapons — turrets for defense only"]);
@@ -2424,7 +2426,7 @@ S("Herald","Drake Interplanetary","Support","XS",1,185,"S1",
   [M("S1 Rack",1,2,"ignite2")],{pp:"Regulus S1",sg:"Palisade S1",cooler:"Polar S1",qd:"Drift S1",counts:{pp:1,sg:2,cooler:2,qd:1}},
   ["Fastest data runner — encrypted comms vault","2x S1 guns as afterthought","Outrun threats rather than fight"]);
 
-S("Vulture","Drake Interplanetary","Support","S",1,150,"S2",
+S("Vulture","Drake Interplanetary","Salvage","S",1,150,"S2",
   [],[],{pp:"Regulus S2",sg:"Palisade S2",cooler:"Arctic S2",qd:"Drift S2",counts:{pp:1,sg:2,cooler:2,qd:1}},
   ["Dual Coda salvage arms — dedicated solo salvage","No weapons — use QD to escape threats","12 SCU processed + 13 SCU raw"]);
 
@@ -2580,7 +2582,7 @@ S("Starlancer TAC","MISC","Fighter","L",5,130,"S3",
   {pp:"Regulus S3",sg:"Rampart S3",cooler:"Blizzard S3",qd:"Drift S3",counts:{pp:2,sg:2,cooler:2,qd:1}},
   ["TAC = combat Starlancer — 2x S4 + S3 + 2x S2 + 8x S3 missiles","One of most heavily armed non-capital ships","Serious firepower for deep space patrol"]);
 
-S("Fortune","MISC","Support","S",1,155,"S2",
+S("Fortune","MISC","Salvage","S",1,155,"S2",
   [],[],{pp:"Regulus S2",sg:"Palisade S2",cooler:"Arctic S2",qd:"Drift S2",counts:{pp:2,sg:2,cooler:2,qd:1}},
   ["Lighter salvage ship — more maneuverable than Vulture","Single salvage arm","Good for quick hit-and-run salvage"]);
 
@@ -10700,7 +10702,7 @@ function populateDashboard(){
   Object.keys(SHIPS).forEach(function(mfr){(SHIPS[mfr]||[]).forEach(function(n){allNames.push(n);});});
   if(!allNames.length)return;
   // Role counts — read from SHIP_DATA[name].role
-  var roles={fighter:0,bomber:0,freighter:0,mining:0,exploration:0,medical:0,capital:0};
+  var roles={fighter:0,bomber:0,freighter:0,mining:0,salvage:0,exploration:0,medical:0,capital:0};
   allNames.forEach(function(n){
     var d=SHIP_DATA[n]||{};
     var r=(d.role||'').toLowerCase();
@@ -10708,6 +10710,7 @@ function populateDashboard(){
     else if(r==='bomber')roles.bomber++;
     else if(r==='cargo'||r==='transport'||r==='freighter')roles.freighter++;
     else if(r==='mining')roles.mining++;
+    else if(r==='salvage')roles.salvage++;
     else if(r==='exploration')roles.exploration++;
     else if(r==='support'||r==='medical')roles.medical++;
     else if(r==='capital'||r==='gunship'||r==='interdiction')roles.capital++;
@@ -10717,6 +10720,7 @@ function populateDashboard(){
   if(el=document.getElementById('dRoleBomber'))el.textContent=roles.bomber||'—';
   if(el=document.getElementById('dRoleFreighter'))el.textContent=roles.freighter||'—';
   if(el=document.getElementById('dRoleMining'))el.textContent=roles.mining||'—';
+  if(el=document.getElementById('dRoleSalvage'))el.textContent=roles.salvage||'—';
   if(el=document.getElementById('dRoleExploration'))el.textContent=roles.exploration||'—';
   if(el=document.getElementById('dRoleMedical'))el.textContent=roles.medical||'—';
   if(el=document.getElementById('dRoleCapital'))el.textContent=roles.capital||'—';
