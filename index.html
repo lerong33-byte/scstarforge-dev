@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.41-DEV</title>
+<title>SC-ShipForge v8.42-DEV</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -989,7 +989,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.41-DEV</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.42-DEV</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -1148,7 +1148,7 @@ option,optgroup{background:var(--bg2)}
   <!-- Top bar: header + search + KPIs -->
   <div style="flex-shrink:0;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
     <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 10px rgba(77,255,110,.5);white-space:nowrap">&#9672; SC SHIPFORGE BUILDER</div>
-    <button id="returnDashBtn" onclick="showDashboard()" title="Return to Dashboard"
+    <button id="returnDashBtn" onclick="ss_clear_sb()" title="Return to Dashboard"
       style="display:none;align-items:center;gap:5px;background:rgba(77,255,110,.06);border:1px solid rgba(77,255,110,.25);border-radius:3px;padding:5px 12px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:var(--green);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0"
       onmouseover="this.style.background='rgba(77,255,110,.14)';this.style.boxShadow='0 0 10px rgba(77,255,110,.2)'"
       onmouseout="this.style.background='rgba(77,255,110,.06)';this.style.boxShadow='none'"
