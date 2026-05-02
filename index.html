@@ -2179,24 +2179,23 @@ body > * .nav ~ * {
 }
 
 /* ── Popular ship cards: 3D lift ── */
-#sbDashboard .d-sc-card {
+#sbDashboard .d-ship-card {
   transition: transform .25s cubic-bezier(.22,1,.36,1),
               box-shadow .25s ease !important;
-  overflow: hidden;
 }
-#sbDashboard .d-sc-card:hover {
+#sbDashboard .d-ship-card:hover {
   transform: translateY(-8px) scale(1.02) !important;
   box-shadow:
     0 16px 48px rgba(0,0,0,.7),
-    0 0 0 1px rgba(79,195,247,.3),
-    0 0 40px rgba(79,195,247,.08) !important;
+    0 0 40px rgba(79,195,247,.06) !important;
 }
-#sbDashboard .d-sc-card:hover .d-sc-img {
+#sbDashboard .d-ship-card:hover .d-ship-img {
   transform: scale(1.06) !important;
   transition: transform .4s ease !important;
 }
-#sbDashboard .d-sc-img {
+#sbDashboard .d-ship-img {
   transition: transform .4s ease !important;
+  overflow: hidden;
 }
 
 /* ── Section labels: glowing left-border accent ── */
@@ -2354,27 +2353,31 @@ body > * .nav ~ * {
   pointer-events: none;
 }
 
-/* ── Border Beam on ship cards ── */
-#sbDashboard .d-sc-card {
+/* ── Border Beam on ship cards (mask-composite technique) ── */
+#sbDashboard .d-ship-card {
   position: relative;
-  isolation: isolate;
-  overflow: hidden;
 }
-#sbDashboard .d-sc-card::before {
+#sbDashboard .d-ship-card::after {
   content: '';
   position: absolute;
-  inset: -1px;
+  inset: 0;
   border-radius: inherit;
+  padding: 1.5px;
   background: conic-gradient(
     from var(--ba) at 50% 50%,
-    transparent 0deg, transparent 300deg,
-    rgba(232,152,26,.9) 340deg, rgba(255,220,140,1) 355deg, transparent 360deg
+    transparent 0deg, transparent 295deg,
+    rgba(232,152,26,.8) 335deg, rgba(255,225,140,1) 352deg, transparent 360deg
   );
-  z-index: -1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 10;
   opacity: 0;
-  transition: opacity .35s;
+  transition: opacity .3s;
 }
-#sbDashboard .d-sc-card:hover::before {
+#sbDashboard .d-ship-card:hover::after {
   opacity: 1;
   animation: beamSpin 2.5s linear infinite;
 }
@@ -2382,29 +2385,34 @@ body > * .nav ~ * {
 /* ── Border Beam on role cards ── */
 #sbDashboard .d-role-card {
   position: relative;
-  isolation: isolate;
 }
-#sbDashboard .d-role-card::before {
+#sbDashboard .d-role-card::after {
   content: '';
   position: absolute;
-  inset: -1px;
+  inset: 0;
   border-radius: inherit;
+  padding: 1.5px;
   background: conic-gradient(
     from var(--ba) at 50% 50%,
     transparent 0deg, transparent 310deg,
-    rgba(79,195,247,.9) 345deg, rgba(200,240,255,1) 355deg, transparent 360deg
+    rgba(79,195,247,.85) 345deg, rgba(200,240,255,1) 355deg, transparent 360deg
   );
-  z-index: -1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 10;
   opacity: 0;
-  transition: opacity .35s;
+  transition: opacity .3s;
 }
-#sbDashboard .d-role-card:hover::before {
+#sbDashboard .d-role-card:hover::after {
   opacity: 1;
   animation: beamSpin 3.5s linear infinite;
 }
 
 /* ── Chrome card surface — top-edge highlight + brushed gradient ── */
-#sbDashboard .d-sc-card,
+#sbDashboard .d-ship-card,
 #sbDashboard .d-role-card {
   border-top: 1px solid rgba(255,255,255,.16) !important;
   border-left: 1px solid rgba(255,255,255,.07) !important;
