@@ -620,7 +620,7 @@ function updatePwr() {
   var out=0,draw=0,wpM=0,enM=0,sgHP=0;
   var sgs = _pwrComps.filter(function(c){return c.cat==='sg';});
   var db = COMP_DB||{};
-  var coObj = _curShip ? (typeof (_curShip.comps||'{}')==="string"?(typeof (_curShip.comps||'{}')==="string"?__safeParse(_curShip.comps||'{}'):(_curShip.comps||'{}')||{}):(_curShip.comps||'{}'||{})) : {};
+  var coObj = _curShip ? (_curShip.comps || {}) : {};
   var sgN = coObj.sg||'';
   var sgD = db.sg&&db.sg[sgN] ? db.sg[sgN] : null;
   var baseSHP = sgD ? sgD.totalHP * sgs.length : 5400;
