@@ -418,7 +418,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
 <script>
 // ============================================================
-// DATA ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ loaded from parent window or fetched
+// DATA ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ loaded from parent window or fetched
 // ============================================================
 var SHIP_DATA = {}, WEAPONS = [], COMP_DB = {}, WEAP_BY_ID = {};
 var _curShip = null, _curShipName = '', _loadout = {}, _pwrComps = null, _mode = 'scm';
@@ -428,7 +428,7 @@ var CC = {pp:'rgba(200,158,48,.82)',sg:'rgba(28,160,210,.82)',wp:'rgba(220,72,40
 var CL = {pp:'Pwr Plant',sg:'Shield',wp:'Weapons',en:'Engines',co:'Cooler',qd:'Q-Drive',rd:'Radar'};
 
 // ============================================================
-// INIT ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ try to grab data from parent window
+// INIT ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ try to grab data from parent window
 // ============================================================
 function init() {
   progress(10, 'LOADING SHIP DATA...');
@@ -535,7 +535,7 @@ function cDraw(c,p){ if(c.output) return 0; if(!c.dMax) return c.dMin||0; return
 function pMult(p,m){ return 0.5+(p/m); }
 
 function buildPwrComps() {
-  var ship = _curShip, co = JSON.parse(ship.comps||'{}');
+  var ship = _curShip, co = ship.comps||{};
   var cnt = co.counts||{}, db = COMP_DB||{};
   var list = [];
   var ppN = co.pp||'Power Plant', ppC = cnt.pp||1;
@@ -682,7 +682,7 @@ function updateStats() {
   if(!_curShip) return;
   var ship = _curShip;
   var db = COMP_DB||{};
-  var coObj = JSON.parse(ship.comps||'{}');
+  var coObj = ship.comps||{};
   var sgN = coObj.sg||''; var sgD = db.sg&&db.sg[sgN] ? db.sg[sgN] : null;
   var cnt = coObj.counts||{}; var sgC = cnt.sg||1;
   var totalSHP = sgD ? sgD.totalHP*sgC : '--';
@@ -719,7 +719,7 @@ function buildHpBand() {
   var ship = _curShip;
   var slots = ship.slots || [];
   var db = COMP_DB||{};
-  var coObj = JSON.parse(ship.comps||'{}');
+  var coObj = ship.comps||{};
   var cnt = coObj.counts||{};
 
   // Weapon slots
