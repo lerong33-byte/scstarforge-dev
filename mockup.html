@@ -68,14 +68,40 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   box-shadow:0 0 6px rgba(86,230,120,.65);}
 
 /* SCENE */
-#scene{position:fixed;top:42px;left:0;right:0;bottom:0;overflow:hidden;}
+#scene{position:fixed;top:42px;left:0;right:0;bottom:0;overflow:hidden;
+  perspective:2400px;perspective-origin:50% 55%;}
 #scene::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
   background:
-    radial-gradient(ellipse 70% 50% at 30% 30%,rgba(60,30,120,.16),transparent 65%),
+    radial-gradient(ellipse 70% 50% at 30% 30%,rgba(60,30,120,.14),transparent 65%),
     radial-gradient(ellipse 60% 50% at 75% 75%,rgba(20,80,140,.10),transparent 60%),
-    radial-gradient(ellipse 80% 80% at 50% 50%,transparent 60%,rgba(0,0,0,.40) 100%);}
+    radial-gradient(ellipse 80% 80% at 50% 50%,transparent 50%,rgba(0,0,0,.55) 100%);}
 #scene::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
   background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(86,230,120,.012) 3px,rgba(86,230,120,.012) 4px);}
+
+/* COCKPIT FRAME — curved canopy + dashboard */
+#cockpit{position:absolute;inset:0;z-index:30;pointer-events:none;}
+#cockpit svg{width:100%;height:100%;display:block;}
+/* canopy top arc — dark frame at top corners */
+#cockpit::before{content:'';position:absolute;top:-60px;left:-40px;right:-40px;height:240px;z-index:31;
+  background:radial-gradient(ellipse 60% 100% at 50% 100%,transparent 50%,rgba(0,0,0,.55) 75%,rgba(0,0,0,.92) 100%);
+  pointer-events:none;}
+/* dashboard bottom curve */
+#cockpit::after{content:'';position:absolute;bottom:-40px;left:-40px;right:-40px;height:120px;z-index:31;
+  background:radial-gradient(ellipse 80% 100% at 50% 0%,transparent 30%,rgba(0,0,0,.50) 70%,rgba(0,0,0,.92) 100%);
+  pointer-events:none;}
+/* left strut */
+.strut{position:absolute;top:0;bottom:0;width:40px;z-index:32;pointer-events:none;}
+.strut.l{left:0;background:linear-gradient(90deg,rgba(0,0,0,.78) 0%,rgba(8,12,18,.55) 60%,transparent 100%);}
+.strut.r{right:0;background:linear-gradient(270deg,rgba(0,0,0,.78) 0%,rgba(8,12,18,.55) 60%,transparent 100%);}
+.strut::before{content:'';position:absolute;top:18%;bottom:18%;width:1px;
+  background:linear-gradient(to bottom,transparent,rgba(86,230,120,.22),transparent);}
+.strut.l::before{right:6px;}
+.strut.r::before{left:6px;}
+/* canopy edge highlight */
+.canopy-edge{position:absolute;left:50%;transform:translateX(-50%);top:0;
+  width:88%;height:2px;z-index:33;pointer-events:none;
+  background:radial-gradient(ellipse 100% 800% at 50% 100%,rgba(86,230,120,.28),transparent 70%);
+  filter:blur(.5px);}
 
 /* SHIP CENTER */
 #ship-center{position:absolute;top:60px;left:50%;transform:translateX(-50%);
@@ -151,11 +177,16 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .hdiv,.hdiv-r{height:1px;background:linear-gradient(to right,transparent,var(--g-m),transparent);margin:1px 8px;}
 .hgap{height:6px;}
 
-/* SHIP COMPONENTS — RIGHT VERTICAL ZONE */
-#comp-zone{position:absolute;top:230px;right:18px;width:300px;bottom:18px;
-  z-index:9;padding:12px 0;
+/* SHIP COMPONENTS — RIGHT VERTICAL ZONE (tilted into cockpit) */
+#comp-zone{position:absolute;top:230px;right:38px;width:300px;bottom:50px;
+  z-index:9;padding:14px 6px 14px 8px;
   display:flex;flex-direction:column;gap:6px;
-  overflow-y:auto;overflow-x:hidden;}
+  overflow-y:auto;overflow-x:hidden;
+  transform:perspective(1400px) rotateY(-7deg);transform-origin:right center;
+  background:linear-gradient(270deg,rgba(8,14,18,.40),rgba(4,8,14,.20) 70%,transparent);
+  border-right:1px solid rgba(86,230,120,.18);
+  box-shadow:inset -1px 0 0 rgba(86,230,120,.10),inset -18px 0 30px rgba(86,230,120,.04);
+  clip-path:polygon(0 0,100% 18px,100% 100%,0 100%);}
 #comp-zone::-webkit-scrollbar{width:2px;}
 #comp-zone::-webkit-scrollbar-thumb{background:var(--g-m);}
 #comp-zone::before{content:'SHIP COMPONENTS';font-size:8px;letter-spacing:4px;
@@ -186,11 +217,16 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 /* ZONE HEADER */
 .zone-hdr{display:none;}
 
-/* POWER MGMT — LEFT VERTICAL ZONE */
-#pwr-ribbon{position:absolute;top:230px;left:18px;width:300px;
-  bottom:18px;z-index:15;
-  padding:12px 6px 12px 0;display:block;
-  overflow-y:scroll;overflow-x:hidden;}
+/* POWER MGMT — LEFT VERTICAL ZONE (tilted into cockpit) */
+#pwr-ribbon{position:absolute;top:230px;left:38px;width:300px;
+  bottom:50px;z-index:15;
+  padding:14px 8px 14px 6px;display:block;
+  overflow-y:scroll;overflow-x:hidden;
+  transform:perspective(1400px) rotateY(7deg);transform-origin:left center;
+  background:linear-gradient(90deg,rgba(8,14,18,.40),rgba(4,8,14,.20) 70%,transparent);
+  border-left:1px solid rgba(86,230,120,.18);
+  box-shadow:inset 1px 0 0 rgba(86,230,120,.10),inset 18px 0 30px rgba(86,230,120,.04);
+  clip-path:polygon(0 18px,18px 0,100% 0,100% 100%,0 100%);}
 #pwr-ribbon::-webkit-scrollbar{width:4px;}
 #pwr-ribbon::-webkit-scrollbar-track{background:rgba(86,230,120,.04);}
 #pwr-ribbon::-webkit-scrollbar-thumb{background:var(--g-d);border-radius:2px;}
@@ -266,9 +302,14 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   border:1px solid var(--r-d);padding:4px 8px;letter-spacing:1px;
   margin:6px 12px 0;display:none;text-align:center;}
 
-/* HARDPOINTS — MIDDLE BOTTOM (centered) */
-#hp-band{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
-  width:520px;z-index:16;padding:10px 0;background:none;border:none;}
+/* HARDPOINTS — MIDDLE BOTTOM (dashboard) */
+#hp-band{position:absolute;bottom:30px;left:50%;
+  transform:translateX(-50%) perspective(1400px) rotateX(8deg);
+  transform-origin:bottom center;
+  width:520px;z-index:16;padding:14px 16px;background:linear-gradient(180deg,transparent,rgba(8,14,18,.45) 30%,rgba(8,14,18,.65));
+  border-top:1px solid rgba(86,230,120,.16);
+  box-shadow:inset 0 1px 0 rgba(86,230,120,.10),0 0 28px rgba(86,230,120,.04);
+  clip-path:polygon(18px 0,calc(100% - 18px) 0,100% 100%,0 100%);}
 #hp-band::before{content:'WEAPONS · MISSILES';font-size:8px;letter-spacing:4px;
   color:var(--g-d);text-align:center;display:block;
   padding-bottom:8px;border-bottom:1px solid var(--g-m);margin-bottom:6px;}
@@ -428,6 +469,11 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
 <!-- SCENE -->
 <div id="scene">
+  <div id="cockpit">
+    <div class="canopy-edge"></div>
+    <div class="strut l"></div>
+    <div class="strut r"></div>
+  </div>
 
   <!-- SHIP CENTER -->
   <div id="ship-center">
