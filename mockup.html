@@ -453,9 +453,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   box-shadow:inset 0 1px 0 rgba(72,66,56,.28),inset 0 -1px 0 rgba(0,0,0,.60);}
 .pp.e::after{opacity:.40;}
 /* filled pips — backlit METALLIC plates with strong inner glow */
-.pp.pp-c{background:linear-gradient(180deg,#f4d878 0%,#d4a040 50%,#a06c14 100%);
-  box-shadow:inset 0 0 8px rgba(255,232,156,.55),inset 0 1px 0 rgba(255,244,196,.65),
-    0 0 4px rgba(232,184,72,.40);}
+.pp.pp-c{background:linear-gradient(180deg,#ff7050 0%,#e83828 50%,#a01608 100%);
+  box-shadow:inset 0 0 8px rgba(255,160,128,.65),inset 0 1px 0 rgba(255,200,176,.75),
+    0 0 4px rgba(232,56,40,.50);}
 .pp.sg{background:linear-gradient(180deg,#b8c8e0 0%,#7088a8 50%,#3c4c68 100%);
   box-shadow:inset 0 0 8px rgba(208,224,248,.55),inset 0 1px 0 rgba(232,240,252,.65),
     0 0 4px rgba(120,144,184,.40);}
@@ -479,9 +479,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .padj{display:none;}
 .pc-eu{display:none;}
 /* category icons via ::before on .pc */
-.pc::after{content:'';display:block;width:14px;height:14px;order:0;margin-bottom:2px;
+.pc::after{content:'';display:block;width:14px;height:14px;order:99;margin-top:3px;
   background-position:center;background-repeat:no-repeat;background-size:contain;
-  opacity:.86;}
+  opacity:.86;cursor:help;}
 .pc-pp::after{content:'\26a1';display:flex;align-items:center;justify-content:center;
   font-size:12px;color:#e8b830;text-shadow:0 0 4px rgba(232,184,48,.45);background:none;}
 .pc-sg::after{content:'\25cb';font-size:13px;color:#28b8e0;
@@ -1414,20 +1414,23 @@ function loadShip(name) {
   document.getElementById('ship-type').textContent =
     (_curShip.role||'').toUpperCase() + ' \u00b7 SIZE ' + (_curShip.size||'?') + ' \u00b7 ' + (mfrName(name)||'');
 
-  // Ship image — fetch via Fleetyards API (cdn.fleetyards.net is dead)
+  // Ship image — fetch via Fleetyards API images endpoint
   var img = document.getElementById('ship-img');
   img.style.opacity = '0';
   img.src = '';
   var slugBase = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-  var slugCandidates = [slugBase, 'anvl-'+slugBase, 'aegs-'+slugBase, 'rsi-'+slugBase, 'misc-'+slugBase, 'drak-'+slugBase, 'crus-'+slugBase, 'orig-'+slugBase, 'kruger-'+slugBase, 'tmbl-'+slugBase];
+  var slugCandidates = [slugBase, 'anvl-'+slugBase, 'aegs-'+slugBase, 'rsi-'+slugBase, 'misc-'+slugBase, 'drak-'+slugBase, 'crus-'+slugBase, 'orig-'+slugBase, 'kruger-'+slugBase, 'tmbl-'+slugBase, 'argo-'+slugBase];
   (function tryNext(i){
     if(i >= slugCandidates.length) return;
-    fetch('https://api.fleetyards.net/v1/models/' + slugCandidates[i])
+    fetch('https://api.fleetyards.net/v1/models/' + slugCandidates[i] + '/images')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
-        if(!data){ tryNext(i+1); return; }
-        var url = data.holo || data.brochure || (data.links && data.links.frontend);
-        if(url && url.indexOf('holo') > -1){
+        if(!data || !data.items || !data.items.length){ tryNext(i+1); return; }
+        // Prefer non-background image, then background
+        var nonBg = data.items.find(function(it){ return !it.background; });
+        var pick = nonBg || data.items[0];
+        var url = pick.smallUrl || pick.url;
+        if(url){
           img.onload = function(){ img.style.opacity = '0.85'; };
           img.onerror = function(){ tryNext(i+1); };
           img.src = url;
@@ -1498,10 +1501,12 @@ function buildPwrComps() {
 
 function renderPwrComps() {
   var flow = document.getElementById('pwr-comps'); flow.innerHTML = '';
+  var CL_FULL = {pp:'POWER PLANT',sg:'SHIELD GENERATOR',wp:'WEAPONS',en:'THRUSTERS',co:'COOLER',qd:'QUANTUM DRIVE',rd:'RADAR'};
   _pwrComps.forEach(function(c){
     var hp = ['wp','sg','en'].indexOf(c.cat) > -1;
     var el = document.createElement('div');
     el.id = 'prc-'+c.id; el.className = 'pc pc-'+c.cat+(c.on?'':' offline');
+    el.title = (CL_FULL[c.cat]||c.cat.toUpperCase()) + (c.name && c.name !== CL_FULL[c.cat] ? ' / ' + c.name : '') + ' (' + (c.on?'ON':'OFF') + ')';
     el.innerHTML =
       '<div class="pc-head">' +
         '<div class="ptog '+(c.on?'on':'off')+'" id="ptog-'+c.id+'" onclick="togComp(\''+c.id+'\')"><div class="ptog-k"></div></div>' +
