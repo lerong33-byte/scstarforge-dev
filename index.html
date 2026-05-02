@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.91</title>
+<title>SC-ShipForge v8.90</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -42,14 +42,14 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
 /* ── TOKENS ── */
 button{background:transparent;border:none;cursor:pointer;font-family:inherit;outline:none}
 :root{
-  --bg:#0b0e15;--bg2:#10141e;--bg3:#151c28;--bg4:#1c2334;
-  --border:rgba(180,200,230,.10);--b2:rgba(180,200,230,.18);
-  --text:#dce8f8;--t2:#7890aa;--t3:#3a4e62;
-  --accent:#e8a034;--accent-bg:rgba(232,160,52,.10);--accent-border:rgba(232,160,52,.30);
-  --green:#3ac97a;--green-bg:rgba(58,201,122,.10);--green-border:rgba(58,201,122,.30);
+  --bg:#0e1117;--bg2:#141820;--bg3:#1a1f28;--bg4:#1f2530;
+  --border:#252d3a;--b2:#2e3a4a;
+  --text:#c8d4e0;--t2:#6a7f96;--t3:#3a4a5a;
+  --accent:#4dff6e;--accent-bg:rgba(77,255,110,.10);--accent-border:rgba(77,255,110,.30);
+  --green:#4dff6e;--green-bg:rgba(77,255,110,.10);--green-border:rgba(77,255,110,.30);
   --warn:#ffd54f;--warn-bg:rgba(255,213,79,.10);--warn-border:rgba(255,213,79,.30);
   --red:#e85060;--red-bg:rgba(232,80,96,.1);--red-border:rgba(232,80,96,.3);
-  --cyan:#40e0ff;--purple:#9080d8;--muted:#3a4a5a;--blue:#5ba8ff;
+  --cyan:#40e0ff;--purple:#9080d8;--muted:#3a4a5a;--blue:#4dff6e;
   --fhud:'Inter',sans-serif;--fmono:'JetBrains Mono',monospace;
   --r:8px;--r-sm:5px;--r-lg:12px
 }
@@ -404,7 +404,7 @@ option,optgroup{background:var(--bg2)}
 
 .pn-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:visible}
 .pn-card-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.pn-version{font-size:16px;font-weight:600;font-family:var(--fmono);color:var(--accent);text-shadow:0 0 8px rgba(232,160,52,.3)}
+.pn-version{font-size:16px;font-weight:600;font-family:var(--fmono);color:var(--accent);text-shadow:0 0 8px rgba(77,255,110,.3)}
 .pn-date{font-size:12px;color:var(--t3);font-family:var(--fmono)}
 .pn-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;margin-left:auto}
 .pn-tag-live{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
@@ -423,7 +423,7 @@ option,optgroup{background:var(--bg2)}
 /* responsive media queries disabled — fixed layout only */
 
 .fb-type-btn.active{border-color:var(--accent)!important;color:var(--accent)!important;background:var(--accent-bg)!important}
-#feedbackBtn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(232,160,52,.3)}
+#feedbackBtn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(77,255,110,.3)}
 #fbText:focus{outline:none;border-color:var(--accent)}
 #fbEmail:focus{outline:none;border-color:var(--accent)}
 
@@ -432,7 +432,7 @@ option,optgroup{background:var(--bg2)}
 
 /* ── Resizable panels ── */
 .resize-handle{width:6px;flex-shrink:0;background:transparent;cursor:col-resize;position:relative;z-index:10;transition:background .15s}
-.resize-handle:hover,.resize-handle.dragging{background:rgba(232,160,52,.3)}
+.resize-handle:hover,.resize-handle.dragging{background:rgba(77,255,110,.3)}
 .resize-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);height:40px;width:2px;background:var(--border);border-radius:2px;transition:background .15s}
 .resize-handle:hover::after,.resize-handle.dragging::after{background:var(--accent)}
 .body{user-select:none}
@@ -530,10 +530,10 @@ option,optgroup{background:var(--bg2)}
 
 
 /* ── Scrollbars ── */
-.lp-scroll,.rp-scroll{scrollbar-width:thin;scrollbar-color:#e8a034 #141820}
+.lp-scroll,.rp-scroll{scrollbar-width:thin;scrollbar-color:#4dff6e #141820}
 .lp-scroll::-webkit-scrollbar,.rp-scroll::-webkit-scrollbar{width:6px;height:6px}
 .lp-scroll::-webkit-scrollbar-track,.rp-scroll::-webkit-scrollbar-track{background:#141820;border-radius:3px}
-.lp-scroll::-webkit-scrollbar-thumb,.rp-scroll::-webkit-scrollbar-thumb{background:#e8a034;border-radius:3px;min-height:40px;opacity:.5}
+.lp-scroll::-webkit-scrollbar-thumb,.rp-scroll::-webkit-scrollbar-thumb{background:#4dff6e;border-radius:3px;min-height:40px;opacity:.5}
 .lp-scroll::-webkit-scrollbar-thumb:hover,.rp-scroll::-webkit-scrollbar-thumb:hover{background:#7aff8e}
 .lp-scroll::-webkit-scrollbar-corner,.rp-scroll::-webkit-scrollbar-corner{background:#141820}
 
@@ -548,7 +548,7 @@ option,optgroup{background:var(--bg2)}
 /* ── Smart Ship Search ── */
 .ss-wrap{position:relative;display:flex;align-items:center;min-width:180px;max-width:280px}
 .ss-input{width:100%;background:#1a1f28;border:1px solid #252d3a;border-radius:20px;padding:6px 28px 6px 32px;font-size:13px;color:#c8d4e0;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .15s}
-.ss-input:focus,.ss-input.has-val{border-color:#e8a034}
+.ss-input:focus,.ss-input.has-val{border-color:#4dff6e}
 .ss-icon{position:absolute;left:11px;color:#3a4a5a;font-size:13px;pointer-events:none}
 .ss-clear{position:absolute;right:9px;background:none;border:none;color:#3a4a5a;cursor:pointer;font-size:15px;line-height:1;padding:0;display:none}
 .ss-clear.show{display:block}
@@ -557,13 +557,13 @@ option,optgroup{background:var(--bg2)}
 .ss-inner{height:auto;max-height:80vh;overflow-y:auto;overflow-y:scroll;max-height:100vh;overflow-y:auto}
 .ss-inner::-webkit-scrollbar{width:3px}
 .ss-inner::-webkit-scrollbar-thumb{background:#252d3a}
-.ss-group-lbl{font-size:10px;letter-spacing:2px;color:#e8a034;font-family:'JetBrains Mono',monospace;padding:10px 12px 4px;text-transform:uppercase;background:#0e1117;position:sticky;top:0;z-index:1;border-left:3px solid #e8a034;font-weight:700}
+.ss-group-lbl{font-size:10px;letter-spacing:2px;color:#4dff6e;font-family:'JetBrains Mono',monospace;padding:10px 12px 4px;text-transform:uppercase;background:#0e1117;position:sticky;top:0;z-index:1;border-left:3px solid #4dff6e;font-weight:700}
 .ss-item{display:block;padding:8px 12px;display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;transition:background .1s}
 .ss-item:hover,.ss-item.hi{background:#1f2530}
 .ss-thumb{width:36px;height:24px;object-fit:contain;border-radius:3px;flex-shrink:0;background:#0e1117;opacity:.9}
 .ss-thumb-ph{width:36px;height:24px;display:flex;align-items:center;justify-content:center;color:#3a4a5a;font-size:14px;flex-shrink:0}
 .ss-name{flex:1;font-size:12px;font-family:'JetBrains Mono',monospace;color:#c8d4e0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ss-name mark{background:none;color:#e8a034;font-weight:700;font-style:normal}
+.ss-name mark{background:none;color:#4dff6e;font-weight:700;font-style:normal}
 .ss-sz{font-size:9px;font-family:'JetBrains Mono',monospace;color:#4a5a70;border:1px solid #252d3a;border-radius:3px;padding:1px 5px;flex-shrink:0}
 .ss-mfr{font-size:9px;color:#3a4a5a;flex-shrink:0;font-family:'JetBrains Mono',monospace}
 .ss-empty{padding:14px 12px;text-align:center;color:#3a4a5a;font-size:11px;font-family:'JetBrains Mono',monospace}
@@ -623,10 +623,10 @@ option,optgroup{background:var(--bg2)}
 
 /* ── Erkul Power Reskin v5.0 — ALL rules scoped to #pwrCard ── */
 #pwrCard{background:linear-gradient(160deg,#161c26,#121620)!important;border:1px solid rgba(56,189,248,0.18)!important;border-radius:6px!important;position:relative!important;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04)!important}
-#pwrCard::before,#pwrCard::after{content:'';position:absolute;width:12px;height:12px;border-color:rgba(232,160,52,0.7);border-style:solid;pointer-events:none;z-index:1}
+#pwrCard::before,#pwrCard::after{content:'';position:absolute;width:12px;height:12px;border-color:rgba(77,255,110,0.7);border-style:solid;pointer-events:none;z-index:1}
 #pwrCard::before{top:5px;left:5px;border-width:1.5px 0 0 1.5px}
 #pwrCard::after{top:5px;right:5px;border-width:1.5px 1.5px 0 0}
-#pwrCard .lp-card-title{font-family:'Rajdhani','JetBrains Mono',monospace!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.18em!important;color:#e8a034!important}
+#pwrCard .lp-card-title{font-family:'Rajdhani','JetBrains Mono',monospace!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.18em!important;color:#4dff6e!important}
 #pwrCard .pwr-eu{font-family:'JetBrains Mono',monospace!important;font-size:13px!important;font-weight:600!important;color:#f59e0b!important}
 #pwrCard .con-lbl{font-family:'Rajdhani',monospace!important;font-size:10px!important;font-weight:600!important;letter-spacing:0.18em!important;color:#8a94a3!important}
 #pwrCard #pwrPct{font-family:'JetBrains Mono',monospace!important;font-size:11px!important;font-weight:600!important}
@@ -666,15 +666,15 @@ option,optgroup{background:var(--bg2)}
 #pane-ships .ships-count{font-family:'JetBrains Mono',monospace;font-size:12px;color:#6a7f96;background:rgba(79,195,247,0.08);padding:4px 10px;border-radius:12px;border:1px solid rgba(79,195,247,0.15)}
 #pane-ships .ships-search-row{margin-bottom:10px;position:sticky;top:44px;z-index:2;background:#0e1117;padding-bottom:4px}
 #pane-ships .ships-search{width:100%;background:#0d1117;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px 10px 38px;font-size:14px;color:#e6ebf2;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238a94a3' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:12px center;box-sizing:border-box}
-#pane-ships .ships-search:focus{border-color:#e8a034;box-shadow:0 0 0 2px rgba(79,195,247,0.1)}
+#pane-ships .ships-search:focus{border-color:#4dff6e;box-shadow:0 0 0 2px rgba(79,195,247,0.1)}
 #pane-ships .ships-search::placeholder{color:#4a5568}
 #pane-ships .ships-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;position:sticky;top:88px;z-index:2;background:#0e1117;padding-bottom:8px}
 #pane-ships .ships-filter-btn{padding:6px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.06em;border-radius:20px;border:1px solid rgba(255,255,255,0.08);color:#8a94a3;background:transparent;cursor:pointer;transition:all .2s;text-transform:uppercase}
 #pane-ships .ships-filter-btn:hover{border-color:rgba(56,189,248,0.3);color:#c0cee0}
-#pane-ships .ships-filter-btn.on{background:rgba(79,195,247,0.12);border-color:rgba(232,160,52,0.4);color:#e8a034}
+#pane-ships .ships-filter-btn.on{background:rgba(79,195,247,0.12);border-color:rgba(77,255,110,0.4);color:#4dff6e}
 #pane-ships .ships-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding-bottom:20px;content-visibility:auto}
 #pane-ships .ship-card{position:relative;background:#1a1f28;border:1px solid rgba(79,195,247,0.08);border-radius:10px;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;will-change:transform;contain:layout style}
-#pane-ships .ship-card:hover{transform:translateY(-3px);border-color:rgba(232,160,52,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+#pane-ships .ship-card:hover{transform:translateY(-3px);border-color:rgba(77,255,110,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
 #pane-ships .ship-card-img-wrap{position:relative;width:100%;height:170px;overflow:hidden;background:#0e1117;border-radius:10px 10px 0 0}
 #pane-ships .ship-card-img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
 #pane-ships .ship-card:hover .ship-card-img{transform:scale(1.05)}
@@ -685,8 +685,8 @@ option,optgroup{background:var(--bg2)}
 #pane-ships .ship-card-mfr{font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a6577;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #pane-ships .ship-card-footer{display:flex;align-items:center;justify-content:space-between}
 #pane-ships .ship-card-role-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:#8a94a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
-#pane-ships .ship-card-builder{padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(232,160,52,0.3);color:#e8a034;background:rgba(79,195,247,0.06);cursor:pointer;transition:all .2s;white-space:nowrap}
-#pane-ships .ship-card-builder:hover{background:rgba(232,160,52,0.15);border-color:#e8a034}
+#pane-ships .ship-card-builder{padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(77,255,110,0.3);color:#4dff6e;background:rgba(79,195,247,0.06);cursor:pointer;transition:all .2s;white-space:nowrap}
+#pane-ships .ship-card-builder:hover{background:rgba(77,255,110,0.15);border-color:#4dff6e}
 #pane-ships .ship-card-no-img{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#252d3a;font-family:'Rajdhani',sans-serif;font-size:40px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em}
 #pane-ships .ship-card-price-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,0.04)}
 #pane-ships .ship-card-price{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#22c55e}
@@ -702,7 +702,7 @@ option,optgroup{background:var(--bg2)}
 #pane-wp .wc-stats{display:flex;flex-direction:column;gap:4px}
 #pane-wp .wc-st{display:flex;justify-content:space-between;align-items:center}
 #pane-wp .wc-sl{font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6577;text-transform:uppercase;letter-spacing:.06em}
-#pane-wp .wc-sv{font-family:'JetBrains Mono',monospace;font-size:12px;color:#e8a034;font-weight:600}
+#pane-wp .wc-sv{font-family:'JetBrains Mono',monospace;font-size:12px;color:#4dff6e;font-weight:600}
 #compGrid .wcard{padding:12px}
 
 
@@ -730,11 +730,11 @@ option,optgroup{background:var(--bg2)}
 .wpm-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
 .wpm-stat{background:rgba(255,255,255,0.03);border-radius:6px;padding:8px;text-align:center}
 .wpm-stat-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6577;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
-.wpm-stat-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#e8a034}
-.wpm-section{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8a034;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;border-bottom:1px solid rgba(79,195,247,0.1);padding-bottom:4px}
+.wpm-stat-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#4dff6e}
+.wpm-section{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#4dff6e;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;border-bottom:1px solid rgba(79,195,247,0.1);padding-bottom:4px}
 .wpm-ships{display:flex;flex-wrap:wrap;gap:6px}
 .wpm-ship{font-family:'JetBrains Mono',monospace;font-size:11px;color:#c0cee0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .15s}
-.wpm-ship:hover{background:rgba(79,195,247,0.1);border-color:rgba(232,160,52,0.3);color:#e8a034}
+.wpm-ship:hover{background:rgba(79,195,247,0.1);border-color:rgba(77,255,110,0.3);color:#4dff6e}
 .wpm-ship-sz{font-size:9px;color:#5a6577;margin-left:4px}
 .wpm-img-wrap{width:100%;height:160px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:16px;border:1px solid rgba(79,195,247,0.1)}
 .wpm-img-wrap img{max-width:100%;max-height:160px;object-fit:contain;display:block}
@@ -748,9 +748,9 @@ option,optgroup{background:var(--bg2)}
 .wpm-badge-pp{background:rgba(255,180,0,0.12);color:#ffb400;border:1px solid rgba(255,180,0,0.3)}
 .wpm-badge-sg{background:rgba(79,195,247,0.12);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3)}
 .wpm-badge-cooler{background:rgba(100,220,255,0.12);color:#64dcff;border:1px solid rgba(100,220,255,0.3)}
-.wpm-badge-qd{background:rgba(232,160,52,0.12);color:#e8a034;border:1px solid rgba(232,160,52,0.3)}
+.wpm-badge-qd{background:rgba(77,255,110,0.12);color:#4dff6e;border:1px solid rgba(77,255,110,0.3)}
 .wpm-loc{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8a94a3;margin-bottom:16px}
-.wpm-loc-star{color:#e8a034}
+.wpm-loc-star{color:#4dff6e}
 .wl-row{cursor:pointer}
 
 #shipModal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center}
@@ -767,15 +767,15 @@ option,optgroup{background:var(--bg2)}
 .sm-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
 .sm-ov{background:rgba(255,255,255,0.03);border-radius:6px;padding:8px;text-align:center}
 .sm-ov-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6577;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
-.sm-ov-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#e8a034}
+.sm-ov-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#4dff6e}
 .sm-price{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:8px 12px;background:rgba(79,195,247,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:8px}
 .sm-price-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#22c55e}
 .sm-price-loc{font-family:'JetBrains Mono',monospace;font-size:10px;color:#8a94a3}
-.sm-section{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8a034;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px;border-bottom:1px solid rgba(79,195,247,0.1);padding-bottom:4px}
+.sm-section{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#4dff6e;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px;border-bottom:1px solid rgba(79,195,247,0.1);padding-bottom:4px}
 .sm-slots{display:flex;flex-direction:column;gap:4px}
 .sm-slot{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px}
 .sm-slot-name{color:#c0cee0}
-.sm-slot-sz{color:#e8a034;font-weight:700;font-size:10px;background:rgba(79,195,247,0.1);padding:2px 6px;border-radius:4px}
+.sm-slot-sz{color:#4dff6e;font-weight:700;font-size:10px;background:rgba(79,195,247,0.1);padding:2px 6px;border-radius:4px}
 .sm-comps{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .sm-comp{padding:6px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px}
 .sm-comp-lbl{color:#5a6577;font-size:9px;text-transform:uppercase;display:block;margin-bottom:2px}
@@ -783,9 +783,9 @@ option,optgroup{background:var(--bg2)}
 .sm-comp-ct{color:#5a6577;font-size:9px}
 .sm-tips{margin-top:12px}
 .sm-tip{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8a94a3;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
-.sm-tip::before{content:'\25B8 ';color:#e8a034}
-.sm-builder-btn{display:block;width:100%;margin-top:16px;padding:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;border-radius:8px;border:1px solid rgba(232,160,52,0.4);color:#e8a034;background:rgba(79,195,247,0.08);cursor:pointer;transition:all .2s}
-.sm-builder-btn:hover{background:rgba(232,160,52,0.2);border-color:#e8a034}
+.sm-tip::before{content:'\25B8 ';color:#4dff6e}
+.sm-builder-btn{display:block;width:100%;margin-top:16px;padding:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;border-radius:8px;border:1px solid rgba(77,255,110,0.4);color:#4dff6e;background:rgba(79,195,247,0.08);cursor:pointer;transition:all .2s}
+.sm-builder-btn:hover{background:rgba(77,255,110,0.2);border-color:#4dff6e}
 
 /* ── Responsive Layout ── */
 #app{max-width:100vw;width:100%}
@@ -940,44 +940,48 @@ option,optgroup{background:var(--bg2)}
 /* ── Military HUD Dashboard (empty state) ── */
 #sbDashboard{display:flex;flex-direction:column;gap:12px;padding:14px 16px;background:var(--bg);min-height:100%;box-sizing:border-box}
 #sbDashboard .d-welcome{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:16px 20px;display:flex;align-items:center;gap:18px;position:relative;overflow:hidden}
-#sbDashboard .d-welcome::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent) 0%,rgba(232,160,52,.3) 60%,transparent 100%)}
-#sbDashboard .d-welcome::after{display:none}
-#sbDashboard .d-wc{display:none}
+#sbDashboard .d-welcome::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green) 0%,var(--warn) 40%,transparent 80%)}
+#sbDashboard .d-welcome::after{content:'';position:absolute;bottom:0;right:0;width:40%;height:100%;background:repeating-linear-gradient(90deg,transparent,transparent 23px,rgba(79,195,247,.015) 23px,rgba(79,195,247,.015) 24px),repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(79,195,247,.015) 23px,rgba(79,195,247,.015) 24px);pointer-events:none}
+#sbDashboard .d-wc{position:absolute;width:12px;height:12px;border-color:var(--green);border-style:solid;opacity:.6}
+#sbDashboard .d-wc.tl{top:6px;left:6px;border-width:2px 0 0 2px}
+#sbDashboard .d-wc.tr{top:6px;right:6px;border-width:2px 2px 0 0}
+#sbDashboard .d-wc.bl{bottom:6px;left:6px;border-width:0 0 2px 2px}
+#sbDashboard .d-wc.br{bottom:6px;right:6px;border-width:0 2px 2px 0}
 #sbDashboard .d-icon{width:46px;height:46px;flex-shrink:0;background:var(--bg4);border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:inset 0 0 12px rgba(79,195,247,.04),0 0 10px rgba(79,195,247,.05)}
-#sbDashboard .d-welcome h1{font-size:17px;font-weight:700;font-family:var(--fhud);color:var(--text);letter-spacing:.5px;margin-bottom:6px}
+#sbDashboard .d-welcome h1{font-size:17px;font-weight:700;font-family:var(--fmono);color:var(--green);letter-spacing:2px;margin-bottom:6px;text-shadow:0 0 12px rgba(77,255,110,.6)}
 #sbDashboard .d-welcome p{font-size:13px;color:#8a9ab0;line-height:1.7;max-width:480px}
 #sbDashboard .d-cta{margin-left:auto;display:flex;flex-direction:column;gap:7px;align-items:flex-end;flex-shrink:0}
-#sbDashboard .d-btn-primary{background:rgba(232,160,52,.10);color:var(--accent);border:1px solid var(--accent-border);border-radius:6px;padding:8px 18px;font-size:12px;font-weight:600;font-family:var(--fhud);letter-spacing:.3px;cursor:pointer;transition:all .15s}
+#sbDashboard .d-btn-primary{background:rgba(77,255,110,.08);color:var(--green);border:1px solid var(--green);border-radius:2px;padding:7px 18px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;cursor:pointer;text-shadow:0 0 8px rgba(77,255,110,.4);box-shadow:0 0 12px rgba(77,255,110,.15);transition:all .15s}
 #sbDashboard .d-btn-primary:hover{background:rgba(79,195,247,.12);box-shadow:0 0 18px rgba(79,195,247,.2)}
 #sbDashboard .d-btn-secondary{background:transparent;border:1px solid var(--border);color:var(--t3);border-radius:2px;padding:5px 14px;font-size:10px;font-family:var(--fmono);letter-spacing:1px;cursor:pointer;transition:all .15s}
 #sbDashboard .d-btn-secondary:hover{border-color:var(--warn);color:var(--warn);text-shadow:0 0 6px rgba(255,213,79,.3)}
-#sbDashboard .d-sec-hd{font-size:12px;letter-spacing:.5px;color:var(--text);font-family:var(--fhud);font-weight:600;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+#sbDashboard .d-sec-hd{font-size:11px;letter-spacing:2.5px;color:var(--green);font-family:var(--fmono);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;text-shadow:0 0 8px rgba(77,255,110,.4)}
 #sbDashboard .d-sec-link{color:var(--warn);cursor:pointer;font-size:9px;letter-spacing:1px;text-shadow:0 0 5px rgba(255,213,79,.3)}
-#sbDashboard .d-role-grid{display:flex;flex-wrap:wrap;gap:5px}
-#sbDashboard .d-role-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 12px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;flex:1;min-width:80px}
+#sbDashboard .d-role-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}
+#sbDashboard .d-role-card{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:9px 5px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
 #sbDashboard .d-role-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);opacity:0;transition:opacity .15s}
-#sbDashboard .d-role-card:hover{border-color:var(--border);background:var(--bg4);box-shadow:0 2px 10px rgba(232,160,52,.07)}
+#sbDashboard .d-role-card:hover{border-color:var(--border);background:var(--bg4);box-shadow:0 2px 10px rgba(77,255,110,.07)}
 #sbDashboard .d-role-card:hover::after{opacity:.5}
 #sbDashboard .d-role-icon{font-size:20px;margin-bottom:5px}
-#sbDashboard .d-role-name{font-size:10px;font-family:var(--fhud);letter-spacing:.3px;color:var(--t2);margin-bottom:3px;text-transform:uppercase}
-#sbDashboard .d-role-count{font-size:16px;font-weight:700;font-family:var(--fmono);color:var(--accent)}
-#sbDashboard .d-two-col{display:grid;grid-template-columns:3fr 2fr;gap:16px}
-#sbDashboard .d-ship-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+#sbDashboard .d-role-name{font-size:10px;font-family:var(--fmono);letter-spacing:.5px;color:#8ab890;margin-bottom:3px;text-transform:uppercase}
+#sbDashboard .d-role-count{font-size:16px;font-weight:700;font-family:var(--fmono);color:var(--green);text-shadow:0 0 8px rgba(77,255,110,.5)}
+#sbDashboard .d-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#sbDashboard .d-ship-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 #sbDashboard .d-ship-card{background:var(--bg3);border:1px solid var(--border);border-radius:3px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative}
 #sbDashboard .d-ship-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green);opacity:0;transition:opacity .15s;z-index:1}
-#sbDashboard .d-ship-card:hover{border-color:var(--border);transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.35),0 0 10px rgba(232,160,52,.07)}
+#sbDashboard .d-ship-card:hover{border-color:var(--border);transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.35),0 0 10px rgba(77,255,110,.07)}
 #sbDashboard .d-ship-card:hover::before{opacity:.7}
 #sbDashboard .d-ship-img{height:90px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#0e1210}
-#sbDashboard .d-ship-img::after{display:none}
+#sbDashboard .d-ship-img::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 11px,rgba(77,255,110,.015) 11px,rgba(77,255,110,.015) 12px);pointer-events:none;z-index:1}
 #sbDashboard .d-ship-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transition:transform .3s}
 #sbDashboard .d-ship-card:hover .d-ship-img img{transform:scale(1.06)}
 #sbDashboard .d-ship-lbl{position:absolute;bottom:4px;left:6px;font-size:9px;font-family:var(--fmono);color:rgba(255,255,255,.55);letter-spacing:1px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
 #sbDashboard .d-ship-body{padding:7px 8px}
-#sbDashboard .d-ship-name{font-size:13px;font-weight:600;font-family:var(--fhud);color:var(--text);margin-bottom:2px}
-#sbDashboard .d-ship-role{font-size:10px;color:var(--t2);font-family:var(--fhud);letter-spacing:.2px}
+#sbDashboard .d-ship-name{font-size:13px;font-weight:700;font-family:var(--fmono);color:#e8f4e8;margin-bottom:2px}
+#sbDashboard .d-ship-role{font-size:9px;color:#8ab890;font-family:var(--fmono);letter-spacing:.5px}
 #sbDashboard .d-ship-dps{font-size:13px;color:var(--warn);font-family:var(--fmono);font-weight:700;margin-top:5px;text-shadow:0 0 6px rgba(255,213,79,.4)}
 #sbDashboard .d-tag{display:inline-block;border-radius:2px;padding:1px 4px;font-size:7px;font-family:var(--fmono);margin-top:4px;letter-spacing:.5px;font-weight:700}
-#sbDashboard .d-tag-pop{background:rgba(232,160,52,.1);border:1px solid rgba(232,160,52,.3);color:var(--green)}
+#sbDashboard .d-tag-pop{background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);color:var(--green)}
 #sbDashboard .d-tag-meta{background:rgba(64,224,255,.08);border:1px solid rgba(64,224,255,.25);color:var(--cyan)}
 #sbDashboard .d-tag-stl{background:rgba(180,180,220,.06);border:1px solid rgba(180,180,220,.18);color:#b0b8d8}
 #sbDashboard .d-tag-hvy{background:rgba(255,213,79,.1);border:1px solid rgba(255,213,79,.3);color:var(--warn)}
@@ -995,7 +999,7 @@ option,optgroup{background:var(--bg2)}
 #sbDashboard .d-pn-item.fix{border-left-color:var(--warn)}
 #sbDashboard .d-pn-item.data{border-left-color:var(--cyan)}
 #sbDashboard .d-pn-badge{font-size:7px;font-family:var(--fmono);letter-spacing:.5px;padding:2px 5px;border-radius:2px;flex-shrink:0;align-self:flex-start;margin-top:1px;font-weight:700}
-#sbDashboard .d-badge-new{background:rgba(232,160,52,.12);color:var(--green);border:1px solid rgba(232,160,52,.3);text-shadow:0 0 5px rgba(232,160,52,.3)}
+#sbDashboard .d-badge-new{background:rgba(77,255,110,.12);color:var(--green);border:1px solid rgba(77,255,110,.3);text-shadow:0 0 5px rgba(77,255,110,.3)}
 #sbDashboard .d-badge-fix{background:rgba(255,213,79,.12);color:var(--warn);border:1px solid rgba(255,213,79,.3);text-shadow:0 0 5px rgba(255,213,79,.3)}
 #sbDashboard .d-badge-data{background:rgba(64,224,255,.1);color:var(--cyan);border:1px solid rgba(64,224,255,.25)}
 #sbDashboard .d-pn-text{font-size:12px;color:#b0c8b0;line-height:1.6}
@@ -1083,7 +1087,7 @@ option,optgroup{background:var(--bg2)}
 
 /* ── MY FLEET TAB ── */
 .fleet-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;position:relative;transition:border-color .15s,box-shadow .15s;cursor:pointer}
-.fleet-card:hover{border-color:rgba(232,160,52,.4);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.fleet-card:hover{border-color:rgba(77,255,110,.4);box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .fleet-card-img-wrap{height:110px;overflow:hidden;background:var(--bg3);position:relative}
 .fleet-card-img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
 .fleet-card:hover .fleet-card-img{transform:scale(1.05)}
@@ -1096,1432 +1100,19 @@ option,optgroup{background:var(--bg2)}
 .fleet-card-role{font-family:var(--fmono);font-size:10px;color:var(--t3)}
 .fleet-card-remove{background:none;border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:3px 8px;font-size:9px;font-weight:700;font-family:var(--fmono);color:#f87171;cursor:pointer;transition:all .15s;letter-spacing:1px}
 .fleet-card-remove:hover{background:rgba(239,68,68,.15);border-color:#f87171}
-.fleet-card-builder{background:none;border:1px solid rgba(232,160,52,.25);border-radius:4px;padding:3px 8px;font-size:9px;font-weight:700;font-family:var(--fmono);color:#e8a034;cursor:pointer;transition:all .15s;letter-spacing:1px}
-.fleet-card-builder:hover{background:rgba(232,160,52,.12);border-color:#e8a034}
-.fleet-owned-badge{position:absolute;top:6px;right:6px;background:rgba(232,160,52,.85);color:#000;font-family:var(--fmono);font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;pointer-events:none;z-index:2}
+.fleet-card-builder{background:none;border:1px solid rgba(77,255,110,.25);border-radius:4px;padding:3px 8px;font-size:9px;font-weight:700;font-family:var(--fmono);color:#4dff6e;cursor:pointer;transition:all .15s;letter-spacing:1px}
+.fleet-card-builder:hover{background:rgba(77,255,110,.12);border-color:#4dff6e}
+.fleet-owned-badge{position:absolute;top:6px;right:6px;background:rgba(77,255,110,.85);color:#000;font-family:var(--fmono);font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;pointer-events:none;z-index:2}
 
 
 /* Fix: hide duplicate ship name overlay on ship cards */
 .fleet-card-img-name { display: none !important; }
-
-/* ═══════════════════════════════════════════════════════════════
-   SC-SHIPFORGE  ·  CINEMATIC GAMING REDESIGN
-   Inspired by Youplay / gaming site aesthetics + sci-fi atmosphere
-   ═══════════════════════════════════════════════════════════════ */
-
-#sbDashboard {
-  --g-bg:      #0b0e15;
-  --g-panel:   #131926;
-  --g-card:    #192030;
-  --g-border:  rgba(180,200,240,.08);
-  --g-amber:   #e8981a;
-  --g-blue:    #4fc3f7;
-  --g-chrome:  #b0c8e8;
-  --g-purple:  #6878a8;
-  --g-red:     #e53535;
-  --g-teal:    #2dd4aa;
-  --g-text:    #dce8f8;
-  --g-muted:   #5a7090;
-  background: var(--g-bg);
-  background-image:
-    radial-gradient(ellipse 100% 50% at 50% -10%, rgba(124,92,191,.18) 0%, transparent 65%),
-    radial-gradient(ellipse 60%  80% at 95%  50%, rgba(79,195,247,.06) 0%, transparent 60%);
-  padding: 0;
-  gap: 0;
-  position: relative;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* ── Hero section ── */
-#sbDashboard .d-welcome {
-  position: relative;
-  background: linear-gradient(105deg, #0c0a1e 0%, #1a1035 40%, #0e0c22 100%);
-  border: none;
-  border-radius: 0;
-  padding: 52px 48px 44px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  overflow: hidden;
-  clip-path: none;
-  margin: 0;
-  min-height: 200px;
-}
-#sbDashboard .d-welcome::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 70% 100% at 80% 50%, rgba(124,92,191,.22) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 60% at 100% 0%, rgba(79,195,247,.10) 0%, transparent 60%);
-  pointer-events: none;
-}
-#sbDashboard .d-welcome::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(124,92,191,.5) 30%, rgba(79,195,247,.4) 70%, transparent);
-}
-#sbDashboard .d-wc  { display: none; }
-#sbDashboard .d-icon { display: none; }
-
-#sbDashboard .d-welcome > div:not(.d-wc):not(.d-icon):not(.d-cta) {
-  position: relative;
-  z-index: 1;
-  padding: 0;
-  border: none;
-}
-#sbDashboard .d-welcome h1 {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 38px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  line-height: 1.1;
-  text-shadow: 0 2px 30px rgba(124,92,191,.5);
-}
-#sbDashboard .d-welcome p {
-  font-size: 14px;
-  color: rgba(200,210,240,.65);
-  line-height: 1.7;
-  max-width: 480px;
-}
-#sbDashboard .d-cta {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-end;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-  padding: 0;
-}
-#sbDashboard .d-btn-primary {
-  background: var(--g-amber);
-  color: #000;
-  border: none;
-  border-radius: 4px;
-  padding: 12px 28px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-  box-shadow: 0 4px 24px rgba(232,152,26,.35);
-  text-shadow: none;
-}
-#sbDashboard .d-btn-primary:hover {
-  background: #ffb330;
-  box-shadow: 0 6px 32px rgba(232,152,26,.5);
-  transform: translateY(-1px);
-}
-#sbDashboard .d-btn-secondary {
-  background: transparent;
-  color: rgba(200,210,240,.8);
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 4px;
-  padding: 10px 24px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-}
-#sbDashboard .d-btn-secondary:hover {
-  background: rgba(255,255,255,.07);
-  border-color: rgba(255,255,255,.4);
-  color: #fff;
-}
-
-/* ── Content wrapper padding ── */
-#sbDashboard > div:not(.d-welcome) {
-  padding: 24px 32px;
-}
-#sbDashboard { padding-bottom: 32px; }
-
-/* ── Section headers ── */
-#sbDashboard .d-sec-hd {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: var(--g-muted);
-  text-transform: uppercase;
-  padding: 0 0 12px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid var(--g-border);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-#sbDashboard .d-sec-hd::before {
-  content: '';
-  display: block;
-  width: 3px;
-  height: 16px;
-  background: linear-gradient(180deg, var(--g-amber), var(--g-purple));
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-#sbDashboard .d-sec-hd::after { display: none; }
-#sbDashboard .d-sec-link {
-  margin-left: auto;
-  color: var(--g-blue);
-  font-size: 9px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  text-shadow: none;
-}
-
-/* ── Role cards ── */
-#sbDashboard .d-role-grid {
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  gap: 8px;
-}
-#sbDashboard .d-role-card {
-  background: var(--g-card);
-  border: 1px solid var(--g-border);
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  padding: 16px 10px 14px;
-  text-align: center;
-  cursor: pointer;
-  transition: all .2s;
-  position: relative;
-  overflow: hidden;
-  min-width: unset;
-  flex: unset;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-#sbDashboard .d-role-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-}
-#sbDashboard .d-role-card:nth-child(1)::before  { background: #e8981a; }
-#sbDashboard .d-role-card:nth-child(2)::before  { background: #e53535; }
-#sbDashboard .d-role-card:nth-child(3)::before  { background: #f59e0b; }
-#sbDashboard .d-role-card:nth-child(4)::before  { background: #60a5fa; }
-#sbDashboard .d-role-card:nth-child(5)::before  { background: #2dd4aa; }
-#sbDashboard .d-role-card:nth-child(6)::before  { background: #9370db; }
-#sbDashboard .d-role-card:nth-child(7)::before  { background: #34d399; }
-#sbDashboard .d-role-card:nth-child(8)::before  { background: #f87171; }
-#sbDashboard .d-role-card:nth-child(9)::before  { background: #4fc3f7; }
-#sbDashboard .d-role-card::after { display: none; }
-#sbDashboard .d-role-card:hover {
-  background: #201d3e;
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0,0,0,.5);
-  border-color: rgba(255,255,255,.12);
-}
-#sbDashboard .d-role-icon  { font-size: 22px; line-height: 1; }
-#sbDashboard .d-role-name  {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: var(--g-muted);
-  text-transform: uppercase;
-}
-#sbDashboard .d-role-count {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--g-text);
-  line-height: 1;
-  text-shadow: none;
-}
-
-/* ── Two-col ── */
-#sbDashboard .d-two-col {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 24px;
-  align-items: start;
-}
-
-/* ── Ship cards ── */
-#sbDashboard .d-ship-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-}
-#sbDashboard .d-ship-card {
-  background: var(--g-card);
-  border: 1px solid var(--g-border);
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all .25s;
-  position: relative;
-  clip-path: none;
-}
-#sbDashboard .d-ship-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--g-amber), var(--g-purple));
-  opacity: 0;
-  transition: opacity .2s;
-  z-index: 2;
-}
-#sbDashboard .d-ship-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.1);
-  border-color: rgba(255,255,255,.12);
-}
-#sbDashboard .d-ship-card:hover::before { opacity: 1; }
-#sbDashboard .d-ship-card:hover .d-ship-img img { transform: scale(1.07); }
-#sbDashboard .d-ship-img {
-  position: relative;
-  overflow: hidden;
-  background: #0d0b20;
-}
-#sbDashboard .d-ship-img img { transition: transform .4s ease; }
-#sbDashboard .d-ship-lbl {
-  position: absolute;
-  bottom: 6px; left: 10px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: rgba(255,255,255,.5);
-  text-transform: uppercase;
-  text-shadow: 0 1px 4px rgba(0,0,0,.9);
-}
-#sbDashboard .d-ship-body  { padding: 12px 14px 14px; }
-#sbDashboard .d-ship-name  {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--g-text);
-  letter-spacing: .5px;
-  margin-bottom: 3px;
-}
-#sbDashboard .d-ship-role  {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--g-muted);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-#sbDashboard .d-ship-dps   {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--g-amber);
-  margin-top: 8px;
-}
-
-/* Tags */
-#sbDashboard .d-tag {
-  display: inline-block;
-  margin-top: 8px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  padding: 3px 8px;
-  border-radius: 3px;
-  text-transform: uppercase;
-}
-#sbDashboard .d-tag-pop  { background: rgba(232,152,26,.15); color: #e8981a; border: 1px solid rgba(232,152,26,.3); }
-#sbDashboard .d-tag-stl  { background: rgba(124,92,191,.15); color: #9b7fd4; border: 1px solid rgba(124,92,191,.3); }
-#sbDashboard .d-tag-meta { background: rgba(79,195,247,.15);  color: #4fc3f7; border: 1px solid rgba(79,195,247,.3); }
-#sbDashboard .d-tag-hvy  { background: rgba(229,53,53,.15);   color: #e53535; border: 1px solid rgba(229,53,53,.3); }
-
-/* ── Manufacturers ── */
-#sbDashboard .d-mfr-list  { display: flex; flex-direction: column; gap: 4px; }
-#sbDashboard .d-mfr-row   {
-  display: grid;
-  grid-template-columns: 120px 1fr 26px;
-  align-items: center;
-  gap: 12px;
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(255,255,255,.04);
-}
-#sbDashboard .d-mfr-name  {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--g-text);
-  letter-spacing: .3px;
-}
-#sbDashboard .d-mfr-bar-wrap {
-  height: 4px;
-  background: rgba(255,255,255,.06);
-  border-radius: 4px;
-  overflow: hidden;
-}
-#sbDashboard .d-mfr-count {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--g-muted);
-  text-align: right;
-}
-
-/* ── Updates ── */
-#sbDashboard .d-pn-list  { display: flex; flex-direction: column; gap: 6px; }
-#sbDashboard .d-pn-item  {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 18px;
-  background: var(--g-card);
-  border: 1px solid var(--g-border);
-  border-left: 3px solid transparent;
-  border-radius: 6px;
-  clip-path: none;
-  transition: background .15s;
-}
-#sbDashboard .d-pn-item:hover { background: #1e1b38; }
-#sbDashboard .d-pn-item.new   { border-left-color: var(--g-teal); }
-#sbDashboard .d-pn-item.fix   { border-left-color: var(--g-amber); }
-#sbDashboard .d-pn-item.data  { border-left-color: var(--g-blue); }
-#sbDashboard .d-pn-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  padding: 3px 9px;
-  border-radius: 3px;
-  white-space: nowrap;
-}
-#sbDashboard .d-badge-new  { background: rgba(45,212,170,.12); color: var(--g-teal);   border: 1px solid rgba(45,212,170,.25); }
-#sbDashboard .d-badge-fix  { background: rgba(232,152,26,.12); color: var(--g-amber);  border: 1px solid rgba(232,152,26,.25); }
-#sbDashboard .d-badge-data { background: rgba(79,195,247,.12); color: var(--g-blue);   border: 1px solid rgba(79,195,247,.25); }
-#sbDashboard .d-pn-text {
-  font-size: 13px;
-  color: rgba(200,210,240,.8);
-  line-height: 1.55;
-}
-#sbDashboard .d-pn-date {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--g-muted);
-  white-space: nowrap;
-}
-
-/* ═══════════════════════════════════════════════════
-   GLOBAL NAV + TABS — gaming theme override
-   ═══════════════════════════════════════════════════ */
-
-.nav {
-  height: 54px;
-  background: #0c0a1e;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  box-shadow: 0 2px 20px rgba(0,0,0,.5);
-}
-
-.nav-logo {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  color: #e8981a;
-  border-right-color: rgba(255,255,255,.08);
-  text-transform: uppercase;
-}
-
-#sSearch {
-  background: rgba(255,255,255,.05);
-  border-color: rgba(255,255,255,.08);
-  color: #c8d8f0;
-  border-radius: 6px;
-}
-#sSearch:focus { border-color: #e8981a; }
-
-.nav-divider { background: rgba(255,255,255,.07); }
-
-#actSel {
-  background: rgba(255,255,255,.05);
-  border-color: rgba(255,255,255,.08);
-  color: #c8d8f0;
-  border-radius: 6px;
-}
-
-#hpatch { color: #9b7fd4; }
-
-.tabs {
-  background: #0e0c22;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  padding: 0 24px;
-}
-
-.tab {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  color: rgba(150,160,200,.55);
-  text-transform: uppercase;
-  padding: 15px 18px;
-  border-bottom: 2px solid transparent;
-  transition: color .15s, border-color .15s;
-}
-
-.tab:hover { color: rgba(200,210,240,.85); }
-
-.tab.on {
-  color: #e8981a;
-  border-bottom-color: #e8981a;
-}
-
-/* Sub-bar (ship selector bar) */
-.sub-bar, [class*="sub-bar"], #subBar {
-  background: #0c0a1e !important;
-  border-bottom: 1px solid rgba(255,255,255,.06) !important;
-}
-
-/* Referral bar */
-.ref-bar, #refBar, [id*="refBanner"], [class*="ref-banner"] {
-  background: rgba(232,152,26,.08) !important;
-  border-bottom: 1px solid rgba(232,152,26,.15) !important;
-  color: rgba(200,180,120,.7) !important;
-}
-
-/* The secondary bar under nav showing selected ship */
-body > * .nav ~ * {
-  background: #0c0a1e;
-}
-
-/* ── WELCOME / HERO PANEL (LCARS elbow shape) ── */
-#sbDashboard .d-welcome {
-  background: var(--space-panel);
-  border: 1px solid var(--space-border);
-  border-left: 5px solid var(--lcars-amber);
-  border-radius: 0 24px 8px 40px;
-  padding: 0;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
-}
-#sbDashboard .d-welcome::before { display: none; }
-#sbDashboard .d-welcome::after  { display: none; }
-#sbDashboard .d-wc { display: none; }
-#sbDashboard .d-icon { display: none; }
-
-#sbDashboard .d-welcome > div:not(.d-wc):not(.d-icon):not(.d-cta) {
-  padding: 20px 28px;
-  border-right: 1px solid var(--space-border);
-}
-#sbDashboard .d-welcome h1 {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 21px;
-  font-weight: 700;
-  color: var(--lcars-blue);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-}
-#sbDashboard .d-welcome p {
-  font-size: 12px;
-  color: var(--space-muted);
-  line-height: 1.65;
-  max-width: 520px;
-}
-#sbDashboard .d-cta {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 20px 28px 20px 20px;
-  flex-shrink: 0;
-  align-items: flex-end;
-}
-#sbDashboard .d-btn-primary {
-  background: rgba(79,195,247,.10);
-  color: var(--lcars-blue);
-  border: 1px solid rgba(79,195,247,.40);
-  border-radius: 0 20px 20px 0;
-  padding: 9px 22px 9px 18px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-  box-shadow: none;
-  text-shadow: none;
-}
-#sbDashboard .d-btn-primary:hover {
-  background: rgba(79,195,247,.20);
-  box-shadow: 0 0 20px rgba(79,195,247,.2);
-}
-#sbDashboard .d-btn-secondary {
-  background: transparent;
-  color: var(--lcars-amber);
-  border: 1px solid rgba(232,152,26,.35);
-  border-radius: 0 20px 20px 0;
-  padding: 7px 18px 7px 14px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-}
-#sbDashboard .d-btn-secondary:hover {
-  background: rgba(232,152,26,.1);
-  border-color: var(--lcars-amber);
-}
-
-/* ── SECTION HEADERS ── */
-#sbDashboard .d-sec-hd {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 3.5px;
-  color: var(--space-muted);
-  text-transform: uppercase;
-  padding: 0 0 10px;
-  margin-bottom: 10px;
-  border-bottom: none;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-#sbDashboard .d-sec-hd::before {
-  content: '';
-  display: block;
-  width: 28px;
-  height: 8px;
-  background: linear-gradient(90deg, var(--lcars-amber), var(--lcars-blue));
-  border-radius: 0 20px 20px 0;
-  flex-shrink: 0;
-}
-#sbDashboard .d-sec-hd::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, var(--space-border) 0%, transparent 100%);
-}
-#sbDashboard .d-sec-link {
-  color: var(--lcars-blue);
-  font-size: 9px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  text-shadow: none;
-}
-
-/* ── ROLE CARDS ── */
-#sbDashboard .d-role-grid {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 4px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-}
-#sbDashboard .d-role-card {
-  background: var(--space-panel);
-  border: 1px solid var(--space-border);
-  border-top: 3px solid transparent;
-  border-radius: 0 0 20px 20px;
-  padding: 12px 14px 10px;
-  text-align: left;
-  cursor: pointer;
-  transition: background .2s, transform .15s, box-shadow .2s;
-  position: relative;
-  overflow: hidden;
-  flex: 1;
-  min-width: 72px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-#sbDashboard .d-role-card:nth-child(1)  { border-top-color: #e8981a; }
-#sbDashboard .d-role-card:nth-child(2)  { border-top-color: #cf4343; }
-#sbDashboard .d-role-card:nth-child(3)  { border-top-color: #f59e0b; }
-#sbDashboard .d-role-card:nth-child(4)  { border-top-color: #60a5fa; }
-#sbDashboard .d-role-card:nth-child(5)  { border-top-color: #2dd4aa; }
-#sbDashboard .d-role-card:nth-child(6)  { border-top-color: #9370db; }
-#sbDashboard .d-role-card:nth-child(7)  { border-top-color: #34d399; }
-#sbDashboard .d-role-card:nth-child(8)  { border-top-color: #f87171; }
-#sbDashboard .d-role-card:nth-child(9)  { border-top-color: #4fc3f7; min-width: 90px; }
-#sbDashboard .d-role-card::after { display: none; }
-#sbDashboard .d-role-card:hover {
-  background: var(--space-card);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 24px rgba(0,0,0,.5);
-}
-#sbDashboard .d-role-icon  { font-size: 17px; line-height: 1; margin-bottom: 0; }
-#sbDashboard .d-role-name  {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: var(--space-muted);
-  text-transform: uppercase;
-  margin-bottom: 0;
-}
-#sbDashboard .d-role-count {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--space-text);
-  line-height: 1;
-  text-shadow: none;
-}
-
-/* ── TWO-COL ── */
-#sbDashboard .d-two-col {
-  display: grid;
-  grid-template-columns: 7fr 4fr;
-  gap: 18px;
-  align-items: start;
-}
-
-/* ── SHIP CARDS ── */
-#sbDashboard .d-ship-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 7px;
-}
-#sbDashboard .d-ship-card {
-  background: var(--space-panel);
-  border: 1px solid var(--space-border);
-  border-radius: 2px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all .2s;
-  position: relative;
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-}
-#sbDashboard .d-ship-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--lcars-blue);
-  opacity: 0;
-  transition: opacity .2s;
-  z-index: 2;
-}
-#sbDashboard .d-ship-card:hover {
-  border-color: rgba(79,195,247,.35);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0,0,0,.5), 0 0 12px rgba(79,195,247,.06);
-}
-#sbDashboard .d-ship-card:hover::before { opacity: 1; }
-#sbDashboard .d-ship-img { position: relative; overflow: hidden; }
-#sbDashboard .d-ship-lbl {
-  position: absolute;
-  bottom: 5px; left: 8px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: rgba(255,255,255,.6);
-  text-transform: uppercase;
-  text-shadow: 0 1px 4px rgba(0,0,0,.9);
-}
-#sbDashboard .d-ship-body { padding: 9px 10px 10px; }
-#sbDashboard .d-ship-name {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--space-text);
-  letter-spacing: .5px;
-  margin-bottom: 2px;
-}
-#sbDashboard .d-ship-role {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--space-muted);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-#sbDashboard .d-ship-dps {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--lcars-amber);
-  margin-top: 5px;
-}
-#sbDashboard .d-ship-card:hover .d-ship-img img { transform: scale(1.05); }
-
-/* Tags */
-#sbDashboard .d-tag {
-  display: inline-block;
-  margin-top: 5px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  padding: 2px 7px;
-  border-radius: 2px;
-  text-transform: uppercase;
-}
-#sbDashboard .d-tag-pop  { background: rgba(232,152,26,.15); color: #e8981a; border: 1px solid rgba(232,152,26,.3); }
-#sbDashboard .d-tag-stl  { background: rgba(147,112,219,.15); color: #9370db; border: 1px solid rgba(147,112,219,.3); }
-#sbDashboard .d-tag-meta { background: rgba(79,195,247,.15);  color: #4fc3f7; border: 1px solid rgba(79,195,247,.3); }
-#sbDashboard .d-tag-hvy  { background: rgba(207,67,67,.15);   color: #cf4343; border: 1px solid rgba(207,67,67,.3); }
-
-/* ── MANUFACTURERS (sensor readout) ── */
-#sbDashboard .d-mfr-list { display: flex; flex-direction: column; gap: 2px; }
-#sbDashboard .d-mfr-row {
-  display: grid;
-  grid-template-columns: 110px 1fr 24px;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(23,32,56,.7);
-}
-#sbDashboard .d-mfr-name {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--space-text);
-  letter-spacing: .5px;
-  white-space: nowrap;
-}
-#sbDashboard .d-mfr-bar-wrap {
-  height: 3px;
-  background: rgba(23,32,56,.9);
-  border-radius: 2px;
-  overflow: hidden;
-}
-#sbDashboard .d-mfr-count {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--space-muted);
-  text-align: right;
-}
-
-/* ── LATEST UPDATES (tactical log) ── */
-#sbDashboard .d-pn-list { display: flex; flex-direction: column; gap: 5px; }
-#sbDashboard .d-pn-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: start;
-  gap: 12px;
-  padding: 10px 16px 10px 14px;
-  background: var(--space-panel);
-  border: 1px solid var(--space-border);
-  border-left: 3px solid transparent;
-  border-radius: 0 16px 16px 0;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
-}
-#sbDashboard .d-pn-item.new  { border-left-color: var(--lcars-teal); }
-#sbDashboard .d-pn-item.fix  { border-left-color: var(--lcars-amber); }
-#sbDashboard .d-pn-item.data { border-left-color: var(--lcars-blue); }
-#sbDashboard .d-pn-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  padding: 3px 8px;
-  border-radius: 2px;
-  white-space: nowrap;
-}
-#sbDashboard .d-badge-new  { background: rgba(45,212,170,.12); color: var(--lcars-teal);   border: 1px solid rgba(45,212,170,.3); }
-#sbDashboard .d-badge-fix  { background: rgba(232,152,26,.12); color: var(--lcars-amber);  border: 1px solid rgba(232,152,26,.3); }
-#sbDashboard .d-badge-data { background: rgba(79,195,247,.12); color: var(--lcars-blue);   border: 1px solid rgba(79,195,247,.3); }
-#sbDashboard .d-pn-text {
-  font-size: 12px;
-  color: var(--space-text);
-  line-height: 1.6;
-}
-#sbDashboard .d-pn-date {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--space-muted);
-  white-space: nowrap;
-  padding-top: 2px;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   3D DROPDOWN OVERRIDES  ·  Deep shadow + glass + perspective pop
-   ═══════════════════════════════════════════════════════════════ */
-
-@keyframes dropIn3d {
-  from {
-    opacity: 0;
-    transform: perspective(700px) rotateX(-10deg) translateY(-10px) scale(.98);
-  }
-  to {
-    opacity: 1;
-    transform: perspective(700px) rotateX(0deg) translateY(0) scale(1);
-  }
-}
-
-/* Nav ship-search dropdown */
-#srbox {
-  background: rgba(12,10,30,.97) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid rgba(255,255,255,.09) !important;
-  border-top: 1px solid rgba(255,255,255,.16) !important;
-  border-radius: 10px !important;
-  box-shadow:
-    0 2px 4px  rgba(0,0,0,.35),
-    0 8px 24px rgba(0,0,0,.6),
-    0 24px 64px rgba(0,0,0,.5),
-    0 0 0 1px rgba(124,92,191,.12),
-    inset 0 1px 0 rgba(255,255,255,.07) !important;
-  transform-origin: top left;
-  animation: dropIn3d .2s cubic-bezier(.22,1,.36,1) !important;
-}
-.sri {
-  border-bottom: 1px solid rgba(255,255,255,.04) !important;
-  transition: background .12s, padding-left .12s !important;
-}
-.sri:hover, .sri.on {
-  background: rgba(232,152,26,.10) !important;
-  color: #e8981a !important;
-  padding-left: 16px !important;
-}
-
-/* Component search dropdown (slot search) */
-.search-dropdown {
-  background: rgba(12,10,30,.97) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid rgba(255,255,255,.09) !important;
-  border-top: 1px solid rgba(255,255,255,.16) !important;
-  border-radius: 10px !important;
-  box-shadow:
-    0 2px 4px  rgba(0,0,0,.35),
-    0 8px 24px rgba(0,0,0,.6),
-    0 24px 64px rgba(0,0,0,.5),
-    0 0 0 1px rgba(79,195,247,.08),
-    inset 0 1px 0 rgba(255,255,255,.07) !important;
-  transform-origin: top center;
-  animation: dropIn3d .2s cubic-bezier(.22,1,.36,1) !important;
-}
-.search-dropdown .sd-group {
-  background: rgba(255,255,255,.025) !important;
-  border-bottom: 1px solid rgba(255,255,255,.06) !important;
-  color: rgba(79,195,247,.6) !important;
-  letter-spacing: 1.8px !important;
-  font-size: 8px !important;
-  padding: 5px 12px 3px !important;
-}
-.search-dropdown .sd-item {
-  transition: background .1s, padding-left .1s !important;
-  border-bottom: 1px solid rgba(255,255,255,.03) !important;
-}
-.search-dropdown .sd-item:hover {
-  background: rgba(232,152,26,.09) !important;
-  color: #e8981a !important;
-  padding-left: 18px !important;
-}
-.search-dropdown .sd-item .sd-size {
-  background: rgba(79,195,247,.08) !important;
-  color: rgba(79,195,247,.7) !important;
-  border-radius: 4px !important;
-}
-
-/* Native <select> slot selectors — custom 3d look */
-.slot-sel {
-  background: rgba(20,17,44,.95) !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-  border-top: 1px solid rgba(255,255,255,.18) !important;
-  border-radius: 6px !important;
-  color: #c8d4e8 !important;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,.4),
-    0 8px 24px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.06) !important;
-  cursor: pointer !important;
-  transition: border-color .15s, box-shadow .15s !important;
-}
-.slot-sel:focus, .slot-sel:hover {
-  border-color: rgba(232,152,26,.5) !important;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,.4),
-    0 8px 24px rgba(0,0,0,.5),
-    0 0 0 2px rgba(232,152,26,.12),
-    inset 0 1px 0 rgba(255,255,255,.08) !important;
-  outline: none !important;
-}
-
-/* Ship builder smart-search dropdown (.ss-drop) */
-.ss-drop {
-  background: rgba(12,10,30,.97) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid rgba(255,255,255,.09) !important;
-  border-top: 1px solid rgba(255,255,255,.18) !important;
-  border-radius: 12px !important;
-  box-shadow:
-    0 2px 4px  rgba(0,0,0,.4),
-    0 10px 30px rgba(0,0,0,.65),
-    0 28px 80px rgba(0,0,0,.5),
-    0 0 0 1px rgba(124,92,191,.12),
-    inset 0 1px 0 rgba(255,255,255,.08) !important;
-}
-.ss-drop.open {
-  animation: dropIn3d .2s cubic-bezier(.22,1,.36,1) !important;
-}
-.ss-inner { background: transparent !important; }
-.ss-group-lbl {
-  background: rgba(255,255,255,.02) !important;
-  border-left: 3px solid #e8981a !important;
-  color: rgba(232,152,26,.8) !important;
-}
-.ss-item {
-  transition: background .1s, padding-left .12s !important;
-  border-bottom: 1px solid rgba(255,255,255,.03) !important;
-}
-.ss-item:hover, .ss-item.hi {
-  background: rgba(232,152,26,.09) !important;
-  padding-left: 18px !important;
-}
-.ss-foot {
-  background: rgba(255,255,255,.025) !important;
-  border-top: 1px solid rgba(255,255,255,.06) !important;
-  border-radius: 0 0 12px 12px !important;
-}
-.ss-foot kbd {
-  background: rgba(255,255,255,.06) !important;
-  color: rgba(200,220,255,.6) !important;
-}
-
-/* Weapon popup modal — lift it off the page */
-.wpm-wrap {
-  background: rgba(10,8,26,.97) !important;
-  backdrop-filter: blur(32px) !important;
-  -webkit-backdrop-filter: blur(32px) !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-  border-top: 1px solid rgba(255,255,255,.20) !important;
-  border-radius: 12px !important;
-  box-shadow:
-    0 4px 8px   rgba(0,0,0,.4),
-    0 16px 48px rgba(0,0,0,.7),
-    0 48px 120px rgba(0,0,0,.5),
-    0 0 0 1px rgba(124,92,191,.15),
-    inset 0 1px 0 rgba(255,255,255,.08) !important;
-}
-.wpm-head {
-  background: linear-gradient(180deg, rgba(255,255,255,.04) 0%, transparent 100%) !important;
-  border-bottom: 1px solid rgba(255,255,255,.08) !important;
-  border-radius: 12px 12px 0 0 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   HERO SECTION ENHANCEMENTS  ·  Cinematic depth + decoration
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Geometric decorative element on hero right side */
-#sbDashboard .d-welcome::after {
-  content: '';
-  position: absolute;
-  right: 0; top: 0; bottom: 0;
-  width: 55%;
-  background:
-    radial-gradient(ellipse 70% 90% at 85% 50%, rgba(124,92,191,.18) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 60% at 100% 20%, rgba(79,195,247,.10) 0%, transparent 55%),
-    radial-gradient(ellipse 30% 40% at 70% 80%, rgba(232,152,26,.08) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Animated hex-grid overlay on hero */
-#sbDashboard .d-welcome > * { position: relative; z-index: 1; }
-
-/* Glowing amber divider line under hero — thicker with pulse */
-@keyframes linePulse {
-  0%, 100% { opacity: .5; }
-  50%       { opacity: 1; }
-}
-#sbDashboard .d-welcome::before {
-  bottom: 0; left: 0; right: 0; top: auto;
-  height: 2px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(124,92,191,.6) 20%,
-    rgba(232,152,26,.9) 50%,
-    rgba(79,195,247,.6) 80%,
-    transparent 100%);
-  animation: linePulse 3s ease-in-out infinite;
-  pointer-events: none;
-}
-
-/* ── Role cards: lift + color glow on hover ── */
-#sbDashboard .d-role-card {
-  transition: transform .2s cubic-bezier(.22,1,.36,1),
-              box-shadow .2s ease,
-              border-color .2s ease !important;
-  cursor: pointer;
-}
-#sbDashboard .d-role-card:hover {
-  transform: translateY(-6px) scale(1.04) !important;
-  box-shadow:
-    0 8px 32px rgba(0,0,0,.6),
-    0 0 0 1px rgba(232,152,26,.35),
-    0 0 24px rgba(232,152,26,.15) !important;
-  border-color: rgba(232,152,26,.4) !important;
-}
-
-/* ── Popular ship cards: 3D lift ── */
-#sbDashboard .d-ship-card {
-  transition: transform .25s cubic-bezier(.22,1,.36,1),
-              box-shadow .25s ease !important;
-}
-#sbDashboard .d-ship-card:hover {
-  transform: translateY(-8px) scale(1.02) !important;
-  box-shadow:
-    0 16px 48px rgba(0,0,0,.7),
-    0 0 40px rgba(79,195,247,.06) !important;
-}
-#sbDashboard .d-ship-card:hover .d-ship-img {
-  transform: scale(1.06) !important;
-  transition: transform .4s ease !important;
-}
-#sbDashboard .d-ship-img {
-  transition: transform .4s ease !important;
-  overflow: hidden;
-}
-
-/* ── Section labels: glowing left-border accent ── */
-#sbDashboard .d-sec-label,
-#sbDashboard .d-mfr-label,
-#sbDashboard .d-pn-label {
-  position: relative;
-}
-#sbDashboard .d-sec-label::before,
-#sbDashboard .d-mfr-label::before {
-  content: '';
-  position: absolute;
-  left: -16px; top: 0; bottom: 0;
-  width: 2px;
-  background: linear-gradient(180deg, #e8981a, rgba(232,152,26,0));
-  border-radius: 2px;
-}
-
-/* ── Manufacturer bars: animated fill ── */
-@keyframes barFill {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
-#sbDashboard .d-mfr-bar-fill {
-  animation: barFill .8s cubic-bezier(.22,1,.36,1) both;
-  transform-origin: left center;
-}
-
-/* ── Nav search bar: glow focus state ── */
-#sSearch:focus {
-  border-color: rgba(232,152,26,.6) !important;
-  box-shadow:
-    0 0 0 3px rgba(232,152,26,.10),
-    0 0 16px rgba(232,152,26,.15) !important;
-  background: rgba(20,17,44,.95) !important;
-}
-
-/* ── Active tab: glowing underline ── */
-.tab.on {
-  text-shadow: 0 0 12px rgba(232,152,26,.5) !important;
-}
-.tab.on::after {
-  box-shadow: 0 2px 8px rgba(232,152,26,.5) !important;
-}
-
-/* ── Subbar / ship-selector area ── */
-.sub-bar, .ship-dd-wrap {
-  background: rgba(14,12,34,.9) !important;
-  border-bottom: 1px solid rgba(255,255,255,.06) !important;
-}
-
-/* ── Loadout section headers ── */
-.lo-sec-hd, .wp-sec-hd {
-  background: linear-gradient(90deg,
-    rgba(232,152,26,.08) 0%,
-    transparent 100%) !important;
-  border-left: 2px solid rgba(232,152,26,.5) !important;
-  letter-spacing: 2px !important;
-  color: rgba(232,152,26,.9) !important;
-}
-
-/* ── Stat cards (firepower / defense / power panels) ── */
-.stat-panel, #statsPanel > div, .sp-block {
-  background: rgba(18,15,36,.9) !important;
-  border: 1px solid rgba(255,255,255,.06) !important;
-  border-top: 1px solid rgba(255,255,255,.12) !important;
-}
-
-/* ── Loadout rows: hover glow ── */
-.wl-row:hover {
-  background: rgba(79,195,247,.06) !important;
-  box-shadow: inset 3px 0 0 rgba(79,195,247,.4) !important;
-}
-
-/* ── "ON" toggle buttons: stronger glow ── */
-.wp-on-btn.on, .on-btn.on, [class*='on-btn'].on {
-  box-shadow: 0 0 10px rgba(58,201,122,.3) !important;
-}
-
-/* ── Overlay backdrop for modals ── */
-.wpm-overlay, .modal-overlay, #wpmOverlay {
-  background: rgba(4,2,16,.75) !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   CHROME SURFACES + HOVER ADDONS  ·  inspired by 21st.dev
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Animatable CSS custom property for Border Beam */
-@property --ba {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-@keyframes beamSpin   { to { --ba: 360deg; } }
-@keyframes shineSweep {
-  from { transform: translateX(-180%) skewX(-18deg); opacity: 1; }
-  to   { transform: translateX(400%)  skewX(-18deg); opacity: 0; }
-}
-
-/* ── Chrome nav bar ── */
-.nav {
-  background: linear-gradient(180deg, #1c2030 0%, #0f1318 100%) !important;
-  border-bottom: 1px solid rgba(120,150,200,.12) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 4px 24px rgba(0,0,0,.55) !important;
-  position: relative;
-}
-.nav::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 25%, rgba(255,255,255,.38) 50%, rgba(255,255,255,.18) 75%, transparent 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* ── Chrome metallic logo ── */
-.nav-logo {
-  background: linear-gradient(180deg, #ffd880 0%, #e89820 35%, #a86010 65%, #e8a030 85%, #ffd880 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  filter: drop-shadow(0 0 10px rgba(232,152,26,.45)) !important;
-}
-
-/* ── Chrome tabs bar ── */
-.tabs {
-  background: linear-gradient(180deg, #131822 0%, #0d1018 100%) !important;
-  border-bottom: 1px solid rgba(120,150,200,.10) !important;
-}
-
-/* ── Tab shine on hover ── */
-.tab { position: relative; overflow: hidden; }
-.tab::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; left: -100%; width: 55%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent);
-  transform: skewX(-15deg);
-  pointer-events: none;
-}
-.tab:hover::after { animation: shineSweep .5s ease forwards; }
-
-/* ── Active tab: chrome underline glow ── */
-.tab.on { text-shadow: 0 0 14px rgba(232,152,26,.55) !important; }
-.tab.on::before {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 15%; right: 15%; height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(232,152,26,.7) 30%, #e8981a 50%, rgba(232,152,26,.7) 70%, transparent);
-  box-shadow: 0 0 10px rgba(232,152,26,.6), 0 0 24px rgba(232,152,26,.25);
-  border-radius: 2px;
-  pointer-events: none;
-}
-
-/* ── Border Beam on ship cards (mask-composite technique) ── */
-#sbDashboard .d-ship-card {
-  position: relative;
-}
-#sbDashboard .d-ship-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: conic-gradient(
-    from var(--ba) at 50% 50%,
-    transparent 0deg, transparent 295deg,
-    rgba(232,152,26,.8) 335deg, rgba(255,225,140,1) 352deg, transparent 360deg
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity .3s;
-}
-#sbDashboard .d-ship-card:hover::after {
-  opacity: 1;
-  animation: beamSpin 2.5s linear infinite;
-}
-
-/* ── Border Beam on role cards ── */
-#sbDashboard .d-role-card {
-  position: relative;
-}
-#sbDashboard .d-role-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: conic-gradient(
-    from var(--ba) at 50% 50%,
-    transparent 0deg, transparent 310deg,
-    rgba(79,195,247,.85) 345deg, rgba(200,240,255,1) 355deg, transparent 360deg
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity .3s;
-}
-#sbDashboard .d-role-card:hover::after {
-  opacity: 1;
-  animation: beamSpin 3.5s linear infinite;
-}
-
-/* ── Chrome card surface — top-edge highlight + brushed gradient ── */
-#sbDashboard .d-ship-card,
-#sbDashboard .d-role-card {
-  border-top: 1px solid rgba(255,255,255,.16) !important;
-  border-left: 1px solid rgba(255,255,255,.07) !important;
-  border-right: 1px solid rgba(0,0,0,.25) !important;
-  border-bottom: 1px solid rgba(0,0,0,.3) !important;
-  background-image: linear-gradient(160deg,
-    rgba(255,255,255,.055) 0%,
-    rgba(255,255,255,.01) 45%,
-    rgba(0,0,0,.07) 100%) !important;
-}
-
-/* ── Shine sweep on primary button ── */
-#sbDashboard .d-btn-primary {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #f0a840 0%, #c87818 52%, #e09030 100%) !important;
-  border-top: 1px solid rgba(255,235,130,.5) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,230,100,.3),
-    inset 0 -1px 0 rgba(0,0,0,.35),
-    0 4px 22px rgba(200,120,20,.42) !important;
-  color: #1a0e00 !important;
-  transition: transform .15s, box-shadow .15s !important;
-}
-#sbDashboard .d-btn-primary::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; left: -60%; width: 45%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
-  transform: skewX(-18deg);
-  pointer-events: none;
-}
-#sbDashboard .d-btn-primary:hover {
-  transform: translateY(-2px) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,230,100,.4),
-    0 8px 32px rgba(232,152,26,.55) !important;
-}
-#sbDashboard .d-btn-primary:hover::after {
-  animation: shineSweep .55s ease forwards;
-}
-
-/* ── Shine on ghost CTA buttons ── */
-#sbDashboard .d-cta a, #sbDashboard .d-cta button {
-  position: relative;
-  overflow: hidden;
-  background: rgba(255,255,255,.04) !important;
-  border: 1px solid rgba(255,255,255,.12) !important;
-  border-top: 1px solid rgba(255,255,255,.22) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 2px 10px rgba(0,0,0,.3) !important;
-  transition: transform .15s, box-shadow .15s, border-color .15s !important;
-}
-#sbDashboard .d-cta a::after, #sbDashboard .d-cta button::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; left: -60%; width: 45%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
-  transform: skewX(-18deg);
-  pointer-events: none;
-}
-#sbDashboard .d-cta a:hover, #sbDashboard .d-cta button:hover {
-  transform: translateY(-2px) !important;
-  border-color: rgba(255,255,255,.25) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 20px rgba(0,0,0,.45) !important;
-}
-#sbDashboard .d-cta a:hover::after, #sbDashboard .d-cta button:hover::after {
-  animation: shineSweep .5s ease forwards;
-}
-
-/* ── Chrome input fields ── */
-#sSearch, .ss-input {
-  background: linear-gradient(180deg, rgba(22,28,42,.95) 0%, rgba(12,15,24,.98) 100%) !important;
-  border: 1px solid rgba(120,150,200,.15) !important;
-  border-top: 1px solid rgba(255,255,255,.12) !important;
-  box-shadow: inset 0 2px 5px rgba(0,0,0,.35), inset 0 -1px 0 rgba(255,255,255,.04) !important;
-}
-#sSearch:focus, .ss-input:focus {
-  border-color: rgba(232,152,26,.38) !important;
-  border-top-color: rgba(232,152,26,.6) !important;
-  box-shadow:
-    inset 0 2px 5px rgba(0,0,0,.3),
-    0 0 0 3px rgba(232,152,26,.08),
-    0 0 22px rgba(232,152,26,.12) !important;
-}
-
-/* ── Weapon row chrome shine ── */
-.wl-row { position: relative; overflow: hidden; }
-.wl-row::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; left: -100%; width: 60%;
-  background: linear-gradient(90deg, transparent, rgba(79,195,247,.04), transparent);
-  pointer-events: none;
-  transition: transform .5s ease;
-}
-.wl-row:hover::after { transform: translateX(300%); }
-
-/* ── Stat value chrome glow ── */
-#statsRight .sp-dps, #statsRight [class*='sp-val'],
-#statsRight [class*='stat-val'] {
-  text-shadow: 0 0 18px currentColor !important;
-}
-
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a034;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(232,160,52,.4)">v8.91</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#4dff6e;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.90</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -2544,7 +1135,7 @@ body > * .nav ~ * {
     onmouseout="this.style.color='var(--t2)';this.style.borderColor='var(--border)'"
     title="Support SC-ShipForge on Ko-fi">☕ Support</a>
     <div class="nav-end" style="display:flex;align-items:center;gap:10px">
-      <span id="syncStatus" style="font-size:8px;font-family:var(--fmono);color:#e8a034;letter-spacing:.5px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Live data sync status"></span>
+      <span id="syncStatus" style="font-size:8px;font-family:var(--fmono);color:#4dff6e;letter-spacing:.5px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Live data sync status"></span>
       <span id="hpatch">&#9679; LOADING&hellip;</span>
     </div>
   </nav>
@@ -2678,11 +1269,11 @@ body > * .nav ~ * {
       <div class="pane on" id="pane-lo" style="flex-direction:column;overflow:hidden;padding:0">
   <!-- Top bar: header + search + KPIs -->
   <div style="flex-shrink:0;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
-    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a034;text-shadow:0 0 10px rgba(232,160,52,.5);white-space:nowrap">&#9672; SC SHIPFORGE BUILDER</div>
+    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 10px rgba(77,255,110,.5);white-space:nowrap">&#9672; SC SHIPFORGE BUILDER</div>
     <button id="returnDashBtn" onclick="window.location.reload()" title="Return to Dashboard"
-      style="display:none;align-items:center;gap:5px;background:rgba(232,160,52,.06);border:1px solid rgba(232,160,52,.25);border-radius:3px;padding:5px 12px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:var(--green);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0"
-      onmouseover="this.style.background='rgba(232,160,52,.14)';this.style.boxShadow='0 0 10px rgba(232,160,52,.2)'"
-      onmouseout="this.style.background='rgba(232,160,52,.06)';this.style.boxShadow='none'"
+      style="display:none;align-items:center;gap:5px;background:rgba(77,255,110,.06);border:1px solid rgba(77,255,110,.25);border-radius:3px;padding:5px 12px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:var(--green);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0"
+      onmouseover="this.style.background='rgba(77,255,110,.14)';this.style.boxShadow='0 0 10px rgba(77,255,110,.2)'"
+      onmouseout="this.style.background='rgba(77,255,110,.06)';this.style.boxShadow='none'"
     >&#8592; DASHBOARD</button>
     <button id="testShowdownBtn" onclick="openShowdownWithBuild()" title="Test this build in Showdown"
       style="display:none;align-items:center;gap:6px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.35);border-radius:3px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0"
@@ -2692,7 +1283,7 @@ body > * .nav ~ * {
     <!-- Ship search -->
     <div style="flex:1;max-width:400px;position:relative">
       <div class="ss-wrap" id="sbSearchWrap" style="border:1px solid rgba(79,195,247,.2);border-radius:8px;background:rgba(14,17,23,.9)">
-        <span class="ss-icon" style="color:#e8a034">&#9672;</span>
+        <span class="ss-icon" style="color:#4dff6e">&#9672;</span>
         <input class="ss-input" id="sbShipInput" placeholder="Select a ship to build…" autocomplete="off"
           oninput="ss_type_sb(this)"
           onfocus="ss_open_sb('')"
@@ -2724,7 +1315,7 @@ body > * .nav ~ * {
       </div>
       <!-- Ship name + size badge -->
       <div id="sbShipNameBar" style="display:none;padding:6px 8px;border-bottom:1px solid var(--border);background:var(--bg3)">
-        <div id="sbShipImgName" style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#ffffff;letter-spacing:1px;text-shadow:0 0 8px rgba(232,160,52,.4)"></div>
+        <div id="sbShipImgName" style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#ffffff;letter-spacing:1px;text-shadow:0 0 8px rgba(77,255,110,.4)"></div>
         <div id="sbShipSizeBadge" style="font-size:10px;color:var(--accent);font-family:var(--fmono);margin-top:3px;letter-spacing:.5px"></div>
       </div>
       <!-- Ship info rows -->
@@ -2766,8 +1357,8 @@ body > * .nav ~ * {
     <div>
       <div class="d-sec-hd"><span>POPULAR BUILDS</span></div>
       <div class="d-ship-grid">
-        <div class="d-ship-card" onclick="ss_pick_sb('Hammerhead')" style="grid-column:span 2">
-          <div class="d-ship-img" id="dCardImgHammerhead" style="background:#0e1210;height:130px"><span class="d-ship-lbl" style="z-index:2">HAMMERHEAD</span></div>
+        <div class="d-ship-card" onclick="ss_pick_sb('Hammerhead')">
+          <div class="d-ship-img" id="dCardImgHammerhead" style="background:#0e1210"><span class="d-ship-lbl" style="z-index:2">HAMMERHEAD</span></div>
           <div class="d-ship-body"><div class="d-ship-name">Hammerhead</div><div class="d-ship-role">CAPITAL · SIZE L</div><div class="d-ship-dps">6,240 DPS</div><span class="d-tag d-tag-pop">POPULAR</span></div>
         </div>
         <div class="d-ship-card" onclick="ss_pick_sb('Eclipse')">
@@ -2778,8 +1369,8 @@ body > * .nav ~ * {
           <div class="d-ship-img" id="dCardImgArrow" style="background:#0e1210"><span class="d-ship-lbl" style="z-index:2">ARROW</span></div>
           <div class="d-ship-body"><div class="d-ship-name">Arrow</div><div class="d-ship-role">FIGHTER · SIZE S</div><div class="d-ship-dps">1,240 DPS</div><span class="d-tag d-tag-meta">META</span></div>
         </div>
-        <div class="d-ship-card" onclick="ss_pick_sb('Hercules A2')" style="grid-column:span 2">
-          <div class="d-ship-img" id="dCardImgHercules" style="background:#0e1210;height:75px"><span class="d-ship-lbl" style="z-index:2">HERCULES A2</span></div>
+        <div class="d-ship-card" onclick="ss_pick_sb('Hercules A2')">
+          <div class="d-ship-img" id="dCardImgHercules" style="background:#0e1210"><span class="d-ship-lbl" style="z-index:2">HERCULES A2</span></div>
           <div class="d-ship-body"><div class="d-ship-name">Hercules A2</div><div class="d-ship-role">MILITARY · SIZE L</div><div class="d-ship-dps">2,800 DPS</div><span class="d-tag d-tag-hvy">HEAVY</span></div>
         </div>
       </div>
@@ -2886,7 +1477,7 @@ body > * .nav ~ * {
       </div>
       <div class="pane" id="pane-wp">
         <div id="wpCatBar" style="display:flex;gap:4px;padding:8px 12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)">
-          <button class="wp-cat-btn on" data-cat="weapons" onclick="switchWpCat('weapons',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(232,160,52,.4);color:#e8a034;background:rgba(232,160,52,.12);cursor:pointer">Weapons</button>
+          <button class="wp-cat-btn on" data-cat="weapons" onclick="switchWpCat('weapons',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(77,255,110,.4);color:#4dff6e;background:rgba(77,255,110,.12);cursor:pointer">Weapons</button>
           <button class="wp-cat-btn" data-cat="pp" onclick="switchWpCat('pp',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,.08);color:#8a94a3;background:transparent;cursor:pointer">Power Plants</button>
           <button class="wp-cat-btn" data-cat="sg" onclick="switchWpCat('sg',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,.08);color:#8a94a3;background:transparent;cursor:pointer">Shields</button>
           <button class="wp-cat-btn" data-cat="cooler" onclick="switchWpCat('cooler',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,.08);color:#8a94a3;background:transparent;cursor:pointer">Coolers</button>
@@ -2913,21 +1504,21 @@ body > * .nav ~ * {
   <div class="sd-hero-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
     <span>&#9876; SHIP SHOWDOWN</span>
     <button id="sdBackToBuildBtn" onclick="goBackToBuild()" title="Return to Builder"
-      style="display:none;align-items:center;gap:6px;background:rgba(232,160,52,.06);border:1px solid rgba(232,160,52,.25);border-radius:3px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#e8a034;cursor:pointer;white-space:nowrap;transition:all .15s"
-      onmouseover="this.style.background='rgba(232,160,52,.14)';this.style.boxShadow='0 0 10px rgba(232,160,52,.2)'"
-      onmouseout="this.style.background='rgba(232,160,52,.06)';this.style.boxShadow='none'"
+      style="display:none;align-items:center;gap:6px;background:rgba(77,255,110,.06);border:1px solid rgba(77,255,110,.25);border-radius:3px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#4dff6e;cursor:pointer;white-space:nowrap;transition:all .15s"
+      onmouseover="this.style.background='rgba(77,255,110,.14)';this.style.boxShadow='0 0 10px rgba(77,255,110,.2)'"
+      onmouseout="this.style.background='rgba(77,255,110,.06)';this.style.boxShadow='none'"
     >&#8592; BACK TO BUILD</button>
   </div>
 
   <!-- My Build context banner (shown when coming from Builder) -->
-  <div id="sdMyBuildBanner" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(232,160,52,.04);border:1px solid rgba(232,160,52,.18);border-radius:6px;border-left:3px solid #e8a034">
-    <div style="font-size:9px;letter-spacing:2px;color:#e8a034;font-family:var(--fmono);margin-bottom:6px;text-shadow:0 0 6px rgba(232,160,52,.3)">YOUR BUILD</div>
+  <div id="sdMyBuildBanner" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(77,255,110,.04);border:1px solid rgba(77,255,110,.18);border-radius:6px;border-left:3px solid #4dff6e">
+    <div style="font-size:9px;letter-spacing:2px;color:#4dff6e;font-family:var(--fmono);margin-bottom:6px;text-shadow:0 0 6px rgba(77,255,110,.3)">YOUR BUILD</div>
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <div style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#e8f4e8" id="sdMyBuildShip">—</div>
       <div style="display:flex;gap:12px">
         <div style="text-align:center"><div style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#ffd54f;text-shadow:0 0 6px rgba(255,213,79,.3)" id="sdMyBuildDps">—</div><div style="font-size:8px;letter-spacing:1px;color:#6a9070;font-family:var(--fmono)">MY DPS</div></div>
         <div style="text-align:center"><div style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#40e0ff;text-shadow:0 0 6px rgba(64,224,255,.3)" id="sdMyBuildShield">—</div><div style="font-size:8px;letter-spacing:1px;color:#6a9070;font-family:var(--fmono)">MY SHIELDS</div></div>
-        <div style="text-align:center"><div style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e8a034;text-shadow:0 0 6px rgba(232,160,52,.3)" id="sdMyBuildHull">—</div><div style="font-size:8px;letter-spacing:1px;color:#6a9070;font-family:var(--fmono)">MY HULL HP</div></div>
+        <div style="text-align:center"><div style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 6px rgba(77,255,110,.3)" id="sdMyBuildHull">—</div><div style="font-size:8px;letter-spacing:1px;color:#6a9070;font-family:var(--fmono)">MY HULL HP</div></div>
       </div>
       <button id="sdRunComparisonBtn" onclick="window.runShowdownAndOpenModal()" style="display:none;margin-left:auto;padding:7px 18px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.5);border-radius:5px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#f87171;cursor:pointer;text-shadow:0 0 8px rgba(248,113,113,.3);transition:all .15s" onmouseover="this.style.background='rgba(220,38,38,.28)';this.style.boxShadow='0 0 12px rgba(220,38,38,.3)'" onmouseout="this.style.background='rgba(220,38,38,.15)';this.style.boxShadow='none'">&#9876; RUN COMPARISON</button>
     </div>
@@ -2996,7 +1587,7 @@ body > * .nav ~ * {
     <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(10,13,18,.97) 0%,rgba(10,13,18,.8) 40%,rgba(10,13,18,.2) 100%)"></div>
     <!-- header bar inside detail panel -->
     <div style="position:absolute;top:0;left:0;right:0;padding:10px 16px 8px;display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.3);z-index:2">
-      <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a034;text-shadow:0 0 10px rgba(232,160,52,.5)">&#9673; MY FLEET</div>
+      <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 10px rgba(77,255,110,.5)">&#9673; MY FLEET</div>
       <div id="fleetStats" style="font-family:var(--fmono);font-size:10px;color:var(--t3);letter-spacing:1px"></div>
       <div style="flex:1"></div>
       <button onclick="openFleetImport()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#38bdf8;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(56,189,248,.18)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">&#8659; IMPORT FROM RSI</button>
@@ -3010,14 +1601,14 @@ body > * .nav ~ * {
         <div id="fdStats" style="display:flex;gap:28px;flex-wrap:wrap"></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0">
-        <button id="fdBuildBtn" style="background:rgba(232,160,52,.12);border:1px solid rgba(232,160,52,.4);border-radius:4px;padding:10px 28px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#e8a034;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(232,160,52,.22)'" onmouseout="this.style.background='rgba(232,160,52,.12)'">&#9658; BUILD</button>
+        <button id="fdBuildBtn" style="background:rgba(77,255,110,.12);border:1px solid rgba(77,255,110,.4);border-radius:4px;padding:10px 28px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#4dff6e;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(77,255,110,.22)'" onmouseout="this.style.background='rgba(77,255,110,.12)'">&#9658; BUILD</button>
         <button id="fdRemoveBtn" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:10px 28px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(239,68,68,.16)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">&#10005; REMOVE</button>
       </div>
     </div>
   </div>
   <!-- Default header bar (shown when no ship selected) -->
   <div id="fleetHeader" style="flex-shrink:0;padding:10px 16px 8px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
-    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a034;text-shadow:0 0 10px rgba(232,160,52,.5)">&#9673; MY FLEET</div>
+    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 10px rgba(77,255,110,.5)">&#9673; MY FLEET</div>
     <div id="fleetStats2" style="font-family:var(--fmono);font-size:10px;color:var(--t3);letter-spacing:1px"></div>
     <div style="flex:1"></div>
     <button onclick="openFleetImport()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#38bdf8;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(56,189,248,.18)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">&#8659; IMPORT FROM RSI</button>
@@ -3028,9 +1619,9 @@ body > * .nav ~ * {
     <div style="font-size:48px;opacity:.15">&#9673;</div>
     <div style="font-family:var(--fmono);font-size:13px;color:var(--t3);letter-spacing:2px;text-align:center">NO SHIPS IN YOUR FLEET YET</div>
     <div style="font-size:11px;color:var(--t3);text-align:center;max-width:420px;line-height:1.7">
-      Import your RSI hangar automatically, or browse the <span style="color:var(--t2);cursor:pointer;text-decoration:underline" onclick="showTab('ships',document.querySelector('[data-t=ships]'))">Ships tab</span> and click <strong style="color:#e8a034">+ Add to Fleet</strong> on any ship.
+      Import your RSI hangar automatically, or browse the <span style="color:var(--t2);cursor:pointer;text-decoration:underline" onclick="showTab('ships',document.querySelector('[data-t=ships]'))">Ships tab</span> and click <strong style="color:#4dff6e">+ Add to Fleet</strong> on any ship.
     </div>
-    <button onclick="openFleetImport()" style="background:rgba(232,160,52,.08);border:1px solid rgba(232,160,52,.3);border-radius:4px;padding:8px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#e8a034;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(232,160,52,.18)'" onmouseout="this.style.background='rgba(232,160,52,.08)'">&#8659; IMPORT FROM RSI HANGAR</button>
+    <button onclick="openFleetImport()" style="background:rgba(77,255,110,.08);border:1px solid rgba(77,255,110,.3);border-radius:4px;padding:8px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#4dff6e;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(77,255,110,.18)'" onmouseout="this.style.background='rgba(77,255,110,.08)'">&#8659; IMPORT FROM RSI HANGAR</button>
   </div>
   <!-- Fleet grid -->
   <div id="fleetGrid" style="flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-content:start"></div>
@@ -3052,15 +1643,15 @@ body > * .nav ~ * {
           browser extension &nbsp;<span style="color:var(--t3);font-size:11px">(Firefox · <a href="https://chromewebstore.google.com/detail/star-citizen-hangar-xplor/bhkgemjdepodofcnmekdobmmbifemhkc" target="_blank" style="color:#38bdf8;text-decoration:none">Chrome</a> · <a href="https://addons.opera.com/en/extensions/details/star-citizen-hangar-xplorer/" target="_blank" style="color:#38bdf8;text-decoration:none">Opera</a>)</span><br>
           <strong style="color:#fff">Step 2</strong> &nbsp;Log in to RSI and go to your
           <a href="https://robertsspaceindustries.com/account/pledges" target="_blank" style="color:#38bdf8;text-decoration:none">Hangar page</a> — the extension will load all your ships automatically<br>
-          <strong style="color:#fff">Step 3</strong> &nbsp;Click the <strong style="color:#e8a034">&#8659; JSON</strong> button added by the extension to download <code style="background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:11px">shiplist.json</code><br>
-          <strong style="color:#fff">Step 4</strong> &nbsp;Click <strong style="color:#e8a034">&#8679; UPLOAD shiplist.json</strong> below and select the file
+          <strong style="color:#fff">Step 3</strong> &nbsp;Click the <strong style="color:#4dff6e">&#8659; JSON</strong> button added by the extension to download <code style="background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:11px">shiplist.json</code><br>
+          <strong style="color:#fff">Step 4</strong> &nbsp;Click <strong style="color:#4dff6e">&#8679; UPLOAD shiplist.json</strong> below and select the file
         </div>
       </div>
 
       <!-- Primary: JSON file upload -->
       <div style="margin-bottom:14px">
-        <label for="fleetJsonFile" style="display:block;width:100%;background:rgba(232,160,52,.08);border:1px dashed rgba(232,160,52,.35);border-radius:6px;padding:14px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(232,160,52,.14)'" onmouseout="this.style.background='rgba(232,160,52,.08)'">
-          <div style="font-family:var(--fmono);font-size:11px;font-weight:700;letter-spacing:2px;color:#e8a034;margin-bottom:4px">&#8679; UPLOAD shiplist.json</div>
+        <label for="fleetJsonFile" style="display:block;width:100%;background:rgba(77,255,110,.08);border:1px dashed rgba(77,255,110,.35);border-radius:6px;padding:14px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(77,255,110,.14)'" onmouseout="this.style.background='rgba(77,255,110,.08)'">
+          <div style="font-family:var(--fmono);font-size:11px;font-weight:700;letter-spacing:2px;color:#4dff6e;margin-bottom:4px">&#8679; UPLOAD shiplist.json</div>
           <div style="font-size:11px;color:var(--t3)">Click to browse or drag &amp; drop your exported JSON file</div>
         </label>
         <input type="file" id="fleetJsonFile" accept=".json,application/json" style="display:none" onchange="fleetHandleJsonFile(this)">
@@ -3085,7 +1676,7 @@ body > * .nav ~ * {
     </div>
     <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0">
       <button onclick="closeFleetImport()" style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:7px 18px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1px;color:var(--t2);cursor:pointer">CANCEL</button>
-      <button onclick="doFleetImport()" style="background:rgba(232,160,52,.1);border:1px solid rgba(232,160,52,.4);border-radius:4px;padding:7px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#e8a034;cursor:pointer" onmouseover="this.style.background='rgba(232,160,52,.2)'" onmouseout="this.style.background='rgba(232,160,52,.1)'">&#10003; IMPORT</button>
+      <button onclick="doFleetImport()" style="background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.4);border-radius:4px;padding:7px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#4dff6e;cursor:pointer" onmouseover="this.style.background='rgba(77,255,110,.2)'" onmouseout="this.style.background='rgba(77,255,110,.1)'">&#10003; IMPORT</button>
     </div>
   </div>
 </div>
@@ -12245,12 +10836,12 @@ tick();
 #sdModalBox::-webkit-scrollbar{width:4px}
 #sdModalBox::-webkit-scrollbar-thumb{background:#252d3a;border-radius:2px}
 .sdm-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(79,195,247,.12);flex-shrink:0}
-.sdm-title{font-size:11px;letter-spacing:3px;font-family:var(--fmono);color:#e8a034;text-shadow:0 0 8px rgba(232,160,52,.4)}
+.sdm-title{font-size:11px;letter-spacing:3px;font-family:var(--fmono);color:#4dff6e;text-shadow:0 0 8px rgba(77,255,110,.4)}
 .sdm-close{background:none;border:none;color:#4a5a6a;font-size:20px;cursor:pointer;padding:0;line-height:1;transition:color .15s}
-.sdm-close:hover{color:#e8a034}
+.sdm-close:hover{color:#4dff6e}
 .sdm-verdict{text-align:center;padding:18px 20px 12px;flex-shrink:0}
 .sdm-verdict-badge{display:inline-block;font-size:22px;font-weight:900;font-family:var(--fmono);letter-spacing:4px;padding:8px 28px;border-radius:6px;margin-bottom:6px}
-.sdm-verdict-badge.win{color:#e8a034;background:rgba(232,160,52,.1);border:1px solid rgba(232,160,52,.3);text-shadow:0 0 20px rgba(232,160,52,.5);box-shadow:0 0 20px rgba(232,160,52,.1)}
+.sdm-verdict-badge.win{color:#4dff6e;background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);text-shadow:0 0 20px rgba(77,255,110,.5);box-shadow:0 0 20px rgba(77,255,110,.1)}
 .sdm-verdict-badge.lose{color:#f87171;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);text-shadow:0 0 20px rgba(220,38,38,.4);box-shadow:0 0 20px rgba(220,38,38,.08)}
 .sdm-verdict-badge.close{color:#ffd54f;background:rgba(255,213,79,.08);border:1px solid rgba(255,213,79,.25);text-shadow:0 0 16px rgba(255,213,79,.4)}
 .sdm-ttk-summary{font-size:11px;color:#6a9070;font-family:var(--fmono);letter-spacing:.5px}
@@ -12270,9 +10861,9 @@ tick();
 .sdm-vs-badge{font-size:13px;font-weight:900;font-family:var(--fmono);color:#252d3a;letter-spacing:2px}
 .sdm-divider{height:1px;background:rgba(79,195,247,.06);margin:0 20px 16px}
 .sdm-why{padding:0 20px 20px}
-.sdm-why-title{font-size:9px;letter-spacing:2px;color:#e8a034;font-family:var(--fmono);margin-bottom:10px;text-shadow:0 0 6px rgba(232,160,52,.3)}
+.sdm-why-title{font-size:9px;letter-spacing:2px;color:#4dff6e;font-family:var(--fmono);margin-bottom:10px;text-shadow:0 0 6px rgba(77,255,110,.3)}
 .sdm-reason{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,.02);border-radius:4px;border-left:2px solid transparent}
-.sdm-reason.good{border-left-color:#e8a034}
+.sdm-reason.good{border-left-color:#4dff6e}
 .sdm-reason.bad{border-left-color:#f87171}
 .sdm-reason.neutral{border-left-color:#ffd54f}
 .sdm-reason-icon{font-size:13px;flex-shrink:0;margin-top:1px}
@@ -12282,7 +10873,7 @@ tick();
 .sdm-btn{flex:1;padding:9px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;cursor:pointer;transition:all .15s;border:1px solid}
 .sdm-btn-primary{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.35);color:#f87171}
 .sdm-btn-primary:hover{background:rgba(220,38,38,.2);box-shadow:0 0 12px rgba(220,38,38,.2)}
-.sdm-btn-secondary{background:rgba(232,160,52,.06);border-color:rgba(232,160,52,.3);color:#e8a034}
+.sdm-btn-secondary{background:rgba(77,255,110,.06);border-color:rgba(77,255,110,.3);color:#4dff6e}
 .sdm-btn-secondary:hover{background:rgba(79,195,247,.1);box-shadow:0 0 8px rgba(79,195,247,.12)}
 
 </style>
@@ -12316,8 +10907,8 @@ tick();
         </div>
         <div class="sdm-stat-row">
           <span class="sdm-stat-lbl">TTK</span>
-          <div class="sdm-bar-wrap"><div class="sdm-bar" id="sdmMyTtkBar" style="background:#e8a034;width:0%"></div></div>
-          <span class="sdm-stat-val" id="sdmMyTtk" style="color:#e8a034">—</span>
+          <div class="sdm-bar-wrap"><div class="sdm-bar" id="sdmMyTtkBar" style="background:#4dff6e;width:0%"></div></div>
+          <span class="sdm-stat-val" id="sdmMyTtk" style="color:#4dff6e">—</span>
         </div>
       </div>
       <!-- VS -->
@@ -12644,7 +11235,7 @@ function populateDashboard(){
   mfrArr.sort(function(a,b){return b.count-a.count;});
   var top=mfrArr.slice(0,7);
   var maxC=top[0]?top[0].count:1;
-  var barColors=['#e8a034','#39e055','#ffd54f','#2ab844','#ff8c42','#40e0ff','#b388ff'];
+  var barColors=['#4dff6e','#39e055','#ffd54f','#2ab844','#ff8c42','#40e0ff','#b388ff'];
   var mfrEl=document.getElementById('dMfrList');
   if(mfrEl){
     mfrEl.innerHTML=top.map(function(m,i){
@@ -12708,10 +11299,10 @@ function _wf_placeholder(){
     if(!_hint){
       _hint = document.createElement('div');
       _hint.id = 'sdWorkflowHint';
-      _hint.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#141820;border:1px solid rgba(79,195,247,.25);border-left:3px solid #e8a034;border-radius:8px;padding:20px 28px;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 20px rgba(79,195,247,.06);font-family:var(--fmono,monospace)';
-      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#e8a034;margin-bottom:10px;text-shadow:0 0 8px rgba(232,160,52,.4)">&#9872; HOW TO USE</div>'
-        + '<div style="font-size:13px;color:#e8f4e8;line-height:1.7;margin-bottom:16px">Build your ship in the <strong style="color:#e8a034">SC ShipForge Builder</strong>, then click <strong style="color:#f87171">&#9876; TEST IN SHOWDOWN</strong> to test your loadout against other ships.</div>'
-        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(232,160,52,.1);border:1px solid rgba(232,160,52,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#e8a034;cursor:pointer">GOT IT</button>';
+      _hint.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#141820;border:1px solid rgba(79,195,247,.25);border-left:3px solid #4dff6e;border-radius:8px;padding:20px 28px;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 20px rgba(79,195,247,.06);font-family:var(--fmono,monospace)';
+      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#4dff6e;margin-bottom:10px;text-shadow:0 0 8px rgba(77,255,110,.4)">&#9872; HOW TO USE</div>'
+        + '<div style="font-size:13px;color:#e8f4e8;line-height:1.7;margin-bottom:16px">Build your ship in the <strong style="color:#4dff6e">SC ShipForge Builder</strong>, then click <strong style="color:#f87171">&#9876; TEST IN SHOWDOWN</strong> to test your loadout against other ships.</div>'
+        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#4dff6e;cursor:pointer">GOT IT</button>';
       document.body.appendChild(_hint);
     } else {
       _hint.style.display = 'block';
@@ -13042,10 +11633,10 @@ window.openShowdownWithBuild = function(){
     if(!_hint){
       _hint = document.createElement('div');
       _hint.id = 'sdWorkflowHint';
-      _hint.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#141820;border:1px solid rgba(79,195,247,.25);border-left:3px solid #e8a034;border-radius:8px;padding:20px 28px;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 20px rgba(79,195,247,.06);font-family:var(--fmono,monospace)';
-      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#e8a034;margin-bottom:10px;text-shadow:0 0 8px rgba(232,160,52,.4)">&#9872; HOW TO USE</div>'
-        + '<div style="font-size:13px;color:#e8f4e8;line-height:1.7;margin-bottom:16px">Build your ship in the <strong style="color:#e8a034">SC ShipForge Builder</strong>, then click <strong style="color:#f87171">&#9876; TEST IN SHOWDOWN</strong> to test your loadout against other ships.</div>'
-        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(232,160,52,.1);border:1px solid rgba(232,160,52,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#e8a034;cursor:pointer">GOT IT</button>';
+      _hint.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#141820;border:1px solid rgba(79,195,247,.25);border-left:3px solid #4dff6e;border-radius:8px;padding:20px 28px;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 20px rgba(79,195,247,.06);font-family:var(--fmono,monospace)';
+      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#4dff6e;margin-bottom:10px;text-shadow:0 0 8px rgba(77,255,110,.4)">&#9872; HOW TO USE</div>'
+        + '<div style="font-size:13px;color:#e8f4e8;line-height:1.7;margin-bottom:16px">Build your ship in the <strong style="color:#4dff6e">SC ShipForge Builder</strong>, then click <strong style="color:#f87171">&#9876; TEST IN SHOWDOWN</strong> to test your loadout against other ships.</div>'
+        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#4dff6e;cursor:pointer">GOT IT</button>';
       document.body.appendChild(_hint);
     } else { _hint.style.display = 'block'; }
     return;
@@ -13138,8 +11729,8 @@ function refreshFleetBadges() {
       var mName = fleetBtn.getAttribute('data-ship');
       if (mName) {
         fleetBtn.textContent = isInFleet(mName) ? '✓ IN MY FLEET' : '+ ADD TO FLEET';
-        fleetBtn.style.color = isInFleet(mName) ? '#e8a034' : '#38bdf8';
-        fleetBtn.style.borderColor = isInFleet(mName) ? 'rgba(232,160,52,.4)' : 'rgba(56,189,248,.3)';
+        fleetBtn.style.color = isInFleet(mName) ? '#4dff6e' : '#38bdf8';
+        fleetBtn.style.borderColor = isInFleet(mName) ? 'rgba(77,255,110,.4)' : 'rgba(56,189,248,.3)';
       }
     }
   }
@@ -13290,7 +11881,7 @@ function renderFleetTab() {
         showFleetDetail(n);
         // Highlight selected card
         document.querySelectorAll('.fleet-card').forEach(function(c){ c.style.borderColor=''; });
-        e.currentTarget.style.borderColor = 'rgba(232,160,52,.7)';
+        e.currentTarget.style.borderColor = 'rgba(77,255,110,.7)';
       }
     }; })(name);
     grid.appendChild(card);
@@ -13321,7 +11912,7 @@ function fleetPastePreview() {
     pr.style.color = '#f87171';
     pr.textContent = 'No ships found — make sure you copied the full RSI hangar page (Ctrl+A then Ctrl+C).';
   } else {
-    pr.style.color = '#e8a034';
+    pr.style.color = '#4dff6e';
     pr.textContent = '✓ Found ' + found.length + ' ship' + (found.length !== 1 ? 's' : '') + ': ' + found.slice(0,5).join(', ') + (found.length > 5 ? '…' : '');
   }
 }
@@ -13395,7 +11986,7 @@ function fleetHandleJsonFile(input) {
         renderFleetTab();
         closeFleetImport();
         var toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a1a;border:1px solid rgba(232,160,52,.4);border-radius:6px;padding:10px 20px;font-family:var(--fmono);font-size:12px;color:#e8a034;z-index:99999;letter-spacing:1px';
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a1a;border:1px solid rgba(77,255,110,.4);border-radius:6px;padding:10px 20px;font-family:var(--fmono);font-size:12px;color:#4dff6e;z-index:99999;letter-spacing:1px';
         toast.textContent = '\u2713 ' + added + ' ship' + (added !== 1 ? 's' : '') + ' imported from shiplist.json';
         document.body.appendChild(toast);
         setTimeout(function(){ toast.remove(); }, 3500);
@@ -13462,8 +12053,8 @@ function _patchShipModal() {
       btn.setAttribute('data-ship', name);
       btn.textContent = isInFleet(name) ? '\u2713 IN MY FLEET' : '+ ADD TO FLEET';
       btn.style.cssText = 'display:block;width:100%;margin-top:8px;padding:8px;font-family:var(--fmono);font-size:11px;font-weight:700;letter-spacing:1.5px;border-radius:6px;cursor:pointer;transition:all .2s;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8';
-      btn.style.color = isInFleet(name) ? '#e8a034' : '#38bdf8';
-      btn.style.borderColor = isInFleet(name) ? 'rgba(232,160,52,.4)' : 'rgba(56,189,248,.3)';
+      btn.style.color = isInFleet(name) ? '#4dff6e' : '#38bdf8';
+      btn.style.borderColor = isInFleet(name) ? 'rgba(77,255,110,.4)' : 'rgba(56,189,248,.3)';
       btn.onclick = function() {
         if (isInFleet(name)) {
           removeFromFleet(name);
@@ -13473,8 +12064,8 @@ function _patchShipModal() {
         } else {
           addToFleet(name);
           btn.textContent = '\u2713 IN MY FLEET';
-          btn.style.color = '#e8a034';
-          btn.style.borderColor = 'rgba(232,160,52,.4)';
+          btn.style.color = '#4dff6e';
+          btn.style.borderColor = 'rgba(77,255,110,.4)';
         }
       };
       mc.appendChild(btn);
