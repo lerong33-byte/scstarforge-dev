@@ -78,6 +78,121 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 #scene::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
   background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(212,168,76,.012) 3px,rgba(212,168,76,.012) 4px);}
 
+/* SYSTEM OVERLOAD WARNING */
+#sys-warn{position:absolute;top:118px;left:50%;transform:translateX(-50%);z-index:25;
+  padding:6px 16px;display:none;align-items:center;gap:10px;
+  background:linear-gradient(180deg,rgba(80,12,4,.92),rgba(40,4,2,.95));
+  border:1px solid rgba(255,80,40,.65);
+  box-shadow:0 0 18px rgba(232,80,48,.40),inset 0 1px 0 rgba(255,150,100,.30);
+  animation:warn-pulse 1.1s ease-in-out infinite;
+  clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,12px 100%,0 50%);}
+#sys-warn.on{display:flex;}
+#sys-warn .sw-icon{font-size:13px;color:#ff8050;text-shadow:0 0 6px rgba(255,80,40,.9);}
+#sys-warn .sw-txt{font-size:10px;letter-spacing:3px;font-weight:700;color:#ffb088;
+  text-shadow:0 0 6px rgba(255,80,40,.65);}
+#sys-warn .sw-sub{font-size:8px;letter-spacing:2px;color:rgba(255,170,140,.78);}
+@keyframes warn-pulse{
+  0%,100%{opacity:1;box-shadow:0 0 18px rgba(232,80,48,.40),inset 0 1px 0 rgba(255,150,100,.30);}
+  50%{opacity:.65;box-shadow:0 0 28px rgba(255,80,40,.75),inset 0 1px 0 rgba(255,170,120,.50);}
+}
+/* Wireframe pulses red on overload */
+#scene.overload #ship-wire{animation:wire-overload 1.1s ease-in-out infinite;}
+@keyframes wire-overload{
+  0%,100%{filter:drop-shadow(0 0 14px rgba(212,168,76,.25));}
+  50%{filter:drop-shadow(0 0 18px rgba(255,80,40,.78)) hue-rotate(-25deg);}
+}
+/* component markers light up on overload */
+#scene.overload .comp-marker{
+  fill:rgba(255,80,40,.85);
+  animation:comp-overload 1.1s ease-in-out infinite;}
+@keyframes comp-overload{
+  0%,100%{r:4;}
+  50%{r:6;}
+}
+/* hp-marker hover transition */
+.hp-marker{transition:r .15s,fill .15s,filter .15s;}
+
+/* COCKPIT BOOT SEQUENCE */
+#boot-seq{position:fixed;inset:0;z-index:500;
+  background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(20,16,28,.92),rgba(2,4,10,.99) 80%);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .8s ease-out,visibility .8s;
+  font-family:'Eurostile','Bahnschrift','Segoe UI Variable',monospace,sans-serif;}
+#boot-seq.done{opacity:0;visibility:hidden;pointer-events:none;}
+#boot-seq::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(220,180,80,.025) 2px,rgba(220,180,80,.025) 3px);}
+#boot-seq::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 60%,rgba(0,0,0,.85) 100%);
+  animation:boot-flicker 4s steps(8,end) infinite;}
+@keyframes boot-flicker{
+  0%,8%,15%,28%,42%,55%,70%,84%,100%{opacity:1;}
+  6%,14%,27%,41%,54%,69%,83%{opacity:.85;}
+}
+#boot-skip{position:absolute;top:18px;right:24px;
+  font-family:inherit;font-size:9px;letter-spacing:3px;font-weight:700;
+  background:transparent;color:rgba(220,180,80,.55);
+  border:1px solid rgba(220,180,80,.30);padding:5px 12px;cursor:pointer;
+  transition:color .15s,border-color .15s,background .15s;z-index:2;}
+#boot-skip:hover{color:rgba(232,200,120,1);border-color:rgba(232,200,120,.65);
+  background:rgba(220,180,80,.08);}
+.boot-frame{position:relative;width:480px;display:flex;flex-direction:column;align-items:center;gap:18px;
+  z-index:1;}
+.boot-logo{font-size:22px;letter-spacing:8px;font-weight:700;color:rgba(232,200,120,1);
+  text-shadow:0 0 14px rgba(232,200,120,.65),0 0 32px rgba(220,180,80,.30);
+  animation:boot-flick 2.6s ease-in-out;}
+.boot-sub{font-size:9px;letter-spacing:5px;color:rgba(180,150,90,.78);
+  text-shadow:0 0 6px rgba(220,180,80,.30);}
+@keyframes boot-flick{
+  0%{opacity:0;}10%{opacity:1;}12%{opacity:.4;}14%{opacity:1;}
+  20%{opacity:.7;}22%{opacity:1;}100%{opacity:1;}
+}
+.boot-bar{width:100%;height:2px;background:rgba(220,180,80,.10);position:relative;overflow:hidden;
+  border:1px solid rgba(220,180,80,.20);}
+.boot-fill{position:absolute;left:0;top:0;height:100%;width:0;
+  background:linear-gradient(90deg,#a07020,#d4a040,#f4dc88);
+  box-shadow:0 0 8px rgba(232,200,120,.65);
+  transition:width .35s ease-out;}
+.boot-log{font-size:9px;letter-spacing:1.5px;color:rgba(180,150,90,.65);
+  width:100%;display:flex;flex-direction:column;gap:3px;
+  font-family:'Consolas','Courier New',monospace;}
+.bl-line{opacity:.20;transition:opacity .25s,color .25s;}
+.bl-line.active{opacity:1;color:rgba(232,200,120,.92);}
+.bl-line.done{opacity:.78;color:rgba(220,210,190,.85);}
+.bl-st{display:inline-block;margin-left:6px;font-weight:700;}
+.bl-line .bl-st{color:rgba(180,150,90,.55);}
+.bl-line.active .bl-st{color:rgba(232,200,120,.95);text-shadow:0 0 4px rgba(232,200,120,.55);}
+.bl-line.done .bl-st{color:rgba(120,255,150,.85);text-shadow:0 0 4px rgba(80,200,100,.40);}
+
+/* PIP DRAG */
+.pp-track{cursor:ns-resize;touch-action:none;}
+.pp-track:hover{box-shadow:inset 0 0 0 1px rgba(220,180,80,.18);}
+.pp{pointer-events:none;}
+
+/* TOOLTIPS */
+[data-tip]{cursor:help;position:relative;}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;
+  transform:translateX(-50%);white-space:nowrap;z-index:200;pointer-events:none;
+  background:linear-gradient(180deg,rgba(40,42,48,.96),rgba(20,22,26,.98));
+  border:1px solid rgba(220,180,80,.35);
+  color:rgba(232,236,242,.95);font-size:9px;letter-spacing:.5px;
+  padding:5px 9px;text-transform:none;font-weight:400;
+  box-shadow:0 4px 14px rgba(0,0,0,.55),inset 0 1px 0 rgba(220,210,190,.18);}
+[data-tip]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px);left:50%;
+  transform:translateX(-50%);width:0;height:0;z-index:201;
+  border-left:5px solid transparent;border-right:5px solid transparent;
+  border-top:5px solid rgba(220,180,80,.40);}
+
+/* SLOT RESET BUTTON */
+.slot-reset{font-family:inherit;font-size:11px;line-height:1;cursor:pointer;
+  width:22px;height:22px;padding:0;
+  background:transparent;color:rgba(220,180,80,.55);
+  border:1px solid rgba(220,180,80,.20);
+  display:flex;align-items:center;justify-content:center;
+  transition:color .15s,border-color .15s,background .15s;}
+.slot-reset:hover{color:rgba(232,200,120,1);border-color:rgba(232,200,120,.55);
+  background:rgba(220,180,80,.08);}
+.slot-reset:active{transform:scale(.92);}
+
 /* DEEP SPACE FX */
 .bg-fx{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
 .saturn{position:absolute;top:64px;left:80px;width:280px;height:180px;
@@ -753,6 +868,26 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 </head>
 <body>
 
+<!-- COCKPIT BOOT SEQUENCE -->
+<div id="boot-seq">
+  <button id="boot-skip">SKIP &raquo;</button>
+  <div class="boot-frame">
+    <div class="boot-logo">SC-SHIPFORGE</div>
+    <div class="boot-sub">FLIGHT SYSTEMS INITIALIZING</div>
+    <div class="boot-bar"><div class="boot-fill"></div></div>
+    <div class="boot-log">
+      <div class="bl-line" data-step="1">&gt; CANOPY HUD ... <span class="bl-st">PENDING</span></div>
+      <div class="bl-line" data-step="2">&gt; POWER DISTRIBUTION ... <span class="bl-st">PENDING</span></div>
+      <div class="bl-line" data-step="3">&gt; WEAPON BUS ... <span class="bl-st">PENDING</span></div>
+      <div class="bl-line" data-step="4">&gt; MISSILE RACK ... <span class="bl-st">PENDING</span></div>
+      <div class="bl-line" data-step="5">&gt; SHIP COMPONENTS ... <span class="bl-st">PENDING</span></div>
+      <div class="bl-line" data-step="6">&gt; QUANTUM DRIVE SPIN-UP ... <span class="bl-st">PENDING</span></div>
+      <div class="bl-line" data-step="7">&gt; FLIGHT READY ... <span class="bl-st">PENDING</span></div>
+    </div>
+  </div>
+</div>
+
+
 <!-- LOADING SCREEN -->
 <div id="loading">
   <div id="load-nm">SC-SHIPFORGE</div>
@@ -897,6 +1032,9 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     <div class="strut r"></div>
   </div>
 
+  <!-- SYSTEM OVERLOAD warning -->
+  <div id="sys-warn"><span class="sw-icon">⚠</span><span class="sw-txt">SYSTEM OVERLOAD</span><span class="sw-sub" id="sw-sub"></span></div>
+
   <!-- SHIP NAMEPLATE (independent floating element) -->
   <div id="ship-nameplate">
     <div id="ship-nm">SELECT A SHIP</div>
@@ -924,10 +1062,16 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
       <!-- detail -->
       <line x1="175" y1="70" x2="175" y2="130" stroke-opacity=".30"/>
       <line x1="210" y1="80" x2="210" y2="120" stroke-opacity=".30"/>
-      <!-- hardpoint markers -->
-      <circle cx="40" cy="60" r="3" fill="rgba(212,168,76,.85)" stroke="none"/>
-      <circle cx="40" cy="140" r="3" fill="rgba(212,168,76,.85)" stroke="none"/>
-      <circle cx="305" cy="100" r="3" fill="rgba(212,168,76,.85)" stroke="none"/>
+      <!-- hardpoint markers (slot 0=port wing, 1=stbd wing, 2=nose, etc.) -->
+      <circle class="hp-marker" data-hp="0" cx="40" cy="60" r="3" fill="rgba(212,168,76,.85)" stroke="none"/>
+      <circle class="hp-marker" data-hp="1" cx="40" cy="140" r="3" fill="rgba(212,168,76,.85)" stroke="none"/>
+      <circle class="hp-marker" data-hp="2" cx="305" cy="100" r="3" fill="rgba(212,168,76,.85)" stroke="none"/>
+      <circle class="hp-marker" data-hp="3" cx="170" cy="60" r="2.5" fill="rgba(212,168,76,.55)" stroke="none"/>
+      <circle class="hp-marker" data-hp="4" cx="170" cy="140" r="2.5" fill="rgba(212,168,76,.55)" stroke="none"/>
+      <circle class="hp-marker" data-hp="5" cx="240" cy="80" r="2.5" fill="rgba(212,168,76,.55)" stroke="none"/>
+      <!-- engine/component glow points (shown on overload) -->
+      <circle class="comp-marker" data-cm="pp" cx="100" cy="100" r="4" fill="rgba(180,150,90,.18)" stroke="none"/>
+      <circle class="comp-marker" data-cm="sg" cx="200" cy="100" r="4" fill="rgba(180,150,90,.18)" stroke="none"/>
     </svg>
     <img id="ship-img" src="" alt="" onerror="this.style.opacity='0'">
     <div id="ship-shadow"></div>
@@ -938,40 +1082,48 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     <div class="smfd-grp">
       <div class="smfd-h">COMBAT</div>
       <div class="smfd-cells">
-        <div class="smfd-c"><span class="smfd-l">DPS</span><span class="smfd-v" id="h-dps">--</span></div>
-        <div class="smfd-c"><span class="smfd-l">ALPHA</span><span class="smfd-v" id="h-alpha">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Damage per second across all active weapons">DPS</span><span class="smfd-v" id="h-dps">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Single-volley combined damage">ALPHA</span><span class="smfd-v" id="h-alpha">--</span></div>
       </div>
     </div>
     <div class="smfd-sep"></div>
     <div class="smfd-grp">
       <div class="smfd-h">SHIELDS</div>
       <div class="smfd-cells">
-        <div class="smfd-c"><span class="smfd-l">SHP</span><span class="smfd-v def" id="h-shp">--</span></div>
-        <div class="smfd-c"><span class="smfd-l">REGN</span><span class="smfd-v def" id="h-regen">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Total shield hit points">SHP</span><span class="smfd-v def" id="h-shp">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Shield regeneration per second">REGN</span><span class="smfd-v def" id="h-regen">--</span></div>
       </div>
     </div>
     <div class="smfd-sep"></div>
     <div class="smfd-grp">
       <div class="smfd-h">POWER</div>
       <div class="smfd-cells">
-        <div class="smfd-c"><span class="smfd-l">OUT</span><span class="smfd-v" id="h-eu">--</span></div>
-        <div class="smfd-c"><span class="smfd-l">LOAD</span><span class="smfd-v" id="h-load">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Power plant output (EU)">OUT</span><span class="smfd-v" id="h-eu">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Power consumption % of max output">LOAD</span><span class="smfd-v" id="h-load">--</span></div>
       </div>
     </div>
     <div class="smfd-sep"></div>
     <div class="smfd-grp">
       <div class="smfd-h">DRIVE</div>
       <div class="smfd-cells">
-        <div class="smfd-c"><span class="smfd-l">SCM</span><span class="smfd-v" id="h-scm">--</span></div>
-        <div class="smfd-c"><span class="smfd-l">QDR</span><span class="smfd-v" id="h-qd">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Space Combat Maneuver speed (m/s)">SCM</span><span class="smfd-v" id="h-scm">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Quantum drive range (Mm)">QDR</span><span class="smfd-v" id="h-qd">--</span></div>
       </div>
     </div>
     <div class="smfd-sep"></div>
     <div class="smfd-grp">
-      <div class="smfd-h">SHIP</div>
+      <div class="smfd-h" data-tip="Ship class · pilot count">SHIP</div>
       <div class="smfd-cells">
-        <div class="smfd-c"><span class="smfd-l">SIZE</span><span class="smfd-v" id="h-size">--</span></div>
-        <div class="smfd-c"><span class="smfd-l">CREW</span><span class="smfd-v" id="h-crew">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Hull size class S/M/L/Capital">SIZE</span><span class="smfd-v" id="h-size">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Maximum crew supported">CREW</span><span class="smfd-v" id="h-crew">--</span></div>
+      </div>
+    </div>
+    <div class="smfd-sep"></div>
+    <div class="smfd-grp">
+      <div class="smfd-h" data-tip="Total cost · sustained fire before overheat">LOADOUT</div>
+      <div class="smfd-cells">
+        <div class="smfd-c"><span class="smfd-l" data-tip="Total aUEC cost of equipped weapons">COST</span><span class="smfd-v" id="h-cost">--</span></div>
+        <div class="smfd-c"><span class="smfd-l" data-tip="Sustained fire seconds before cooler caps">SFC</span><span class="smfd-v" id="h-sfc">--</span></div>
       </div>
     </div>
     <span style="display:none" id="h-range"></span>
@@ -1178,6 +1330,7 @@ function loadShip(name) {
   _curShipName = name;
   _curShip = SHIP_DATA[name];
   if (!_curShip) return;
+  applyShipWireframe(_curShip);
   
   // Init loadout with defaults
   _loadout = {};
@@ -1269,6 +1422,30 @@ function renderPwrComps() {
 function bpips(c) {
   var el = document.getElementById('ppt-'+c.id); if(!el) return;
   el.innerHTML = '';
+  // Drag-to-set wiring (mouse + touch)
+  el.onpointerdown = function(e){
+    if(!c.on) return;
+    var rect = el.getBoundingClientRect();
+    var setFromY = function(y){
+      var rel = (rect.bottom - y) / rect.height;
+      var pip = Math.round(rel * c.max);
+      pip = Math.max(0, Math.min(c.max, pip));
+      if(pip !== c.pips){ c.pips = pip; updatePwr(); }
+    };
+    setFromY(e.clientY);
+    el.setPointerCapture(e.pointerId);
+    var move = function(ev){ setFromY(ev.clientY); };
+    var up = function(){
+      el.releasePointerCapture(e.pointerId);
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up);
+      el.removeEventListener('pointercancel', up);
+    };
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+    e.preventDefault();
+  };
   for(var i=0;i<c.max;i++){
     var d = document.createElement('div');
     d.className = 'pp '+(i<(c.on?c.pips:0)?c.cat+' pp-c':'e').replace('pp-c','pp-c');
@@ -1330,6 +1507,21 @@ function updatePwr() {
   var en = document.getElementById('peu-nums'); if(en) en.textContent=Math.round(draw)+' / '+out+' EU';
   var es = document.getElementById('peu-status');
   if(es){if(lp>100){es.style.color='rgba(220,60,38,.85)';es.textContent='OVERDRAW';}else{es.style.color='';es.textContent=Math.round(lp)+'%';}}
+  // SYSTEM OVERLOAD visual feedback
+  var sw = document.getElementById('sys-warn');
+  var swSub = document.getElementById('sw-sub');
+  var sceneEl = document.getElementById('scene');
+  var shipWire = document.getElementById('ship-wire');
+  if(lp > 100){
+    if(sw) sw.classList.add('on');
+    if(swSub) swSub.textContent = 'POWER ' + Math.round(lp) + '% / DRAW ' + Math.round(draw) + ' EU';
+    if(sceneEl) sceneEl.classList.add('overload');
+    if(shipWire) shipWire.classList.add('overload');
+  } else {
+    if(sw) sw.classList.remove('on');
+    if(sceneEl) sceneEl.classList.remove('overload');
+    if(shipWire) shipWire.classList.remove('overload');
+  }
 
   var wb = document.getElementById('pwr-warn');
   if(wb){
@@ -1350,8 +1542,49 @@ function updatePwr() {
   setText('h-scm', (_mode==='scm'?spd:ship.scm||226)+' ');
   setText('h-scm-foot', spd+' m/s '+_mode.toUpperCase());
 
+  // Cost + Sustainability
+  computeLoadoutEconomy();
+
   // Rebuild hp band dps display
   buildHpBand();
+}
+
+function computeLoadoutEconomy() {
+  if(!_curShip) return;
+  var slots = _curShip.slots || [];
+  var missiles = _curShip.missiles || [];
+  var totalCost = 0, totalDraw = 0, totalHeat = 0;
+  slots.forEach(function(sl,i){
+    var cnt = sl.count||1;
+    for(var u=0; u<cnt; u++){
+      var key = 'w'+i+'_'+u;
+      var wid = _loadout[key] || _loadout['w'+i] || sl.default;
+      var w = WEAP_BY_ID[wid];
+      var on = !(_loadout._off && _loadout._off[key]);
+      if(w){
+        totalCost += (w.price||0);
+        if(on){ totalDraw += (w.draw||0); totalHeat += (w.heat||0); }
+      }
+    }
+  });
+  missiles.forEach(function(sl,i){
+    var cnt = sl.count||1;
+    for(var u=0; u<cnt; u++){
+      var key = 'm'+i+'_'+u;
+      var mid = _loadout[key] || _loadout['m'+i] || sl.default;
+      var m = WEAP_BY_ID[mid];
+      if(m) totalCost += (m.price||0);
+    }
+  });
+  var co = _curShip.comps || {};
+  var coolerName = _loadout['c_cooler'] || co.cooler;
+  var coData = COMP_DB && COMP_DB.cooler && COMP_DB.cooler[coolerName];
+  var coolerCount = (co.counts||{}).cooler||1;
+  var coolRate = coData ? ((coData.rate||coData.cooling||40) * coolerCount) : (40 * coolerCount);
+  var sfcSec = totalHeat>0 ? Math.max(1, Math.round(coolRate*8 / totalHeat)) : 999;
+
+  setText('h-cost', totalCost > 1000 ? (totalCost/1000).toFixed(0)+'k' : totalCost.toLocaleString());
+  setText('h-sfc', sfcSec >= 999 ? 'INF' : sfcSec+'s');
 }
 
 function resetPower() {
@@ -1507,10 +1740,11 @@ function makeSlot(type, sl, slotIdx, sz) {
     + '</div>'
     + '<span class="slot-stat"><b>' + (master.w ? totalAlpha.toFixed(1) : '--') + '</b><i>' + (type==='missile'?'DMG':'\u03B1') + '</i></span>'
     + '<span class="slot-dps"><b>' + Math.round(totalDPS) + '</b><i>DPS</i></span>'
+    + '<button class="slot-reset" title="Reset to default">\u21BA</button>'
     + '<span class="slot-on ' + (slotOn?'on':'off') + '">' + (slotOn?'ON':'OFF') + '</span>';
 
   hdr.onclick = function(e){
-    if(e.target.closest('.slot-on')) return;
+    if(e.target.closest('.slot-on') || e.target.closest('.slot-reset')) return;
     slot.classList.toggle('expanded');
     _loadout._exp[slotKey] = slot.classList.contains('expanded');
     var chev = hdr.querySelector('.chev');
@@ -1522,6 +1756,16 @@ function makeSlot(type, sl, slotIdx, sz) {
     units.forEach(function(u){ _loadout._off[u.key] = newOff; });
     buildHpBand(); updateStats();
   };
+  hdr.querySelector('.slot-reset').onclick = function(e){
+    e.stopPropagation();
+    units.forEach(function(u){ delete _loadout[u.key]; if(_loadout._off) delete _loadout._off[u.key]; });
+    delete _loadout[prefix+slotIdx];
+    buildHpBand(); updateStats();
+  };
+  // Wireframe marker highlight on hover
+  slot.dataset.hp = slotIdx;
+  slot.onmouseenter = function(){ highlightHpMarker(slotIdx, true); };
+  slot.onmouseleave = function(){ highlightHpMarker(slotIdx, false); };
   slot.appendChild(hdr);
 
   // Body
@@ -1647,10 +1891,11 @@ function makeCompSlot(cs) {
       + '<div class="slot-meta">' + cs.lbl + (sub2?' <span class="slot-tag">' + sub2 + '</span>':'') + '</div>'
     + '</div>'
     + '<span class="slot-dps"><b>' + (primary||'--') + '</b><i>' + primaryUnit + '</i></span>'
+    + '<button class="slot-reset" title="Reset to default">\u21BA</button>'
     + '<span class="slot-on ' + (slotOn?'on':'off') + '">' + (slotOn?'ON':'OFF') + '</span>';
 
   hdr.onclick = function(e){
-    if(e.target.closest('.slot-on')) return;
+    if(e.target.closest('.slot-on') || e.target.closest('.slot-reset')) return;
     slot.classList.toggle('expanded');
     _loadout._exp[slotKey] = slot.classList.contains('expanded');
     var chev = hdr.querySelector('.chev');
@@ -1661,6 +1906,12 @@ function makeCompSlot(cs) {
     var newOff = slotOn;
     units.forEach(function(u){ _loadout._off[u.key] = newOff; });
     buildHpBand(); updateStats();
+  };
+  hdr.querySelector('.slot-reset').onclick = function(e){
+    e.stopPropagation();
+    units.forEach(function(u){ delete _loadout[u.key]; if(_loadout._off) delete _loadout._off[u.key]; });
+    delete _loadout['c_'+cs.key];
+    buildHpBand(); buildPwrComps(); updateStats();
   };
   slot.appendChild(hdr);
 
@@ -1727,6 +1978,21 @@ function makeCompUnitRow(cs, unit, catDb) {
     row.appendChild(sub);
   }
   return row;
+}
+
+// Highlight a hardpoint marker on the wireframe (slot hover)
+function highlightHpMarker(idx, on) {
+  var m = document.querySelector('.hp-marker[data-hp="'+idx+'"]');
+  if(!m) return;
+  if(on){
+    m.setAttribute('r', 5.2);
+    m.setAttribute('fill', 'rgba(255,232,168,.95)');
+    m.style.filter = 'drop-shadow(0 0 6px rgba(255,200,80,.85))';
+  } else {
+    m.setAttribute('r', m.getAttribute('data-hp') < 3 ? 3 : 2.5);
+    m.setAttribute('fill', m.getAttribute('data-hp') < 3 ? 'rgba(212,168,76,.85)' : 'rgba(212,168,76,.55)');
+    m.style.filter = '';
+  }
 }
 
 // Toggle on/off for any hardpoint/missile/component
@@ -1825,10 +2091,54 @@ document.getElementById('wsel-modal').addEventListener('click', function(e){
 // ============================================================
 // START
 // ============================================================
+function runBootSequence(onComplete){
+  var seq = document.getElementById('boot-seq');
+  var fill = seq && seq.querySelector('.boot-fill');
+  var lines = seq ? seq.querySelectorAll('.bl-line') : [];
+  var skip = document.getElementById('boot-skip');
+  var aborted = false;
+  var i = 0;
+  function finish(){
+    if(aborted) return;
+    aborted = true;
+    if(seq) seq.classList.add('done');
+    if(typeof onComplete==='function') onComplete();
+  }
+  if(skip) skip.onclick = finish;
+  function step(){
+    if(aborted) return;
+    if(i >= lines.length){
+      if(fill) fill.style.width = '100%';
+      setTimeout(finish, 600);
+      return;
+    }
+    var line = lines[i];
+    line.classList.add('active');
+    var st = line.querySelector('.bl-st');
+    if(st) st.textContent = 'CONNECTING';
+    if(fill) fill.style.width = ((i+1)/lines.length*100)+'%';
+    setTimeout(function(){
+      if(aborted) return;
+      line.classList.remove('active');
+      line.classList.add('done');
+      if(st) st.textContent = 'ONLINE';
+      i++;
+      step();
+    }, 280 + Math.random()*180);
+  }
+  step();
+}
+
 window.addEventListener('load', function(){
   init();
-  // Init mode pill after layout
   setTimeout(initModePill, 200);
+  // Boot sequence runs in parallel with init
+  if(window.location.search.indexOf('noboot') < 0){
+    runBootSequence();
+  } else {
+    var seq = document.getElementById('boot-seq');
+    if(seq) seq.classList.add('done');
+  }
 });
 
 function openWsel(idx){openPicker('weapon',idx,(_curShip&&_curShip.slots[idx]?_curShip.slots[idx].sz:null));}
