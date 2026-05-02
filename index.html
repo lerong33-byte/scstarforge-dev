@@ -42,9 +42,9 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
 /* ── TOKENS ── */
 button{background:transparent;border:none;cursor:pointer;font-family:inherit;outline:none}
 :root{
-  --bg:#0c0a1e;--bg2:#0e0c22;--bg3:#13102a;--bg4:#181535;
-  --border:#1e1b38;--b2:#2a2650;
-  --text:#c8d8f0;--t2:#6a7a9a;--t3:#3a4060;
+  --bg:#0b0e15;--bg2:#10141e;--bg3:#151c28;--bg4:#1c2334;
+  --border:rgba(180,200,230,.10);--b2:rgba(180,200,230,.18);
+  --text:#dce8f8;--t2:#7890aa;--t3:#3a4e62;
   --accent:#e8a034;--accent-bg:rgba(232,160,52,.10);--accent-border:rgba(232,160,52,.30);
   --green:#3ac97a;--green-bg:rgba(58,201,122,.10);--green-border:rgba(58,201,122,.30);
   --warn:#ffd54f;--warn-bg:rgba(255,213,79,.10);--warn-border:rgba(255,213,79,.30);
@@ -1110,17 +1110,18 @@ option,optgroup{background:var(--bg2)}
    ═══════════════════════════════════════════════════════════════ */
 
 #sbDashboard {
-  --g-bg:      #0c0a1e;
-  --g-panel:   #13102a;
-  --g-card:    #1a1735;
-  --g-border:  rgba(255,255,255,.07);
+  --g-bg:      #0b0e15;
+  --g-panel:   #131926;
+  --g-card:    #192030;
+  --g-border:  rgba(180,200,240,.08);
   --g-amber:   #e8981a;
   --g-blue:    #4fc3f7;
-  --g-purple:  #7c5cbf;
+  --g-chrome:  #b0c8e8;
+  --g-purple:  #6878a8;
   --g-red:     #e53535;
   --g-teal:    #2dd4aa;
-  --g-text:    #e8eaf6;
-  --g-muted:   #6b6d8a;
+  --g-text:    #dce8f8;
+  --g-muted:   #5a7090;
   background: var(--g-bg);
   background-image:
     radial-gradient(ellipse 100% 50% at 50% -10%, rgba(124,92,191,.18) 0%, transparent 65%),
@@ -2280,6 +2281,231 @@ body > * .nav ~ * {
   background: rgba(4,2,16,.75) !important;
   backdrop-filter: blur(6px) !important;
   -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHROME SURFACES + HOVER ADDONS  ·  inspired by 21st.dev
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Animatable CSS custom property for Border Beam */
+@property --ba {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes beamSpin   { to { --ba: 360deg; } }
+@keyframes shineSweep {
+  from { transform: translateX(-180%) skewX(-18deg); opacity: 1; }
+  to   { transform: translateX(400%)  skewX(-18deg); opacity: 0; }
+}
+
+/* ── Chrome nav bar ── */
+.nav {
+  background: linear-gradient(180deg, #1c2030 0%, #0f1318 100%) !important;
+  border-bottom: 1px solid rgba(120,150,200,.12) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.05), 0 4px 24px rgba(0,0,0,.55) !important;
+  position: relative;
+}
+.nav::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 25%, rgba(255,255,255,.38) 50%, rgba(255,255,255,.18) 75%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Chrome metallic logo ── */
+.nav-logo {
+  background: linear-gradient(180deg, #ffd880 0%, #e89820 35%, #a86010 65%, #e8a030 85%, #ffd880 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 10px rgba(232,152,26,.45)) !important;
+}
+
+/* ── Chrome tabs bar ── */
+.tabs {
+  background: linear-gradient(180deg, #131822 0%, #0d1018 100%) !important;
+  border-bottom: 1px solid rgba(120,150,200,.10) !important;
+}
+
+/* ── Tab shine on hover ── */
+.tab { position: relative; overflow: hidden; }
+.tab::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: -100%; width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent);
+  transform: skewX(-15deg);
+  pointer-events: none;
+}
+.tab:hover::after { animation: shineSweep .5s ease forwards; }
+
+/* ── Active tab: chrome underline glow ── */
+.tab.on { text-shadow: 0 0 14px rgba(232,152,26,.55) !important; }
+.tab.on::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 15%; right: 15%; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(232,152,26,.7) 30%, #e8981a 50%, rgba(232,152,26,.7) 70%, transparent);
+  box-shadow: 0 0 10px rgba(232,152,26,.6), 0 0 24px rgba(232,152,26,.25);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* ── Border Beam on ship cards ── */
+#sbDashboard .d-sc-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+#sbDashboard .d-sc-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--ba) at 50% 50%,
+    transparent 0deg, transparent 300deg,
+    rgba(232,152,26,.9) 340deg, rgba(255,220,140,1) 355deg, transparent 360deg
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity .35s;
+}
+#sbDashboard .d-sc-card:hover::before {
+  opacity: 1;
+  animation: beamSpin 2.5s linear infinite;
+}
+
+/* ── Border Beam on role cards ── */
+#sbDashboard .d-role-card {
+  position: relative;
+  isolation: isolate;
+}
+#sbDashboard .d-role-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--ba) at 50% 50%,
+    transparent 0deg, transparent 310deg,
+    rgba(79,195,247,.9) 345deg, rgba(200,240,255,1) 355deg, transparent 360deg
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity .35s;
+}
+#sbDashboard .d-role-card:hover::before {
+  opacity: 1;
+  animation: beamSpin 3.5s linear infinite;
+}
+
+/* ── Chrome card surface — top-edge highlight + brushed gradient ── */
+#sbDashboard .d-sc-card,
+#sbDashboard .d-role-card {
+  border-top: 1px solid rgba(255,255,255,.16) !important;
+  border-left: 1px solid rgba(255,255,255,.07) !important;
+  border-right: 1px solid rgba(0,0,0,.25) !important;
+  border-bottom: 1px solid rgba(0,0,0,.3) !important;
+  background-image: linear-gradient(160deg,
+    rgba(255,255,255,.055) 0%,
+    rgba(255,255,255,.01) 45%,
+    rgba(0,0,0,.07) 100%) !important;
+}
+
+/* ── Shine sweep on primary button ── */
+#sbDashboard .d-btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f0a840 0%, #c87818 52%, #e09030 100%) !important;
+  border-top: 1px solid rgba(255,235,130,.5) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,230,100,.3),
+    inset 0 -1px 0 rgba(0,0,0,.35),
+    0 4px 22px rgba(200,120,20,.42) !important;
+  color: #1a0e00 !important;
+  transition: transform .15s, box-shadow .15s !important;
+}
+#sbDashboard .d-btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: -60%; width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+}
+#sbDashboard .d-btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,230,100,.4),
+    0 8px 32px rgba(232,152,26,.55) !important;
+}
+#sbDashboard .d-btn-primary:hover::after {
+  animation: shineSweep .55s ease forwards;
+}
+
+/* ── Shine on ghost CTA buttons ── */
+#sbDashboard .d-cta a, #sbDashboard .d-cta button {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-top: 1px solid rgba(255,255,255,.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 2px 10px rgba(0,0,0,.3) !important;
+  transition: transform .15s, box-shadow .15s, border-color .15s !important;
+}
+#sbDashboard .d-cta a::after, #sbDashboard .d-cta button::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: -60%; width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+}
+#sbDashboard .d-cta a:hover, #sbDashboard .d-cta button:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(255,255,255,.25) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 20px rgba(0,0,0,.45) !important;
+}
+#sbDashboard .d-cta a:hover::after, #sbDashboard .d-cta button:hover::after {
+  animation: shineSweep .5s ease forwards;
+}
+
+/* ── Chrome input fields ── */
+#sSearch, .ss-input {
+  background: linear-gradient(180deg, rgba(22,28,42,.95) 0%, rgba(12,15,24,.98) 100%) !important;
+  border: 1px solid rgba(120,150,200,.15) !important;
+  border-top: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,.35), inset 0 -1px 0 rgba(255,255,255,.04) !important;
+}
+#sSearch:focus, .ss-input:focus {
+  border-color: rgba(232,152,26,.38) !important;
+  border-top-color: rgba(232,152,26,.6) !important;
+  box-shadow:
+    inset 0 2px 5px rgba(0,0,0,.3),
+    0 0 0 3px rgba(232,152,26,.08),
+    0 0 22px rgba(232,152,26,.12) !important;
+}
+
+/* ── Weapon row chrome shine ── */
+.wl-row { position: relative; overflow: hidden; }
+.wl-row::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: -100%; width: 60%;
+  background: linear-gradient(90deg, transparent, rgba(79,195,247,.04), transparent);
+  pointer-events: none;
+  transition: transform .5s ease;
+}
+.wl-row:hover::after { transform: translateX(300%); }
+
+/* ── Stat value chrome glow ── */
+#statsRight .sp-dps, #statsRight [class*='sp-val'],
+#statsRight [class*='stat-val'] {
+  text-shadow: 0 0 18px currentColor !important;
 }
 
 </style>
