@@ -182,7 +182,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   z-index:9;padding:14px 6px 14px 8px;
   display:flex;flex-direction:column;gap:6px;
   overflow:hidden;
-  transform:perspective(1400px) rotateY(-7deg);transform-origin:right center;
+  transform:none;
   background:
     linear-gradient(270deg,rgba(28,32,36,.62) 0%,rgba(20,22,26,.50) 50%,rgba(10,12,14,.30) 100%),
     repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
@@ -222,7 +222,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   bottom:50px;z-index:15;
   padding:14px 8px 14px 6px;display:flex;flex-direction:column;
   overflow:hidden;
-  transform:perspective(1800px) rotateY(4deg);transform-origin:left center;
+  transform:none;
   background:
     linear-gradient(90deg,rgba(28,32,36,.62) 0%,rgba(20,22,26,.50) 50%,rgba(10,12,14,.30) 100%),
     repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
@@ -359,22 +359,105 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   border:1px solid var(--r-d);padding:4px 8px;letter-spacing:1px;
   margin:6px 12px 0;display:none;text-align:center;}
 
+/* SECTION HEADERS — WEAPONS / MISSILES / SYSTEMS */
+.sec-hdr{display:flex;align-items:baseline;gap:10px;
+  padding:6px 12px 4px;margin:6px 0 4px;
+  border-bottom:1px solid rgba(180,170,150,.20);
+  font-size:9px;letter-spacing:4px;color:rgba(220,210,190,.80);font-weight:700;}
+.sec-hdr .sec-l{text-shadow:0 0 6px rgba(220,180,80,.30);}
+.sec-hdr .sec-s{font-size:7px;letter-spacing:2px;color:rgba(140,130,116,.60);
+  margin-left:auto;font-weight:400;}
+
+/* SLOT (collapsible row) */
+.slot{margin:0 0 4px;background:linear-gradient(180deg,rgba(20,22,26,.55),rgba(12,14,18,.75));
+  border:1px solid rgba(180,170,150,.10);transition:border-color .15s,background .15s;}
+.slot.expanded{border-color:rgba(220,180,80,.30);
+  background:linear-gradient(180deg,rgba(28,30,34,.78),rgba(18,20,24,.85));}
+.slot-hdr{display:grid;grid-template-columns:14px 36px 1fr auto auto auto;
+  column-gap:10px;align-items:center;padding:7px 12px;cursor:pointer;
+  transition:background .12s;}
+.slot-hdr:hover{background:linear-gradient(90deg,rgba(220,180,80,.04),transparent);}
+.chev{font-size:8px;color:rgba(220,180,80,.70);text-align:center;line-height:1;}
+.slot.expanded .chev{color:rgba(220,180,80,1);}
+.slot-sz{font-size:9px;font-weight:700;text-align:center;padding:3px 0;
+  border:1px solid rgba(180,170,150,.30);color:rgba(220,210,190,.92);
+  letter-spacing:.5px;background:rgba(20,18,14,.55);}
+.slot-sz.w{color:#ff9070;border-color:rgba(232,128,80,.45);}
+.slot-sz.s{color:#7bb8e0;border-color:rgba(80,160,210,.45);}
+.slot-sz.p{color:#f0c870;border-color:rgba(220,180,80,.45);}
+.slot-info{min-width:0;display:flex;flex-direction:column;gap:1px;}
+.slot-nm{font-size:11px;font-weight:600;color:var(--w);letter-spacing:.5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slot-cnt{font-size:9px;font-weight:400;color:rgba(220,180,80,.70);letter-spacing:1px;margin-left:3px;}
+.slot-meta{font-size:7px;letter-spacing:1.5px;color:rgba(140,130,116,.55);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slot-tag{display:inline-block;padding:0 5px;margin-left:3px;
+  border:1px solid rgba(120,180,210,.25);color:rgba(120,180,210,.78);
+  font-size:6.5px;letter-spacing:1.5px;}
+.slot-stat{display:flex;align-items:baseline;gap:2px;font-size:11px;font-weight:700;
+  color:#ff9070;text-shadow:0 0 6px rgba(232,80,48,.30);min-width:48px;justify-content:flex-end;}
+.slot-stat i{font-style:normal;font-size:7px;letter-spacing:1px;color:rgba(140,130,116,.55);font-weight:400;}
+.slot-dps{display:flex;align-items:baseline;gap:2px;font-size:14px;font-weight:700;
+  color:#ff9070;text-shadow:0 0 8px rgba(232,80,48,.40);min-width:60px;justify-content:flex-end;letter-spacing:.5px;}
+.slot-dps i{font-style:normal;font-size:7px;letter-spacing:1.5px;color:rgba(140,130,116,.55);font-weight:400;}
+.slot-on{font-size:8px;font-weight:700;letter-spacing:1.5px;padding:3px 8px;
+  border:1px solid;cursor:pointer;text-align:center;min-width:40px;transition:all .15s;}
+.slot-on.on{color:rgba(120,255,150,.92);border-color:rgba(80,200,100,.45);
+  background:rgba(40,140,52,.10);box-shadow:0 0 6px rgba(80,200,100,.18) inset;}
+.slot-on.off{color:rgba(220,80,48,.92);border-color:rgba(220,80,48,.40);
+  background:rgba(120,40,20,.10);}
+.slot-on:hover{filter:brightness(1.18);}
+
+.slot-body{display:none;padding:6px 12px 10px;
+  border-top:1px solid rgba(180,170,150,.08);background:rgba(8,10,14,.40);}
+.slot.expanded .slot-body{display:flex;flex-direction:column;gap:4px;}
+.slot-clbl{font-size:8px;letter-spacing:2.5px;color:rgba(160,150,130,.55);padding:3px 0 5px;}
+
+.unit-row{display:grid;grid-template-columns:1fr auto;column-gap:6px;row-gap:2px;align-items:center;}
+.unit-row.off{opacity:.55;}
+.unit-sel{width:100%;color:var(--w);font-family:inherit;font-size:10px;letter-spacing:.5px;
+  border:1px solid rgba(180,170,150,.22);padding:5px 8px;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background:linear-gradient(180deg,rgba(28,30,34,.55),rgba(12,14,18,.85));
+  transition:border-color .15s,box-shadow .15s;}
+.unit-sel:focus,.unit-sel:hover{outline:none;border-color:rgba(220,180,80,.55);
+  box-shadow:0 0 6px rgba(220,180,80,.18) inset;}
+.unit-sel option{background:#15161a;color:var(--w);}
+.unit-tog{font-size:8px;font-weight:700;letter-spacing:1px;padding:4px 8px;
+  border:1px solid;cursor:pointer;text-align:center;min-width:38px;transition:all .15s;}
+.unit-tog.on{color:rgba(120,255,150,.92);border-color:rgba(80,200,100,.45);
+  background:rgba(40,140,52,.10);}
+.unit-tog.off{color:rgba(160,150,130,.55);border-color:rgba(140,130,116,.30);}
+.unit-tog:hover{filter:brightness(1.18);}
+.unit-sub{grid-column:1/3;font-size:8px;letter-spacing:1px;color:rgba(160,150,130,.65);
+  padding:1px 0 3px 4px;}
+.unit-sub b{color:rgba(220,210,190,.92);font-weight:700;}
+
+.unit-stats-line{font-size:9px;letter-spacing:.5px;color:rgba(140,130,116,.65);
+  padding:5px 0 3px;border-top:1px dashed rgba(180,170,150,.10);margin-top:4px;}
+.unit-stats-line .sl-lbl{display:inline-block;padding:1px 5px;margin-right:5px;
+  border:1px solid rgba(120,180,210,.22);color:rgba(120,180,210,.75);
+  font-size:7px;letter-spacing:1.5px;text-transform:uppercase;}
+.unit-stats-line b{color:rgba(220,210,190,.92);font-weight:700;}
+.unit-loc{font-size:8px;letter-spacing:1.5px;color:rgba(180,150,80,.70);
+  padding:3px 0 2px;border-top:1px dashed rgba(180,150,80,.20);margin-top:3px;}
+
 /* HARDPOINTS — MIDDLE BOTTOM (dashboard) */
-#hp-band{position:absolute;bottom:14px;left:380px;right:380px;
-  z-index:16;padding:14px 16px;max-height:54vh;overflow:hidden;
-  transform:none;
+#hp-band{position:absolute;top:230px;left:360px;right:360px;bottom:14px;
+  z-index:16;padding:8px 14px 14px;overflow-y:auto;overflow-x:hidden;
+  transform:none;}
+#hp-band::-webkit-scrollbar{width:0;}
+#hp-flow{max-height:none;overflow:visible;display:flex;flex-direction:column;gap:0;}
+#hp-flow::-webkit-scrollbar{width:0;}
+
+/* hp-band background (flat panel) */
+#hp-band{
   background:
-    linear-gradient(180deg,transparent,rgba(24,26,30,.50) 30%,rgba(20,22,26,.70)),
-    repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
-  border-top:1px solid rgba(180,170,150,.22);
-  box-shadow:inset 0 1px 0 rgba(220,210,190,.18),0 0 28px rgba(0,0,0,.30);
-  clip-path:polygon(18px 0,calc(100% - 18px) 0,100% 100%,0 100%);}
-#hp-band::before{content:'WEAPONS · MISSILES';font-size:8px;letter-spacing:4px;
-  color:var(--g-d);text-align:center;display:block;
-  padding-bottom:8px;border-bottom:1px solid var(--g-m);margin-bottom:6px;}
-#hp-flow{display:flex;flex-direction:column;gap:3px;max-height:42vh;overflow-y:auto;}
-#hp-flow::-webkit-scrollbar{width:2px;}
-#hp-flow::-webkit-scrollbar-thumb{background:var(--g-m);}
+    linear-gradient(180deg,rgba(24,26,30,.55),rgba(16,18,22,.78)),
+    repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.010) 2px,rgba(255,255,255,.010) 3px);
+  border:1px solid rgba(180,170,150,.16);
+  box-shadow:inset 0 1px 0 rgba(220,210,190,.10);
+  clip-path:none;}
 .hpi{padding:5px 12px;position:relative;cursor:pointer;
   display:grid;grid-template-columns:32px 1fr auto;column-gap:8px;align-items:center;
   transition:background .12s;}
@@ -1153,137 +1236,301 @@ function calcAlpha() {
 function buildHpBand() {
   var flow = document.getElementById('hp-flow'); if(!flow||!_curShip) return;
   flow.innerHTML = '';
+  if(!_loadout._off) _loadout._off = {};
+  if(!_loadout._exp) _loadout._exp = {};
   var ship = _curShip;
   var slots = ship.slots || [];
   var missiles = ship.missiles || [];
   var co = ship.comps || {};
   var cnt = co.counts || {};
-  var db = COMP_DB || {};
 
-  // --- WEAPONS ---
-  if(!_loadout._off) _loadout._off = {};
-  slots.forEach(function(sl,i){
-    var wid = _loadout['w'+i] || sl.default || '';
-    var w = WEAP_BY_ID[wid];
-    var cnt = sl.count||1;
-    var key = 'w'+i;
-    var on = !_loadout._off[key];
-    var dps = (w && on) ? Math.round((w.dps||0)*cnt) : 0;
-    var alpha = w ? Math.round((w.alpha||0)*cnt*10)/10 : 0;
-    var div = document.createElement('div');
-    div.className = 'hpi'+(on?'':' hpi-off');
-    div.title = w ? (w.name+' / '+(w.type||'')+' / '+(w.range||'?')+'m / '+(w.draw||0)+' EU draw / '+(w.heat||0)+' heat'+(w.loc?' / BUY: '+w.loc:'')) : 'Click to equip';
-    div.style.cursor = 'pointer';
-
-    div.innerHTML =
-      '<span class="hpi-slot">S'+sl.sz+' '+(sl.lbl||'HARDPOINT').toUpperCase()+(cnt>1?' x'+cnt:'')+(w?' / '+(w.type||'').toUpperCase()+(w.mfr?' / '+w.mfr:''):'')+'</span>'
-      +'<div class="hpi-nr"><span class="hpi-sz w">S'+sl.sz+'</span><span class="hpi-nm">'+(w?w.name:'[ EMPTY - click to equip ]')+'</span></div>'
-      +(w?'<div class="hpi-stats"><span class="hpi-stat"><b>'+alpha+'</b><i>ALPHA</i></span><span class="hpi-stat"><b>'+(w.range||'--')+'</b><i>m</i></span><span class="hpi-stat"><b>'+(w.draw||0)+'</b><i>EU</i></span>'+(w.loc?'<span class="hpi-loc">BUY: '+w.loc+'</span>':'')+'</div>':'')
-      +'<div class="hpi-dv"><span class="hpi-dps gd">'+(dps||'--')+'</span><span class="hpi-u">DPS</span></div>';
-
-    var togEl = document.createElement('div');
-    togEl.className = 'hpi-tog '+(on?'on':'off');
-    togEl.innerHTML = '<div class="hpi-tog-k"></div>';
-    togEl.onclick = function(e){ e.stopPropagation(); togHp(key); };
-    div.insertBefore(togEl, div.firstChild);
-
-    div.onclick = function(e){
-      if(e.target.closest('.hpi-tog')) return;
-      openPicker('weapon', i, sl.sz);
-    };
-    flow.appendChild(div);
-  });
-
-  // --- MISSILES ---
+  // ===== WEAPONS =====
+  if(slots.length){
+    flow.appendChild(makeSecHdr('WEAPONS', slots.length + ' HARDPOINTS'));
+    slots.forEach(function(sl, i){ flow.appendChild(makeSlot('weapon', sl, i, sl.sz)); });
+  }
+  // ===== MISSILES =====
   if(missiles.length){
-    var msep = document.createElement('div');
-    msep.style.cssText='height:1px;margin:6px 4px;background:linear-gradient(to right,transparent,rgba(180,170,150,.20),transparent);';
-    flow.appendChild(msep);
-    missiles.forEach(function(sl,i){
-      var mid = _loadout['m'+i] || sl.default || '';
-      var mis = WEAP_BY_ID[mid];
-      var mcnt = sl.count||1;
-      var mkey = 'm'+i;
-      var mon = !_loadout._off[mkey];
-      var div=document.createElement('div');
-      div.className='hpi'+(mon?'':' hpi-off');
-      div.style.cursor='pointer';
-      div.title = mis ? (mis.name+(mis.type?' / '+mis.type:'')+(mis.range?' / '+mis.range+'m':'')+(mis.loc?' / BUY: '+mis.loc:'')) : 'Click to equip';
+    flow.appendChild(makeSecHdr('MISSILES'));
+    missiles.forEach(function(sl, i){ flow.appendChild(makeSlot('missile', sl, i, sl.sz)); });
+  }
+  // ===== SYSTEMS (in right comp-zone) =====
+  var compFlow = document.getElementById('comp-flow');
+  if(compFlow){
+    compFlow.innerHTML = '';
+    var compSlots=[
+      {key:'pp',lbl:'POWER PLANT',cat:'pp',count:cnt.pp||1},
+      {key:'sg',lbl:'SHIELD GEN',cat:'sg',count:cnt.sg||1},
+      {key:'cooler',lbl:'COOLER',cat:'cooler',count:cnt.cooler||1},
+      {key:'qd',lbl:'Q-DRIVE',cat:'qd',count:1},
+    ];
+    compFlow.appendChild(makeSecHdr('SYSTEMS'));
+    compSlots.forEach(function(cs){ compFlow.appendChild(makeCompSlot(cs)); });
+  }
+}
 
-      div.innerHTML='<span class="hpi-slot">S'+sl.sz+' MISSILE'+(mcnt>1?' x'+mcnt:'')+(mis?' / '+(mis.type||'').toUpperCase():'')+'</span>'
-        +'<div class="hpi-nr"><span class="hpi-sz s">S'+sl.sz+'</span><span class="hpi-nm">'+(mis?mis.name:sl.default||'[ empty ]')+'</span></div>'
-        +(mis?'<div class="hpi-stats"><span class="hpi-stat"><b>'+Math.round(mis.alpha||mis.dps||0)+'</b><i>DMG</i></span><span class="hpi-stat"><b>'+(mis.range||'--')+'</b><i>m</i></span>'+(mis.loc?'<span class="hpi-loc">BUY: '+mis.loc+'</span>':'')+'</div>':'')
-        +'<div class="hpi-dv"><span class="hpi-dps df">'+(mis&&mon?Math.round((mis.dps||0)*mcnt):'--')+'</span><span class="hpi-u">DPS</span></div>';
+function makeSecHdr(label, sub) {
+  var d = document.createElement('div');
+  d.className = 'sec-hdr';
+  d.innerHTML = '<span class="sec-l">' + label + '</span>' + (sub ? '<span class="sec-s">' + sub + '</span>' : '');
+  return d;
+}
 
-      var mtogEl = document.createElement('div');
-      mtogEl.className = 'hpi-tog '+(mon?'on':'off');
-      mtogEl.innerHTML = '<div class="hpi-tog-k"></div>';
-      mtogEl.onclick = function(e){ e.stopPropagation(); togHp(mkey); };
-      div.insertBefore(mtogEl, div.firstChild);
+function makeSlot(type, sl, slotIdx, sz) {
+  var cnt = sl.count || 1;
+  var prefix = type==='missile' ? 'm' : 'w';
+  var slot = document.createElement('div');
+  slot.className = 'slot';
+  var slotKey = prefix+slotIdx;
+  if(_loadout._exp[slotKey]) slot.classList.add('expanded');
 
-      div.onclick=function(e){
-        if(e.target.closest('.hpi-tog')) return;
-        openPicker('missile',i,sl.sz);
-      };
-      flow.appendChild(div);
-    });
+  var units = [];
+  for(var u=0; u<cnt; u++){
+    var key = prefix+slotIdx+'_'+u;
+    var wid = _loadout[key] || _loadout[prefix+slotIdx] || sl.default;
+    var w = WEAP_BY_ID[wid];
+    var on = !_loadout._off[key];
+    units.push({key:key, wid:wid, w:w, on:on});
+  }
+  var master = units[0];
+  var totalDPS = 0, totalAlpha = 0;
+  units.forEach(function(u){ if(u.w){ if(u.on) totalDPS += u.w.dps||0; totalAlpha += u.w.alpha||0; } });
+  var slotOn = units.some(function(u){return u.on;});
+
+  // Header
+  var hdr = document.createElement('div');
+  hdr.className = 'slot-hdr';
+  var typeColor = type==='weapon' ? 'w' : 's';
+  hdr.innerHTML = '<span class="chev">' + (slot.classList.contains('expanded')?'\u25BC':'\u25B6') + '</span>'
+    + '<span class="slot-sz ' + typeColor + '">S' + sl.sz + '</span>'
+    + '<div class="slot-info">'
+      + '<div class="slot-nm">' + (master.w ? master.w.name : (master.wid || 'EMPTY')) + (cnt>1 ? ' <span class="slot-cnt">\u00D7' + cnt + '</span>' : '') + '</div>'
+      + '<div class="slot-meta">' + (sl.lbl||(type==='missile'?'MISSILE':'HARDPOINT')).toUpperCase()
+        + (master.w&&master.w.type ? ' <span class="slot-tag">' + master.w.type.toUpperCase() + '</span>' : '')
+      + '</div>'
+    + '</div>'
+    + '<span class="slot-stat"><b>' + (master.w ? totalAlpha.toFixed(1) : '--') + '</b><i>' + (type==='missile'?'DMG':'\u03B1') + '</i></span>'
+    + '<span class="slot-dps"><b>' + Math.round(totalDPS) + '</b><i>DPS</i></span>'
+    + '<span class="slot-on ' + (slotOn?'on':'off') + '">' + (slotOn?'ON':'OFF') + '</span>';
+
+  hdr.onclick = function(e){
+    if(e.target.closest('.slot-on')) return;
+    slot.classList.toggle('expanded');
+    _loadout._exp[slotKey] = slot.classList.contains('expanded');
+    var chev = hdr.querySelector('.chev');
+    if(chev) chev.textContent = slot.classList.contains('expanded') ? '\u25BC' : '\u25B6';
+  };
+  hdr.querySelector('.slot-on').onclick = function(e){
+    e.stopPropagation();
+    var newOff = slotOn;
+    units.forEach(function(u){ _loadout._off[u.key] = newOff; });
+    buildHpBand(); updateStats();
+  };
+  slot.appendChild(hdr);
+
+  // Body
+  var body = document.createElement('div');
+  body.className = 'slot-body';
+  if(cnt > 1){
+    var clbl = document.createElement('div');
+    clbl.className = 'slot-clbl';
+    clbl.textContent = (sl.lbl||(type==='missile'?'MISSILE':'HARDPOINT')) + ' \u00D7' + cnt;
+    body.appendChild(clbl);
+  }
+  units.forEach(function(unit){ body.appendChild(makeUnitRow(type, unit, sz)); });
+  if(master.w){
+    var statsLine = document.createElement('div');
+    statsLine.className = 'unit-stats-line';
+    var sParts = [];
+    if(master.w.type) sParts.push('<span class="sl-lbl">' + master.w.type + '</span>');
+    sParts.push('<b>' + Math.round(master.w.dps||0) + '</b> DPS');
+    if(master.w.range) sParts.push('<b>' + master.w.range + '</b>m');
+    sParts.push('<b>S' + master.w.sz + '</b>');
+    if(master.w.draw) sParts.push('Draw:<b>' + master.w.draw + 'EU</b>');
+    if(master.w.heat) sParts.push('Heat:<b>' + master.w.heat + '</b>');
+    statsLine.innerHTML = sParts.join(' \u00B7 ');
+    body.appendChild(statsLine);
+  }
+  if(master.w && master.w.loc){
+    var loc = document.createElement('div');
+    loc.className = 'unit-loc';
+    loc.textContent = 'BUY ' + master.w.loc;
+    body.appendChild(loc);
+  }
+  slot.appendChild(body);
+  return slot;
+}
+
+function makeUnitRow(type, unit, sz) {
+  var row = document.createElement('div');
+  row.className = 'unit-row' + (unit.on?'':' off');
+
+  var sel = document.createElement('select');
+  sel.className = 'unit-sel';
+  var pool = (WEAPONS||[]).filter(function(w){ return w.sz === sz; });
+  if(type==='missile') pool = pool.filter(function(w){ var t=(w.type||'').toLowerCase(); return t.indexOf('missile') > -1 || t.indexOf('torpedo') > -1; });
+  pool.sort(function(a,b){ return (b.dps||0)-(a.dps||0); });
+  var emp = document.createElement('option'); emp.value=''; emp.textContent='[Empty]';
+  sel.appendChild(emp);
+  pool.forEach(function(w){
+    var opt = document.createElement('option');
+    opt.value = w.id;
+    opt.textContent = w.name + ' (' + Math.round(w.dps||0) + 'DPS) S' + w.sz;
+    if(w.id === unit.wid) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.onchange = function(e){
+    e.stopPropagation();
+    _loadout[unit.key] = sel.value;
+    buildHpBand(); updateStats();
+  };
+  sel.onclick = function(e){ e.stopPropagation(); };
+
+  var tog = document.createElement('div');
+  tog.className = 'unit-tog ' + (unit.on?'on':'off');
+  tog.textContent = unit.on ? 'ON' : 'OFF';
+  tog.onclick = function(e){
+    e.stopPropagation();
+    _loadout._off[unit.key] = !_loadout._off[unit.key];
+    buildHpBand(); updateStats();
+  };
+
+  row.appendChild(sel);
+  row.appendChild(tog);
+
+  if(unit.w){
+    var sub = document.createElement('div');
+    sub.className = 'unit-sub';
+    sub.innerHTML = '<b>' + Math.round(unit.w.dps||0) + '</b> DPS \u00B7 <b>' + Math.round(unit.w.alpha||0) + '</b> \u03B1 \u00B7 <b>' + (unit.w.draw||0) + '</b>EU';
+    row.appendChild(sub);
+  }
+  return row;
+}
+
+function makeCompSlot(cs) {
+  var co = (_curShip && _curShip.comps) || {};
+  var db = COMP_DB || {};
+  var catDb = db[cs.cat] || {};
+  var slot = document.createElement('div');
+  slot.className = 'slot';
+  var slotKey = 'c_'+cs.key;
+  if(_loadout._exp[slotKey]) slot.classList.add('expanded');
+
+  var units = [];
+  for(var u=0; u<cs.count; u++){
+    var key = slotKey+'_'+u;
+    var cname = _loadout[key] || _loadout[slotKey] || co[cs.key] || cs.lbl;
+    var cdata = catDb[cname];
+    var on = !_loadout._off[key];
+    units.push({key:key, name:cname, data:cdata, on:on});
+  }
+  var master = units[0];
+  var slotOn = units.some(function(u){return u.on;});
+
+  var primary='', primaryUnit='';
+  if(master.data){
+    if(cs.cat==='pp'){ primary = (master.data.out||16)*cs.count; primaryUnit='EU'; }
+    else if(cs.cat==='sg'){ primary = (master.data.totalHP||0)*cs.count; primaryUnit='HP'; }
+    else if(cs.cat==='qd'){ primary = master.data.speed||0; primaryUnit='Mm/s'; }
+    else if(cs.cat==='cooler'){ primary = (master.data.rate||master.data.cooling||0)*cs.count; primaryUnit='cool'; }
+  }
+  var sub2 = '';
+  if(master.data){
+    if(cs.cat==='pp') sub2 = 'EM ' + (master.data.em||'?');
+    else if(cs.cat==='sg') sub2 = (master.data.regen||0) + '/s regen';
+    else if(cs.cat==='qd') sub2 = (master.data.range||0) + ' Gm';
+    else if(cs.cat==='cooler') sub2 = (master.data.rate||0) + ' cool/s';
   }
 
-  // --- COMPONENTS (rendered in middle #comp-flow) ---
-  var compFlow = document.getElementById('comp-flow');
-  if(compFlow){ compFlow.innerHTML=''; }
-  var compSlots=[
-    {key:'pp',lbl:'POWER PLANT',sz:'p',cat:'pp',count:cnt.pp||1},
-    {key:'sg',lbl:'SHIELD GEN',sz:'s',cat:'sg',count:cnt.sg||1},
-    {key:'cooler',lbl:'COOLER',sz:'p',cat:'cooler',count:cnt.cooler||1},
-    {key:'qd',lbl:'Q-DRIVE',sz:'s',cat:'qd',count:1},
-  ];
-  compSlots.forEach(function(cs){
-    var cname = _loadout['c_'+cs.key] || co[cs.key] || cs.lbl;
-    var cdata = db[cs.cat] && db[cs.cat][cname] ? db[cs.cat][cname] : null;
-    var ckey = 'c_'+cs.key;
-    var con = !_loadout._off[ckey];
+  var hdr = document.createElement('div');
+  hdr.className = 'slot-hdr';
+  hdr.innerHTML = '<span class="chev">' + (slot.classList.contains('expanded')?'\u25BC':'\u25B6') + '</span>'
+    + '<span class="slot-sz s">S' + (master.data&&master.data.sz?master.data.sz:'?') + '</span>'
+    + '<div class="slot-info">'
+      + '<div class="slot-nm">' + master.name + (cs.count>1 ? ' <span class="slot-cnt">\u00D7' + cs.count + '</span>' : '') + '</div>'
+      + '<div class="slot-meta">' + cs.lbl + (sub2?' <span class="slot-tag">' + sub2 + '</span>':'') + '</div>'
+    + '</div>'
+    + '<span class="slot-dps"><b>' + (primary||'--') + '</b><i>' + primaryUnit + '</i></span>'
+    + '<span class="slot-on ' + (slotOn?'on':'off') + '">' + (slotOn?'ON':'OFF') + '</span>';
 
-    // Stats block based on category
-    var stats = '';
-    var primary = '', primaryUnit = '';
-    if(cs.cat==='pp' && cdata) {
-      primary = Math.round((cdata.out||16)*cs.count); primaryUnit = 'EU';
-      stats = '<span class="hpi-stat"><b>'+(cdata.heat||0)+'</b><i>HEAT</i></span><span class="hpi-stat"><b>'+(cdata.em||0)+'</b><i>EM</i></span>';
-    } else if(cs.cat==='sg' && cdata) {
-      primary = Math.round((cdata.totalHP||0)*cs.count); primaryUnit = 'HP';
-      stats = '<span class="hpi-stat"><b>'+(cdata.regen||0)+'</b><i>REGEN</i></span><span class="hpi-stat"><b>'+(cdata.drawMin||0)+'-'+(cdata.drawMax||0)+'</b><i>EU</i></span>';
-    } else if(cs.cat==='qd' && cdata) {
-      primary = cdata.speed||0; primaryUnit = 'Mm/s';
-      stats = '<span class="hpi-stat"><b>'+(cdata.range||0)+'</b><i>Gm</i></span><span class="hpi-stat"><b>'+(cdata.spool||0)+'</b><i>SPOOL</i></span>';
-    } else if(cs.cat==='cooler' && cdata) {
-      primary = cdata.rate||cdata.cooling||'--'; primaryUnit = 'COOL';
-    }
-    var locStr = cdata && cdata.loc ? '<span class="hpi-loc">BUY: '+cdata.loc+'</span>' : '';
+  hdr.onclick = function(e){
+    if(e.target.closest('.slot-on')) return;
+    slot.classList.toggle('expanded');
+    _loadout._exp[slotKey] = slot.classList.contains('expanded');
+    var chev = hdr.querySelector('.chev');
+    if(chev) chev.textContent = slot.classList.contains('expanded') ? '\u25BC' : '\u25B6';
+  };
+  hdr.querySelector('.slot-on').onclick = function(e){
+    e.stopPropagation();
+    var newOff = slotOn;
+    units.forEach(function(u){ _loadout._off[u.key] = newOff; });
+    buildHpBand(); updateStats();
+  };
+  slot.appendChild(hdr);
 
-    var div=document.createElement('div');
-    div.className='hpi cmp'+(con?'':' hpi-off');
-    div.style.cursor='pointer';
-    div.title = cdata && cdata.loc ? cname+' / '+cs.lbl+' / BUY: '+cdata.loc : cname;
+  var body = document.createElement('div');
+  body.className = 'slot-body';
+  units.forEach(function(unit){ body.appendChild(makeCompUnitRow(cs, unit, catDb)); });
+  if(master.data && master.data.loc){
+    var loc = document.createElement('div');
+    loc.className = 'unit-loc';
+    loc.textContent = 'BUY ' + master.data.loc;
+    body.appendChild(loc);
+  }
+  slot.appendChild(body);
+  return slot;
+}
 
-    div.innerHTML =
-      '<span class="hpi-slot">'+(cs.count>1?cs.count+'x ':'')+cs.lbl+(cdata&&cdata.sz?' / S'+cdata.sz:'')+'</span>'
-      +'<div class="hpi-nr"><span class="hpi-sz '+cs.sz+'">'+(cdata&&cdata.sz?'S'+cdata.sz:'S?')+'</span><span class="hpi-nm">'+cname+'</span></div>'
-      +(stats||locStr?'<div class="hpi-stats">'+stats+locStr+'</div>':'')
-      +'<div class="hpi-dv"><span class="hpi-dps gd">'+(primary||'--')+'</span><span class="hpi-u">'+(primaryUnit||'')+'</span></div>';
+function makeCompUnitRow(cs, unit, catDb) {
+  var row = document.createElement('div');
+  row.className = 'unit-row' + (unit.on?'':' off');
 
-    var ctogEl = document.createElement('div');
-    ctogEl.className = 'hpi-tog '+(con?'on':'off');
-    ctogEl.innerHTML = '<div class="hpi-tog-k"></div>';
-    ctogEl.onclick = function(e){ e.stopPropagation(); togHp(ckey); };
-    div.insertBefore(ctogEl, div.firstChild);
-
-    div.onclick=function(e){
-      if(e.target.closest('.hpi-tog')) return;
-      openPicker('comp',cs.key,null,cs.cat);
-    };
-    (compFlow||flow).appendChild(div);
+  var sel = document.createElement('select');
+  sel.className = 'unit-sel';
+  Object.keys(catDb).forEach(function(n){
+    var d = catDb[n]||{};
+    var opt = document.createElement('option');
+    opt.value = n;
+    var label = n;
+    if(cs.cat==='pp') label += ' | ' + (d.out||0) + 'EU';
+    else if(cs.cat==='sg') label += ' | ' + (d.totalHP||0).toLocaleString() + 'HP';
+    else if(cs.cat==='qd') label += ' | ' + (d.speed||0) + ' Mm/s';
+    else if(cs.cat==='cooler') label += ' | ' + (d.rate||d.cooling||0) + '/s';
+    opt.textContent = label;
+    if(n === unit.name) opt.selected = true;
+    sel.appendChild(opt);
   });
+  sel.onchange = function(e){
+    e.stopPropagation();
+    _loadout[unit.key] = sel.value;
+    if(unit.key.endsWith('_0')) _loadout['c_'+cs.key] = sel.value;
+    buildHpBand(); buildPwrComps(); updateStats();
+  };
+  sel.onclick = function(e){ e.stopPropagation(); };
+
+  var tog = document.createElement('div');
+  tog.className = 'unit-tog ' + (unit.on?'on':'off');
+  tog.textContent = unit.on ? 'ON' : 'OFF';
+  tog.onclick = function(e){
+    e.stopPropagation();
+    _loadout._off[unit.key] = !_loadout._off[unit.key];
+    buildHpBand(); updateStats();
+  };
+
+  row.appendChild(sel);
+  row.appendChild(tog);
+
+  if(unit.data){
+    var sub = document.createElement('div');
+    sub.className = 'unit-sub';
+    var d = unit.data;
+    if(cs.cat==='pp') sub.innerHTML = '<b>' + (d.out||0) + '</b>EU \u00B7 <b>' + (d.heat||0) + '</b>heat/s \u00B7 EM <b>' + (d.em||0) + '</b>';
+    else if(cs.cat==='sg') sub.innerHTML = '<b>' + (d.totalHP||0).toLocaleString() + '</b>HP \u00B7 +<b>' + (d.regen||0) + '</b>/s \u00B7 <b>' + (d.drawMin||0) + '-' + (d.drawMax||0) + '</b>EU';
+    else if(cs.cat==='qd') sub.innerHTML = '<b>' + (d.speed||0) + '</b>Mm/s \u00B7 <b>' + (d.range||0) + '</b>Gm \u00B7 <b>' + (d.spool||0) + '</b>s spool';
+    else if(cs.cat==='cooler') sub.innerHTML = '<b>' + (d.rate||d.cooling||0) + '</b>cool/s \u00B7 <b>1-4</b>EU';
+    row.appendChild(sub);
+  }
+  return row;
 }
 
 // Toggle on/off for any hardpoint/missile/component
