@@ -1406,12 +1406,8 @@ function loadShip(name) {
   if (!_curShip) return;
   applyShipWireframe(_curShip);
   
-  // Init loadout with defaults
-  _loadout = {};
-  var slots = _curShip.slots || [];
-  slots.forEach(function(sl, i) {
-    _loadout[i] = sl.default || '';
-  });
+  // Init loadout fresh — no overrides, defaults flow from ship data through buildHpBand
+  _loadout = { _off: {}, _pips: {}, _exp: {} };
   
   // Ship nameplate
   document.getElementById('ship-nm').textContent = name.toUpperCase();
@@ -2119,7 +2115,8 @@ function makeCompUnitRow(cs, unit, catDb) {
   tog.onclick = function(e){
     e.stopPropagation();
     _loadout._off[unit.key] = !_loadout._off[unit.key];
-    buildHpBand(); updateStats();
+    if(typeof syncPwrFromComp === 'function') syncPwrFromComp(unit.key);
+    buildHpBand(); buildPwrComps(); updatePwr(); updateStats();
   };
 
   row.appendChild(sel);
