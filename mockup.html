@@ -487,9 +487,28 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .padj{display:none;}
 .pc-eu{display:none;}
 /* category icons via ::before on .pc */
-.pc::after{content:'';display:block;width:14px;height:14px;order:99;margin-top:3px;
-  background-position:center;background-repeat:no-repeat;background-size:contain;
-  opacity:.86;cursor:help;}
+.pc::after{display:none;}
+.pc-icon-btn{order:99;width:24px;height:24px;margin-top:4px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(220,180,80,.28);
+  background:rgba(8,8,10,.55);
+  font-size:14px;line-height:1;
+  transition:all .15s;color:rgba(220,180,80,.82);}
+.pc-icon-btn:hover{border-color:rgba(232,200,120,.85);background:rgba(220,180,80,.12);
+  box-shadow:0 0 6px rgba(220,180,80,.35) inset;}
+.pc.offline .pc-icon-btn{opacity:.45;border-color:rgba(140,130,116,.30);color:rgba(140,130,116,.50);}
+/* Per-category icon glyphs */
+.pc-icon-btn[data-cat="pp"]::before{content:'\26a1';color:#ff5040;text-shadow:0 0 5px rgba(232,40,24,.65);}
+.pc-icon-btn[data-cat="sg"]::before{content:'\25cb';color:#28b8e0;text-shadow:0 0 5px rgba(40,184,224,.55);}
+.pc-icon-btn[data-cat="wp"]::before{content:'\27a4';color:#ffb060;text-shadow:0 0 5px rgba(232,160,48,.55);}
+.pc-icon-btn[data-cat="en"]::before{content:'\00bb';color:#f0c848;text-shadow:0 0 5px rgba(216,184,40,.55);font-size:18px;}
+.pc-icon-btn[data-cat="co"]::before{content:'\2744';color:#1ce0a8;text-shadow:0 0 5px rgba(28,224,168,.55);}
+.pc-icon-btn[data-cat="qd"]::before{content:'\2295';color:#c878ff;text-shadow:0 0 5px rgba(168,80,224,.65);}
+.pc-icon-btn[data-cat="rd"]::before{content:'\25c9';color:#b8b8c0;text-shadow:0 0 5px rgba(184,184,192,.40);}
+.pc.offline .pc-icon-btn::before{filter:saturate(.20) brightness(.6);}
+/* Hide the old top toggle */
+.ptog{display:none !important;}
+.pc-head,.pc-sub,.pc-foot{display:none;}
 .pc-pp::after{content:'\26a1';display:flex;align-items:center;justify-content:center;
   font-size:12px;color:#e8b830;text-shadow:0 0 4px rgba(232,184,48,.45);background:none;}
 .pc-sg::after{content:'\25cb';font-size:13px;color:#28b8e0;
@@ -1564,16 +1583,8 @@ function renderPwrComps() {
     el.id = 'prc-'+c.id; el.className = 'pc pc-'+c.cat+(c.on?'':' offline');
     el.title = (CL_FULL[c.cat]||c.cat.toUpperCase()) + (c.name && c.name !== CL_FULL[c.cat] ? ' / ' + c.name : '') + ' (' + (c.on?'ON':'OFF') + ')';
     el.innerHTML =
-      '<div class="pc-head">' +
-        '<div class="ptog '+(c.on?'on':'off')+'" id="ptog-'+c.id+'" onclick="togComp(\''+c.id+'\')"><div class="ptog-k"></div></div>' +
-        '<span class="pc-name" style="color:'+CC[c.cat]+'">'+CL[c.cat]+'</span>' +
-      '</div>' +
-      '<div class="pc-sub">'+c.name+'</div>' +
       '<div class="pp-track" id="ppt-'+c.id+'"></div>' +
-      '<div class="pc-foot">' +
-        (hp?'<div class="padj"><div class="padb" onclick="adjPip(\''+c.id+'\',-1)">\u2212</div><div class="padb" onclick="adjPip(\''+c.id+'\',1)">+</div></div>':'') +
-        '<div class="pc-eu" style="color:'+CC[c.cat]+'" id="pce-'+c.id+'"></div>' +
-      '</div>';
+      '<div class="pc-icon-btn" id="ptog-'+c.id+'" data-cat="'+c.cat+'" onclick="togComp(\''+c.id+'\')" title="'+(CL_FULL[c.cat]||c.cat.toUpperCase())+' — click to toggle"></div>';
     flow.appendChild(el);
   });
   updatePwr();
