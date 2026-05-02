@@ -1414,18 +1414,29 @@ function loadShip(name) {
   document.getElementById('ship-type').textContent =
     (_curShip.role||'').toUpperCase() + ' \u00b7 SIZE ' + (_curShip.size||'?') + ' \u00b7 ' + (mfrName(name)||'');
 
-  // Ship image
+  // Ship image — fetch via Fleetyards API (cdn.fleetyards.net is dead)
   var img = document.getElementById('ship-img');
-  var slug = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-  img.style.opacity = '1';
-  img.src = 'https://cdn.fleetyards.net/ships/' + slug + '/store_final_jpeg.jpg';
-  img.onerror = function() {
-    this.style.opacity = '0.0';
-    // Try alternative slug
-    var alt = slug.replace(/-/g,'_');
-    this.src = 'https://cdn.fleetyards.net/ships/' + alt + '/store_final_jpeg.jpg';
-    this.onerror = function(){ this.style.opacity='0'; };
-  };
+  img.style.opacity = '0';
+  img.src = '';
+  var slugBase = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  var slugCandidates = [slugBase, 'anvl-'+slugBase, 'aegs-'+slugBase, 'rsi-'+slugBase, 'misc-'+slugBase, 'drak-'+slugBase, 'crus-'+slugBase, 'orig-'+slugBase, 'kruger-'+slugBase, 'tmbl-'+slugBase];
+  (function tryNext(i){
+    if(i >= slugCandidates.length) return;
+    fetch('https://api.fleetyards.net/v1/models/' + slugCandidates[i])
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if(!data){ tryNext(i+1); return; }
+        var url = data.holo || data.brochure || (data.links && data.links.frontend);
+        if(url && url.indexOf('holo') > -1){
+          img.onload = function(){ img.style.opacity = '0.85'; };
+          img.onerror = function(){ tryNext(i+1); };
+          img.src = url;
+        } else {
+          tryNext(i+1);
+        }
+      })
+      .catch(function(){ tryNext(i+1); });
+  })(0);
 
   // Update URL
   history.replaceState(null,'','?ship='+encodeURIComponent(name));
