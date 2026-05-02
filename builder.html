@@ -564,7 +564,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   word-break:break-word;line-height:1.25;}
 #comp-flow .slot-nm{font-size:11.5px;}
 .slot-cnt{font-size:9px;font-weight:400;color:rgba(220,180,80,.70);letter-spacing:1px;margin-left:3px;}
-.slot-meta{font-size:7px;letter-spacing:1.5px;color:rgba(140,130,116,.55);
+.slot-meta{font-size:9px;letter-spacing:1.5px;color:rgba(140,130,116,.55);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .slot-tag{display:inline-block;padding:0 5px;margin-left:3px;
   border:1px solid rgba(120,180,210,.25);color:rgba(120,180,210,.78);
@@ -606,17 +606,17 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:rgba(40,140,52,.10);}
 .unit-tog.off{color:rgba(160,150,130,.55);border-color:rgba(140,130,116,.30);}
 .unit-tog:hover{filter:brightness(1.18);}
-.unit-sub{grid-column:1/3;font-size:8px;letter-spacing:1px;color:rgba(160,150,130,.65);
+.unit-sub{grid-column:1/3;font-size:10px;letter-spacing:1px;color:rgba(160,150,130,.65);
   padding:1px 0 3px 4px;}
 .unit-sub b{color:rgba(220,210,190,.92);font-weight:700;}
 
-.unit-stats-line{font-size:9px;letter-spacing:.5px;color:rgba(140,130,116,.65);
+.unit-stats-line{font-size:10.5px;letter-spacing:.5px;color:rgba(140,130,116,.65);
   padding:5px 0 3px;border-top:1px dashed rgba(180,170,150,.10);margin-top:4px;}
 .unit-stats-line .sl-lbl{display:inline-block;padding:1px 5px;margin-right:5px;
   border:1px solid rgba(120,180,210,.22);color:rgba(120,180,210,.75);
   font-size:7px;letter-spacing:1.5px;text-transform:uppercase;}
 .unit-stats-line b{color:rgba(220,210,190,.92);font-weight:700;}
-.unit-loc{font-size:8px;letter-spacing:1.5px;color:rgba(180,150,80,.70);
+.unit-loc{font-size:9.5px;letter-spacing:1.5px;color:rgba(180,150,80,.70);
   padding:3px 0 2px;border-top:1px dashed rgba(180,150,80,.20);margin-top:3px;}
 
 /* WEAPONS — MIDDLE-LEFT (curved flatscreen) */
@@ -1228,14 +1228,14 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     <div class="pwr-foot">
       <div class="pmode" id="pmode-row">
         <div class="pmpill" id="pmpill"></div>
-        <div class="pmopt on" id="pscm" onclick="setMode('scm')">SCM MODE</div>
-        <div class="pmopt" id="pnav" onclick="setMode('nav')">NAV MODE</div>
+        <div class="pmopt on" id="pscm" onclick="setHudMode('scm')">SCM MODE</div>
+        <div class="pmopt" id="pnav" onclick="setHudMode('nav')">NAV MODE</div>
       </div>
       <div class="pwr-speed">
         <span class="pwr-speed-l">SPEED</span>
         <span class="pwr-speed-v" id="h-scm-foot">-- m/s</span>
       </div>
-      <button class="pwr-reset" onclick="resetPower()">↺ RESET POWER</button>
+      <button class="pwr-reset" onclick="resetHudPower()">↺ RESET POWER</button>
     </div>
   </div>
 
@@ -1658,7 +1658,7 @@ function adjPip(id,d) {
   updatePwr();
 }
 
-function setMode(m) {
+function setHudMode(m) {
   _mode = m;
   document.getElementById('pscm').className = 'pmopt'+(m==='scm'?' on':'');
   document.getElementById('pnav').className = 'pmopt'+(m==='nav'?' on':'');
@@ -1781,7 +1781,7 @@ function computeLoadoutEconomy() {
   setText('h-sfc', sfcSec >= 999 ? 'INF' : sfcSec+'s');
 }
 
-function resetPower() {
+function resetHudPower() {
   if(!_loadout) _loadout = {};
   _loadout._pips = {};
   if(_loadout._off){
