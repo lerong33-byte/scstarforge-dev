@@ -850,6 +850,10 @@ function pickItem(key, val) {
   updateStats();
 }
 
+function closeWsel() {
+  document.getElementById('wsel-modal').classList.remove('open');
+}
+
 // Close modal on backdrop click
 document.getElementById('wsel-modal').addEventListener('click', function(e){
   if(e.target === this) closeWsel();
