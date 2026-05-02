@@ -1456,29 +1456,34 @@ function buildPwrComps() {
   var ship = _curShip, co = ship.comps||{};
   var cnt = co.counts||{}, db = COMP_DB||{};
   var L = _loadout || {};
+  if(!L._pips) L._pips = {};
+  if(!L._off) L._off = {};
+  function P(id, def){ return (id in L._pips) ? L._pips[id] : def; }
+  function ON(id){ return !L._off['pwr_'+id]; }
   var list = [];
   var ppC = cnt.pp||1;
   for(var i=0;i<ppC;i++){
     var ppN = L['c_pp_'+i] || L['c_pp'] || co.pp || 'Power Plant';
     var d = (db.pp && db.pp[ppN]) || null;
-    list.push({id:'pp'+i,cat:'pp',name:ppN,pips:8,max:8,output:d?d.out:16,on:true});
+    list.push({id:'pp'+i,cat:'pp',name:ppN,pips:P('pp'+i,8),max:8,output:d?d.out:16,on:ON('pp'+i)});
   }
   var sgC = cnt.sg||1;
   for(var i=0;i<sgC;i++){
     var sgN = L['c_sg_'+i] || L['c_sg'] || co.sg || 'Shield Gen';
     var d = (db.sg && db.sg[sgN]) || null;
-    list.push({id:'sg'+i,cat:'sg',name:sgN,pips:5,max:10,dMin:d?d.drawMin:3,dMax:d?d.drawMax:6,on:true});
+    list.push({id:'sg'+i,cat:'sg',name:sgN,pips:P('sg'+i,5),max:10,dMin:d?d.drawMin:3,dMax:d?d.drawMax:6,on:ON('sg'+i)});
   }
-  list.push({id:'wp',cat:'wp',name:'Hardpoints',pips:5,max:10,dMin:0,dMax:13,on:true});
-  list.push({id:'en',cat:'en',name:'Thrusters',pips:5,max:10,dMin:0,dMax:6,on:true});
+  list.push({id:'wp',cat:'wp',name:'Hardpoints',pips:P('wp',5),max:10,dMin:0,dMax:13,on:ON('wp')});
+  list.push({id:'en',cat:'en',name:'Thrusters',pips:P('en',5),max:10,dMin:0,dMax:6,on:ON('en')});
   var coC = cnt.cooler||1;
   for(var i=0;i<coC;i++){
     var coN = L['c_cooler_'+i] || L['c_cooler'] || co.cooler || 'Cooler';
-    list.push({id:'co'+i,cat:'co',name:coN,pips:5,max:5,dMin:6,dMax:6,on:true});
+    list.push({id:'co'+i,cat:'co',name:coN,pips:P('co'+i,5),max:5,dMin:6,dMax:6,on:ON('co'+i)});
   }
   var qdN = L['c_qd_0'] || L['c_qd'] || co.qd || 'Q-Drive';
-  list.push({id:'qd',cat:'qd',name:qdN,pips:3,max:3,dMin:3,dMax:3,on:true});
-  list.push({id:'rd',cat:'rd',name:co.radar||'Radar',pips:2,max:2,dMin:1,dMax:1,on:true});
+  list.push({id:'qd',cat:'qd',name:qdN,pips:P('qd',3),max:3,dMin:3,dMax:3,on:ON('qd')});
+  var rdN = L['c_radar_0'] || L['c_radar'] || co.radar || 'Radar';
+  list.push({id:'rd',cat:'rd',name:rdN,pips:P('rd',2),max:2,dMin:1,dMax:1,on:ON('rd')});
   _pwrComps = list;
   renderPwrComps();
   initModePill();
@@ -1517,7 +1522,7 @@ function bpips(c) {
       var rel = (rect.bottom - y) / rect.height;
       var pip = Math.round(rel * c.max);
       pip = Math.max(0, Math.min(c.max, pip));
-      if(pip !== c.pips){ c.pips = pip; updatePwr(); }
+      if(pip !== c.pips){ c.pips = pip; if(!_loadout._pips) _loadout._pips = {}; _loadout._pips[c.id] = pip; updatePwr(); }
     };
     setFromY(e.clientY);
     el.setPointerCapture(e.pointerId);
@@ -1538,7 +1543,7 @@ function bpips(c) {
     d.className = 'pp '+(i<(c.on?c.pips:0)?c.cat+' pp-c':'e').replace('pp-c','pp-c');
     // fix class: use cat as pip class
     d.className = 'pp '+(i<(c.on?c.pips:0)?c.cat:'e');
-    (function(idx,comp){d.onclick=function(){if(!comp.on)return;comp.pips=idx+1;updatePwr();};}(i,c));
+    (function(idx,comp){d.onclick=function(){if(!comp.on)return;comp.pips=idx+1;if(!_loadout._pips)_loadout._pips={};_loadout._pips[comp.id]=comp.pips;updatePwr();};}(i,c));
     el.appendChild(d);
   }
 }
@@ -1546,13 +1551,18 @@ function bpips(c) {
 function togComp(id) {
   var c = _pwrComps.find(function(x){return x.id===id;}); if(!c) return;
   c.on = !c.on;
+  if(!_loadout._off) _loadout._off = {};
+  _loadout._off['pwr_'+id] = !c.on;
   document.getElementById('ptog-'+id).className = 'ptog '+(c.on?'on':'off');
-  document.getElementById('prc-'+id).className = 'pc'+(c.on?'':' offline');
+  document.getElementById('prc-'+id).className = 'pc pc-'+c.cat+(c.on?'':' offline');
   updatePwr();
 }
 function adjPip(id,d) {
   var c = _pwrComps.find(function(x){return x.id===id;}); if(!c||!c.on) return;
-  c.pips = Math.max(0,Math.min(c.max,c.pips+d)); updatePwr();
+  c.pips = Math.max(0,Math.min(c.max,c.pips+d));
+  if(!_loadout._pips) _loadout._pips = {};
+  _loadout._pips[id] = c.pips;
+  updatePwr();
 }
 
 function setMode(m) {
@@ -1664,10 +1674,14 @@ function computeLoadoutEconomy() {
     }
   });
   var co = _curShip.comps || {};
-  var coolerName = _loadout['c_cooler_0'] || _loadout['c_cooler'] || co.cooler;
-  var coData = COMP_DB && COMP_DB.cooler && COMP_DB.cooler[coolerName];
   var coolerCount = (co.counts||{}).cooler||1;
-  var coolRate = coData ? ((coData.rate||coData.cooling||40) * coolerCount) : (40 * coolerCount);
+  var coolRate = 0;
+  for(var ci=0; ci<coolerCount; ci++){
+    var coN = _loadout['c_cooler_'+ci] || _loadout['c_cooler'] || co.cooler;
+    var coD = COMP_DB && COMP_DB.cooler && COMP_DB.cooler[coN];
+    var coOn = !(_loadout._off && _loadout._off['pwr_co'+ci]);
+    if(coOn) coolRate += coD ? (coD.rate||coD.cooling||40) : 40;
+  }
   var sfcSec = totalHeat>0 ? Math.max(1, Math.round(coolRate*8 / totalHeat)) : 999;
 
   setText('h-cost', totalCost > 1000 ? (totalCost/1000).toFixed(0)+'k' : totalCost.toLocaleString());
@@ -1795,6 +1809,7 @@ function buildHpBand() {
       {key:'sg',lbl:'SHIELD GEN',cat:'sg',count:cnt.sg||1},
       {key:'cooler',lbl:'COOLER',cat:'cooler',count:cnt.cooler||1},
       {key:'qd',lbl:'Q-DRIVE',cat:'qd',count:1},
+      {key:'radar',lbl:'RADAR',cat:'radar',count:1},
     ];
     compFlow.appendChild(makeSecHdr('SYSTEMS'));
     compSlots.forEach(function(cs){ compFlow.appendChild(makeCompSlot(cs)); });
