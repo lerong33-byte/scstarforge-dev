@@ -274,42 +274,46 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .ptog.off .ptog-k{left:1px;}
 .pc-name{display:none;}
 .pc-sub{display:none;}
-.pp-track{order:2;display:flex;flex-direction:column-reverse;gap:3px;
-  width:100%;flex:1;min-height:170px;margin:0;
-  background:none;border:none;padding:0;}
+.pp-track{order:2;display:flex;flex-direction:column-reverse;gap:1px;
+  width:100%;flex:1;min-height:180px;margin:0;padding:3px;
+  background:linear-gradient(180deg,rgba(8,8,10,.78),rgba(4,4,6,.88));
+  border:1px solid rgba(180,170,150,.16);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.50),inset 0 1px 4px rgba(0,0,0,.65),
+    0 1px 0 rgba(220,210,190,.10);}
 .pp{width:100%;flex:1;height:auto;cursor:pointer;
-  border-radius:3px;position:relative;
-  transition:transform .10s cubic-bezier(.34,1.8,.64,1),opacity .15s;min-height:11px;}
-.pp::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,.06) 35%,transparent 50%,rgba(0,0,0,.18) 100%);}
-.pp:hover{transform:scaleX(1.10);}
-/* empty pip — machined dark steel cell */
-.pp.e{background:linear-gradient(180deg,#26221c 0%,#181410 50%,#0c0a08 100%);
-  box-shadow:inset 0 1px 0 rgba(80,72,60,.30),inset 0 -1px 0 rgba(0,0,0,.55),
-    0 0 0 1px rgba(40,36,30,.70);}
-.pp.e::after{background:linear-gradient(180deg,rgba(120,108,88,.12) 0%,transparent 50%,rgba(0,0,0,.20) 100%);}
-/* filled pips — METALLIC variants (brass, steel, bronze, gold, chrome, gunmetal, aluminum) */
-/* Power Plant — brass */
-.pp.pp-c{background:linear-gradient(180deg,#e8c878 0%,#c89c48 30%,#a07424 60%,#704c14 100%);
-  box-shadow:inset 0 1px 0 rgba(255,232,168,.55),inset 0 -1px 0 rgba(40,24,8,.45),0 0 0 1px rgba(140,100,52,.55);}
-/* Shield Gen — steel blue */
-.pp.sg{background:linear-gradient(180deg,#c8d4e0 0%,#849ab0 30%,#56697e 60%,#2c3848 100%);
-  box-shadow:inset 0 1px 0 rgba(232,240,250,.55),inset 0 -1px 0 rgba(8,12,20,.45),0 0 0 1px rgba(86,104,124,.55);}
-/* Weapons — red bronze */
-.pp.wp{background:linear-gradient(180deg,#d09478 0%,#a26450 30%,#74402c 60%,#401c14 100%);
-  box-shadow:inset 0 1px 0 rgba(248,200,168,.50),inset 0 -1px 0 rgba(28,12,8,.45),0 0 0 1px rgba(116,64,44,.55);}
-/* Engines — polished gold */
-.pp.en{background:linear-gradient(180deg,#f4dc88 0%,#cca844 30%,#9a7c2c 60%,#605014 100%);
-  box-shadow:inset 0 1px 0 rgba(255,242,180,.55),inset 0 -1px 0 rgba(36,28,8,.45),0 0 0 1px rgba(154,124,44,.55);}
-/* Cooler — chrome silver */
-.pp.co{background:linear-gradient(180deg,#e0e4e8 0%,#a8b0b8 30%,#727880 60%,#383c44 100%);
-  box-shadow:inset 0 1px 0 rgba(248,250,252,.60),inset 0 -1px 0 rgba(8,12,16,.45),0 0 0 1px rgba(112,120,128,.55);}
-/* Quantum — gunmetal */
-.pp.qd{background:linear-gradient(180deg,#9aa4b0 0%,#5e6770 30%,#3a4048 60%,#1c2028 100%);
-  box-shadow:inset 0 1px 0 rgba(196,204,212,.55),inset 0 -1px 0 rgba(0,0,0,.55),0 0 0 1px rgba(58,64,72,.65);}
-/* Radar — aluminum */
-.pp.rd{background:linear-gradient(180deg,#d4d8dc 0%,#9ca0a4 30%,#686c70 60%,#34383c 100%);
-  box-shadow:inset 0 1px 0 rgba(244,246,248,.55),inset 0 -1px 0 rgba(8,12,16,.45),0 0 0 1px rgba(104,108,112,.55);}
+  border-radius:0;position:relative;
+  transition:opacity .15s,filter .15s;min-height:9px;
+  background-clip:padding-box;}
+.pp::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.030) 2px,rgba(255,255,255,.030) 3px);
+  mix-blend-mode:overlay;}
+.pp:hover{filter:brightness(1.20);}
+/* empty pip — backlit machined steel slot */
+.pp.e{background:linear-gradient(180deg,#1a1814 0%,#0e0d0b 50%,#080706 100%);
+  box-shadow:inset 0 1px 0 rgba(72,66,56,.28),inset 0 -1px 0 rgba(0,0,0,.60);}
+.pp.e::after{opacity:.40;}
+/* filled pips — backlit METALLIC plates with strong inner glow */
+.pp.pp-c{background:linear-gradient(180deg,#f4d878 0%,#d4a040 50%,#a06c14 100%);
+  box-shadow:inset 0 0 8px rgba(255,232,156,.55),inset 0 1px 0 rgba(255,244,196,.65),
+    0 0 4px rgba(232,184,72,.40);}
+.pp.sg{background:linear-gradient(180deg,#b8c8e0 0%,#7088a8 50%,#3c4c68 100%);
+  box-shadow:inset 0 0 8px rgba(208,224,248,.55),inset 0 1px 0 rgba(232,240,252,.65),
+    0 0 4px rgba(120,144,184,.40);}
+.pp.wp{background:linear-gradient(180deg,#d88468 0%,#a85838 50%,#683018 100%);
+  box-shadow:inset 0 0 8px rgba(255,176,140,.55),inset 0 1px 0 rgba(255,200,168,.65),
+    0 0 4px rgba(216,108,76,.40);}
+.pp.en{background:linear-gradient(180deg,#f4dc78 0%,#c8a040 50%,#88680c 100%);
+  box-shadow:inset 0 0 8px rgba(255,236,160,.55),inset 0 1px 0 rgba(255,244,180,.65),
+    0 0 4px rgba(216,176,52,.40);}
+.pp.co{background:linear-gradient(180deg,#e0e4e8 0%,#a0a8b0 50%,#5c6068 100%);
+  box-shadow:inset 0 0 8px rgba(232,236,240,.55),inset 0 1px 0 rgba(248,250,252,.70),
+    0 0 4px rgba(168,176,184,.30);}
+.pp.qd{background:linear-gradient(180deg,#a8b0bc 0%,#686e78 50%,#34383e 100%);
+  box-shadow:inset 0 0 8px rgba(208,216,224,.45),inset 0 1px 0 rgba(232,238,244,.55),
+    0 0 4px rgba(104,110,120,.30);}
+.pp.rd{background:linear-gradient(180deg,#cccfd2 0%,#90949a 50%,#4c4f54 100%);
+  box-shadow:inset 0 0 8px rgba(232,236,240,.45),inset 0 1px 0 rgba(244,246,248,.55),
+    0 0 4px rgba(140,144,150,.30);}
 .pc-foot{order:3;display:flex;flex-direction:column;align-items:center;gap:0;
   width:100%;margin-top:2px;}
 .padj{display:none;}
