@@ -88,8 +88,14 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 #ship-nm{font-size:24px;font-weight:700;letter-spacing:8px;color:var(--w);
   text-shadow:0 0 12px rgba(86,230,120,.42),0 0 28px rgba(86,230,120,.18);}
 #ship-type{font-size:9px;letter-spacing:4px;color:var(--g-d);margin-top:5px;}
-#ship-img{width:100%;height:200px;object-fit:contain;margin-top:36px;opacity:.85;
-  filter:drop-shadow(0 0 18px rgba(86,230,120,.18)) hue-rotate(75deg) saturate(.6) brightness(1.1);}
+#ship-wire{position:absolute;top:46px;left:0;right:0;width:100%;height:200px;
+  filter:drop-shadow(0 0 14px rgba(86,230,120,.25)) drop-shadow(0 0 30px rgba(86,230,120,.10));
+  z-index:1;}
+#ship-img{position:absolute;top:46px;left:0;width:100%;height:200px;object-fit:contain;
+  opacity:0;z-index:2;
+  filter:drop-shadow(0 0 18px rgba(86,230,120,.18));
+  transition:opacity .4s;}
+#ship-img[src]:not([src=""]){opacity:.78;}
 #ship-shadow{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
   width:200px;height:6px;
   background:radial-gradient(ellipse,rgba(86,230,120,.16) 0%,transparent 70%);
@@ -425,6 +431,29 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
       <div id="ship-nm">SELECT A SHIP</div>
       <div id="ship-type"></div>
     </div>
+    <svg id="ship-wire" viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="rgba(86,230,120,.62)" stroke-width="1" stroke-linejoin="round">
+      <!-- fuselage -->
+      <path d="M 130 100 L 175 70 L 240 80 L 255 100 L 240 120 L 175 130 Z"/>
+      <!-- left wing -->
+      <path d="M 175 70 L 50 50 L 18 70 L 70 92 L 175 92"/>
+      <path d="M 50 50 L 70 92"/>
+      <!-- right wing -->
+      <path d="M 175 130 L 50 150 L 18 130 L 70 108 L 175 108"/>
+      <path d="M 50 150 L 70 108"/>
+      <!-- nose -->
+      <path d="M 255 100 L 300 96 L 322 100 L 300 104 Z"/>
+      <!-- engine block -->
+      <path d="M 130 100 L 100 88 L 88 100 L 100 112 Z"/>
+      <!-- cockpit -->
+      <path d="M 210 84 L 232 88 L 240 100 L 232 112 L 210 116" stroke-opacity=".75"/>
+      <!-- detail -->
+      <line x1="175" y1="70" x2="175" y2="130" stroke-opacity=".30"/>
+      <line x1="210" y1="80" x2="210" y2="120" stroke-opacity=".30"/>
+      <!-- hardpoint markers -->
+      <circle cx="40" cy="60" r="3" fill="rgba(86,230,120,.85)" stroke="none"/>
+      <circle cx="40" cy="140" r="3" fill="rgba(86,230,120,.85)" stroke="none"/>
+      <circle cx="305" cy="100" r="3" fill="rgba(86,230,120,.85)" stroke="none"/>
+    </svg>
     <img id="ship-img" src="" alt="" onerror="this.style.opacity='0'">
     <div id="ship-shadow"></div>
   </div>
