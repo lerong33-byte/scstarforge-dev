@@ -1694,7 +1694,7 @@ function updatePwr() {
   var lp = out>0?(draw/out)*100:999;
   var bg = lp>100?'linear-gradient(to right,#c02020,#e03030)':lp>85?'linear-gradient(to right,#b07820,#e0b030,#f0c040)':'linear-gradient(to right,#7a5010,#c08020,#e8b030)';
   var ef = document.getElementById('peu-fill'); if(ef){ef.style.width=Math.min(100,lp)+'%';ef.style.background=bg;}
-  var en = document.getElementById('peu-nums'); if(en) en.textContent=Math.round(draw)+' / '+out+' EU';
+  var en = document.getElementById('peu-nums'); if(en) en.textContent=Math.round(draw)+' / '+out+' PWR';
   var es = document.getElementById('peu-status');
   if(es){if(lp>100){es.style.color='rgba(220,60,38,.85)';es.textContent='OVERDRAW';}else{es.style.color='';es.textContent=Math.round(lp)+'%';}}
   // SYSTEM OVERLOAD visual feedback
@@ -1727,7 +1727,7 @@ function updatePwr() {
   var spd = enM>0 ? Math.round((_mode==='scm'?(ship.scm||226):(ship.nav||1193))*enM) : (_mode==='scm'?ship.scm||226:ship.nav||1193);
   setText('h-dps', dps.toLocaleString());
   setText('h-shp', sgHP ? sgHP.toLocaleString() : (baseSHP?baseSHP.toLocaleString():'--'));
-  setText('h-eu', out+' EU');
+  setText('h-eu', out+' PWR');
   setText('h-load', Math.round(lp)+'%');
   setText('h-scm', (_mode==='scm'?spd:ship.scm||226)+' ');
   setText('h-scm-foot', spd+' m/s '+_mode.toUpperCase());
@@ -1782,17 +1782,16 @@ function computeLoadoutEconomy() {
 }
 
 function resetPower() {
-  if(!_pwrComps) return;
-  _pwrComps.forEach(function(c){
-    c.on = true;
-    if(['wp','sg','en'].indexOf(c.cat) > -1) c.pips = 5;
-    else c.pips = c.max;
-    var tog = document.getElementById('ptog-'+c.id);
-    if(tog) tog.className = 'ptog on';
-    var pr = document.getElementById('prc-'+c.id);
-    if(pr) pr.className = 'pc pc-'+c.cat;
-  });
+  if(!_loadout) _loadout = {};
+  _loadout._pips = {};
+  if(_loadout._off){
+    Object.keys(_loadout._off).forEach(function(k){
+      if(k.indexOf('pwr_') === 0) delete _loadout._off[k];
+    });
+  }
+  buildPwrComps();
   updatePwr();
+  updateStats();
 }
 
 function setText(id, v) { var el=document.getElementById(id); if(el) el.textContent=v; }
@@ -2035,7 +2034,7 @@ function makeSlot(type, sl, slotIdx, sz) {
     missilePool.forEach(function(m){
       var opt = document.createElement('option');
       opt.value = m.id;
-      opt.textContent = m.name + ' (' + m.dmg + ' DMG, ' + m.type + ', ' + m.range + 'm)';
+      opt.textContent = m.name + ' (' + m.dmg + ' DMG, ' + m.type + ', ' + m.range + 'm)' + (m.loc?' · ' + m.loc:'');
       if(m.id === missId || (!missId && missileData && m.id === missileData.id)) opt.selected = true;
       missSel.appendChild(opt);
     });
@@ -2180,7 +2179,7 @@ function makeUnitRow(type, unit, sz) {
     pool.forEach(function(w){
       var opt = document.createElement('option');
       opt.value = w.id;
-      opt.textContent = w.name + ' (' + Math.round(w.dps||0) + 'DPS) S' + w.sz;
+      opt.textContent = w.name + ' (' + Math.round(w.dps||0) + 'DPS) S' + w.sz + (w.loc?' · ' + w.loc:'');
       if(w.id === unit.wid) opt.selected = true;
       sel.appendChild(opt);
     });
@@ -2236,7 +2235,7 @@ function makeCompSlot(cs) {
 
   var primary='', primaryUnit='';
   if(master.data){
-    if(cs.cat==='pp'){ primary = (master.data.out||16)*cs.count; primaryUnit='EU'; }
+    if(cs.cat==='pp'){ primary = (master.data.out||16)*cs.count; primaryUnit='PWR'; }
     else if(cs.cat==='sg'){ primary = (master.data.totalHP||0)*cs.count; primaryUnit='HP'; }
     else if(cs.cat==='qd'){ primary = master.data.speed||0; primaryUnit='Mm/s'; }
     else if(cs.cat==='cooler'){ primary = (master.data.rate||master.data.cooling||0)*cs.count; primaryUnit='cool'; }
@@ -2306,11 +2305,11 @@ function makeCompUnitRow(cs, unit, catDb) {
     var opt = document.createElement('option');
     opt.value = n;
     var label = n;
-    if(cs.cat==='pp') label += ' | ' + (d.out||0) + 'EU';
+    if(cs.cat==='pp') label += ' | ' + (d.out||0) + ' PWR';
     else if(cs.cat==='sg') label += ' | ' + (d.totalHP||0).toLocaleString() + 'HP';
     else if(cs.cat==='qd') label += ' | ' + (d.speed||0) + ' Mm/s';
     else if(cs.cat==='cooler') label += ' | ' + (d.rate||d.cooling||0) + '/s';
-    opt.textContent = label;
+    opt.textContent = label + (d.loc?' · ' + d.loc:'');
     if(n === unit.name) opt.selected = true;
     sel.appendChild(opt);
   });
