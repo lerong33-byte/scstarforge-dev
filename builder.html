@@ -418,7 +418,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
 <script>
 // ============================================================
-// DATA ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ loaded from parent window or fetched
+// DATA ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ loaded from parent window or fetched
 // ============================================================
 var SHIP_DATA = {}, WEAPONS = [], COMP_DB = {}, WEAP_BY_ID = {};
 var _curShip = null, _curShipName = '', _loadout = {}, _pwrComps = null, _mode = 'scm';
@@ -428,38 +428,36 @@ var CC = {pp:'rgba(200,158,48,.82)',sg:'rgba(28,160,210,.82)',wp:'rgba(220,72,40
 var CL = {pp:'Pwr Plant',sg:'Shield',wp:'Weapons',en:'Engines',co:'Cooler',qd:'Q-Drive',rd:'Radar'};
 
 // ============================================================
-// INIT ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ try to grab data from parent window
+// INIT ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ try to grab data from parent window
 // ============================================================
 function init() {
   progress(10, 'LOADING SHIP DATA...');
   fetch('/').then(function(r){return r.text();}).then(function(src){
     progress(30,'PARSING...');
-    // Find and extract the data script block (the one with S() calls and WEAPONS=)
-    var blocks=[];
-    var re=/<script[^>]*>([sS]*?)</script>/gi, m;
-    while((m=re.exec(src))!==null){
-      var s=m[1];
-      if(s.indexOf('SHIP_DATA')>-1||s.indexOf('WEAPONS')>-1) blocks.push(s);
-    }
+    // Extract all inline script blocks
+    var blocks=[],re=/<script(?![^>]*src)[^>]*>([sS]*?)</script>/gi,m;
+    while((m=re.exec(src))!==null) blocks.push(m[1]);
     var code=blocks.join('
 ');
-    try{
-      // Run in isolated scope, capture the globals we need
-      var _SD={},_W=[],_DB={};
-      var fn=new Function(
-        'SHIP_DATA','WEAPONS','COMP_DB','document','window','location','navigator',
-        '"use strict";'+code+';return {SD:SHIP_DATA,W:WEAPONS,DB:COMP_DB};'
-      );
-      var res=fn(_SD,_W,_DB,{getElementById:function(){return null;},addEventListener:function(){},querySelector:function(){return null;}},{addEventListener:function(){},location:{href:''}},{href:''},{})||{};
-      if(res.SD&&Object.keys(res.SD).length>0){
-        SHIP_DATA=res.SD; WEAPONS=Array.isArray(res.W)?res.W:Object.values(res.W||{}); COMP_DB=res.DB||{};
-      }
-    }catch(e){console.warn('parse err:',e.message);}
-    if(!Array.isArray(WEAPONS)) WEAPONS=Object.values(WEAPONS||{});
-    WEAPONS.forEach(function(w){if(w&&w.id)WEAP_BY_ID[w.id]=w;});
-    progress(100,'READY');
-    setTimeout(function(){document.getElementById('loading').classList.add('done');},300);
-    populateShipSel();
+    // Inject as a real script so it runs in full browser context
+    var blob=new Blob([code],{type:'text/javascript'});
+    var url=URL.createObjectURL(blob);
+    var scr=document.createElement('script');
+    scr.src=url;
+    scr.onload=function(){
+      URL.revokeObjectURL(url);
+      // SHIP_DATA/WEAPONS/COMP_DB should now be populated as globals
+      if(window.WEAPONS&&!Array.isArray(window.WEAPONS)) WEAPONS=Object.values(window.WEAPONS);
+      else if(window.WEAPONS) WEAPONS=window.WEAPONS;
+      if(window.SHIP_DATA) SHIP_DATA=window.SHIP_DATA;
+      if(window.COMP_DB) COMP_DB=window.COMP_DB;
+      WEAPONS.forEach(function(w){if(w&&w.id)WEAP_BY_ID[w.id]=w;});
+      progress(100,'READY');
+      setTimeout(function(){document.getElementById('loading').classList.add('done');},300);
+      populateShipSel();
+    };
+    scr.onerror=function(){progress(100,'SCRIPT ERROR');};
+    document.head.appendChild(scr);
   }).catch(function(e){progress(100,'ERROR: '+e.message);});
 }
 
