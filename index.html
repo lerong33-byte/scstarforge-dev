@@ -1418,7 +1418,21 @@ body::before{
       <!-- Ship info rows -->
       <div id="sbShipInfo" style="flex-shrink:0;padding:6px 8px;display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--border)"></div>
       <!-- Power panel -->
-      <div id="sbPowerPanel" style="flex-shrink:0"></div>
+      <div class="pwr-ribbon" id="sbPwrRibbon">
+  <div class="pwr-eu-row">
+    <span class="pwr-eu-label">POWER</span>
+    <div class="pwr-mode-tog" id="pwrModeRow">
+      <div class="pwr-mpill" id="pwrModePill"></div>
+      <div class="pwr-mopt on" id="pwrScmBtn" onclick="pwrSetMode('scm')">SCM</div>
+      <div class="pwr-mopt" id="pwrNavBtn" onclick="pwrSetMode('nav')">NAV</div>
+    </div>
+    <div class="pwr-eu-track"><div class="pwr-eu-fill" id="pwrEuFill"></div></div>
+    <div class="pwr-eu-nums" id="pwrEuNums"></div>
+    <div class="pwr-eu-status" id="pwrEuStatus"></div>
+  </div>
+  <div class="pwr-comps" id="pwrComps"></div>
+  <div class="pwr-warn" id="pwrWarn"></div>
+</div>
     </div>
     <!-- CENTER: loadout -->
     <div id="sbResult" style="flex:1;min-width:0;overflow-y:auto;padding:0"><div id="sbDashboard">
@@ -10141,196 +10155,55 @@ function _pwrMaxEU(){
 }
 function _pwrUsed(){return _pwrSystems.reduce(function(s,k){return s+(_pwrState[k]||0);},0);}
 function buildPowerPanel(){
-  /* sbPowerPanel lives inside sbResult (builder); sdPowerPanel lives in sdSelectedShip (showdown left col) */
-  var panelId=window._sbBuilderActive?'sbPowerPanel':'sdPowerPanel';
-  var panel=document.getElementById(panelId);
-  if(!panel)panel=document.getElementById('sdPowerPanel');
-  if(!panel)panel=document.getElementById('sbPowerPanel');
-  if(!panel)return;
-  var shipName=window._pvpShip;
-  var def=SHIP_DATA&&SHIP_DATA[shipName];
-  if(!def){panel.style.display='none';return;}
-
-  /* Derive max EU from the enemy loadout's currently selected PP (falls back to ship default) */
-  var ppKey=(typeof _eComps!=='undefined'&&_eComps['pp'])||(def.comps&&def.comps.pp)||'';
-  var ppCnt=(def.comps&&def.comps.counts&&def.comps.counts.pp)||1;
-  var ppDb=COMP_DB&&COMP_DB.pp&&COMP_DB.pp[ppKey];
-  var maxEU=ppDb?(parseFloat(ppDb.out)||0)*ppCnt:0;
-  /* If PP is toggled OFF, max EU is 0 */
-  if(typeof _eSysEnabled!=='undefined'&&_eSysEnabled['pp']===false)maxEU=0;
-  /* Consumption: each system pip draws (maxEU / (numSystems * 10)) EU
-     Total used = sumOfPips * drawPerPip; pct = used/maxEU*100 */
-  var numSys=_pwrSystems.length; /* 7 */
-  var drawPerPip=maxEU>0?maxEU/(numSys*10):1;
-  var totalPips=_pwrSystems.reduce(function(s,k){return s+Math.min(_pwrState[k]||0,10);},0);
-  var used=Math.round(totalPips*drawPerPip);
-  var segTotal=maxEU;
-  var pct=segTotal>0?Math.min(Math.round(used/segTotal*100),200):0;
-  var barCol=pct>90?'var(--red)':pct>70?'var(--warn)':'var(--accent)';
-
-  /* Speed */
-  var live=liveShipData&&liveShipData[shipName];
-  var isNAV=_pwrState.mode==='nav';
-  var baseSpeed=isNAV?(live&&live.speed&&live.speed.max?live.speed.max:(def.scm||175)*4):(live&&live.speed&&live.speed.scm?live.speed.scm:(def.scm||175));
-  var engRatio=_pwrState.engines/5;
-  var speed=Math.round(baseSpeed*Math.min(engRatio,2));
-
-  /* Systems: same order/icons/colors as ship builder SPV_SYSTEMS */
-  var SYSS=[
-    {k:'weapons', icon:'⚡', color:'#ffaa00', label:'Weapons'},
-    {k:'shields',  icon:'⬡', color:'#00ee88', label:'Shield'},
-    {k:'engines',  icon:'»',  color:'#44aaff', label:'Boost'},
-    {k:'qd',       icon:'◎', color:'#cc88ff', label:'QD'},
-    {k:'radar',    icon:'📡', color:'#44ccff', label:'Radar'},
-    {k:'cooler',   icon:'❄', color:'#00ccff', label:'Cooler'},
-    {k:'thrusters',icon:'⊕', color:'#ff6622', label:'Flight'},
-    {k:'pp',       icon:'⚡', color:'#f59e0b', label:'PP', ppCol:true},
-  ];
-
-  var h='<div class="lp-card" style="margin-top:0">';
-  /* Header: POWER + EU totals */
-  h+='<div class="lp-card-hd">'
-    +'<span class="lp-card-title">POWER</span>'
-    +'<span class="pwr-eu" style="font-size:13px;font-weight:600;color:var(--text)">'+Math.round(used)+'</span>'
-    +'<span style="color:var(--t3);font-size:10px"> / </span>'
-    +'<span class="pwr-eu" style="color:var(--warn);font-size:13px;font-weight:600">'+(segTotal||'—')+'</span>'
-    +'<span style="color:var(--t3);font-size:9px"> EU</span>'
-    +'</div>';
-  /* Consumption bar */
-  h+='<div class="con-row">'
-    +'<span class="con-lbl">CONSUMPTION</span>'
-    +'<span style="font-size:10px;font-family:var(--fmono);color:'+barCol+'">'+pct+'%</span>'
-    +'</div>'
-    +'<div class="con-bar-wrap"><div style="height:100%;width:'+pct+'%;background:'+barCol+';border-radius:2px;transition:width .3s"></div></div>';
-
-  /* SPV block chart — 12 pips total: 10 normal + 2 overclock above */
-  /* Overclock pips (11-12) shown in red above a separator line */
-  var _compCntMap={weapons:0,shields:'sg',engines:0,qd:'qd',radar:'radar',cooler:'cooler',thrusters:0,pp:'pp'};
-  _compCnts={};  /* update the module-level global so sdSetPwrPip can read unit counts */
-  _pwrSystems.forEach(function(k){
-    var ck=_compCntMap[k];
-    _compCnts[k]=(ck&&def.comps&&def.comps.counts&&def.comps.counts[ck])||1;
+  const CC={'pp':'rgba(200,158,48,0.82)','sg':'rgba(28,160,210,0.82)','wp':'rgba(220,72,40,0.82)','en':'rgba(180,168,48,0.82)','co':'rgba(18,178,148,0.82)','qd':'rgba(18,148,178,0.82)','rd':'rgba(158,152,172,0.55)'};
+  const CL={'pp':'Pwr Plant','sg':'Shield','wp':'Weapons','en':'Engines','co':'Cooler','qd':'Q-Drive','rd':'Radar'};
+  
+  const ribbon = document.getElementById('sbPwrRibbon');
+  if(!ribbon) return;
+  
+  // Get current ship components
+  const ship = _curShip || {};
+  const comps = _buildPwrComps ? _buildPwrComps() : [];
+  
+  // Build EU row
+  const euRow = ribbon.querySelector('.pwr-eu-row');
+  if(euRow){
+    // Mode toggle
+    const mrow = ribbon.querySelector('.pwr-mode-tog');
+    if(mrow){
+      const pw = mrow.offsetWidth/2-2;
+      const pill = mrow.querySelector('.pwr-mpill');
+      if(pill){pill.style.left='2px';pill.style.width=pw+'px';}
+    }
+  }
+  
+  // Build component flow
+  const flow = ribbon.querySelector('.pwr-comps');
+  if(!flow) return;
+  flow.innerHTML='';
+  
+  comps.forEach(function(c){
+    const hasPip = ['wp','sg','en'].includes(c.cat);
+    const el = document.createElement('div');
+    el.id = 'prc-'+c.id;
+    el.className = 'pwr-comp' + (c.on ? '' : ' offline');
+    el.innerHTML =
+      '<div class="pwr-comp-head">' +
+        '<div class="pwr-ctog '+(c.on?'on':'off')+'" id="pct-'+c.id+'" onclick="pwrTogComp(''+c.id+'')"><div class="pwr-ctog-k"></div></div>' +
+        '<span class="pwr-cname" style="color:'+CC[c.cat]+';">'+CL[c.cat]+'</span>' +
+      '</div>' +
+      '<div class="pwr-csub">'+c.name+'</div>' +
+      '<div class="pwr-pip-track" id="ppt-'+c.id+'"></div>' +
+      '<div class="pwr-comp-foot">' +
+        (hasPip ? '<div class="pwr-adj"><div class="pwr-adb" onclick="pwrAdj(''+c.id+'',-1)">&#8722;</div><div class="pwr-adb" onclick="pwrAdj(''+c.id+'',1)">&#43;</div></div>' : '') +
+        '<div class="pwr-ceu" style="color:'+CC[c.cat]+';" id="pce-'+c.id+'"></div>' +
+      '</div>';
+    flow.appendChild(el);
   });
-  /* Also count pp for the PP column */
-  _compCnts['pp']=(def.comps&&def.comps.counts&&def.comps.counts['pp'])||1;
-  var PIP_H=11; /* px per pip */
-  var PIP_GAP=2;
-  var OC_PIPS=2; /* overclock pips above normal range */
-  var NORM_PIPS=10;
-  var TOTAL_PIPS=NORM_PIPS+OC_PIPS;
-  /* Total column height = (TOTAL_PIPS * PIP_H) + (TOTAL_PIPS-1)*PIP_GAP + separator(4) + icon area(32) */
-  /* NAV mode: weapons and shields are unavailable — locked/dimmed */
-  var NAV_LOCKED={weapons:isNAV, shields:isNAV};
-  h+='<div style="display:flex;gap:3px;margin-top:8px;box-sizing:border-box">';
-  SYSS.forEach(function(sys){
-    var isPPCol=sys.k==='pp';
-    /* PP column: val = fully on (NORM_PIPS) when PP is enabled, 0 when off */
-    var ppIsOff=isPPCol&&typeof _eSysEnabled!=='undefined'&&_eSysEnabled['pp']===false;
-    var val=isPPCol?(ppIsOff?0:NORM_PIPS):(_pwrState[sys.k]||0);
-    var unitCnt=_compCnts[sys.k]||1;
-    var ppu=Math.floor(NORM_PIPS/unitCnt);
-    var navLocked=NAV_LOCKED[sys.k]||false;
-    var sysColor=navLocked?'rgba(255,255,255,0.15)':sys.color;
-    var colOpacity=(navLocked&&!isPPCol)?'0.4':'1';
-    var colBorderLeft=isPPCol?'border-left:1px solid rgba(245,158,11,0.2);padding-left:2px;':'';
-    h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;opacity:'+colOpacity+';'+colBorderLeft+'">';
-    /* Overclock pips (11-12) at top — red/orange; locked in NAV mode */
-    /* PP column: no OC pips — render exact-height spacer so column aligns */
-    if(isPPCol){
-      var _ocSpH=(OC_PIPS*PIP_H+(OC_PIPS-1)*PIP_GAP+4)+(2+4);
-      h+='<div style="width:100%;height:'+_ocSpH+'px;flex-shrink:0"></div>';
-    } else {
-      h+='<div style="display:flex;flex-direction:column;align-items:center;gap:'+PIP_GAP+'px;width:100%;margin-bottom:4px">';
-      for(var oc=TOTAL_PIPS;oc>=NORM_PIPS+1;oc--){
-        var ocFilled=!navLocked&&val>=oc;
-        h+='<div '+(navLocked?'':('onclick="sdSetPwrPip(\''+sys.k+'\','+oc+')"'))+' style="width:100%;height:'+PIP_H+'px;min-height:'+PIP_H+'px;border-radius:2px;border:1px solid rgba(255,80,0,0.4);box-sizing:border-box;cursor:'+(navLocked?'not-allowed':'pointer')+';background:'+(ocFilled?'linear-gradient(180deg,#ff6600,#cc3300)':'rgba(255,80,0,0.12)')+'"></div>';
-      }
-      h+='</div>';
-      /* Separator line between overclock and normal */
-      h+='<div style="width:100%;height:2px;background:rgba(255,100,0,0.4);border-radius:1px;margin-bottom:4px"></div>';
-    }
-    /* Normal pips (1-10) */
-    if(unitCnt>1){
-      /* 1 solid block per unit — each block = ppu pips tall, clicking sets power to that unit's pip threshold */
-      /* Block height = ppu*PIP_H + (ppu-1)*PIP_GAP to exactly match the height of ppu individual pips */
-      var blockH=ppu*PIP_H+(ppu-1)*PIP_GAP;
-      var unitSysBase=sys.k==='shields'?'sg':(sys.k==='pp'?'pp':'cooler');
-      h+='<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:'+PIP_GAP+'px;width:100%;height:'+(NORM_PIPS*PIP_H+(NORM_PIPS-1)*PIP_GAP)+'px;margin-bottom:4px">';
-      /* Render from top unit (highest) to bottom unit (unit 0) */
-      for(var ui=unitCnt-1;ui>=0;ui--){
-        var unitDisabled=typeof _eSysEnabled!=='undefined'&&_eSysEnabled[unitSysBase+'_'+ui]===false;
-        /* Unit is "filled" if current power val covers at least 1 pip of this unit's range */
-        var uPipLo=ui*ppu+1; /* lowest pip belonging to this unit */
-        /* For multi-unit toggle cols (cooler/shields), filled = unit is enabled (not disabled) */
-        var isMultiUnitFill=unitCnt>1&&(sys.k==='cooler'||sys.k==='shields');
-        var filled=!navLocked&&!unitDisabled&&(isMultiUnitFill?true:val>=uPipLo);
-        /* Clicking the block sets power to the top pip of this unit's range */
-        var uPipHi=(ui===unitCnt-1)?NORM_PIPS:(ui+1)*ppu;
-        var clickVal=filled?uPipLo-1:uPipHi; /* toggle: if filled click turns it off (set to pip below), else fills it */
-        if(clickVal<0)clickVal=0;
-        var blockOpacity=unitDisabled?'0.2':'1';
-        var blockBg=unitDisabled?'rgba(255,80,80,0.10)':(filled?sysColor:'rgba(255,255,255,0.08)');
-        var blockBorder=unitDisabled?'1px solid rgba(255,80,80,0.25)':'1px solid rgba(0,0,0,0.3)';
-        /* Multi-unit cols (cooler, shields): each block directly toggles that unit */
-        var isMultiUnit=unitCnt>1&&(sys.k==='cooler'||sys.k==='shields');
-        var unitToggleKey=sys.k==='shields'?'sg_'+ui:'cooler_'+ui;
-        var blockClick=isPPCol?'toggleESystem(\'pp\')':isMultiUnit?(navLocked?'':('toggleESystem(\''+unitToggleKey+'\')')):(navLocked||unitDisabled?'':('sdSetPwrPip(\''+sys.k+'\','+clickVal+')'));
-        h+='<div onclick="'+blockClick+'" '
-          +'style="width:100%;height:'+blockH+'px;min-height:'+blockH+'px;border-radius:3px;border:'+blockBorder+';box-sizing:border-box;cursor:'+(navLocked||unitDisabled?'not-allowed':'pointer')+';'
-          +'background:'+blockBg+';opacity:'+blockOpacity+'">' 
-          +'</div>';
-      }
-      h+='</div>';
-    } else {
-      /* Individual pips */
-      h+='<div style="display:flex;flex-direction:column;align-items:center;gap:'+PIP_GAP+'px;width:100%;margin-bottom:4px">';
-      for(var p=NORM_PIPS;p>=1;p--){
-        var filled=!navLocked&&p<=val;
-        var isMin=navLocked; /* only lock in NAV mode */
-        h+='<div onclick="'+(isMin?'':'sdSetPwrPip(\''+sys.k+'\','+p+')')+' " '
-          +'style="width:100%;height:'+PIP_H+'px;min-height:'+PIP_H+'px;border-radius:2px;border:1px solid rgba(0,0,0,0.3);box-sizing:border-box;cursor:'+(isMin?'not-allowed':'pointer')+';'
-          +'background:'+(filled?sysColor:'rgba(255,255,255,0.08)')+';opacity:'+(filled?'1':'0.35')+'">'
-          +'</div>';
-      }
-      h+='</div>';
-    }
-    /* Icon = power toggle button for toggleable systems (shields, cooler, qd, radar); weapons/engines/thrusters are non-toggle */
-    var toggleSysMap={shields:'sg',cooler:'cooler',qd:'qd',radar:'radar',pp:'pp'};
-    var toggleSysKey=toggleSysMap[sys.k];
-    var sysIsOff=toggleSysKey&&typeof _eSysEnabled!=='undefined'&&_eSysEnabled[toggleSysKey]===false;
-    h+='<div style="display:flex;flex-direction:column;align-items:center;width:100%">';
-    if(toggleSysKey){
-      /* Clickable power toggle icon button */
-      h+='<button onclick="toggleESystem(\''+toggleSysKey+'\')" '
-        +'style="background:none;border:none;padding:0;cursor:pointer;font-size:14px;line-height:1;display:block;margin-bottom:1px;color:'+(sysIsOff?'rgba(255,80,80,0.5)':sysColor)+';filter:'+(sysIsOff?'grayscale(1)':'none')+'">'+sys.icon+'</button>';
-    } else {
-      h+='<span style="font-size:12px;line-height:1;display:block;margin-bottom:1px;color:'+sysColor+'">'+sys.icon+'</span>';
-    }
-    h+='<span style="font-size:8px;display:block;color:'+(navLocked||sysIsOff?'#f87171':'var(--t2)')+'">'
-      +(navLocked?'NAV':sysIsOff?'OFF':(isPPCol?'ON':Math.round(val*10)+'%'))+'</span>'
-      +'</div>';
-    h+='</div>';
-  });
-  h+='</div>';
-
-  /* SCM/NAV mode buttons */
-  var isSCM=_pwrState.mode==='scm';
-  h+='<div class="spv-modes">'
-    +'<button class="spv-mode-btn'+(isSCM?' on':'')+'" onclick="sdSetPwrMode(\'scm\')">SCM MODE</button>'
-    +'<button class="spv-mode-btn'+(!isSCM?' on':'')+'" onclick="sdSetPwrMode(\'nav\')">NAV MODE</button>'
-    +'</div>';
-
-  /* Speed row */
-  h+='<div class="speed-row"><span class="sig-lbl">SPEED</span>'
-    +'<span class="sig-val" style="color:'+(isNAV?'var(--warn)':'var(--accent)')+'">'+speed+' m/s '+(isNAV?'NAV':'SCM')+'</span>'
-    +'</div>';
-
-  /* Reset button */
-  h+='<button class="reset-pwr" onclick="sdResetPower()">&#10227; RESET POWER</button>';
-  h+='</div>';
-  panel.innerHTML=h;
-  panel.style.display='block';
+  
+  updatePwrRibbon();
 }
+
 function sdSetPwrPip(key,val){
   val=Math.min(12,Math.max(0,val));
   /* When val=0 for a multi-unit column, toggle the lowest active unit OFF */
@@ -12186,5 +12059,162 @@ document.addEventListener('click', function(e) {
   var modal = document.getElementById('fleetImportModal');
   if (modal && e.target === modal) closeFleetImport();
 });
+
+
+/* ===== POWER RIBBON SYSTEM v8.97 ===== */
+var _pwrRibbonMode = 'scm';
+var _pwrRibbonComps = null;
+
+function _buildPwrComps(){
+  if(!_curShip) return [];
+  var ship = _curShip;
+  var comps = [];
+  var sys = ship.systems || {};
+  var counts = sys.counts || {};
+  var db = COMP_DB || {};
+  
+  // Power plant(s)
+  var ppCount = counts.pp || 1;
+  var ppName = sys.pp || 'Power Plant';
+  for(var i=0;i<ppCount;i++){
+    var ppData = db.pp ? db.pp[ppName] : null;
+    comps.push({id:'pp'+i,cat:'pp',name:ppName+(ppCount>1?' '+(i+1):''),pips:8,max:8,output:ppData?ppData.out:32,on:true});
+  }
+  
+  // Shield generator(s)
+  var sgCount = counts.sg || 1;
+  var sgName = sys.sg || 'Shield Gen';
+  for(var i=0;i<sgCount;i++){
+    var sgData = db.sg ? db.sg[sgName] : null;
+    comps.push({id:'sg'+i,cat:'sg',name:sgName+(sgCount>1?' '+(i+1):''),pips:5,max:10,dMin:sgData?sgData.drawMin:3,dMax:sgData?sgData.drawMax:6,on:true});
+  }
+  
+  // Weapons (triangle)
+  comps.push({id:'wp',cat:'wp',name:'Hardpoints',pips:5,max:10,dMin:0,dMax:Math.round(_pwrWpDraw||13),on:true});
+  
+  // Engines (triangle)
+  comps.push({id:'en',cat:'en',name:'Thrusters',pips:5,max:10,dMin:0,dMax:Math.round(_pwrEnDraw||6),on:true});
+  
+  // Cooler(s)
+  var coCount = counts.cooler || 1;
+  var coName = sys.cooler || 'Cooler';
+  for(var i=0;i<coCount;i++){
+    comps.push({id:'co'+i,cat:'co',name:coName+(coCount>1?' '+(i+1):''),pips:5,max:5,dMin:6,dMax:6,on:true});
+  }
+  
+  // Q-Drive
+  comps.push({id:'qd',cat:'qd',name:sys.qd||'Q-Drive',pips:3,max:3,dMin:3,dMax:3,on:true});
+  
+  // Radar
+  comps.push({id:'rd',cat:'rd',name:sys.radar||'Radar',pips:2,max:2,dMin:1,dMax:1,on:true});
+  
+  _pwrRibbonComps = comps;
+  return comps;
+}
+
+function pwrCalcDraw(c,p){if(c.output)return 0;if(!c.dMax)return c.dMin||0;return c.dMin+(p/c.max)*(c.dMax-c.dMin);}
+function pwrPerfMult(p,m){return 0.5+(p/m);}
+
+function pwrBuildPips(c){
+  var el=document.getElementById('ppt-'+c.id);
+  if(!el)return;
+  el.innerHTML='';
+  for(var i=0;i<c.max;i++){
+    var d=document.createElement('div');
+    d.className='pwr-pip '+(i<(c.on?c.pips:0)?c.cat:'e');
+    (function(idx,comp){d.onclick=function(){if(!comp.on)return;comp.pips=idx+1;updatePwrRibbon();};})(i,c);
+    el.appendChild(d);
+  }
+}
+
+function pwrTogComp(id){
+  var comps=_pwrRibbonComps;
+  if(!comps)return;
+  var c=comps.find(function(x){return x.id===id;});
+  if(!c)return;
+  c.on=!c.on;
+  document.getElementById('pct-'+id).className='pwr-ctog '+(c.on?'on':'off');
+  document.getElementById('prc-'+id).className='pwr-comp'+(c.on?'':' offline');
+  updatePwrRibbon();
+}
+
+function pwrAdj(id,d){
+  var comps=_pwrRibbonComps;
+  if(!comps)return;
+  var c=comps.find(function(x){return x.id===id;});
+  if(!c||!c.on)return;
+  c.pips=Math.max(0,Math.min(c.max,c.pips+d));
+  updatePwrRibbon();
+}
+
+function pwrSetMode(m){
+  _pwrRibbonMode=m;
+  var scmBtn=document.getElementById('pwrScmBtn');
+  var navBtn=document.getElementById('pwrNavBtn');
+  if(scmBtn)scmBtn.className='pwr-mopt'+(m==='scm'?' on':'');
+  if(navBtn)navBtn.className='pwr-mopt'+(m==='nav'?' on':'');
+  var mrow=document.getElementById('pwrModeRow');
+  var pill=document.getElementById('pwrModePill');
+  if(mrow&&pill){var pw=mrow.offsetWidth/2-2;pill.style.left=(m==='scm'?2:pw+2)+'px';pill.style.width=pw+'px';}
+  updatePwrRibbon();
+}
+
+function updatePwrRibbon(){
+  var comps=_pwrRibbonComps;
+  if(!comps||!_curShip)return;
+  
+  var out=0,draw=0,wpM=0,enM=0,sgHP=0;
+  var sgs=comps.filter(function(c){return c.cat==='sg';});
+  var ship=_curShip;
+  var baseSHP=_pwrBaseSHP||5400;
+  
+  comps.forEach(function(c){
+    pwrBuildPips(c);
+    if(c.output){var o=c.on?c.output:0;out+=o;var el=document.getElementById('pce-'+c.id);if(el)el.textContent=o+' EU';return;}
+    var dr=c.on?pwrCalcDraw(c,c.pips):0;draw+=dr;
+    var el=document.getElementById('pce-'+c.id);if(el)el.textContent=Math.round(dr)+' EU';
+    if(c.cat==='wp'&&c.on)wpM=pwrPerfMult(c.pips,c.max);
+    if(c.cat==='en'&&c.on)enM=pwrPerfMult(c.pips,c.max);
+    if(c.cat==='sg'&&c.on)sgHP+=Math.round((baseSHP/sgs.length)*pwrPerfMult(c.pips,c.max));
+  });
+  
+  var lp=out>0?(draw/out)*100:999;
+  var bg=lp>100?'linear-gradient(to right,#c02020,#e03030)':lp>85?'linear-gradient(to right,#b07820,#e0b030,#f0c040)':'linear-gradient(to right,#7a5010,#c08020,#e8b030)';
+  var fill=document.getElementById('pwrEuFill');
+  if(fill){fill.style.width=Math.min(100,lp)+'%';fill.style.background=bg;}
+  var nums=document.getElementById('pwrEuNums');
+  if(nums)nums.textContent=Math.round(draw)+'/'+out+' EU';
+  var st=document.getElementById('pwrEuStatus');
+  if(st){
+    if(lp>100){st.style.color='rgba(220,60,38,0.75)';st.textContent='OVERDRAW';}
+    else{st.style.color='rgba(70,188,100,0.55)';st.textContent=Math.round(lp)+'% load';}
+  }
+  
+  // Warn
+  var wb=document.getElementById('pwrWarn');
+  if(wb){
+    var off=comps.filter(function(c){return !c.on&&['pp','sg','en'].includes(c.cat);}).map(function(c){return c.id.replace(/[0-9]/g,'').toUpperCase();});
+    if(lp>100)off.unshift('OVERDRAW');
+    if(off.length){wb.style.display='block';wb.textContent='⚠ '+off.join(' · ');}
+    else wb.style.display='none';
+  }
+  
+  // Update existing power display in the right panel
+  if(typeof updatePower==='function')updatePower();
+  
+  // Store for HUD
+  _pwrRibbonWpM=wpM;_pwrRibbonEnM=enM;_pwrRibbonSgHP=sgHP;_pwrRibbonOut=out;_pwrRibbonDraw=Math.round(draw);
+}
+
+// Init mode pill after DOM ready
+document.addEventListener('DOMContentLoaded',function(){
+  setTimeout(function(){
+    var mrow=document.getElementById('pwrModeRow');
+    var pill=document.getElementById('pwrModePill');
+    if(mrow&&pill){var pw=mrow.offsetWidth/2-2;pill.style.left='2px';pill.style.width=pw+'px';}
+  },500);
+});
+var _pwrRibbonWpM=1,_pwrRibbonEnM=1,_pwrRibbonSgHP=0,_pwrRibbonOut=32,_pwrRibbonDraw=0;
+var _pwrWpDraw=13,_pwrEnDraw=6,_pwrBaseSHP=5400;
 
 </script>
