@@ -1664,38 +1664,37 @@ function setHudMode(m) {
   if(!_loadout._pips) _loadout._pips = {};
   if(!_loadout._off) _loadout._off = {};
 
-  // Star Citizen NAV mode behavior:
-  //   - Weapons OFFLINE (no firing)
-  //   - Shields OFFLINE (no defense)
-  //   - Engines at MAX pips (max thrust → NAV speed)
+  // NAV mode = Quantum drive spool-up:
+  //   - Q-DRIVE pips MAX (drive spinning up to jump)
+  //   - WEAPONS OFFLINE (power diverted to QD)
+  //   - SHIELDS OFFLINE (power diverted to QD)
+  //   - Engines stay on at default
   if(m === 'nav' && prev !== 'nav'){
-    // Snapshot current pip + on-state for wp/sg/en
+    // Snapshot current state
     _loadout._scmSnap = {
       wp_pips: _loadout._pips.wp,
+      qd_pips: _loadout._pips.qd,
       sg_pips: {},
-      en_pips: _loadout._pips.en,
       wp_off: _loadout._off.pwr_wp,
-      en_off: _loadout._off.pwr_en
+      qd_off: _loadout._off.pwr_qd
     };
-    // Find all sg* in _pwrComps
     (_pwrComps||[]).forEach(function(c){
       if(c.cat==='sg'){
         _loadout._scmSnap.sg_pips[c.id] = _loadout._pips[c.id];
         _loadout._scmSnap['sg_off_'+c.id] = _loadout._off['pwr_'+c.id];
       }
     });
-    // Apply NAV: weapons & shields OFF, engines MAX
+    // Apply NAV: QD MAX, weapons/shields OFF
     _loadout._off.pwr_wp = true;
     (_pwrComps||[]).forEach(function(c){ if(c.cat==='sg') _loadout._off['pwr_'+c.id] = true; });
-    _loadout._pips.en = 10; // max thrust
-    _loadout._off.pwr_en = false; // engines forced on
+    _loadout._off.pwr_qd = false; // QD forced ON
+    _loadout._pips.qd = 3; // max QD pips
   } else if(m === 'scm' && prev === 'nav'){
-    // Restore from snapshot
     var snap = _loadout._scmSnap || {};
     if(snap.wp_pips !== undefined) _loadout._pips.wp = snap.wp_pips; else delete _loadout._pips.wp;
-    if(snap.en_pips !== undefined) _loadout._pips.en = snap.en_pips; else delete _loadout._pips.en;
+    if(snap.qd_pips !== undefined) _loadout._pips.qd = snap.qd_pips; else delete _loadout._pips.qd;
     _loadout._off.pwr_wp = !!snap.wp_off;
-    _loadout._off.pwr_en = !!snap.en_off;
+    _loadout._off.pwr_qd = !!snap.qd_off;
     Object.keys(snap.sg_pips||{}).forEach(function(k){
       if(snap.sg_pips[k] !== undefined) _loadout._pips[k] = snap.sg_pips[k]; else delete _loadout._pips[k];
       _loadout._off['pwr_'+k] = !!snap['sg_off_'+k];
@@ -1703,8 +1702,8 @@ function setHudMode(m) {
     delete _loadout._scmSnap;
   }
 
-  document.getElementById('pscm').className = 'pmopt'+(m==='scm'?' on':'');
-  document.getElementById('pnav').className = 'pmopt'+(m==='nav'?' on':'');
+  var psc = document.getElementById('pscm'); if(psc) psc.className = 'pmopt'+(m==='scm'?' on':'');
+  var pnv = document.getElementById('pnav'); if(pnv) pnv.className = 'pmopt'+(m==='nav'?' on':'');
   initModePill();
   buildPwrComps();
   updatePwr();
