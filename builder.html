@@ -1326,6 +1326,47 @@ function populateShipSel() {
 // ============================================================
 // LOAD SHIP
 // ============================================================
+var MISSILE_DB = {
+  1: [
+    {id:'marksman1',name:'Marksman-I',mfr:'Behring',dmg:200,range:1500,type:'IR',loc:'Centermass / Platinum Bay'},
+    {id:'stinger1',name:'Stinger-I',mfr:'Behring',dmg:180,range:1200,type:'IR',loc:'Centermass'},
+    {id:'firestorm1',name:'Firestorm-I',mfr:'Talon',dmg:240,range:1700,type:'CS',loc:'Platinum Bay'}
+  ],
+  2: [
+    {id:'spartan2',name:'Spartan-II',mfr:'Behring',dmg:430,range:2000,type:'IR',loc:'Centermass / Platinum Bay'},
+    {id:'pioneer2',name:'Pioneer-II',mfr:'Behring',dmg:400,range:1800,type:'CS',loc:'Centermass'},
+    {id:'ignite2',name:'Ignite-II',mfr:'Behring',dmg:380,range:1900,type:'IR',loc:'Platinum Bay'},
+    {id:'arrowMk2',name:'Arrow Mk.II',mfr:'Talon',dmg:460,range:2100,type:'EM',loc:'Lorville'}
+  ],
+  3: [
+    {id:'arrester3',name:'Arrester-III',mfr:'Behring',dmg:1000,range:2400,type:'EM',loc:'Centermass / Platinum Bay'},
+    {id:'ignite3',name:'Ignite-III',mfr:'Behring',dmg:900,range:2200,type:'IR',loc:'Platinum Bay'},
+    {id:'thunderbolt3',name:'Thunderbolt-III',mfr:'Behring',dmg:1100,range:2600,type:'CS',loc:'Lorville'},
+    {id:'arr3',name:'Arrester-III',mfr:'Behring',dmg:1000,range:2400,type:'EM',loc:'Centermass'}
+  ],
+  4: [
+    {id:'tempest4',name:'Tempest-IV',mfr:'Behring',dmg:1900,range:2800,type:'IR',loc:'Platinum Bay'},
+    {id:'rattler4',name:'Rattler-IV',mfr:'Behring',dmg:1800,range:2600,type:'CS',loc:'Centermass'},
+    {id:'inferno4',name:'Inferno-IV',mfr:'Talon',dmg:2100,range:2900,type:'EM',loc:'Lorville'}
+  ],
+  5: [
+    {id:'tempest5',name:'Tempest-V',mfr:'Behring',dmg:3400,range:3000,type:'IR',loc:'Platinum Bay'},
+    {id:'sledge5',name:'Sledge-V',mfr:'Talon',dmg:3800,range:3200,type:'EM',loc:'Lorville'}
+  ],
+  6: [
+    {id:'maxislug6',name:'Maxi-Slug',mfr:'Behring',dmg:6000,range:3500,type:'EM',loc:'Centermass'},
+    {id:'tarantula6',name:'Tarantula',mfr:'Behring',dmg:5500,range:3200,type:'CS',loc:'Platinum Bay'}
+  ],
+  7: [
+    {id:'tempest7',name:'Tempest-VII',mfr:'Behring',dmg:11000,range:4200,type:'IR',loc:'Capital ports'}
+  ],
+  9: [
+    {id:'bristle9',name:'Bristle',mfr:'Behring',dmg:18000,range:5000,type:'CS',loc:'Capital ports'},
+    {id:'tarpi9',name:'TARPI-9',mfr:'Behring',dmg:16000,range:4800,type:'EM',loc:'Capital ports'},
+    {id:'lidar9',name:'LIDAR-9',mfr:'Talon',dmg:15000,range:5200,type:'IR',loc:'Capital ports'}
+  ]
+};
+
 var WIRE_LIB = {
   fighter: '<path d="M 130 100 L 175 70 L 240 80 L 255 100 L 240 120 L 175 130 Z"/>'+
     '<path d="M 175 70 L 50 50 L 18 70 L 70 92 L 175 92"/><path d="M 50 50 L 70 92"/>'+
@@ -1869,6 +1910,151 @@ function makeSlot(type, sl, slotIdx, sz) {
   var slotKey = prefix+slotIdx;
   if(_loadout._exp[slotKey]) slot.classList.add('expanded');
 
+  // ===== MISSILE SLOT — special: rack + missile dual dropdown =====
+  if(type === 'missile'){
+    var rackKey = 'm'+slotIdx+'_rack';
+    var missKey = 'm'+slotIdx+'_missile';
+    var rackId = _loadout[rackKey] || sl.default || '';
+    var missId = _loadout[missKey] || '';
+    var rackData = (typeof RACK_DB !== 'undefined' && RACK_DB && RACK_DB[rackId]) ? RACK_DB[rackId] : null;
+    if(!rackData){
+      // Pick first compatible rack as default
+      var fallback = (typeof RACK_DB !== 'undefined' && RACK_DB) ? Object.keys(RACK_DB).find(function(k){ return RACK_DB[k].sz === sz; }) : null;
+      if(fallback){ rackId = fallback; rackData = RACK_DB[fallback]; }
+    }
+    var missilePool = rackData && MISSILE_DB && MISSILE_DB[rackData.sz] ? MISSILE_DB[rackData.sz] : [];
+    var missileData = missilePool.find(function(m){ return m.id === missId; }) || missilePool[0] || null;
+
+    var slotOn = !_loadout._off[rackKey];
+    var totalDmg = (missileData && rackData) ? (missileData.dmg||0) * (rackData.cap||1) * cnt : 0;
+
+    // Header
+    var hdr = document.createElement('div');
+    hdr.className = 'slot-hdr';
+    hdr.innerHTML = '<span class="chev">' + (slot.classList.contains('expanded')?'\u25BC':'\u25B6') + '</span>'
+      + '<span class="slot-sz s">S' + sl.sz + '</span>'
+      + '<div class="slot-info">'
+        + '<div class="slot-nm">' + (rackId || '[ EMPTY ]') + (cnt>1 ? ' <span class="slot-cnt">\u00D7' + cnt + '</span>' : '') + '</div>'
+        + '<div class="slot-meta">' + (sl.lbl||'MISSILE').toUpperCase()
+          + (rackData ? ' <span class="slot-tag">' + (rackData.cap||1) + ' \u00D7 S' + rackData.sz + '</span>' : '')
+        + '</div>'
+      + '</div>'
+      + '<span class="slot-stat"><b>' + (missileData ? Math.round(missileData.dmg||0) : '--') + '</b><i>DMG</i></span>'
+      + '<span class="slot-dps"><b>' + Math.round(totalDmg) + '</b><i>TOT</i></span>'
+      + '<button class="slot-reset" title="Reset to default">\u21BA</button>'
+      + '<span class="slot-on ' + (slotOn?'on':'off') + '">' + (slotOn?'ON':'OFF') + '</span>';
+
+    hdr.onclick = function(e){
+      if(e.target.closest('.slot-on') || e.target.closest('.slot-reset')) return;
+      slot.classList.toggle('expanded');
+      _loadout._exp[slotKey] = slot.classList.contains('expanded');
+      var chev = hdr.querySelector('.chev');
+      if(chev) chev.textContent = slot.classList.contains('expanded') ? '\u25BC' : '\u25B6';
+    };
+    hdr.querySelector('.slot-on').onclick = function(e){
+      e.stopPropagation();
+      _loadout._off[rackKey] = slotOn;
+      buildHpBand(); updatePwr(); updateStats();
+    };
+    hdr.querySelector('.slot-reset').onclick = function(e){
+      e.stopPropagation();
+      delete _loadout[rackKey]; delete _loadout[missKey];
+      if(_loadout._off){ delete _loadout._off[rackKey]; }
+      buildHpBand(); updatePwr(); updateStats();
+    };
+    slot.appendChild(hdr);
+
+    // Body — TWO dropdowns: rack + missile
+    var body = document.createElement('div');
+    body.className = 'slot-body';
+
+    // RACK DROPDOWN
+    var rackLbl = document.createElement('div');
+    rackLbl.className = 'slot-clbl';
+    rackLbl.textContent = 'MSD / RACK';
+    body.appendChild(rackLbl);
+
+    var rackRow = document.createElement('div');
+    rackRow.className = 'unit-row';
+    var rackSel = document.createElement('select');
+    rackSel.className = 'unit-sel';
+    var racks = (typeof RACK_DB !== 'undefined' && RACK_DB) ? Object.keys(RACK_DB).filter(function(k){ return RACK_DB[k].sz === sz; }) : [];
+    racks.sort();
+    racks.forEach(function(rk){
+      var d = RACK_DB[rk];
+      var opt = document.createElement('option');
+      opt.value = rk;
+      opt.textContent = rk + ' (\u00D7' + (d.cap||1) + ' S' + d.sz + ', ' + (d.mfr||'?') + ')';
+      if(rk === rackId) opt.selected = true;
+      rackSel.appendChild(opt);
+    });
+    rackSel.onchange = function(e){
+      e.stopPropagation();
+      _loadout[rackKey] = rackSel.value;
+      // Reset missile choice when rack changes (missile size may differ)
+      delete _loadout[missKey];
+      buildHpBand(); updatePwr(); updateStats();
+    };
+    rackSel.onclick = function(e){ e.stopPropagation(); };
+    rackRow.appendChild(rackSel);
+    body.appendChild(rackRow);
+
+    if(rackData){
+      var rackSub = document.createElement('div');
+      rackSub.className = 'unit-sub';
+      rackSub.innerHTML = '<b>S' + rackData.sz + '</b> mount \u00B7 holds <b>' + (rackData.cap||1) + '</b> missiles' + (rackData.mfr ? ' \u00B7 ' + rackData.mfr : '');
+      body.appendChild(rackSub);
+    }
+
+    // MISSILE DROPDOWN (compatible with selected rack's size)
+    var missLbl = document.createElement('div');
+    missLbl.className = 'slot-clbl';
+    missLbl.textContent = 'MISSILE TYPE';
+    body.appendChild(missLbl);
+
+    var missRow = document.createElement('div');
+    missRow.className = 'unit-row';
+    var missSel = document.createElement('select');
+    missSel.className = 'unit-sel';
+    var emp = document.createElement('option'); emp.value=''; emp.textContent='[Empty]';
+    missSel.appendChild(emp);
+    missilePool.forEach(function(m){
+      var opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.name + ' (' + m.dmg + ' DMG, ' + m.type + ', ' + m.range + 'm)';
+      if(m.id === missId || (!missId && missileData && m.id === missileData.id)) opt.selected = true;
+      missSel.appendChild(opt);
+    });
+    missSel.onchange = function(e){
+      e.stopPropagation();
+      _loadout[missKey] = missSel.value;
+      buildHpBand(); updatePwr(); updateStats();
+    };
+    missSel.onclick = function(e){ e.stopPropagation(); };
+    missRow.appendChild(missSel);
+    body.appendChild(missRow);
+
+    if(missileData){
+      var missSub = document.createElement('div');
+      missSub.className = 'unit-sub';
+      missSub.innerHTML = '<b>' + missileData.dmg + '</b> DMG \u00B7 <b>' + missileData.range + '</b>m \u00B7 <b>' + missileData.type + '</b> guidance';
+      body.appendChild(missSub);
+    }
+
+    // Buy locations
+    var locWrap = document.createElement('div');
+    locWrap.className = 'unit-loc';
+    var locParts = [];
+    if(rackData && rackData.loc) locParts.push('RACK: ' + rackData.loc);
+    if(missileData && missileData.loc) locParts.push('MISSILE: ' + missileData.loc);
+    if(locParts.length) { locWrap.textContent = 'BUY \u00B7 ' + locParts.join(' / '); body.appendChild(locWrap); }
+
+    slot.appendChild(body);
+    slot.dataset.hp = slotIdx;
+    return slot;
+  }
+
+  // ===== WEAPON SLOT — per-unit dropdowns =====
   var units = [];
   for(var u=0; u<cnt; u++){
     var key = prefix+slotIdx+'_'+u;
@@ -1882,7 +2068,6 @@ function makeSlot(type, sl, slotIdx, sz) {
   units.forEach(function(u){ if(u.w){ if(u.on) totalDPS += u.w.dps||0; totalAlpha += u.w.alpha||0; } });
   var slotOn = units.some(function(u){return u.on;});
 
-  // Header
   var hdr = document.createElement('div');
   hdr.className = 'slot-hdr';
   var typeColor = type==='weapon' ? 'w' : 's';
@@ -1890,11 +2075,11 @@ function makeSlot(type, sl, slotIdx, sz) {
     + '<span class="slot-sz ' + typeColor + '">S' + sl.sz + '</span>'
     + '<div class="slot-info">'
       + '<div class="slot-nm">' + (master.w ? master.w.name : (master.wid || 'EMPTY')) + (cnt>1 ? ' <span class="slot-cnt">\u00D7' + cnt + '</span>' : '') + '</div>'
-      + '<div class="slot-meta">' + (sl.lbl||(type==='missile'?'MISSILE':'HARDPOINT')).toUpperCase()
+      + '<div class="slot-meta">' + (sl.lbl||'HARDPOINT').toUpperCase()
         + (master.w&&master.w.type ? ' <span class="slot-tag">' + master.w.type.toUpperCase() + '</span>' : '')
       + '</div>'
     + '</div>'
-    + '<span class="slot-stat"><b>' + (master.w ? totalAlpha.toFixed(1) : '--') + '</b><i>' + (type==='missile'?'DMG':'\u03B1') + '</i></span>'
+    + '<span class="slot-stat"><b>' + (master.w ? totalAlpha.toFixed(1) : '--') + '</b><i>\u03B1</i></span>'
     + '<span class="slot-dps"><b>' + Math.round(totalDPS) + '</b><i>DPS</i></span>'
     + '<button class="slot-reset" title="Reset to default">\u21BA</button>'
     + '<span class="slot-on ' + (slotOn?'on':'off') + '">' + (slotOn?'ON':'OFF') + '</span>';
@@ -1914,23 +2099,21 @@ function makeSlot(type, sl, slotIdx, sz) {
   };
   hdr.querySelector('.slot-reset').onclick = function(e){
     e.stopPropagation();
-    units.forEach(function(u){ delete _loadout[u.key]; if(_loadout._off) delete _loadout._off[u.key]; });
+    units.forEach(function(u){ delete _loadout[u.key]; if(_loadout._off) delete _loadout._off[u.key]; if(typeof syncPwrFromComp === 'function') syncPwrFromComp(u.key); });
     delete _loadout[prefix+slotIdx];
-    buildHpBand(); updatePwr(); updateStats();
+    buildHpBand(); buildPwrComps(); updatePwr(); updateStats();
   };
-  // Wireframe marker highlight on hover
   slot.dataset.hp = slotIdx;
-  slot.onmouseenter = function(){ highlightHpMarker(slotIdx, true); };
-  slot.onmouseleave = function(){ highlightHpMarker(slotIdx, false); };
+  slot.onmouseenter = function(){ if(typeof highlightHpMarker === 'function') highlightHpMarker(slotIdx, true); };
+  slot.onmouseleave = function(){ if(typeof highlightHpMarker === 'function') highlightHpMarker(slotIdx, false); };
   slot.appendChild(hdr);
 
-  // Body
   var body = document.createElement('div');
   body.className = 'slot-body';
   if(cnt > 1){
     var clbl = document.createElement('div');
     clbl.className = 'slot-clbl';
-    clbl.textContent = (sl.lbl||(type==='missile'?'MISSILE':'HARDPOINT')) + ' \u00D7' + cnt;
+    clbl.textContent = (sl.lbl||'HARDPOINT') + ' \u00D7' + cnt;
     body.appendChild(clbl);
   }
   units.forEach(function(unit){ body.appendChild(makeUnitRow(type, unit, sz)); });
