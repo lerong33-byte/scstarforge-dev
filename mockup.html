@@ -101,6 +101,28 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:radial-gradient(ellipse 100% 100% at 50% 50%,rgba(220,240,250,.22),rgba(160,200,230,.08) 45%,transparent 75%);
   transform:rotate(-40deg);filter:blur(1.2px);}
 
+/* FLOATING ASTEROIDS — silent rocks */
+.ast{position:absolute;pointer-events:none;
+  filter:drop-shadow(0 0 4px rgba(0,0,0,.55));
+  animation:ast-drift 80s ease-in-out infinite alternate;}
+.ast.a1{top:32%;left:36%;width:54px;height:44px;rotate:15deg;animation-duration:90s;}
+.ast.a2{top:58%;left:24%;width:32px;height:25px;rotate:-22deg;animation-duration:75s;animation-delay:-22s;}
+.ast.a3{top:18%;left:46%;width:20px;height:16px;rotate:40deg;animation-duration:110s;animation-delay:-38s;}
+.ast.a4{top:72%;left:52%;width:26px;height:20px;rotate:-8deg;animation-duration:85s;animation-delay:-50s;}
+.ast.a5{top:28%;left:62%;width:16px;height:12px;rotate:55deg;animation-duration:95s;animation-delay:-28s;}
+.ast.a6{top:62%;left:68%;width:13px;height:10px;rotate:-30deg;animation-duration:80s;animation-delay:-60s;}
+@keyframes ast-drift{
+  from{translate:0 0;}
+  to{translate:8px -5px;}
+}
+
+/* DISTANT COMET */
+.comet{position:absolute;top:8%;right:18%;width:380px;height:70px;
+  pointer-events:none;
+  filter:drop-shadow(0 0 6px rgba(220,240,255,.30)) drop-shadow(0 0 12px rgba(180,210,255,.12));
+  transform:rotate(-8deg);
+  opacity:.85;}
+
 /* COCKPIT FRAME — curved canopy + dashboard */
 #cockpit{position:absolute;inset:0;z-index:30;pointer-events:none;}
 #cockpit svg{width:100%;height:100%;display:block;}
@@ -812,6 +834,61 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     <div class="galaxy g2"></div>
     <div class="galaxy g3"></div>
     <div class="galaxy g4"></div>
+
+    <!-- Floating asteroids -->
+    <svg class="ast a1" viewBox="0 0 60 48" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="8,22 14,7 28,4 42,8 54,18 52,32 44,42 28,44 14,40 5,30" fill="rgba(58,48,38,.92)" stroke="rgba(28,20,12,.82)" stroke-width=".7"/>
+      <polygon points="22,18 30,14 38,18 36,26 28,28" fill="rgba(36,28,20,.55)"/>
+      <polygon points="14,34 20,32 22,38 16,40" fill="rgba(72,60,46,.40)"/>
+    </svg>
+    <svg class="ast a2" viewBox="0 0 36 28" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="4,12 9,4 18,3 28,8 32,16 26,22 14,24 6,20" fill="rgba(64,54,42,.88)" stroke="rgba(28,20,12,.78)" stroke-width=".5"/>
+      <polygon points="14,10 20,8 24,12 18,16" fill="rgba(40,30,22,.50)"/>
+    </svg>
+    <svg class="ast a3" viewBox="0 0 22 18" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="3,8 6,2 14,1 19,5 20,12 14,16 7,15 2,11" fill="rgba(56,46,36,.85)" stroke="rgba(24,16,10,.72)" stroke-width=".4"/>
+    </svg>
+    <svg class="ast a4" viewBox="0 0 28 22" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="3,10 7,3 16,2 24,6 26,14 20,19 10,18 4,15" fill="rgba(60,50,40,.90)" stroke="rgba(26,18,10,.78)" stroke-width=".5"/>
+      <polygon points="10,8 16,6 19,11 13,12" fill="rgba(36,28,20,.45)"/>
+    </svg>
+    <svg class="ast a5" viewBox="0 0 18 14" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="2,6 5,2 10,1 15,4 16,10 10,12 4,10" fill="rgba(52,44,34,.82)" stroke="rgba(20,14,8,.65)" stroke-width=".4"/>
+    </svg>
+    <svg class="ast a6" viewBox="0 0 14 10" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="2,4 4,1 9,1 12,4 11,8 6,9 3,7" fill="rgba(48,40,30,.78)" stroke="rgba(20,14,8,.55)" stroke-width=".3"/>
+    </svg>
+
+    <!-- Distant comet streaking across -->
+    <svg class="comet" viewBox="0 0 380 70" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="comet-tail" x1="0" x2="1" y1="0.55" y2="0.45">
+          <stop offset="0%" stop-color="rgba(220,240,255,0)"/>
+          <stop offset="35%" stop-color="rgba(220,240,255,.16)"/>
+          <stop offset="72%" stop-color="rgba(232,242,255,.55)"/>
+          <stop offset="92%" stop-color="rgba(255,255,255,.92)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,1)"/>
+        </linearGradient>
+        <linearGradient id="comet-tail2" x1="0" x2="1" y1="0.55" y2="0.45">
+          <stop offset="0%" stop-color="rgba(180,200,255,0)"/>
+          <stop offset="55%" stop-color="rgba(180,200,255,.18)"/>
+          <stop offset="92%" stop-color="rgba(220,232,255,.55)"/>
+        </linearGradient>
+        <radialGradient id="comet-head">
+          <stop offset="0%" stop-color="rgba(255,255,255,1)"/>
+          <stop offset="40%" stop-color="rgba(232,240,255,.85)"/>
+          <stop offset="100%" stop-color="rgba(180,200,250,0)"/>
+        </radialGradient>
+      </defs>
+      <!-- main tail (curved) -->
+      <path d="M 10 44 Q 140 32, 270 38 T 358 36" stroke="url(#comet-tail)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <!-- secondary thinner trail -->
+      <path d="M 40 50 Q 160 42, 280 44 T 356 38" stroke="url(#comet-tail2)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <!-- coma glow -->
+      <circle cx="358" cy="36" r="9" fill="url(#comet-head)" opacity=".75"/>
+      <!-- bright head core -->
+      <circle cx="358" cy="36" r="2.6" fill="rgba(255,255,255,1)"/>
+    </svg>
   </div>
 
   <div id="cockpit">
