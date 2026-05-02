@@ -747,7 +747,7 @@ function buildHpBand() {
         +'<div class="dd-s"><div class="dd-sv ch">'+(w.draw||0)+' EU</div><div class="dd-sl">DRAW</div></div>'
         +'</div><div class="dd-opts">';
       alts.forEach(function(aw){
-        dd+='<div class="dd-opt'+(aw.id===wid?' sel':'')+'" onclick="event.stopPropagation();pickItem('w'+i+'',''+aw.id+'')">'+
+        dd+='<div class="dd-opt'+(aw.id===wid?' sel':'')+'" onclick="event.stopPropagation();pickItem(\'w'+i+'\',\''+aw.id+'\')">'+
           '<div><div class="dd-on">'+aw.name+'</div><div class="dd-osub">'+aw.type+' S'+aw.sz+'</div></div>'+
           '<div class="dd-os gd">'+Math.round(aw.dps||0)+'</div></div>';
       });
