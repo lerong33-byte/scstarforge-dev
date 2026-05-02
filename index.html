@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.93</title>
+<title>SC-ShipForge v8.92</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -62,7 +62,7 @@ input,select,button,textarea{font-family:var(--fhud)}
 option,optgroup{background:var(--bg2)}
 
 /* ── APP SHELL ── */
-#app{display:flex;flex-direction:column;height:100vh;width:100%;max-width:1600px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+#app{display:flex;flex-direction:column;height:100vh;width:100%;max-width:1400px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
 
 /* ── TOP NAV ── */
 .nav{height:54px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;position:relative;z-index:20}
@@ -92,7 +92,7 @@ option,optgroup{background:var(--bg2)}
 .body{display:flex;flex:1;min-height:0;overflow:hidden}
 
 /* ── LEFT PANEL ── */
-.lp{width:20%;min-width:200px;max-width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--bg2);overflow:hidden}
+.lp{width:210px;min-width:210px;max-width:210px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--bg2);overflow:hidden}
 
 /* Ship image */
 .ship-img-wrap{height:150px;background:var(--bg3);flex-shrink:0;border-bottom:1px solid var(--border);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -306,7 +306,7 @@ option,optgroup{background:var(--bg2)}
 .loc-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--text)}
 
 /* ── RIGHT PANEL ── */
-.rp{width: 200px;min-width:260px;max-width:380px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--border);background:var(--bg2);overflow:hidden}
+.rp{width:190px;min-width:190px;max-width:190px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--border);background:var(--bg2);overflow:hidden}
 .rp-scroll{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;min-height:0}
 
 /* Target analysis */
@@ -1112,7 +1112,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a427;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.93</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a427;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.92</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
