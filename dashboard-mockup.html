@@ -132,16 +132,30 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 #title-sub{font-size:9px;letter-spacing:6px;color:var(--g-d);margin-top:5px;}
 .brk{color:var(--g);opacity:.62;font-weight:300;}
 
-/* TOP STATS — floating cells */
+/* TOP STATS — meta highlights */
 #stats{position:absolute;top:108px;left:50%;transform:translateX(-50%);z-index:18;
-  display:flex;align-items:center;gap:36px;}
-.stat{display:flex;flex-direction:column;align-items:center;position:relative;padding:0 14px;}
-.stat::before,.stat::after{content:'';position:absolute;top:6px;height:54px;width:1px;
+  display:flex;align-items:stretch;gap:18px;}
+.stat{display:flex;flex-direction:column;align-items:center;position:relative;
+  padding:8px 18px 10px;min-width:148px;cursor:pointer;text-decoration:none;
+  background:linear-gradient(180deg,rgba(20,22,26,.40),rgba(10,12,14,.20));
+  transition:background .15s,transform .15s;}
+.stat::before,.stat::after{content:'';position:absolute;top:10%;bottom:10%;width:1px;
   background:linear-gradient(to bottom,transparent,var(--g-m),transparent);}
 .stat::before{left:0;} .stat::after{right:0;}
-.stat-v{font-size:30px;font-weight:700;line-height:1;letter-spacing:1px;color:var(--w);
+.stat:hover{transform:translateY(-3px);
+  background:linear-gradient(180deg,rgba(40,42,48,.55),rgba(20,22,26,.30));}
+.stat-tag{font-size:7px;letter-spacing:2.5px;color:var(--g-d);font-weight:700;margin-bottom:4px;
+  white-space:nowrap;}
+.stat-v{font-size:26px;font-weight:700;line-height:1;letter-spacing:1px;color:var(--w);
   text-shadow:0 0 10px rgba(212,168,76,.32);}
-.stat-l{font-size:8px;letter-spacing:3px;color:var(--g-d);margin-top:6px;}
+.stat-v.r{color:#ff8060;text-shadow:0 0 10px rgba(232,80,48,.45);}
+.stat-v.b{color:#7bc8e8;text-shadow:0 0 10px rgba(80,180,232,.45);}
+.stat-v.g{color:#7be0a8;text-shadow:0 0 10px rgba(80,224,168,.45);}
+.stat-u{font-size:11px;font-weight:400;color:var(--g-d);margin-left:3px;letter-spacing:1px;}
+.stat-name{font-size:10px;letter-spacing:2.5px;font-weight:700;color:var(--w);margin-top:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
+.stat-l{font-size:7px;letter-spacing:2px;color:var(--char);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
 
 /* PANEL — generic curved-flatscreen card */
 .panel{position:absolute;
@@ -361,12 +375,42 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   </div>
 
   <div id="stats">
-    <div class="stat"><div class="stat-v">131</div><div class="stat-l">HULLS</div></div>
-    <div class="stat"><div class="stat-v">122</div><div class="stat-l">WEAPONS</div></div>
-    <div class="stat"><div class="stat-v">15</div><div class="stat-l">RACKS</div></div>
-    <div class="stat"><div class="stat-v">17</div><div class="stat-l">MFRs</div></div>
-    <div class="stat"><div class="stat-v">9.00</div><div class="stat-l">VERSION</div></div>
-    <div class="stat"><div class="stat-v">4.7.2</div><div class="stat-l">PU</div></div>
+    <a href="builder.html?ship=Hammerhead" class="stat top">
+      <div class="stat-tag">META · TOP DPS</div>
+      <div class="stat-v r">6,240</div>
+      <div class="stat-name">HAMMERHEAD</div>
+      <div class="stat-l">CAPITAL · 6 CREW</div>
+    </a>
+    <a href="builder.html?ship=Polaris" class="stat top">
+      <div class="stat-tag">TOP SHIELD HP</div>
+      <div class="stat-v b">320k</div>
+      <div class="stat-name">POLARIS</div>
+      <div class="stat-l">CORVETTE · 4 CREW</div>
+    </a>
+    <a href="builder.html?ship=Arrow" class="stat top">
+      <div class="stat-tag">FASTEST IN COMBAT</div>
+      <div class="stat-v">220<span class="stat-u">m/s</span></div>
+      <div class="stat-name">ARROW</div>
+      <div class="stat-l">LIGHT FIGHTER</div>
+    </a>
+    <a href="builder.html?ship=Eclipse" class="stat top">
+      <div class="stat-tag">HIGHEST ALPHA</div>
+      <div class="stat-v r">540k</div>
+      <div class="stat-name">ECLIPSE</div>
+      <div class="stat-l">BOMBER · STEALTH</div>
+    </a>
+    <div class="stat top">
+      <div class="stat-tag">NEW THIS PATCH</div>
+      <div class="stat-v g">+3</div>
+      <div class="stat-name">PALADIN · POLARIS · A2</div>
+      <div class="stat-l">PU 4.7.2</div>
+    </div>
+    <div class="stat top">
+      <div class="stat-tag">DATA SYNC</div>
+      <div class="stat-v g">LIVE</div>
+      <div class="stat-name">2026-05-02</div>
+      <div class="stat-l">131 hulls · 122 wpn · 15 racks</div>
+    </div>
   </div>
 
   <!-- SPOTLIGHT (top-left) -->
