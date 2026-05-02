@@ -731,30 +731,13 @@ function buildHpBand() {
     var w = WEAP_BY_ID[wid];
     var dps = w ? Math.round((w.dps||0)*(sl.count||1)) : 0;
     var div = document.createElement('div');
-    div.className = 'hpi ddw';
+    div.className = 'hpi';
     div.style.cursor = 'pointer';
     div.title = 'Click to change weapon';
     div.onclick = function(){ openPicker('weapon', i, sl.sz); };
 
-    // 3D dropdown preview
-    var dd = '';
-    if(w){
-      var alts = WEAPONS.filter(function(x){return x.sz===sl.sz;}).sort(function(a,b){return (b.dps||0)-(a.dps||0);}).slice(0,4);
-      dd = '<div class="dd"><div class="dd-stats">'
-        +'<div class="dd-s"><div class="dd-sv gd">'+Math.round(w.dps||0)+'</div><div class="dd-sl">DPS</div></div>'
-        +'<div class="dd-s"><div class="dd-sv fr">'+Math.round(w.alpha||0)+'</div><div class="dd-sl">ALPHA</div></div>'
-        +'<div class="dd-s"><div class="dd-sv df">'+(w.range||0)+'m</div><div class="dd-sl">RANGE</div></div>'
-        +'<div class="dd-s"><div class="dd-sv ch">'+(w.draw||0)+' EU</div><div class="dd-sl">DRAW</div></div>'
-        +'</div><div class="dd-opts">';
-      alts.forEach(function(aw){
-        dd+='<div class="dd-opt'+(aw.id===wid?' sel':'')+'" onclick="event.stopPropagation();pickItem(\'w'+i+'\',\''+aw.id+'\')">'+
-          '<div><div class="dd-on">'+aw.name+'</div><div class="dd-osub">'+aw.type+' S'+aw.sz+'</div></div>'+
-          '<div class="dd-os gd">'+Math.round(aw.dps||0)+'</div></div>';
-      });
-      dd+='</div><div class="dd-loc">'+(w.loc||'CenterMass')+'</div></div>';
-    }
-    div.innerHTML = dd
-      +'<span class="hpi-slot">S'+sl.sz+' '+(sl.lbl||'HARDPOINT').toUpperCase()+'</span>'
+    div.innerHTML =
+      '<span class="hpi-slot">S'+sl.sz+' '+(sl.lbl||'HARDPOINT').toUpperCase()+'</span>'
       +'<div class="hpi-nr"><span class="hpi-sz w">S'+sl.sz+'</span><span class="hpi-nm">'+(w?w.name:'[ EMPTY Ã¢ÂÂ click to equip ]')+'</span>'+(w?'<span class="hpi-on">ON</span>':'')+'</div>'
       +'<div class="hpi-dv"><span class="hpi-dps gd">'+(dps||'--')+'</span><span class="hpi-u">DPS</span></div>';
     flow.appendChild(div);
