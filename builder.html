@@ -1857,13 +1857,13 @@ function makeSlot(type, sl, slotIdx, sz) {
     e.stopPropagation();
     var newOff = slotOn;
     units.forEach(function(u){ _loadout._off[u.key] = newOff; });
-    buildHpBand(); updateStats();
+    buildHpBand(); updatePwr(); updateStats();
   };
   hdr.querySelector('.slot-reset').onclick = function(e){
     e.stopPropagation();
     units.forEach(function(u){ delete _loadout[u.key]; if(_loadout._off) delete _loadout._off[u.key]; });
     delete _loadout[prefix+slotIdx];
-    buildHpBand(); updateStats();
+    buildHpBand(); updatePwr(); updateStats();
   };
   // Wireframe marker highlight on hover
   slot.dataset.hp = slotIdx;
@@ -1924,8 +1924,7 @@ function makeUnitRow(type, unit, sz) {
   });
   sel.onchange = function(e){
     e.stopPropagation();
-    _loadout[unit.key] = sel.value;
-    buildHpBand(); updateStats();
+    _loadout[unit.key] = sel.value; buildHpBand(); updatePwr(); updateStats();
   };
   sel.onclick = function(e){ e.stopPropagation(); };
 
@@ -2008,13 +2007,13 @@ function makeCompSlot(cs) {
     e.stopPropagation();
     var newOff = slotOn;
     units.forEach(function(u){ _loadout._off[u.key] = newOff; });
-    buildHpBand(); updateStats();
+    buildHpBand(); updatePwr(); updateStats();
   };
   hdr.querySelector('.slot-reset').onclick = function(e){
     e.stopPropagation();
     units.forEach(function(u){ delete _loadout[u.key]; if(_loadout._off) delete _loadout._off[u.key]; });
     delete _loadout['c_'+cs.key];
-    buildHpBand(); buildPwrComps(); updateStats();
+    buildHpBand(); buildPwrComps(); updatePwr(); updateStats();
   };
   slot.appendChild(hdr);
 
@@ -2054,7 +2053,7 @@ function makeCompUnitRow(cs, unit, catDb) {
     e.stopPropagation();
     _loadout[unit.key] = sel.value;
     if(unit.key.endsWith('_0')) _loadout['c_'+cs.key] = sel.value;
-    buildHpBand(); buildPwrComps(); updateStats();
+    buildHpBand(); buildPwrComps(); updatePwr(); updateStats();
   };
   sel.onclick = function(e){ e.stopPropagation(); };
 
@@ -2102,8 +2101,7 @@ function highlightHpMarker(idx, on) {
 function togHp(key) {
   if(!_loadout._off) _loadout._off = {};
   _loadout._off[key] = !_loadout._off[key];
-  buildHpBand();
-  updateStats();
+  buildHpBand(); updatePwr(); updateStats();
 }
 
 // ============================================================
