@@ -213,32 +213,47 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .fl-go:hover{background:rgba(212,168,76,.16);border-color:var(--g);color:var(--g2);
   box-shadow:0 0 12px rgba(212,168,76,.30);}
 
-/* CENTER: ROLE BROWSER STRIP (curved horizontal floating bar) */
-#role-strip{position:absolute;top:54%;left:50%;transform:translate(-50%,-50%);z-index:15;
-  padding:14px 28px 18px;
-  background:radial-gradient(ellipse 100% 100% at 50% 50%,rgba(28,30,34,.78) 0%,rgba(18,20,24,.55) 60%,rgba(10,12,14,.20) 100%),
-    repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
-  box-shadow:inset 0 1px 0 rgba(220,210,190,.16),0 0 28px rgba(0,0,0,.45);
-  clip-path:polygon(22px 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,22px 100%,0 50%);
-  display:flex;flex-direction:column;align-items:center;gap:10px;}
-.rs-hdr{font-size:10px;letter-spacing:8px;font-weight:700;color:var(--g);
-  text-shadow:0 0 8px rgba(212,168,76,.45);text-align:center;}
-.rs-hdr .brk{color:var(--g);opacity:.62;font-weight:300;letter-spacing:0;margin:0 6px;}
-#rs-inner{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:nowrap;}
-.role{position:relative;width:78px;height:78px;cursor:pointer;text-decoration:none;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-  background:radial-gradient(circle at 50% 35%,rgba(40,42,48,.86),rgba(18,20,24,.56) 70%);
-  border:1px solid var(--g-m);
-  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px);
-  transition:border-color .15s,background .15s,transform .15s;}
-.role:hover{border-color:var(--g);transform:scale(1.08);
-  background:radial-gradient(circle at 50% 35%,rgba(60,52,32,.86),rgba(28,22,12,.65) 70%);
-  box-shadow:0 0 14px rgba(212,168,76,.30);}
-.role-icon{font-size:22px;color:var(--g);text-shadow:0 0 8px rgba(212,168,76,.55);
-  margin-bottom:1px;line-height:1;}
-.role-name{font-size:8px;letter-spacing:1.5px;color:var(--w);font-weight:700;}
-.role-count{font-size:9px;letter-spacing:1px;color:var(--g);font-weight:700;
-  text-shadow:0 0 4px rgba(212,168,76,.40);}
+/* CENTER: ROLE CONSTELLATION (organic curve of ship-silhouette nodes) */
+#role-const{position:absolute;top:54%;left:50%;transform:translate(-50%,-50%);
+  width:1100px;height:240px;z-index:15;pointer-events:none;}
+#rc-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
+  z-index:0;}
+.rc-hdr{position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+  font-size:10px;letter-spacing:8px;font-weight:700;color:var(--g);
+  text-shadow:0 0 8px rgba(212,168,76,.55);white-space:nowrap;z-index:5;
+  padding:0 18px;background:linear-gradient(90deg,transparent,rgba(8,7,13,.85) 20%,rgba(8,7,13,.85) 80%,transparent);}
+.rc-hdr .brk{color:var(--g);opacity:.62;font-weight:300;letter-spacing:0;margin:0 6px;}
+.rnode{position:absolute;width:120px;height:80px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  text-decoration:none;cursor:pointer;pointer-events:auto;z-index:3;
+  transition:transform .25s ease;}
+.rnode svg{width:88px;height:50px;
+  filter:drop-shadow(0 0 6px rgba(212,168,76,.45));
+  transition:filter .25s,transform .25s;}
+.rnode .rn-nm{font-size:9px;letter-spacing:2.5px;font-weight:700;color:var(--w);
+  text-shadow:0 0 5px rgba(0,0,0,.85);
+  padding:1px 8px;border:1px solid var(--g-m);
+  background:rgba(8,7,13,.62);
+  transition:border-color .25s,color .25s,box-shadow .25s;}
+.rnode:hover{transform:scale(1.18);}
+.rnode:hover svg{filter:drop-shadow(0 0 14px rgba(232,200,120,.85)) drop-shadow(0 0 28px rgba(212,168,76,.40));}
+.rnode:hover .rn-nm{color:var(--g2);border-color:var(--g);
+  box-shadow:0 0 12px rgba(212,168,76,.30) inset;}
+/* Pulsing dot at each node showing hull count */
+.rn-cnt-pulse{position:absolute;width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:var(--g2);
+  background:radial-gradient(circle,rgba(232,200,120,.32),rgba(212,168,76,.10) 70%,transparent);
+  border:1px solid var(--g);border-radius:50%;
+  text-shadow:0 0 4px rgba(232,200,120,.85);
+  transform:translate(-50%,-50%);margin-left:50px;margin-top:-6px;
+  pointer-events:none;z-index:4;
+  animation:rn-pulse 3.2s ease-in-out infinite;
+  animation-delay:calc(var(--n,0) * 0.32s);}
+@keyframes rn-pulse{
+  0%,100%{box-shadow:0 0 6px rgba(212,168,76,.30);}
+  50%{box-shadow:0 0 14px rgba(232,200,120,.65),0 0 22px rgba(212,168,76,.30);}
+}
 
 /* BOTTOM-LEFT: POPULAR BUILDS */
 #popular{bottom:14px;left:14px;width:560px;height:280px;z-index:14;
@@ -379,20 +394,55 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     <a href="#" class="fl-go">▶ MY FLEET</a>
   </div>
 
-  <!-- CENTER: ROLE BROWSER (curved strip floating between corners) -->
-  <div id="role-strip">
-    <div class="rs-hdr"><span class="brk">⟦</span> BROWSE BY ROLE <span class="brk">⟧</span></div>
-    <div id="rs-inner">
-      <a href="builder.html" class="role"><div class="role-icon">⚔</div><div class="role-name">FIGHTER</div><div class="role-count">23</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">✈</div><div class="role-name">BOMBER</div><div class="role-count">7</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">⚡</div><div class="role-name">GUNSHIP</div><div class="role-count">9</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">▣</div><div class="role-name">FREIGHT</div><div class="role-count">18</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">⛏</div><div class="role-name">MINING</div><div class="role-count">6</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">⚒</div><div class="role-name">SALVAGE</div><div class="role-count">4</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">🜨</div><div class="role-name">EXPLORE</div><div class="role-count">12</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">✚</div><div class="role-name">MEDICAL</div><div class="role-count">3</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">▤</div><div class="role-name">CAPITAL</div><div class="role-count">8</div></a>
-    </div>
+  <!-- CENTER: ROLE CONSTELLATION (organic node layout with ship silhouettes) -->
+  <div id="role-const">
+    <svg id="rc-lines" viewBox="0 0 1200 220" preserveAspectRatio="none"></svg>
+    <div class="rc-hdr"><span class="brk">⟦</span> SELECT A ROLE <span class="brk">⟧</span></div>
+    <a href="builder.html" class="rnode" style="left:4%;top:46%" data-cnt="23">
+      <svg viewBox="0 0 100 60"><path d="M 38 30 L 50 18 L 70 22 L 78 30 L 70 38 L 50 42 Z M 50 18 L 18 12 L 8 22 L 22 30 L 50 30 M 50 42 L 18 48 L 8 38 L 22 30 L 50 30 M 78 30 L 92 28 L 96 30 L 92 32 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/></svg>
+      <div class="rn-nm">FIGHTER</div>
+    </a>
+    <a href="builder.html" class="rnode" style="left:14%;top:18%" data-cnt="7">
+      <svg viewBox="0 0 100 60"><path d="M 30 30 L 42 18 L 70 18 L 84 28 L 70 42 L 42 42 Z M 42 18 L 14 14 L 6 24 L 22 30 L 42 30 M 42 42 L 14 46 L 6 36 L 22 30 L 42 30 M 84 28 L 96 30 L 84 32 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/><rect x="50" y="22" width="10" height="16" fill="none" stroke="rgba(232,200,120,.55)" stroke-width="0.7"/></svg>
+      <div class="rn-nm">BOMBER</div>
+    </a>
+    <a href="builder.html" class="rnode" style="left:24%;top:54%" data-cnt="9">
+      <svg viewBox="0 0 100 60"><path d="M 22 30 L 32 16 L 72 18 L 84 28 L 86 32 L 84 32 L 72 42 L 32 44 Z M 32 16 L 22 8 L 8 12 L 18 26 L 32 26 M 32 44 L 22 52 L 8 48 L 18 34 L 32 34 M 86 30 L 96 28 L 100 30 L 96 32 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/></svg>
+      <div class="rn-nm">GUNSHIP</div>
+    </a>
+    <a href="builder.html" class="rnode" style="left:35%;top:22%" data-cnt="18">
+      <svg viewBox="0 0 100 60"><path d="M 18 30 L 28 18 L 76 18 L 88 26 L 92 32 L 88 32 L 76 42 L 28 42 Z M 28 18 L 14 14 L 6 22 L 22 28 L 28 28 M 28 42 L 14 46 L 6 38 L 22 32 L 28 32 M 92 30 L 96 30 L 100 30 L 96 30 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/><rect x="34" y="22" width="36" height="16" fill="none" stroke="rgba(232,200,120,.55)" stroke-width="0.7"/></svg>
+      <div class="rn-nm">FREIGHTER</div>
+    </a>
+    <a href="builder.html" class="rnode" style="left:46%;top:54%" data-cnt="6">
+      <svg viewBox="0 0 100 60"><path d="M 32 30 L 44 14 L 72 16 L 84 26 L 84 34 L 72 44 L 44 46 Z M 44 14 L 26 6 L 14 18 L 30 30 L 44 30 M 84 26 L 92 22 L 100 30 L 92 38 L 84 34 M 60 30 L 76 30" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/><circle cx="22" cy="30" r="4" fill="none" stroke="rgba(232,200,120,.65)" stroke-width="0.7"/></svg>
+      <div class="rn-nm">MINING</div>
+    </a>
+    <a href="builder.html" class="rnode" style="left:57%;top:22%" data-cnt="4">
+      <svg viewBox="0 0 100 60"><path d="M 28 30 L 38 16 L 70 18 L 82 26 L 86 32 L 82 32 L 70 42 L 38 44 Z M 38 16 L 24 8 L 12 18 L 24 28 M 38 44 L 24 52 L 12 42 L 24 32 M 86 30 L 96 30 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/><path d="M 50 24 L 56 20 L 62 24 L 58 32 L 50 32 Z" fill="none" stroke="rgba(232,200,120,.55)" stroke-width="0.7"/></svg>
+      <div class="rn-nm">SALVAGE</div>
+    </a>
+    <a href="builder.html" class="rnode" style="left:68%;top:50%" data-cnt="12">
+      <svg viewBox="0 0 100 60"><path d="M 30 30 L 44 14 L 72 16 L 84 28 L 72 42 L 44 44 Z M 44 14 L 22 8 L 8 18 L 22 26 L 44 26 M 44 44 L 22 50 L 8 40 L 22 32 L 44 32 M 84 28 L 96 28 L 100 30 L 96 32 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/><circle cx="58" cy="30" r="9" fill="none" stroke="rgba(232,200,120,.65)" stroke-width="0.6"/></svg>
+      <div class="rn-nm">EXPLORE</div>
+    </a>
+    <a href="builder.html" class="rnode" style="left:79%;top:18%" data-cnt="3">
+      <svg viewBox="0 0 100 60"><path d="M 32 30 L 44 18 L 70 20 L 82 28 L 70 40 L 44 42 Z M 44 18 L 18 14 L 10 22 L 22 28 M 44 42 L 18 46 L 10 38 L 22 32 M 82 28 L 94 28 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/><path d="M 56 24 L 56 36 M 50 30 L 62 30" stroke="rgba(255,180,160,.85)" stroke-width="1"/></svg>
+      <div class="rn-nm">MEDICAL</div>
+    </a>
+    <a href="builder.html" class="rnode" style="left:88%;top:50%" data-cnt="8">
+      <svg viewBox="0 0 100 60"><path d="M 14 30 L 26 12 L 72 14 L 86 24 L 92 32 L 86 32 L 72 44 L 26 46 Z M 26 12 L 8 6 L 2 16 L 14 24 L 26 24 M 26 46 L 8 52 L 2 42 L 14 32 L 26 32 M 92 30 L 100 30 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/><rect x="32" y="20" width="36" height="6" fill="none" stroke="rgba(232,200,120,.45)" stroke-width="0.6"/><rect x="32" y="34" width="36" height="6" fill="none" stroke="rgba(232,200,120,.45)" stroke-width="0.6"/></svg>
+      <div class="rn-nm">CAPITAL</div>
+    </a>
+    <span class="rn-cnt-pulse" style="--n:1;left:4%;top:46%">23</span>
+    <span class="rn-cnt-pulse" style="--n:2;left:14%;top:18%">7</span>
+    <span class="rn-cnt-pulse" style="--n:3;left:24%;top:54%">9</span>
+    <span class="rn-cnt-pulse" style="--n:4;left:35%;top:22%">18</span>
+    <span class="rn-cnt-pulse" style="--n:5;left:46%;top:54%">6</span>
+    <span class="rn-cnt-pulse" style="--n:6;left:57%;top:22%">4</span>
+    <span class="rn-cnt-pulse" style="--n:7;left:68%;top:50%">12</span>
+    <span class="rn-cnt-pulse" style="--n:8;left:79%;top:18%">3</span>
+    <span class="rn-cnt-pulse" style="--n:9;left:88%;top:50%">8</span>
   </div>
 
   <!-- POPULAR BUILDS (bottom-left) -->
@@ -486,5 +536,45 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   </div>
 
 </div>
+
+<script>
+// Draw connecting lines between role nodes (constellation effect)
+(function(){
+  var svg = document.getElementById('rc-lines');
+  if(!svg) return;
+  // viewBox 1200x220. Node centers at (left%, top%) of viewBox
+  var centers = [
+    {x: 0.04, y: 0.46},
+    {x: 0.14, y: 0.18},
+    {x: 0.24, y: 0.54},
+    {x: 0.35, y: 0.22},
+    {x: 0.46, y: 0.54},
+    {x: 0.57, y: 0.22},
+    {x: 0.68, y: 0.50},
+    {x: 0.79, y: 0.18},
+    {x: 0.88, y: 0.50}
+  ];
+  var W = 1200, H = 220;
+  // Add gradient + segments
+  var defs = '<defs><linearGradient id="rc-grad" x1="0" x2="1" y1="0" y2="0">'+
+    '<stop offset="0%" stop-color="rgba(212,168,76,0)"/>'+
+    '<stop offset="50%" stop-color="rgba(232,200,120,.55)"/>'+
+    '<stop offset="100%" stop-color="rgba(212,168,76,0)"/>'+
+    '</linearGradient></defs>';
+  var paths = '';
+  for(var i=0; i<centers.length-1; i++){
+    var a = centers[i], b = centers[i+1];
+    var x1 = a.x*W, y1 = a.y*H, x2 = b.x*W, y2 = b.y*H;
+    var mx = (x1+x2)/2, my = ((y1+y2)/2) + (i%2===0 ? -16 : 16);
+    paths += '<path d="M '+x1+' '+y1+' Q '+mx+' '+my+' '+x2+' '+y2+'" fill="none" stroke="rgba(212,168,76,.35)" stroke-width="0.8" stroke-dasharray="3 3"/>';
+    paths += '<circle cx="'+x1+'" cy="'+y1+'" r="3" fill="rgba(232,200,120,.85)"/>';
+  }
+  // Last circle
+  var last = centers[centers.length-1];
+  paths += '<circle cx="'+(last.x*W)+'" cy="'+(last.y*H)+'" r="3" fill="rgba(232,200,120,.85)"/>';
+  svg.innerHTML = defs + paths;
+})();
+</script>
+
 </body>
 </html>
