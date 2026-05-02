@@ -1548,14 +1548,40 @@ function bpips(c) {
   }
 }
 
+function syncPwrFromComp(compKey){
+  var m = compKey.match(/^c_(\w+?)_(\d+)$/);
+  if(!m) return;
+  var cat = m[1], idx = m[2];
+  var pwrId;
+  if(cat === 'cooler') pwrId = 'co' + idx;
+  else if(cat === 'radar') pwrId = 'rd';
+  else if(cat === 'qd') pwrId = 'qd';
+  else pwrId = cat + idx;
+  if(!_loadout._off) _loadout._off = {};
+  _loadout._off['pwr_' + pwrId] = !!_loadout._off[compKey];
+}
+
+function syncCompFromPwr(pwrId){
+  var compKey;
+  if(pwrId.indexOf('pp') === 0) compKey = 'c_pp_' + pwrId.slice(2);
+  else if(pwrId.indexOf('sg') === 0) compKey = 'c_sg_' + pwrId.slice(2);
+  else if(pwrId.indexOf('co') === 0) compKey = 'c_cooler_' + pwrId.slice(2);
+  else if(pwrId === 'qd') compKey = 'c_qd_0';
+  else if(pwrId === 'rd') compKey = 'c_radar_0';
+  else return;
+  if(!_loadout._off) _loadout._off = {};
+  _loadout._off[compKey] = !!_loadout._off['pwr_' + pwrId];
+}
+
 function togComp(id) {
   var c = _pwrComps.find(function(x){return x.id===id;}); if(!c) return;
   c.on = !c.on;
   if(!_loadout._off) _loadout._off = {};
   _loadout._off['pwr_'+id] = !c.on;
+  syncCompFromPwr(id);
   document.getElementById('ptog-'+id).className = 'ptog '+(c.on?'on':'off');
   document.getElementById('prc-'+id).className = 'pc pc-'+c.cat+(c.on?'':' offline');
-  updatePwr();
+  buildHpBand(); updatePwr(); updateStats();
 }
 function adjPip(id,d) {
   var c = _pwrComps.find(function(x){return x.id===id;}); if(!c||!c.on) return;
@@ -1871,8 +1897,8 @@ function makeSlot(type, sl, slotIdx, sz) {
   hdr.querySelector('.slot-on').onclick = function(e){
     e.stopPropagation();
     var newOff = slotOn;
-    units.forEach(function(u){ _loadout._off[u.key] = newOff; });
-    buildHpBand(); updatePwr(); updateStats();
+    units.forEach(function(u){ _loadout._off[u.key] = newOff; if(typeof syncPwrFromComp === 'function') syncPwrFromComp(u.key); });
+    buildHpBand(); buildPwrComps(); updatePwr(); updateStats();
   };
   hdr.querySelector('.slot-reset').onclick = function(e){
     e.stopPropagation();
@@ -1925,18 +1951,32 @@ function makeUnitRow(type, unit, sz) {
 
   var sel = document.createElement('select');
   sel.className = 'unit-sel';
-  var pool = (WEAPONS||[]).filter(function(w){ return w.sz === sz; });
-  if(type==='missile') pool = pool.filter(function(w){ var t=(w.type||'').toLowerCase(); return t.indexOf('missile') > -1 || t.indexOf('torpedo') > -1; });
-  pool.sort(function(a,b){ return (b.dps||0)-(a.dps||0); });
   var emp = document.createElement('option'); emp.value=''; emp.textContent='[Empty]';
   sel.appendChild(emp);
-  pool.forEach(function(w){
-    var opt = document.createElement('option');
-    opt.value = w.id;
-    opt.textContent = w.name + ' (' + Math.round(w.dps||0) + 'DPS) S' + w.sz;
-    if(w.id === unit.wid) opt.selected = true;
-    sel.appendChild(opt);
-  });
+
+  if(type === 'missile'){
+    var racks = (typeof RACK_DB !== 'undefined' && RACK_DB) ? Object.keys(RACK_DB).map(function(n){ var d=RACK_DB[n]; return {id:n,name:n,sz:d.sz,cap:d.cap,mfr:d.mfr,loc:d.loc}; }) : [];
+    var pool = racks.filter(function(r){ return r.sz === sz; });
+    pool.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+    pool.forEach(function(r){
+      var opt = document.createElement('option');
+      opt.value = r.id;
+      opt.textContent = r.name + ' ×' + (r.cap||1) + ' (' + (r.mfr||'?') + ')';
+      if(r.id === unit.wid) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  } else {
+    var pool = (WEAPONS||[]).filter(function(w){ return w.sz === sz; });
+    pool.sort(function(a,b){ return (b.dps||0)-(a.dps||0); });
+    pool.forEach(function(w){
+      var opt = document.createElement('option');
+      opt.value = w.id;
+      opt.textContent = w.name + ' (' + Math.round(w.dps||0) + 'DPS) S' + w.sz;
+      if(w.id === unit.wid) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
   sel.onchange = function(e){
     e.stopPropagation();
     _loadout[unit.key] = sel.value; buildHpBand(); updatePwr(); updateStats();
@@ -1949,7 +1989,8 @@ function makeUnitRow(type, unit, sz) {
   tog.onclick = function(e){
     e.stopPropagation();
     _loadout._off[unit.key] = !_loadout._off[unit.key];
-    buildHpBand(); updateStats();
+    if(typeof syncPwrFromComp === 'function') syncPwrFromComp(unit.key);
+    buildHpBand(); buildPwrComps(); updatePwr(); updateStats();
   };
 
   row.appendChild(sel);
@@ -2021,8 +2062,8 @@ function makeCompSlot(cs) {
   hdr.querySelector('.slot-on').onclick = function(e){
     e.stopPropagation();
     var newOff = slotOn;
-    units.forEach(function(u){ _loadout._off[u.key] = newOff; });
-    buildHpBand(); updatePwr(); updateStats();
+    units.forEach(function(u){ _loadout._off[u.key] = newOff; if(typeof syncPwrFromComp === 'function') syncPwrFromComp(u.key); });
+    buildHpBand(); buildPwrComps(); updatePwr(); updateStats();
   };
   hdr.querySelector('.slot-reset').onclick = function(e){
     e.stopPropagation();
