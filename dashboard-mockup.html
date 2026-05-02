@@ -306,17 +306,6 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .upd-tag.add{color:#7bc8e8;border-color:rgba(80,180,232,.30);background:rgba(80,180,232,.08);}
 .upd-txt{font-size:9.5px;letter-spacing:.5px;color:var(--w);line-height:1.4;}
 
-/* MANUFACTURER BAR (bottom flowing strip) */
-#mfr-strip{position:absolute;left:580px;right:540px;bottom:298px;height:38px;z-index:13;
-  display:flex;align-items:center;gap:6px;padding:0 14px;
-  background:radial-gradient(ellipse 100% 100% at 50% 50%,rgba(20,22,26,.68),rgba(10,12,14,.30) 80%,transparent);
-  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%);}
-.mfr{display:flex;align-items:center;gap:5px;padding:4px 9px;
-  border:1px solid rgba(180,170,150,.18);background:rgba(8,8,10,.55);
-  font-size:8px;letter-spacing:1.5px;color:var(--w-d);font-weight:700;
-  cursor:pointer;transition:border-color .15s,color .15s;}
-.mfr:hover{border-color:var(--g);color:var(--g);}
-.mfr-dot{width:5px;height:5px;border-radius:50%;}
 
 /* COMET tail + stars + saturn already in body bg */
 
@@ -342,7 +331,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   0%{opacity:0;transform:perspective(2400px) rotateY(-6deg) rotateX(2deg) translateY(28px) scale(.96);filter:blur(10px);}
   100%{opacity:1;transform:perspective(2400px) rotateY(-6deg) rotateX(2deg) translateY(0) scale(1);filter:blur(0);}
 }
-#title,#stats,#role-const,#mfr-strip,.rnode,.pop,.upd,.fl-row,.stat{
+#title,#stats,#role-const,.rnode,.pop,.upd,.fl-row,.stat{
   animation:card-in .55s cubic-bezier(.22,1.1,.42,1) backwards;
   animation-delay:var(--delay,0ms);}
 #spotlight{animation:card-in-keep .7s cubic-bezier(.22,1.1,.42,1) backwards;animation-delay:140ms;}
@@ -558,7 +547,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 <script>
 // Stagger load-in animation
 (function(){
-  document.querySelectorAll('#title, #stats, .panel, #role-const, #mfr-strip, .rnode, .pop, .upd, .fl-row, .stat')
+  document.querySelectorAll('#title, #stats, .panel, #role-const, .rnode, .pop, .upd, .fl-row, .stat')
     .forEach(function(el, i){ el.style.setProperty('--delay', (i*32)+'ms'); });
 })();
 
