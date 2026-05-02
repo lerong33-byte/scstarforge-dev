@@ -222,7 +222,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   bottom:50px;z-index:15;
   padding:14px 8px 14px 6px;display:flex;flex-direction:column;
   overflow:hidden;
-  transform:perspective(1400px) rotateY(7deg);transform-origin:left center;
+  transform:perspective(1800px) rotateY(4deg);transform-origin:left center;
   background:
     linear-gradient(90deg,rgba(28,32,36,.62) 0%,rgba(20,22,26,.50) 50%,rgba(10,12,14,.30) 100%),
     repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
@@ -258,9 +258,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
 /* POWER DISTRIBUTION — vertical bar chart */
 #pwr-comps{display:flex;flex-direction:row;gap:3px;align-items:stretch;
-  padding:6px 8px 10px;min-height:200px;}
+  padding:6px 8px;flex:1;min-height:0;overflow:hidden;}
 .pc{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  min-width:0;padding:0;background:none;
+  min-width:0;min-height:0;padding:0;background:none;
   position:relative;cursor:pointer;}
 .pc::before{display:none;}
 .pc.offline{opacity:.4;}
@@ -275,14 +275,14 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .pc-name{display:none;}
 .pc-sub{display:none;}
 .pp-track{order:2;display:flex;flex-direction:column-reverse;gap:1px;
-  width:100%;flex:1;min-height:180px;margin:0;padding:3px;
+  width:100%;flex:1;min-height:0;margin:0;padding:3px;
   background:linear-gradient(180deg,rgba(8,8,10,.78),rgba(4,4,6,.88));
   border:1px solid rgba(180,170,150,.16);
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.50),inset 0 1px 4px rgba(0,0,0,.65),
     0 1px 0 rgba(220,210,190,.10);}
 .pp{width:100%;flex:1;height:auto;cursor:pointer;
   border-radius:0;position:relative;
-  transition:opacity .15s,filter .15s;min-height:9px;
+  transition:opacity .15s,filter .15s;min-height:6px;
   background-clip:padding-box;}
 .pp::after{content:'';position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.030) 2px,rgba(255,255,255,.030) 3px);
@@ -360,10 +360,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   margin:6px 12px 0;display:none;text-align:center;}
 
 /* HARDPOINTS — MIDDLE BOTTOM (dashboard) */
-#hp-band{position:absolute;bottom:30px;left:50%;
-  transform:translateX(-50%) perspective(1400px) rotateX(8deg);
-  transform-origin:bottom center;
-  width:520px;z-index:16;padding:14px 16px;
+#hp-band{position:absolute;bottom:14px;left:380px;right:380px;
+  z-index:16;padding:14px 16px;max-height:54vh;overflow:hidden;
+  transform:none;
   background:
     linear-gradient(180deg,transparent,rgba(24,26,30,.50) 30%,rgba(20,22,26,.70)),
     repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
@@ -385,6 +384,30 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .hpi:hover::before{background:var(--g);box-shadow:0 0 6px rgba(212,168,76,.50);}
 .hpi:not(:last-child)::after{display:none;}
 .hpi-slot{font-size:7px;letter-spacing:2px;color:var(--char);grid-column:2;grid-row:1;}
+/* ON/OFF toggle for weapons / missiles / components */
+.hpi-tog{width:24px;height:12px;border:1px solid rgba(180,170,150,.35);position:relative;cursor:pointer;
+  flex-shrink:0;background:rgba(8,8,10,.55);grid-column:1;grid-row:1/3;align-self:center;
+  transition:border-color .18s,background .18s;margin-right:6px;}
+.hpi-tog .hpi-tog-k{position:absolute;top:1px;width:8px;height:8px;
+  background:rgba(140,130,116,.42);transition:left .20s,background .20s,box-shadow .20s;}
+.hpi-tog.on{border-color:rgba(220,180,80,.65);box-shadow:0 0 5px rgba(220,180,80,.18) inset;}
+.hpi-tog.on .hpi-tog-k{left:13px;background:linear-gradient(135deg,#f8d870,#c89c40);
+  box-shadow:0 0 5px rgba(232,184,72,.65);}
+.hpi-tog.off .hpi-tog-k{left:1px;}
+.hpi-off{opacity:.50;}
+.hpi-off .hpi-nm,.hpi-off .hpi-dps{color:rgba(180,170,150,.45) !important;text-shadow:none !important;}
+
+/* extended stats row for weapons/missiles/components */
+.hpi-stats{display:flex;align-items:center;gap:7px;grid-column:2;grid-row:3;flex-wrap:wrap;
+  margin-top:1px;}
+.hpi-stat{display:flex;align-items:baseline;gap:2px;font-size:9px;font-weight:600;
+  color:rgba(220,210,190,.88);letter-spacing:.5px;}
+.hpi-stat b{font-weight:700;color:var(--w);}
+.hpi-stat i{font-style:normal;font-size:7px;letter-spacing:1.5px;color:rgba(140,130,116,.55);}
+.hpi-loc{font-size:7px;letter-spacing:1.5px;color:rgba(160,150,130,.55);
+  border:1px dashed rgba(140,130,116,.30);padding:1px 5px;margin-left:auto;}
+.hpi{grid-template-rows:auto auto auto;}
+
 .hpi-nr{display:flex;align-items:center;gap:6px;grid-column:2;grid-row:2;flex-wrap:nowrap;}
 .hpi-sz{font-size:8px;font-weight:700;width:32px;text-align:center;padding:2px 0;
   border:1px solid var(--g-m);grid-column:1;grid-row:1/3;align-self:center;
@@ -435,17 +458,26 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 #wsel-list{overflow-y:auto;flex:1;}
 #wsel-list::-webkit-scrollbar{width:2px;}
 #wsel-list::-webkit-scrollbar-thumb{background:var(--g-m);}
-.wsel-item{display:flex;align-items:center;justify-content:space-between;
-  padding:8px 18px;border-bottom:1px solid rgba(212,168,76,.04);cursor:pointer;
+.wsel-item{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:10px 18px;border-bottom:1px solid rgba(212,168,76,.04);cursor:pointer;
   transition:background .12s;}
 .wsel-item:hover{background:rgba(212,168,76,.06);}
 .wsel-item.cur{background:rgba(212,168,76,.12);border-left:2px solid var(--g);}
-.wi-name{font-size:11px;font-weight:600;color:var(--w);letter-spacing:.5px;
+.wi-main{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;}
+.wi-name{font-size:12px;font-weight:600;color:var(--w);letter-spacing:.5px;
   background:none !important;-webkit-text-fill-color:initial !important;}
-.wi-sub{font-size:8px;color:var(--char);letter-spacing:1px;margin-top:2px;}
-.wi-dps{font-size:12px;font-weight:700;color:var(--g);
+.wi-sub{font-size:8px;color:var(--char);letter-spacing:1.5px;}
+.wi-stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:2px;}
+.wi-st{display:flex;align-items:baseline;gap:2px;font-size:10px;font-weight:600;color:rgba(220,210,190,.88);}
+.wi-st b{font-weight:700;color:var(--w);}
+.wi-st i{font-style:normal;font-size:7px;letter-spacing:1.5px;color:rgba(140,130,116,.55);}
+.wi-loc{font-size:8px;letter-spacing:1.5px;color:rgba(160,150,130,.65);
+  border:1px dashed rgba(140,130,116,.30);padding:2px 7px;margin-top:4px;display:inline-block;align-self:flex-start;}
+.wi-dps{display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex-shrink:0;
+  font-size:14px;font-weight:700;color:var(--g);
   text-shadow:0 0 6px rgba(212,168,76,.30);
   background:none !important;-webkit-text-fill-color:initial !important;}
+.wi-dps i{font-style:normal;font-size:7px;letter-spacing:1.5px;color:rgba(140,130,116,.55);font-weight:400;}
 
 /* LOADING */
 #loading{position:fixed;inset:0;z-index:300;background:var(--bg);
@@ -1129,37 +1161,70 @@ function buildHpBand() {
   var db = COMP_DB || {};
 
   // --- WEAPONS ---
+  if(!_loadout._off) _loadout._off = {};
   slots.forEach(function(sl,i){
     var wid = _loadout['w'+i] || sl.default || '';
     var w = WEAP_BY_ID[wid];
-    var dps = w ? Math.round((w.dps||0)*(sl.count||1)) : 0;
+    var cnt = sl.count||1;
+    var key = 'w'+i;
+    var on = !_loadout._off[key];
+    var dps = (w && on) ? Math.round((w.dps||0)*cnt) : 0;
+    var alpha = w ? Math.round((w.alpha||0)*cnt*10)/10 : 0;
     var div = document.createElement('div');
-    div.className = 'hpi';
+    div.className = 'hpi'+(on?'':' hpi-off');
+    div.title = w ? (w.name+' / '+(w.type||'')+' / '+(w.range||'?')+'m / '+(w.draw||0)+' EU draw / '+(w.heat||0)+' heat'+(w.loc?' / BUY: '+w.loc:'')) : 'Click to equip';
     div.style.cursor = 'pointer';
-    div.title = 'Click to change weapon';
-    div.onclick = function(){ openPicker('weapon', i, sl.sz); };
 
     div.innerHTML =
-      '<span class="hpi-slot">S'+sl.sz+' '+(sl.lbl||'HARDPOINT').toUpperCase()+'</span>'
-      +'<div class="hpi-nr"><span class="hpi-sz w">S'+sl.sz+'</span><span class="hpi-nm">'+(w?w.name:'[ EMPTY Ã¢ÂÂ click to equip ]')+'</span>'+(w?'<span class="hpi-on">ON</span>':'')+'</div>'
+      '<span class="hpi-slot">S'+sl.sz+' '+(sl.lbl||'HARDPOINT').toUpperCase()+(cnt>1?' x'+cnt:'')+(w?' / '+(w.type||'').toUpperCase()+(w.mfr?' / '+w.mfr:''):'')+'</span>'
+      +'<div class="hpi-nr"><span class="hpi-sz w">S'+sl.sz+'</span><span class="hpi-nm">'+(w?w.name:'[ EMPTY - click to equip ]')+'</span></div>'
+      +(w?'<div class="hpi-stats"><span class="hpi-stat"><b>'+alpha+'</b><i>ALPHA</i></span><span class="hpi-stat"><b>'+(w.range||'--')+'</b><i>m</i></span><span class="hpi-stat"><b>'+(w.draw||0)+'</b><i>EU</i></span>'+(w.loc?'<span class="hpi-loc">BUY: '+w.loc+'</span>':'')+'</div>':'')
       +'<div class="hpi-dv"><span class="hpi-dps gd">'+(dps||'--')+'</span><span class="hpi-u">DPS</span></div>';
+
+    var togEl = document.createElement('div');
+    togEl.className = 'hpi-tog '+(on?'on':'off');
+    togEl.innerHTML = '<div class="hpi-tog-k"></div>';
+    togEl.onclick = function(e){ e.stopPropagation(); togHp(key); };
+    div.insertBefore(togEl, div.firstChild);
+
+    div.onclick = function(e){
+      if(e.target.closest('.hpi-tog')) return;
+      openPicker('weapon', i, sl.sz);
+    };
     flow.appendChild(div);
   });
 
   // --- MISSILES ---
   if(missiles.length){
     var msep = document.createElement('div');
-    msep.className='hpi';msep.style.cssText='flex:0 0 1px;padding:0;background:linear-gradient(to bottom,transparent,rgba(200,168,76,.12),transparent);';
+    msep.style.cssText='height:1px;margin:6px 4px;background:linear-gradient(to right,transparent,rgba(180,170,150,.20),transparent);';
     flow.appendChild(msep);
     missiles.forEach(function(sl,i){
       var mid = _loadout['m'+i] || sl.default || '';
       var mis = WEAP_BY_ID[mid];
+      var mcnt = sl.count||1;
+      var mkey = 'm'+i;
+      var mon = !_loadout._off[mkey];
       var div=document.createElement('div');
-      div.className='hpi'; div.style.cursor='pointer';
-      div.onclick=function(){openPicker('missile',i,sl.sz);};
-      div.innerHTML='<span class="hpi-slot">S'+sl.sz+' MISSILE'+(sl.count>1?' x'+sl.count:'')+'</span>'
+      div.className='hpi'+(mon?'':' hpi-off');
+      div.style.cursor='pointer';
+      div.title = mis ? (mis.name+(mis.type?' / '+mis.type:'')+(mis.range?' / '+mis.range+'m':'')+(mis.loc?' / BUY: '+mis.loc:'')) : 'Click to equip';
+
+      div.innerHTML='<span class="hpi-slot">S'+sl.sz+' MISSILE'+(mcnt>1?' x'+mcnt:'')+(mis?' / '+(mis.type||'').toUpperCase():'')+'</span>'
         +'<div class="hpi-nr"><span class="hpi-sz s">S'+sl.sz+'</span><span class="hpi-nm">'+(mis?mis.name:sl.default||'[ empty ]')+'</span></div>'
-        +'<div class="hpi-dv"><span class="hpi-dps df">'+(mis?Math.round((mis.dps||0)*sl.count):'--')+'</span><span class="hpi-u">DPS</span></div>';
+        +(mis?'<div class="hpi-stats"><span class="hpi-stat"><b>'+Math.round(mis.alpha||mis.dps||0)+'</b><i>DMG</i></span><span class="hpi-stat"><b>'+(mis.range||'--')+'</b><i>m</i></span>'+(mis.loc?'<span class="hpi-loc">BUY: '+mis.loc+'</span>':'')+'</div>':'')
+        +'<div class="hpi-dv"><span class="hpi-dps df">'+(mis&&mon?Math.round((mis.dps||0)*mcnt):'--')+'</span><span class="hpi-u">DPS</span></div>';
+
+      var mtogEl = document.createElement('div');
+      mtogEl.className = 'hpi-tog '+(mon?'on':'off');
+      mtogEl.innerHTML = '<div class="hpi-tog-k"></div>';
+      mtogEl.onclick = function(e){ e.stopPropagation(); togHp(mkey); };
+      div.insertBefore(mtogEl, div.firstChild);
+
+      div.onclick=function(e){
+        if(e.target.closest('.hpi-tog')) return;
+        openPicker('missile',i,sl.sz);
+      };
       flow.appendChild(div);
     });
   }
@@ -1176,17 +1241,57 @@ function buildHpBand() {
   compSlots.forEach(function(cs){
     var cname = _loadout['c_'+cs.key] || co[cs.key] || cs.lbl;
     var cdata = db[cs.cat] && db[cs.cat][cname] ? db[cs.cat][cname] : null;
-    var val='',unit='';
-    if(cs.cat==='pp'&&cdata){val=Math.round((cdata.out||16)*(cs.count));unit='EU';}
-    else if(cs.cat==='sg'&&cdata){val=Math.round((cdata.totalHP||0)*(cs.count));unit='HP';}
+    var ckey = 'c_'+cs.key;
+    var con = !_loadout._off[ckey];
+
+    // Stats block based on category
+    var stats = '';
+    var primary = '', primaryUnit = '';
+    if(cs.cat==='pp' && cdata) {
+      primary = Math.round((cdata.out||16)*cs.count); primaryUnit = 'EU';
+      stats = '<span class="hpi-stat"><b>'+(cdata.heat||0)+'</b><i>HEAT</i></span><span class="hpi-stat"><b>'+(cdata.em||0)+'</b><i>EM</i></span>';
+    } else if(cs.cat==='sg' && cdata) {
+      primary = Math.round((cdata.totalHP||0)*cs.count); primaryUnit = 'HP';
+      stats = '<span class="hpi-stat"><b>'+(cdata.regen||0)+'</b><i>REGEN</i></span><span class="hpi-stat"><b>'+(cdata.drawMin||0)+'-'+(cdata.drawMax||0)+'</b><i>EU</i></span>';
+    } else if(cs.cat==='qd' && cdata) {
+      primary = cdata.speed||0; primaryUnit = 'Mm/s';
+      stats = '<span class="hpi-stat"><b>'+(cdata.range||0)+'</b><i>Gm</i></span><span class="hpi-stat"><b>'+(cdata.spool||0)+'</b><i>SPOOL</i></span>';
+    } else if(cs.cat==='cooler' && cdata) {
+      primary = cdata.rate||cdata.cooling||'--'; primaryUnit = 'COOL';
+    }
+    var locStr = cdata && cdata.loc ? '<span class="hpi-loc">BUY: '+cdata.loc+'</span>' : '';
+
     var div=document.createElement('div');
-    div.className='cmp'; div.style.cursor='pointer';
-    div.onclick=function(){openPicker('comp',cs.key,null,cs.cat);};
-    div.innerHTML='<span class="cmp-slot">'+(cs.count>1?cs.count+'× ':'')+cs.lbl+'</span>'
-      +'<div class="cmp-nm-row"><span class="cmp-sz '+cs.sz+'">S?</span><span class="cmp-nm">'+cname+'</span></div>'
-      +'<div class="cmp-dv"><span class="cmp-val">'+(val||'')+'</span>'+(unit?'<span class="cmp-u">'+unit+'</span>':'')+'</div>';
+    div.className='hpi cmp'+(con?'':' hpi-off');
+    div.style.cursor='pointer';
+    div.title = cdata && cdata.loc ? cname+' / '+cs.lbl+' / BUY: '+cdata.loc : cname;
+
+    div.innerHTML =
+      '<span class="hpi-slot">'+(cs.count>1?cs.count+'x ':'')+cs.lbl+(cdata&&cdata.sz?' / S'+cdata.sz:'')+'</span>'
+      +'<div class="hpi-nr"><span class="hpi-sz '+cs.sz+'">'+(cdata&&cdata.sz?'S'+cdata.sz:'S?')+'</span><span class="hpi-nm">'+cname+'</span></div>'
+      +(stats||locStr?'<div class="hpi-stats">'+stats+locStr+'</div>':'')
+      +'<div class="hpi-dv"><span class="hpi-dps gd">'+(primary||'--')+'</span><span class="hpi-u">'+(primaryUnit||'')+'</span></div>';
+
+    var ctogEl = document.createElement('div');
+    ctogEl.className = 'hpi-tog '+(con?'on':'off');
+    ctogEl.innerHTML = '<div class="hpi-tog-k"></div>';
+    ctogEl.onclick = function(e){ e.stopPropagation(); togHp(ckey); };
+    div.insertBefore(ctogEl, div.firstChild);
+
+    div.onclick=function(e){
+      if(e.target.closest('.hpi-tog')) return;
+      openPicker('comp',cs.key,null,cs.cat);
+    };
     (compFlow||flow).appendChild(div);
   });
+}
+
+// Toggle on/off for any hardpoint/missile/component
+function togHp(key) {
+  if(!_loadout._off) _loadout._off = {};
+  _loadout._off[key] = !_loadout._off[key];
+  buildHpBand();
+  updateStats();
 }
 
 // ============================================================
@@ -1214,10 +1319,19 @@ function filterPicker(q) {
       if(q) return (w.name||'').toLowerCase().indexOf(q.toLowerCase())>-1;
       return true;
     }).sort(function(a,b){return (b.dps||0)-(a.dps||0);});
-    items.slice(0,60).forEach(function(w){
+    items.slice(0,80).forEach(function(w){
       var d=document.createElement('div');
       d.className='wsel-item'+(w.id===curId?' cur':'');
-      d.innerHTML='<div><div class="wi-name">'+w.name+'</div><div class="wi-sub">'+w.type+' S'+w.sz+' ÃÂ· '+w.mfr+'</div></div><div class="wi-dps">'+Math.round(w.dps||0)+' DPS</div>';
+      var sub='S'+w.sz+(w.type?' / '+w.type.toUpperCase():'')+(w.mfr?' / '+w.mfr:'');
+      var stats = '<div class="wi-stats">'
+        +'<span class="wi-st"><b>'+(Math.round(w.alpha||0)||'--')+'</b><i>ALPHA</i></span>'
+        +'<span class="wi-st"><b>'+(w.range||'--')+'</b><i>m</i></span>'
+        +'<span class="wi-st"><b>'+(w.draw||0)+'</b><i>EU</i></span>'
+        +'<span class="wi-st"><b>'+(w.heat||0)+'</b><i>HEAT</i></span>'
+        +(w.price?'<span class="wi-st"><b>'+(w.price/1000).toFixed(0)+'k</b><i>aUEC</i></span>':'')
+        +'</div>';
+      var locRow = w.loc ? '<div class="wi-loc">BUY: '+w.loc+'</div>' : '';
+      d.innerHTML = '<div class="wi-main"><div class="wi-name">'+w.name+'</div><div class="wi-sub">'+sub+'</div>'+stats+locRow+'</div><div class="wi-dps">'+Math.round(w.dps||0)+'<i>DPS</i></div>';
       d.onclick=function(){
         pickItem((_pickerType==='weapon'?'w':'m')+_pickerIdx, w.id);
         closeWsel();
@@ -1234,14 +1348,15 @@ function filterPicker(q) {
     });
     names.forEach(function(n){
       var cd=catDb[n];
-      var val='';
-      if(_pickerCat==='pp') val=(cd.out||0)+' EU out';
-      else if(_pickerCat==='sg') val=(cd.totalHP||0)+' HP';
-      else if(_pickerCat==='cooler') val='cooler';
-      else if(_pickerCat==='qd') val=(cd.speed||'')+' Mm/s';
+      var primary='', primaryUnit='', stats='';
+      if(_pickerCat==='pp'){ primary=cd.out||0; primaryUnit='EU OUT'; stats='<span class="wi-st"><b>'+(cd.heat||0)+'</b><i>HEAT</i></span><span class="wi-st"><b>'+(cd.em||0)+'</b><i>EM</i></span>'; }
+      else if(_pickerCat==='sg'){ primary=cd.totalHP||0; primaryUnit='HP'; stats='<span class="wi-st"><b>'+(cd.regen||0)+'</b><i>REGEN</i></span><span class="wi-st"><b>'+(cd.faceHP||0)+'</b><i>FACE</i></span><span class="wi-st"><b>'+(cd.drawMin||0)+'-'+(cd.drawMax||0)+'</b><i>EU</i></span>'; }
+      else if(_pickerCat==='qd'){ primary=cd.speed||0; primaryUnit='Mm/s'; stats='<span class="wi-st"><b>'+(cd.range||0)+'</b><i>Gm</i></span><span class="wi-st"><b>'+(cd.spool||0)+'</b><i>SPOOL</i></span>'; }
+      else if(_pickerCat==='cooler'){ primary=cd.rate||cd.cooling||'--'; primaryUnit='COOL'; }
+      var locRow = cd.loc ? '<div class="wi-loc">BUY: '+cd.loc+'</div>' : '';
       var d=document.createElement('div');
       d.className='wsel-item'+(n===curName?' cur':'');
-      d.innerHTML='<div><div class="wi-name">'+n+'</div><div class="wi-sub">Size '+(cd.sz||'?')+'</div></div><div class="wi-dps">'+val+'</div>';
+      d.innerHTML = '<div class="wi-main"><div class="wi-name">'+n+'</div><div class="wi-sub">SIZE '+(cd.sz||'?')+'</div><div class="wi-stats">'+stats+'</div>'+locRow+'</div><div class="wi-dps">'+primary+'<i>'+primaryUnit+'</i></div>';
       d.onclick=function(){ pickItem('c_'+_pickerIdx, n); closeWsel(); };
       list.appendChild(d);
     });
