@@ -181,14 +181,14 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 #comp-zone{position:absolute;top:230px;right:38px;width:300px;bottom:50px;
   z-index:9;padding:14px 6px 14px 8px;
   display:flex;flex-direction:column;gap:6px;
-  overflow-y:auto;overflow-x:hidden;
+  overflow:hidden;
   transform:perspective(1400px) rotateY(-7deg);transform-origin:right center;
-  background:linear-gradient(270deg,rgba(8,14,18,.40),rgba(4,8,14,.20) 70%,transparent);
-  border-right:1px solid rgba(212,168,76,.18);
-  box-shadow:inset -1px 0 0 rgba(212,168,76,.10),inset -18px 0 30px rgba(212,168,76,.04);
+  background:
+    linear-gradient(270deg,rgba(28,32,36,.62) 0%,rgba(20,22,26,.50) 50%,rgba(10,12,14,.30) 100%),
+    repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
+  border-right:1px solid rgba(180,170,150,.22);
+  box-shadow:inset -1px 0 0 rgba(220,210,190,.16),inset -18px 0 30px rgba(160,150,130,.04),inset 1px 0 0 rgba(0,0,0,.40);
   clip-path:polygon(0 0,100% 18px,100% 100%,0 100%);}
-#comp-zone::-webkit-scrollbar{width:2px;}
-#comp-zone::-webkit-scrollbar-thumb{background:var(--g-m);}
 #comp-zone::before{content:'SHIP COMPONENTS';font-size:8px;letter-spacing:4px;
   color:var(--g-d);text-align:center;display:block;
   padding-bottom:8px;border-bottom:1px solid var(--g-m);margin-bottom:4px;}
@@ -220,17 +220,15 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 /* POWER MGMT — LEFT VERTICAL ZONE (tilted into cockpit) */
 #pwr-ribbon{position:absolute;top:230px;left:38px;width:300px;
   bottom:50px;z-index:15;
-  padding:14px 8px 14px 6px;display:block;
-  overflow-y:scroll;overflow-x:hidden;
+  padding:14px 8px 14px 6px;display:flex;flex-direction:column;
+  overflow:hidden;
   transform:perspective(1400px) rotateY(7deg);transform-origin:left center;
-  background:linear-gradient(90deg,rgba(8,14,18,.40),rgba(4,8,14,.20) 70%,transparent);
-  border-left:1px solid rgba(212,168,76,.18);
-  box-shadow:inset 1px 0 0 rgba(212,168,76,.10),inset 18px 0 30px rgba(212,168,76,.04);
+  background:
+    linear-gradient(90deg,rgba(28,32,36,.62) 0%,rgba(20,22,26,.50) 50%,rgba(10,12,14,.30) 100%),
+    repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
+  border-left:1px solid rgba(180,170,150,.22);
+  box-shadow:inset 1px 0 0 rgba(220,210,190,.16),inset 18px 0 30px rgba(160,150,130,.04),inset -1px 0 0 rgba(0,0,0,.40);
   clip-path:polygon(0 18px,18px 0,100% 0,100% 100%,0 100%);}
-#pwr-ribbon::-webkit-scrollbar{width:4px;}
-#pwr-ribbon::-webkit-scrollbar-track{background:rgba(212,168,76,.04);}
-#pwr-ribbon::-webkit-scrollbar-thumb{background:var(--g-d);border-radius:2px;}
-#pwr-ribbon::-webkit-scrollbar-thumb:hover{background:var(--g);}
 #pwr-ribbon > .zone-hdr-injected,
 #pwr-ribbon::before{content:'POWER DISTRIBUTION';font-size:8px;letter-spacing:4px;
   color:var(--g-d);text-align:center;display:block;
@@ -285,32 +283,37 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .pp::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,.06) 35%,transparent 50%,rgba(0,0,0,.18) 100%);}
 .pp:hover{transform:scaleX(1.10);}
-/* empty pip — dark brown grid cell */
-.pp.e{background:linear-gradient(180deg,#3a1c12 0%,#2a140c 50%,#1a0a06 100%);
-  box-shadow:inset 0 1px 0 rgba(160,60,30,.16),inset 0 -1px 0 rgba(0,0,0,.4),
-    0 0 0 1px rgba(80,28,14,.45);}
-.pp.e::after{background:linear-gradient(180deg,rgba(180,80,40,.10) 0%,transparent 60%);}
-/* filled pip variants — vibrant chiclets with 3D */
-.pp.pp-c{background:linear-gradient(180deg,#ffd040 0%,#e8b020 55%,#a06808 100%);
-  box-shadow:inset 0 1px 0 rgba(255,240,180,.50),0 0 0 1px rgba(255,200,60,.30),0 0 5px rgba(232,176,32,.40);}
-.pp.sg{background:linear-gradient(180deg,#5ce0f8 0%,#28b0e0 55%,#0c5890 100%);
-  box-shadow:inset 0 1px 0 rgba(190,240,255,.55),0 0 0 1px rgba(86,224,248,.30),0 0 5px rgba(40,184,224,.40);}
-.pp.wp{background:linear-gradient(180deg,#ff8050 0%,#e85030 55%,#a02810 100%);
-  box-shadow:inset 0 1px 0 rgba(255,200,170,.50),0 0 0 1px rgba(255,128,80,.30),0 0 5px rgba(232,80,48,.40);}
-.pp.en{background:linear-gradient(180deg,#f8d848 0%,#d0a818 55%,#806808 100%);
-  box-shadow:inset 0 1px 0 rgba(255,240,180,.50),0 0 0 1px rgba(248,216,72,.30),0 0 5px rgba(208,168,24,.40);}
-.pp.co{background:linear-gradient(180deg,#54f8a8 0%,#1cc878 55%,#087840 100%);
-  box-shadow:inset 0 1px 0 rgba(180,255,220,.55),0 0 0 1px rgba(84,248,168,.30),0 0 5px rgba(28,200,120,.40);}
-.pp.qd{background:linear-gradient(180deg,#c890f8 0%,#9858d8 55%,#5028a0 100%);
-  box-shadow:inset 0 1px 0 rgba(220,180,255,.55),0 0 0 1px rgba(200,144,248,.30),0 0 5px rgba(152,88,216,.40);}
-.pp.rd{background:linear-gradient(180deg,#a8d8f8 0%,#5898d0 55%,#2858a0 100%);
-  box-shadow:inset 0 1px 0 rgba(200,224,255,.55),0 0 0 1px rgba(168,216,248,.30),0 0 5px rgba(88,152,208,.40);}
-.pc-foot{order:3;display:flex;flex-direction:column;align-items:center;gap:2px;
+/* empty pip — machined dark steel cell */
+.pp.e{background:linear-gradient(180deg,#26221c 0%,#181410 50%,#0c0a08 100%);
+  box-shadow:inset 0 1px 0 rgba(80,72,60,.30),inset 0 -1px 0 rgba(0,0,0,.55),
+    0 0 0 1px rgba(40,36,30,.70);}
+.pp.e::after{background:linear-gradient(180deg,rgba(120,108,88,.12) 0%,transparent 50%,rgba(0,0,0,.20) 100%);}
+/* filled pips — METALLIC variants (brass, steel, bronze, gold, chrome, gunmetal, aluminum) */
+/* Power Plant — brass */
+.pp.pp-c{background:linear-gradient(180deg,#e8c878 0%,#c89c48 30%,#a07424 60%,#704c14 100%);
+  box-shadow:inset 0 1px 0 rgba(255,232,168,.55),inset 0 -1px 0 rgba(40,24,8,.45),0 0 0 1px rgba(140,100,52,.55);}
+/* Shield Gen — steel blue */
+.pp.sg{background:linear-gradient(180deg,#c8d4e0 0%,#849ab0 30%,#56697e 60%,#2c3848 100%);
+  box-shadow:inset 0 1px 0 rgba(232,240,250,.55),inset 0 -1px 0 rgba(8,12,20,.45),0 0 0 1px rgba(86,104,124,.55);}
+/* Weapons — red bronze */
+.pp.wp{background:linear-gradient(180deg,#d09478 0%,#a26450 30%,#74402c 60%,#401c14 100%);
+  box-shadow:inset 0 1px 0 rgba(248,200,168,.50),inset 0 -1px 0 rgba(28,12,8,.45),0 0 0 1px rgba(116,64,44,.55);}
+/* Engines — polished gold */
+.pp.en{background:linear-gradient(180deg,#f4dc88 0%,#cca844 30%,#9a7c2c 60%,#605014 100%);
+  box-shadow:inset 0 1px 0 rgba(255,242,180,.55),inset 0 -1px 0 rgba(36,28,8,.45),0 0 0 1px rgba(154,124,44,.55);}
+/* Cooler — chrome silver */
+.pp.co{background:linear-gradient(180deg,#e0e4e8 0%,#a8b0b8 30%,#727880 60%,#383c44 100%);
+  box-shadow:inset 0 1px 0 rgba(248,250,252,.60),inset 0 -1px 0 rgba(8,12,16,.45),0 0 0 1px rgba(112,120,128,.55);}
+/* Quantum — gunmetal */
+.pp.qd{background:linear-gradient(180deg,#9aa4b0 0%,#5e6770 30%,#3a4048 60%,#1c2028 100%);
+  box-shadow:inset 0 1px 0 rgba(196,204,212,.55),inset 0 -1px 0 rgba(0,0,0,.55),0 0 0 1px rgba(58,64,72,.65);}
+/* Radar — aluminum */
+.pp.rd{background:linear-gradient(180deg,#d4d8dc 0%,#9ca0a4 30%,#686c70 60%,#34383c 100%);
+  box-shadow:inset 0 1px 0 rgba(244,246,248,.55),inset 0 -1px 0 rgba(8,12,16,.45),0 0 0 1px rgba(104,108,112,.55);}
+.pc-foot{order:3;display:flex;flex-direction:column;align-items:center;gap:0;
   width:100%;margin-top:2px;}
 .padj{display:none;}
-.pc-eu{font-size:8px;font-weight:700;letter-spacing:.5px;text-align:center;
-  text-shadow:0 0 4px rgba(212,168,76,.30);margin:0;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.pc-eu{display:none;}
 /* category icons via ::before on .pc */
 .pc::after{content:'';display:block;width:14px;height:14px;order:0;margin-bottom:2px;
   background-position:center;background-repeat:no-repeat;background-size:contain;
@@ -356,9 +359,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 #hp-band{position:absolute;bottom:30px;left:50%;
   transform:translateX(-50%) perspective(1400px) rotateX(8deg);
   transform-origin:bottom center;
-  width:520px;z-index:16;padding:14px 16px;background:linear-gradient(180deg,transparent,rgba(8,14,18,.45) 30%,rgba(8,14,18,.65));
-  border-top:1px solid rgba(212,168,76,.16);
-  box-shadow:inset 0 1px 0 rgba(212,168,76,.10),0 0 28px rgba(212,168,76,.04);
+  width:520px;z-index:16;padding:14px 16px;
+  background:
+    linear-gradient(180deg,transparent,rgba(24,26,30,.50) 30%,rgba(20,22,26,.70)),
+    repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
+  border-top:1px solid rgba(180,170,150,.22);
+  box-shadow:inset 0 1px 0 rgba(220,210,190,.18),0 0 28px rgba(0,0,0,.30);
   clip-path:polygon(18px 0,calc(100% - 18px) 0,100% 100%,0 100%);}
 #hp-band::before{content:'WEAPONS · MISSILES';font-size:8px;letter-spacing:4px;
   color:var(--g-d);text-align:center;display:block;
