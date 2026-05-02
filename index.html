@@ -33,7 +33,7 @@
 <link rel="sitemap" type="application/xml" href="/sitemap.xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
 <style>
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
 /* #app sizing handled below in APP SHELL block */
@@ -45,12 +45,12 @@ button{background:transparent;border:none;cursor:pointer;font-family:inherit;out
   --bg: #0d0f12;--bg2: #161a1f;--bg3: #1c2028;--bg4:#1f2530;
   --border: #2a2f3a;--b2:#2e3a4a;
   --text:#c8d4e0;--t2:#6a7f96;--t3:#3a4a5a;
-  --accent: #e8a427;--accent-bg:rgba(232,164,39,.10);--accent-border:rgba(232,164,39,.30);
-  --green: #e8a427;--green-bg:rgba(232,164,39,.10);--green-border:rgba(232,164,39,.30);
+  --accent: #e8a427;--accent-bg:rgba(77,255,110,.10);--accent-border:rgba(77,255,110,.30);
+  --green: #e8a427;--green-bg:rgba(77,255,110,.10);--green-border:rgba(77,255,110,.30);
   --warn:#ffd54f;--warn-bg:rgba(255,213,79,.10);--warn-border:rgba(255,213,79,.30);
   --red:#e85060;--red-bg:rgba(232,80,96,.1);--red-border:rgba(232,80,96,.3);
   --cyan:#40e0ff;--purple:#9080d8;--muted:#3a4a5a;--blue:#e8a427;
-  --fhud:'DM Sans',sans-serif;--fmono:'JetBrains Mono',monospace;
+  --fhud:'Inter',sans-serif;--fmono:'JetBrains Mono',monospace;
   --r:8px;--r-sm:5px;--r-lg:12px
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -404,7 +404,7 @@ option,optgroup{background:var(--bg2)}
 
 .pn-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:visible}
 .pn-card-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.pn-version{font-size:16px;font-weight:600;font-family:var(--fmono);color:var(--accent);text-shadow:0 0 8px rgba(232,164,39,.3)}
+.pn-version{font-size:16px;font-weight:600;font-family:var(--fmono);color:var(--accent);text-shadow:0 0 8px rgba(77,255,110,.3)}
 .pn-date{font-size:12px;color:var(--t3);font-family:var(--fmono)}
 .pn-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;margin-left:auto}
 .pn-tag-live{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
@@ -423,7 +423,7 @@ option,optgroup{background:var(--bg2)}
 /* responsive media queries disabled â fixed layout only */
 
 .fb-type-btn.active{border-color:var(--accent)!important;color:var(--accent)!important;background:var(--accent-bg)!important}
-#feedbackBtn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(232,164,39,.3)}
+#feedbackBtn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(77,255,110,.3)}
 #fbText:focus{outline:none;border-color:var(--accent)}
 #fbEmail:focus{outline:none;border-color:var(--accent)}
 
@@ -432,7 +432,7 @@ option,optgroup{background:var(--bg2)}
 
 /* ââ Resizable panels ââ */
 .resize-handle{width:6px;flex-shrink:0;background:transparent;cursor:col-resize;position:relative;z-index:10;transition:background .15s}
-.resize-handle:hover,.resize-handle.dragging{background:rgba(232,164,39,.3)}
+.resize-handle:hover,.resize-handle.dragging{background:rgba(77,255,110,.3)}
 .resize-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);height:40px;width:2px;background:var(--border);border-radius:2px;transition:background .15s}
 .resize-handle:hover::after,.resize-handle.dragging::after{background:var(--accent)}
 .body{user-select:none}
@@ -623,7 +623,7 @@ option,optgroup{background:var(--bg2)}
 
 /* ââ Erkul Power Reskin v5.0 â ALL rules scoped to #pwrCard ââ */
 #pwrCard{background:linear-gradient(160deg,#161c26,#121620)!important;border:1px solid rgba(56,189,248,0.18)!important;border-radius:6px!important;position:relative!important;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04)!important}
-#pwrCard::before,#pwrCard::after{content:'';position:absolute;width:12px;height:12px;border-color:rgba(232,164,39,0.7);border-style:solid;pointer-events:none;z-index:1}
+#pwrCard::before,#pwrCard::after{content:'';position:absolute;width:12px;height:12px;border-color:rgba(77,255,110,0.7);border-style:solid;pointer-events:none;z-index:1}
 #pwrCard::before{top:5px;left:5px;border-width:1.5px 0 0 1.5px}
 #pwrCard::after{top:5px;right:5px;border-width:1.5px 1.5px 0 0}
 #pwrCard .lp-card-title{font-family:'Rajdhani','JetBrains Mono',monospace!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.18em!important;color:#e8a427!important}
@@ -671,10 +671,10 @@ option,optgroup{background:var(--bg2)}
 #pane-ships .ships-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;position:sticky;top:88px;z-index:2;background:#0e1117;padding-bottom:8px}
 #pane-ships .ships-filter-btn{padding:6px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.06em;border-radius:20px;border:1px solid rgba(255,255,255,0.08);color:#8a94a3;background:transparent;cursor:pointer;transition:all .2s;text-transform:uppercase}
 #pane-ships .ships-filter-btn:hover{border-color:rgba(56,189,248,0.3);color:#c0cee0}
-#pane-ships .ships-filter-btn.on{background:rgba(79,195,247,0.12);border-color:rgba(232,164,39,0.4);color:#e8a427}
+#pane-ships .ships-filter-btn.on{background:rgba(79,195,247,0.12);border-color:rgba(77,255,110,0.4);color:#e8a427}
 #pane-ships .ships-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding-bottom:20px;content-visibility:auto}
 #pane-ships .ship-card{position:relative;background:#1a1f28;border:1px solid rgba(79,195,247,0.08);border-radius:10px;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;will-change:transform;contain:layout style}
-#pane-ships .ship-card:hover{transform:translateY(-3px);border-color:rgba(232,164,39,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+#pane-ships .ship-card:hover{transform:translateY(-3px);border-color:rgba(77,255,110,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
 #pane-ships .ship-card-img-wrap{position:relative;width:100%;height:170px;overflow:hidden;background:#0e1117;border-radius:10px 10px 0 0}
 #pane-ships .ship-card-img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
 #pane-ships .ship-card:hover .ship-card-img{transform:scale(1.05)}
@@ -685,8 +685,8 @@ option,optgroup{background:var(--bg2)}
 #pane-ships .ship-card-mfr{font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a6577;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #pane-ships .ship-card-footer{display:flex;align-items:center;justify-content:space-between}
 #pane-ships .ship-card-role-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:#8a94a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
-#pane-ships .ship-card-builder{padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(232,164,39,0.3);color:#e8a427;background:rgba(79,195,247,0.06);cursor:pointer;transition:all .2s;white-space:nowrap}
-#pane-ships .ship-card-builder:hover{background:rgba(232,164,39,0.15);border-color:#e8a427}
+#pane-ships .ship-card-builder{padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(77,255,110,0.3);color:#e8a427;background:rgba(79,195,247,0.06);cursor:pointer;transition:all .2s;white-space:nowrap}
+#pane-ships .ship-card-builder:hover{background:rgba(77,255,110,0.15);border-color:#e8a427}
 #pane-ships .ship-card-no-img{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#252d3a;font-family:'Rajdhani',sans-serif;font-size:40px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em}
 #pane-ships .ship-card-price-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,0.04)}
 #pane-ships .ship-card-price{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#22c55e}
@@ -734,7 +734,7 @@ option,optgroup{background:var(--bg2)}
 .wpm-section{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8a427;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;border-bottom:1px solid rgba(79,195,247,0.1);padding-bottom:4px}
 .wpm-ships{display:flex;flex-wrap:wrap;gap:6px}
 .wpm-ship{font-family:'JetBrains Mono',monospace;font-size:11px;color:#c0cee0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .15s}
-.wpm-ship:hover{background:rgba(79,195,247,0.1);border-color:rgba(232,164,39,0.3);color:#e8a427}
+.wpm-ship:hover{background:rgba(79,195,247,0.1);border-color:rgba(77,255,110,0.3);color:#e8a427}
 .wpm-ship-sz{font-size:9px;color:#5a6577;margin-left:4px}
 .wpm-img-wrap{width:100%;height:160px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:16px;border:1px solid rgba(79,195,247,0.1)}
 .wpm-img-wrap img{max-width:100%;max-height:160px;object-fit:contain;display:block}
@@ -748,7 +748,7 @@ option,optgroup{background:var(--bg2)}
 .wpm-badge-pp{background:rgba(255,180,0,0.12);color:#ffb400;border:1px solid rgba(255,180,0,0.3)}
 .wpm-badge-sg{background:rgba(79,195,247,0.12);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3)}
 .wpm-badge-cooler{background:rgba(100,220,255,0.12);color:#64dcff;border:1px solid rgba(100,220,255,0.3)}
-.wpm-badge-qd{background:rgba(232,164,39,0.12);color:#e8a427;border:1px solid rgba(232,164,39,0.3)}
+.wpm-badge-qd{background:rgba(77,255,110,0.12);color:#e8a427;border:1px solid rgba(77,255,110,0.3)}
 .wpm-loc{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8a94a3;margin-bottom:16px}
 .wpm-loc-star{color:#e8a427}
 .wl-row{cursor:pointer}
@@ -784,8 +784,8 @@ option,optgroup{background:var(--bg2)}
 .sm-tips{margin-top:12px}
 .sm-tip{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8a94a3;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
 .sm-tip::before{content:'\25B8 ';color:#e8a427}
-.sm-builder-btn{display:block;width:100%;margin-top:16px;padding:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;border-radius:8px;border:1px solid rgba(232,164,39,0.4);color:#e8a427;background:rgba(79,195,247,0.08);cursor:pointer;transition:all .2s}
-.sm-builder-btn:hover{background:rgba(232,164,39,0.2);border-color:#e8a427}
+.sm-builder-btn{display:block;width:100%;margin-top:16px;padding:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;border-radius:8px;border:1px solid rgba(77,255,110,0.4);color:#e8a427;background:rgba(79,195,247,0.08);cursor:pointer;transition:all .2s}
+.sm-builder-btn:hover{background:rgba(77,255,110,0.2);border-color:#e8a427}
 
 /* ââ Responsive Layout ââ */
 #app{max-width:100vw;width:100%}
@@ -948,31 +948,31 @@ option,optgroup{background:var(--bg2)}
 #sbDashboard .d-wc.bl{bottom:6px;left:6px;border-width:0 0 2px 2px}
 #sbDashboard .d-wc.br{bottom:6px;right:6px;border-width:0 2px 2px 0}
 #sbDashboard .d-icon{width:46px;height:46px;flex-shrink:0;background:var(--bg4);border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:inset 0 0 12px rgba(79,195,247,.04),0 0 10px rgba(79,195,247,.05)}
-#sbDashboard .d-welcome h1{font-size:17px;font-weight:700;font-family:var(--fmono);color:var(--green);letter-spacing:2px;margin-bottom:6px;text-shadow:0 0 12px rgba(232,164,39,.6)}
+#sbDashboard .d-welcome h1{font-size:17px;font-weight:700;font-family:var(--fmono);color:var(--green);letter-spacing:2px;margin-bottom:6px;text-shadow:0 0 12px rgba(77,255,110,.6)}
 #sbDashboard .d-welcome p{font-size:13px;color:#8a9ab0;line-height:1.7;max-width:480px}
 #sbDashboard .d-cta{margin-left:auto;display:flex;flex-direction:column;gap:7px;align-items:flex-end;flex-shrink:0}
-#sbDashboard .d-btn-primary{background:rgba(232,164,39,.08);color:var(--green);border:1px solid var(--green);border-radius:2px;padding:7px 18px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;cursor:pointer;text-shadow:0 0 8px rgba(232,164,39,.4);box-shadow:0 0 12px rgba(232,164,39,.15);transition:all .15s}
+#sbDashboard .d-btn-primary{background:rgba(77,255,110,.08);color:var(--green);border:1px solid var(--green);border-radius:2px;padding:7px 18px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;cursor:pointer;text-shadow:0 0 8px rgba(77,255,110,.4);box-shadow:0 0 12px rgba(77,255,110,.15);transition:all .15s}
 #sbDashboard .d-btn-primary:hover{background:rgba(79,195,247,.12);box-shadow:0 0 18px rgba(79,195,247,.2)}
 #sbDashboard .d-btn-secondary{background:transparent;border:1px solid var(--border);color:var(--t3);border-radius:2px;padding:5px 14px;font-size:10px;font-family:var(--fmono);letter-spacing:1px;cursor:pointer;transition:all .15s}
 #sbDashboard .d-btn-secondary:hover{border-color:var(--warn);color:var(--warn);text-shadow:0 0 6px rgba(255,213,79,.3)}
-#sbDashboard .d-sec-hd{font-size:11px;letter-spacing:2.5px;color:var(--green);font-family:var(--fmono);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;text-shadow:0 0 8px rgba(232,164,39,.4)}
+#sbDashboard .d-sec-hd{font-size:11px;letter-spacing:2.5px;color:var(--green);font-family:var(--fmono);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;text-shadow:0 0 8px rgba(77,255,110,.4)}
 #sbDashboard .d-sec-link{color:var(--warn);cursor:pointer;font-size:9px;letter-spacing:1px;text-shadow:0 0 5px rgba(255,213,79,.3)}
 #sbDashboard .d-role-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}
 #sbDashboard .d-role-card{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:9px 5px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
 #sbDashboard .d-role-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);opacity:0;transition:opacity .15s}
-#sbDashboard .d-role-card:hover{border-color:var(--border);background:var(--bg4);box-shadow:0 2px 10px rgba(232,164,39,.07)}
+#sbDashboard .d-role-card:hover{border-color:var(--border);background:var(--bg4);box-shadow:0 2px 10px rgba(77,255,110,.07)}
 #sbDashboard .d-role-card:hover::after{opacity:.5}
 #sbDashboard .d-role-icon{font-size:20px;margin-bottom:5px}
 #sbDashboard .d-role-name{font-size:10px;font-family:var(--fmono);letter-spacing:.5px;color:#8ab890;margin-bottom:3px;text-transform:uppercase}
-#sbDashboard .d-role-count{font-size:16px;font-weight:700;font-family:var(--fmono);color:var(--green);text-shadow:0 0 8px rgba(232,164,39,.5)}
+#sbDashboard .d-role-count{font-size:16px;font-weight:700;font-family:var(--fmono);color:var(--green);text-shadow:0 0 8px rgba(77,255,110,.5)}
 #sbDashboard .d-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 #sbDashboard .d-ship-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 #sbDashboard .d-ship-card{background:var(--bg3);border:1px solid var(--border);border-radius:3px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative}
 #sbDashboard .d-ship-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green);opacity:0;transition:opacity .15s;z-index:1}
-#sbDashboard .d-ship-card:hover{border-color:var(--border);transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.35),0 0 10px rgba(232,164,39,.07)}
+#sbDashboard .d-ship-card:hover{border-color:var(--border);transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.35),0 0 10px rgba(77,255,110,.07)}
 #sbDashboard .d-ship-card:hover::before{opacity:.7}
 #sbDashboard .d-ship-img{height:90px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#0e1210}
-#sbDashboard .d-ship-img::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 11px,rgba(232,164,39,.015) 11px,rgba(232,164,39,.015) 12px);pointer-events:none;z-index:1}
+#sbDashboard .d-ship-img::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 11px,rgba(77,255,110,.015) 11px,rgba(77,255,110,.015) 12px);pointer-events:none;z-index:1}
 #sbDashboard .d-ship-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transition:transform .3s}
 #sbDashboard .d-ship-card:hover .d-ship-img img{transform:scale(1.06)}
 #sbDashboard .d-ship-lbl{position:absolute;bottom:4px;left:6px;font-size:9px;font-family:var(--fmono);color:rgba(255,255,255,.55);letter-spacing:1px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
@@ -981,7 +981,7 @@ option,optgroup{background:var(--bg2)}
 #sbDashboard .d-ship-role{font-size:9px;color:#8ab890;font-family:var(--fmono);letter-spacing:.5px}
 #sbDashboard .d-ship-dps{font-size:13px;color:var(--warn);font-family:var(--fmono);font-weight:700;margin-top:5px;text-shadow:0 0 6px rgba(255,213,79,.4)}
 #sbDashboard .d-tag{display:inline-block;border-radius:2px;padding:1px 4px;font-size:7px;font-family:var(--fmono);margin-top:4px;letter-spacing:.5px;font-weight:700}
-#sbDashboard .d-tag-pop{background:rgba(232,164,39,.1);border:1px solid rgba(232,164,39,.3);color:var(--green)}
+#sbDashboard .d-tag-pop{background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);color:var(--green)}
 #sbDashboard .d-tag-meta{background:rgba(64,224,255,.08);border:1px solid rgba(64,224,255,.25);color:var(--cyan)}
 #sbDashboard .d-tag-stl{background:rgba(180,180,220,.06);border:1px solid rgba(180,180,220,.18);color:#b0b8d8}
 #sbDashboard .d-tag-hvy{background:rgba(255,213,79,.1);border:1px solid rgba(255,213,79,.3);color:var(--warn)}
@@ -999,7 +999,7 @@ option,optgroup{background:var(--bg2)}
 #sbDashboard .d-pn-item.fix{border-left-color:var(--warn)}
 #sbDashboard .d-pn-item.data{border-left-color:var(--cyan)}
 #sbDashboard .d-pn-badge{font-size:7px;font-family:var(--fmono);letter-spacing:.5px;padding:2px 5px;border-radius:2px;flex-shrink:0;align-self:flex-start;margin-top:1px;font-weight:700}
-#sbDashboard .d-badge-new{background:rgba(232,164,39,.12);color:var(--green);border:1px solid rgba(232,164,39,.3);text-shadow:0 0 5px rgba(232,164,39,.3)}
+#sbDashboard .d-badge-new{background:rgba(77,255,110,.12);color:var(--green);border:1px solid rgba(77,255,110,.3);text-shadow:0 0 5px rgba(77,255,110,.3)}
 #sbDashboard .d-badge-fix{background:rgba(255,213,79,.12);color:var(--warn);border:1px solid rgba(255,213,79,.3);text-shadow:0 0 5px rgba(255,213,79,.3)}
 #sbDashboard .d-badge-data{background:rgba(64,224,255,.1);color:var(--cyan);border:1px solid rgba(64,224,255,.25)}
 #sbDashboard .d-pn-text{font-size:12px;color:#b0c8b0;line-height:1.6}
@@ -1087,7 +1087,7 @@ option,optgroup{background:var(--bg2)}
 
 /* ââ MY FLEET TAB ââ */
 .fleet-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;position:relative;transition:border-color .15s,box-shadow .15s;cursor:pointer}
-.fleet-card:hover{border-color:rgba(232,164,39,.4);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.fleet-card:hover{border-color:rgba(77,255,110,.4);box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .fleet-card-img-wrap{height:110px;overflow:hidden;background:var(--bg3);position:relative}
 .fleet-card-img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
 .fleet-card:hover .fleet-card-img{transform:scale(1.05)}
@@ -1100,9 +1100,9 @@ option,optgroup{background:var(--bg2)}
 .fleet-card-role{font-family:var(--fmono);font-size:10px;color:var(--t3)}
 .fleet-card-remove{background:none;border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:3px 8px;font-size:9px;font-weight:700;font-family:var(--fmono);color:#f87171;cursor:pointer;transition:all .15s;letter-spacing:1px}
 .fleet-card-remove:hover{background:rgba(239,68,68,.15);border-color:#f87171}
-.fleet-card-builder{background:none;border:1px solid rgba(232,164,39,.25);border-radius:4px;padding:3px 8px;font-size:9px;font-weight:700;font-family:var(--fmono);color:#e8a427;cursor:pointer;transition:all .15s;letter-spacing:1px}
-.fleet-card-builder:hover{background:rgba(232,164,39,.12);border-color:#e8a427}
-.fleet-owned-badge{position:absolute;top:6px;right:6px;background:rgba(232,164,39,.85);color:#000;font-family:var(--fmono);font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;pointer-events:none;z-index:2}
+.fleet-card-builder{background:none;border:1px solid rgba(77,255,110,.25);border-radius:4px;padding:3px 8px;font-size:9px;font-weight:700;font-family:var(--fmono);color:#e8a427;cursor:pointer;transition:all .15s;letter-spacing:1px}
+.fleet-card-builder:hover{background:rgba(77,255,110,.12);border-color:#e8a427}
+.fleet-owned-badge{position:absolute;top:6px;right:6px;background:rgba(77,255,110,.85);color:#000;font-family:var(--fmono);font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;pointer-events:none;z-index:2}
 
 
 /* Fix: hide duplicate ship name overlay on ship cards */
@@ -1112,7 +1112,7 @@ option,optgroup{background:var(--bg2)}
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a427;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(232,164,39,.4)">v8.92</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a427;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.92</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -1269,11 +1269,11 @@ option,optgroup{background:var(--bg2)}
       <div class="pane on" id="pane-lo" style="flex-direction:column;overflow:hidden;padding:0">
   <!-- Top bar: header + search + KPIs -->
   <div style="flex-shrink:0;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
-    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 10px rgba(232,164,39,.5);white-space:nowrap">&#9672; SC SHIPFORGE BUILDER</div>
+    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 10px rgba(77,255,110,.5);white-space:nowrap">&#9672; SC SHIPFORGE BUILDER</div>
     <button id="returnDashBtn" onclick="window.location.reload()" title="Return to Dashboard"
-      style="display:none;align-items:center;gap:5px;background:rgba(232,164,39,.06);border:1px solid rgba(232,164,39,.25);border-radius:3px;padding:5px 12px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:var(--green);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0"
-      onmouseover="this.style.background='rgba(232,164,39,.14)';this.style.boxShadow='0 0 10px rgba(232,164,39,.2)'"
-      onmouseout="this.style.background='rgba(232,164,39,.06)';this.style.boxShadow='none'"
+      style="display:none;align-items:center;gap:5px;background:rgba(77,255,110,.06);border:1px solid rgba(77,255,110,.25);border-radius:3px;padding:5px 12px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:var(--green);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0"
+      onmouseover="this.style.background='rgba(77,255,110,.14)';this.style.boxShadow='0 0 10px rgba(77,255,110,.2)'"
+      onmouseout="this.style.background='rgba(77,255,110,.06)';this.style.boxShadow='none'"
     >&#8592; DASHBOARD</button>
     <button id="testShowdownBtn" onclick="openShowdownWithBuild()" title="Test this build in Showdown"
       style="display:none;align-items:center;gap:6px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.35);border-radius:3px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0"
@@ -1315,7 +1315,7 @@ option,optgroup{background:var(--bg2)}
       </div>
       <!-- Ship name + size badge -->
       <div id="sbShipNameBar" style="display:none;padding:6px 8px;border-bottom:1px solid var(--border);background:var(--bg3)">
-        <div id="sbShipImgName" style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#ffffff;letter-spacing:1px;text-shadow:0 0 8px rgba(232,164,39,.4)"></div>
+        <div id="sbShipImgName" style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#ffffff;letter-spacing:1px;text-shadow:0 0 8px rgba(77,255,110,.4)"></div>
         <div id="sbShipSizeBadge" style="font-size:10px;color:var(--accent);font-family:var(--fmono);margin-top:3px;letter-spacing:.5px"></div>
       </div>
       <!-- Ship info rows -->
@@ -1359,19 +1359,19 @@ option,optgroup{background:var(--bg2)}
       <div class="d-ship-grid">
         <div class="d-ship-card" onclick="ss_pick_sb('Hammerhead')">
           <div class="d-ship-img" id="dCardImgHammerhead" style="background:#0e1210"><span class="d-ship-lbl" style="z-index:2">HAMMERHEAD</span></div>
-          <div class="d-ship-body"><div class="d-ship-name">Hammerhead</div><div class="d-ship-role">CAPITAL · SIZE L</div><div class="d-ship-dps">6,240 DPS</div><span class="d-tag d-tag-pop">POPULAR</span></div>
+          <div class="d-ship-body"><div class="d-ship-name">Hammerhead</div><div class="d-ship-role">CAPITAL Â&middot; SIZE L</div><div class="d-ship-dps">6,240 DPS</div><span class="d-tag d-tag-pop">POPULAR</span></div>
         </div>
         <div class="d-ship-card" onclick="ss_pick_sb('Eclipse')">
           <div class="d-ship-img" id="dCardImgEclipse" style="background:#0e1210"><span class="d-ship-lbl" style="z-index:2">ECLIPSE</span></div>
-          <div class="d-ship-body"><div class="d-ship-name">Eclipse</div><div class="d-ship-role">BOMBER · SIZE M</div><div class="d-ship-dps">540K dmg</div><span class="d-tag d-tag-stl">STEALTH</span></div>
+          <div class="d-ship-body"><div class="d-ship-name">Eclipse</div><div class="d-ship-role">BOMBER Â&middot; SIZE M</div><div class="d-ship-dps">540K dmg</div><span class="d-tag d-tag-stl">STEALTH</span></div>
         </div>
         <div class="d-ship-card" onclick="ss_pick_sb('Arrow')">
           <div class="d-ship-img" id="dCardImgArrow" style="background:#0e1210"><span class="d-ship-lbl" style="z-index:2">ARROW</span></div>
-          <div class="d-ship-body"><div class="d-ship-name">Arrow</div><div class="d-ship-role">FIGHTER · SIZE S</div><div class="d-ship-dps">1,240 DPS</div><span class="d-tag d-tag-meta">META</span></div>
+          <div class="d-ship-body"><div class="d-ship-name">Arrow</div><div class="d-ship-role">FIGHTER Â&middot; SIZE S</div><div class="d-ship-dps">1,240 DPS</div><span class="d-tag d-tag-meta">META</span></div>
         </div>
         <div class="d-ship-card" onclick="ss_pick_sb('Hercules A2')">
           <div class="d-ship-img" id="dCardImgHercules" style="background:#0e1210"><span class="d-ship-lbl" style="z-index:2">HERCULES A2</span></div>
-          <div class="d-ship-body"><div class="d-ship-name">Hercules A2</div><div class="d-ship-role">MILITARY · SIZE L</div><div class="d-ship-dps">2,800 DPS</div><span class="d-tag d-tag-hvy">HEAVY</span></div>
+          <div class="d-ship-body"><div class="d-ship-name">Hercules A2</div><div class="d-ship-role">MILITARY Â&middot; SIZE L</div><div class="d-ship-dps">2,800 DPS</div><span class="d-tag d-tag-hvy">HEAVY</span></div>
         </div>
       </div>
     </div>
@@ -1477,7 +1477,7 @@ option,optgroup{background:var(--bg2)}
       </div>
       <div class="pane" id="pane-wp">
         <div id="wpCatBar" style="display:flex;gap:4px;padding:8px 12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)">
-          <button class="wp-cat-btn on" data-cat="weapons" onclick="switchWpCat('weapons',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(232,164,39,.4);color:#e8a427;background:rgba(232,164,39,.12);cursor:pointer">Weapons</button>
+          <button class="wp-cat-btn on" data-cat="weapons" onclick="switchWpCat('weapons',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(77,255,110,.4);color:#e8a427;background:rgba(77,255,110,.12);cursor:pointer">Weapons</button>
           <button class="wp-cat-btn" data-cat="pp" onclick="switchWpCat('pp',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,.08);color:#8a94a3;background:transparent;cursor:pointer">Power Plants</button>
           <button class="wp-cat-btn" data-cat="sg" onclick="switchWpCat('sg',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,.08);color:#8a94a3;background:transparent;cursor:pointer">Shields</button>
           <button class="wp-cat-btn" data-cat="cooler" onclick="switchWpCat('cooler',this)" style="padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,.08);color:#8a94a3;background:transparent;cursor:pointer">Coolers</button>
@@ -1504,21 +1504,21 @@ option,optgroup{background:var(--bg2)}
   <div class="sd-hero-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
     <span>&#9876; SHIP SHOWDOWN</span>
     <button id="sdBackToBuildBtn" onclick="goBackToBuild()" title="Return to Builder"
-      style="display:none;align-items:center;gap:6px;background:rgba(232,164,39,.06);border:1px solid rgba(232,164,39,.25);border-radius:3px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#e8a427;cursor:pointer;white-space:nowrap;transition:all .15s"
-      onmouseover="this.style.background='rgba(232,164,39,.14)';this.style.boxShadow='0 0 10px rgba(232,164,39,.2)'"
-      onmouseout="this.style.background='rgba(232,164,39,.06)';this.style.boxShadow='none'"
+      style="display:none;align-items:center;gap:6px;background:rgba(77,255,110,.06);border:1px solid rgba(77,255,110,.25);border-radius:3px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#e8a427;cursor:pointer;white-space:nowrap;transition:all .15s"
+      onmouseover="this.style.background='rgba(77,255,110,.14)';this.style.boxShadow='0 0 10px rgba(77,255,110,.2)'"
+      onmouseout="this.style.background='rgba(77,255,110,.06)';this.style.boxShadow='none'"
     >&#8592; BACK TO BUILD</button>
   </div>
 
   <!-- My Build context banner (shown when coming from Builder) -->
-  <div id="sdMyBuildBanner" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(232,164,39,.04);border:1px solid rgba(232,164,39,.18);border-radius:6px;border-left:3px solid #e8a427">
-    <div style="font-size:9px;letter-spacing:2px;color:#e8a427;font-family:var(--fmono);margin-bottom:6px;text-shadow:0 0 6px rgba(232,164,39,.3)">YOUR BUILD</div>
+  <div id="sdMyBuildBanner" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(77,255,110,.04);border:1px solid rgba(77,255,110,.18);border-radius:6px;border-left:3px solid #e8a427">
+    <div style="font-size:9px;letter-spacing:2px;color:#e8a427;font-family:var(--fmono);margin-bottom:6px;text-shadow:0 0 6px rgba(77,255,110,.3)">YOUR BUILD</div>
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <div style="font-size:13px;font-weight:700;font-family:var(--fmono);color:#e8f4e8" id="sdMyBuildShip">â</div>
       <div style="display:flex;gap:12px">
         <div style="text-align:center"><div style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#ffd54f;text-shadow:0 0 6px rgba(255,213,79,.3)" id="sdMyBuildDps">â</div><div style="font-size:8px;letter-spacing:1px;color:#6a9070;font-family:var(--fmono)">MY DPS</div></div>
         <div style="text-align:center"><div style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#40e0ff;text-shadow:0 0 6px rgba(64,224,255,.3)" id="sdMyBuildShield">â</div><div style="font-size:8px;letter-spacing:1px;color:#6a9070;font-family:var(--fmono)">MY SHIELDS</div></div>
-        <div style="text-align:center"><div style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 6px rgba(232,164,39,.3)" id="sdMyBuildHull">â</div><div style="font-size:8px;letter-spacing:1px;color:#6a9070;font-family:var(--fmono)">MY HULL HP</div></div>
+        <div style="text-align:center"><div style="font-size:14px;font-weight:700;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 6px rgba(77,255,110,.3)" id="sdMyBuildHull">â</div><div style="font-size:8px;letter-spacing:1px;color:#6a9070;font-family:var(--fmono)">MY HULL HP</div></div>
       </div>
       <button id="sdRunComparisonBtn" onclick="window.runShowdownAndOpenModal()" style="display:none;margin-left:auto;padding:7px 18px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.5);border-radius:5px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#f87171;cursor:pointer;text-shadow:0 0 8px rgba(248,113,113,.3);transition:all .15s" onmouseover="this.style.background='rgba(220,38,38,.28)';this.style.boxShadow='0 0 12px rgba(220,38,38,.3)'" onmouseout="this.style.background='rgba(220,38,38,.15)';this.style.boxShadow='none'">&#9876; RUN COMPARISON</button>
     </div>
@@ -1587,7 +1587,7 @@ option,optgroup{background:var(--bg2)}
     <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(10,13,18,.97) 0%,rgba(10,13,18,.8) 40%,rgba(10,13,18,.2) 100%)"></div>
     <!-- header bar inside detail panel -->
     <div style="position:absolute;top:0;left:0;right:0;padding:10px 16px 8px;display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.3);z-index:2">
-      <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 10px rgba(232,164,39,.5)">&#9673; MY FLEET</div>
+      <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 10px rgba(77,255,110,.5)">&#9673; MY FLEET</div>
       <div id="fleetStats" style="font-family:var(--fmono);font-size:10px;color:var(--t3);letter-spacing:1px"></div>
       <div style="flex:1"></div>
       <button onclick="openFleetImport()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#38bdf8;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(56,189,248,.18)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">&#8659; IMPORT FROM RSI</button>
@@ -1601,14 +1601,14 @@ option,optgroup{background:var(--bg2)}
         <div id="fdStats" style="display:flex;gap:28px;flex-wrap:wrap"></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0">
-        <button id="fdBuildBtn" style="background:rgba(232,164,39,.12);border:1px solid rgba(232,164,39,.4);border-radius:4px;padding:10px 28px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#e8a427;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(232,164,39,.22)'" onmouseout="this.style.background='rgba(232,164,39,.12)'">&#9658; BUILD</button>
+        <button id="fdBuildBtn" style="background:rgba(77,255,110,.12);border:1px solid rgba(77,255,110,.4);border-radius:4px;padding:10px 28px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#e8a427;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(77,255,110,.22)'" onmouseout="this.style.background='rgba(77,255,110,.12)'">&#9658; BUILD</button>
         <button id="fdRemoveBtn" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:10px 28px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#f87171;cursor:pointer;white-space:nowrap" onmouseover="this.style.background='rgba(239,68,68,.16)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">&#10005; REMOVE</button>
       </div>
     </div>
   </div>
   <!-- Default header bar (shown when no ship selected) -->
   <div id="fleetHeader" style="flex-shrink:0;padding:10px 16px 8px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
-    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 10px rgba(232,164,39,.5)">&#9673; MY FLEET</div>
+    <div style="font-size:13px;font-weight:800;letter-spacing:3px;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 10px rgba(77,255,110,.5)">&#9673; MY FLEET</div>
     <div id="fleetStats2" style="font-family:var(--fmono);font-size:10px;color:var(--t3);letter-spacing:1px"></div>
     <div style="flex:1"></div>
     <button onclick="openFleetImport()" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:4px;padding:5px 14px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#38bdf8;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(56,189,248,.18)'" onmouseout="this.style.background='rgba(56,189,248,.08)'">&#8659; IMPORT FROM RSI</button>
@@ -1621,7 +1621,7 @@ option,optgroup{background:var(--bg2)}
     <div style="font-size:11px;color:var(--t3);text-align:center;max-width:420px;line-height:1.7">
       Import your RSI hangar automatically, or browse the <span style="color:var(--t2);cursor:pointer;text-decoration:underline" onclick="showTab('ships',document.querySelector('[data-t=ships]'))">Ships tab</span> and click <strong style="color:#e8a427">+ Add to Fleet</strong> on any ship.
     </div>
-    <button onclick="openFleetImport()" style="background:rgba(232,164,39,.08);border:1px solid rgba(232,164,39,.3);border-radius:4px;padding:8px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#e8a427;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(232,164,39,.18)'" onmouseout="this.style.background='rgba(232,164,39,.08)'">&#8659; IMPORT FROM RSI HANGAR</button>
+    <button onclick="openFleetImport()" style="background:rgba(77,255,110,.08);border:1px solid rgba(77,255,110,.3);border-radius:4px;padding:8px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:2px;color:#e8a427;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(77,255,110,.18)'" onmouseout="this.style.background='rgba(77,255,110,.08)'">&#8659; IMPORT FROM RSI HANGAR</button>
   </div>
   <!-- Fleet grid -->
   <div id="fleetGrid" style="flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-content:start"></div>
@@ -1640,7 +1640,7 @@ option,optgroup{background:var(--bg2)}
         <div style="font-size:12px;color:var(--t2);line-height:1.9">
           <strong style="color:#fff">Step 1</strong> &nbsp;Install the
           <a href="https://addons.mozilla.org/en-US/firefox/addon/star-citizen-hangar-xplorer/" target="_blank" style="color:#38bdf8;text-decoration:none">Star Citizen Hangar XPLORer</a>
-          browser extension &nbsp;<span style="color:var(--t3);font-size:11px">(Firefox · <a href="https://chromewebstore.google.com/detail/star-citizen-hangar-xplor/bhkgemjdepodofcnmekdobmmbifemhkc" target="_blank" style="color:#38bdf8;text-decoration:none">Chrome</a> · <a href="https://addons.opera.com/en/extensions/details/star-citizen-hangar-xplorer/" target="_blank" style="color:#38bdf8;text-decoration:none">Opera</a>)</span><br>
+          browser extension &nbsp;<span style="color:var(--t3);font-size:11px">(Firefox Â&middot; <a href="https://chromewebstore.google.com/detail/star-citizen-hangar-xplor/bhkgemjdepodofcnmekdobmmbifemhkc" target="_blank" style="color:#38bdf8;text-decoration:none">Chrome</a> Â&middot; <a href="https://addons.opera.com/en/extensions/details/star-citizen-hangar-xplorer/" target="_blank" style="color:#38bdf8;text-decoration:none">Opera</a>)</span><br>
           <strong style="color:#fff">Step 2</strong> &nbsp;Log in to RSI and go to your
           <a href="https://robertsspaceindustries.com/account/pledges" target="_blank" style="color:#38bdf8;text-decoration:none">Hangar page</a> â the extension will load all your ships automatically<br>
           <strong style="color:#fff">Step 3</strong> &nbsp;Click the <strong style="color:#e8a427">&#8659; JSON</strong> button added by the extension to download <code style="background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:11px">shiplist.json</code><br>
@@ -1650,7 +1650,7 @@ option,optgroup{background:var(--bg2)}
 
       <!-- Primary: JSON file upload -->
       <div style="margin-bottom:14px">
-        <label for="fleetJsonFile" style="display:block;width:100%;background:rgba(232,164,39,.08);border:1px dashed rgba(232,164,39,.35);border-radius:6px;padding:14px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(232,164,39,.14)'" onmouseout="this.style.background='rgba(232,164,39,.08)'">
+        <label for="fleetJsonFile" style="display:block;width:100%;background:rgba(77,255,110,.08);border:1px dashed rgba(77,255,110,.35);border-radius:6px;padding:14px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(77,255,110,.14)'" onmouseout="this.style.background='rgba(77,255,110,.08)'">
           <div style="font-family:var(--fmono);font-size:11px;font-weight:700;letter-spacing:2px;color:#e8a427;margin-bottom:4px">&#8679; UPLOAD shiplist.json</div>
           <div style="font-size:11px;color:var(--t3)">Click to browse or drag &amp; drop your exported JSON file</div>
         </label>
@@ -1676,7 +1676,7 @@ option,optgroup{background:var(--bg2)}
     </div>
     <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0">
       <button onclick="closeFleetImport()" style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:7px 18px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1px;color:var(--t2);cursor:pointer">CANCEL</button>
-      <button onclick="doFleetImport()" style="background:rgba(232,164,39,.1);border:1px solid rgba(232,164,39,.4);border-radius:4px;padding:7px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#e8a427;cursor:pointer" onmouseover="this.style.background='rgba(232,164,39,.2)'" onmouseout="this.style.background='rgba(232,164,39,.1)'">&#10003; IMPORT</button>
+      <button onclick="doFleetImport()" style="background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.4);border-radius:4px;padding:7px 22px;font-size:11px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;color:#e8a427;cursor:pointer" onmouseover="this.style.background='rgba(77,255,110,.2)'" onmouseout="this.style.background='rgba(77,255,110,.1)'">&#10003; IMPORT</button>
     </div>
   </div>
 </div>
@@ -2972,14 +2972,14 @@ var curRacks = {}; // stores selected rack per slot
 
 // âââ LOCATIONS âââ
 var LOCATIONS=[
-  {name:"CenterMass â Area18",sys:"ArcCorp · Stanton",tags:["weapons"],st:"CF-series Klaus & Werner S1âS4, Omnisky cannons, Tarantula/AD4B/AD5B Gatlings, M-series Behring, Klaus Broadsword S5. Best one-stop weapon shop.",tip:"â­ Best for energy weapons and legal ballistics. Check 2nd floor terminal â stock rotates each session."},
-  {name:"CenterMass â New Babbage",sys:"microTech · Stanton",tags:["weapons"],st:"Same stock as Area18 CenterMass. CF-series, Omnisky, M-series, AD4B/AD5B.",tip:"Best weapon shop if you're based on microTech. Saves cross-system trip."},
-  {name:"Hurston Dynamics Showcase â Lorville",sys:"Hurston · Stanton",tags:["weapons","components"],st:"Attrition S1âS6 laser repeaters EXCLUSIVE â sold nowhere else. HD power plants, coolers, shields.",tip:"â­ MUST VISIT: Attrition series only here. Best sustained laser repeater. Stock up before bounty sessions."},
-  {name:"Omega Pro â New Babbage",sys:"microTech · Stanton",tags:["components"],st:"QDs: VK-00, Atlas, PYMANCER, Journey. Power plants: Regulus, White Dwarf, Shubin. Coolers: Zero Rush, Orca, Bracer. Shields: FR-66, Palisade S1âS3.",tip:"Best component shop in system. Upgrade QT drive and shields here before Pyro runs."},
-  {name:"Platinum Bay â All L-Points",sys:"All Lagrange Stations · Stanton",tags:["components"],st:"Full component selection S1âS3 at every L-point: ARC-L1/4/5, CRU-L1/4/5, HUR-L1/2/4/5, MIC-L1/2/5. No weapons.",tip:"Most convenient mid-session stop. FR-66 shields available â biggest single upgrade for most ships."},
-  {name:"Grim HEX â Yela",sys:"Crusader · Stanton",tags:["weapons","outlaw"],st:"Revenant Gatling S4 EXCLUSIVE, Deadbolt IIâV, Breakneck S4. Stealth PP and coolers. Dumper's Depot rotating stock.",tip:"â­ OUTLAW WEAPONS: Revenant and Deadbolt ONLY here and Levski. Crime stat required to land."},
-  {name:"Levski â Delamar, Nyx",sys:"Nyx System · Pyro",tags:["weapons","outlaw","components"],st:"NN-13 Neutron S1 (17,970 aUEC), NN-14 S2 (40,430 aUEC), NN-15 S3 (90,970 aUEC) at Teach's Ship Shop Sublevel 01. Deadbolt series. Stealth components.",tip:"â­ 4.7 MUST VISIT: NN-15 S3 = 552 DPS at 2,604m range â best S3 in game. Trip is worth it."},
-  {name:"Astro Armada â Area18 / Orison",sys:"ArcCorp / Crusader · Stanton",tags:["ships"],st:"Ships for sale and rent â all major manufacturers. Rent any ship for a session to test before buying.",tip:"Rent before you buy. All civilian ships available for session rental."},
+  {name:"CenterMass â Area18",sys:"ArcCorp Â&middot; Stanton",tags:["weapons"],st:"CF-series Klaus & Werner S1âS4, Omnisky cannons, Tarantula/AD4B/AD5B Gatlings, M-series Behring, Klaus Broadsword S5. Best one-stop weapon shop.",tip:"â­ Best for energy weapons and legal ballistics. Check 2nd floor terminal â stock rotates each session."},
+  {name:"CenterMass â New Babbage",sys:"microTech Â&middot; Stanton",tags:["weapons"],st:"Same stock as Area18 CenterMass. CF-series, Omnisky, M-series, AD4B/AD5B.",tip:"Best weapon shop if you're based on microTech. Saves cross-system trip."},
+  {name:"Hurston Dynamics Showcase â Lorville",sys:"Hurston Â&middot; Stanton",tags:["weapons","components"],st:"Attrition S1âS6 laser repeaters EXCLUSIVE â sold nowhere else. HD power plants, coolers, shields.",tip:"â­ MUST VISIT: Attrition series only here. Best sustained laser repeater. Stock up before bounty sessions."},
+  {name:"Omega Pro â New Babbage",sys:"microTech Â&middot; Stanton",tags:["components"],st:"QDs: VK-00, Atlas, PYMANCER, Journey. Power plants: Regulus, White Dwarf, Shubin. Coolers: Zero Rush, Orca, Bracer. Shields: FR-66, Palisade S1âS3.",tip:"Best component shop in system. Upgrade QT drive and shields here before Pyro runs."},
+  {name:"Platinum Bay â All L-Points",sys:"All Lagrange Stations Â&middot; Stanton",tags:["components"],st:"Full component selection S1âS3 at every L-point: ARC-L1/4/5, CRU-L1/4/5, HUR-L1/2/4/5, MIC-L1/2/5. No weapons.",tip:"Most convenient mid-session stop. FR-66 shields available â biggest single upgrade for most ships."},
+  {name:"Grim HEX â Yela",sys:"Crusader Â&middot; Stanton",tags:["weapons","outlaw"],st:"Revenant Gatling S4 EXCLUSIVE, Deadbolt IIâV, Breakneck S4. Stealth PP and coolers. Dumper's Depot rotating stock.",tip:"â­ OUTLAW WEAPONS: Revenant and Deadbolt ONLY here and Levski. Crime stat required to land."},
+  {name:"Levski â Delamar, Nyx",sys:"Nyx System Â&middot; Pyro",tags:["weapons","outlaw","components"],st:"NN-13 Neutron S1 (17,970 aUEC), NN-14 S2 (40,430 aUEC), NN-15 S3 (90,970 aUEC) at Teach's Ship Shop Sublevel 01. Deadbolt series. Stealth components.",tip:"â­ 4.7 MUST VISIT: NN-15 S3 = 552 DPS at 2,604m range â best S3 in game. Trip is worth it."},
+  {name:"Astro Armada â Area18 / Orison",sys:"ArcCorp / Crusader Â&middot; Stanton",tags:["ships"],st:"Ships for sale and rent â all major manufacturers. Rent any ship for a session to test before buying.",tip:"Rent before you buy. All civilian ships available for session rental."},
   {name:"Dumper's Depot â Multiple",sys:"Area18 / Grim HEX / Levski / Pyro",tags:["components","weapons"],st:"Rotating used-goods stock. S1âS4 weapons and B/C grade components. Resets each server wipe.",tip:"â­ Check every session â sometimes yields Attrition or M7A below market. Grim HEX Depot carries outlaw weapons."},
   {name:"Grey's Market â Pyro",sys:"Pyro System",tags:["ships","outlaw"],st:"The Shiv heavy fighter (aUEC purchase â only in-game source). Pyro-exclusive weapon variants and salvaged military components.",tip:"Bring armed escort â pirates camp the StantonâPyro jump point. Only place to buy Shiv."}
 ];
@@ -3160,7 +3160,7 @@ var _liveSync = {
         // Update hull count in nav
         var total = Object.values(SHIPS).reduce(function(a,b){return a+(b?b.length:0);},0);
         var hp = document.getElementById('hpatch');
-        if (hp) hp.textContent = 'â ' + total + ' HULLS · PU ' + (_liveSync._scVer || '4.7.2') + ' LIVE';
+        if (hp) hp.textContent = 'â ' + total + ' HULLS Â&middot; PU ' + (_liveSync._scVer || '4.7.2') + ' LIVE';
         // Rebuild ship search if open
         var srbox = document.getElementById('srbox');
         if (srbox && srbox.style.display !== 'none') buildSrbox('');
@@ -3521,7 +3521,7 @@ function onActChange(val){selAct=val;if(selShip)generate();}
     sel.appendChild(og);
   });
   var total=Object.values(SHIPS).reduce(function(a,b){return a+b.length;},0);
-  document.getElementById('hpatch').textContent='â '+total+' HULLS · PU '+(window._scVer||'4.7.2')+' LIVE';
+  document.getElementById('hpatch').textContent='â '+total+' HULLS Â&middot; PU '+(window._scVer||'4.7.2')+' LIVE';
   // SC version shown from hardcoded fallback (scfocus.org has CORS restrictions)
   var as=document.getElementById('actSel');
   if(as){ACTS.forEach(function(a){var o=document.createElement('option');o.value=a;o.textContent=a;if(a===selAct)o.selected=true;as.appendChild(o);});}
@@ -3715,7 +3715,7 @@ function generate(){
     if(!w)return '<span style="color:var(--muted);font-size:9px;font-family:var(--fmono)">'+wid+'</span>';
     var tc=w.type==='ballistic'?'si-b':'si-e';
     return '<span class="'+tc+'">'+w.type+'</span> <span class="si-dps">'+w.dps+' DPS</span>'
-      +'<br><span style="color:var(--t2);font-family:var(--fmono);font-size:9px">'+w.range+'m · S'+w.sz+' · Draw:'+w.draw+'EU</span>'
+      +'<br><span style="color:var(--t2);font-family:var(--fmono);font-size:9px">'+w.range+'m Â&middot; S'+w.sz+' Â&middot; Draw:'+w.draw+'EU</span>'
       +'<div class="si-loc">'+w.loc+'</div>';
   }
   function misInfo(mid){
@@ -3723,7 +3723,7 @@ function generate(){
     var m=WEAPONS.find(function(x){return x.id===mid;});
     if(!m)return '<span style="color:var(--muted);font-size:9px;font-family:var(--fmono)">'+mid+'</span>';
     var typeCol=m.type.includes('emp')?'#cc88ff':m.type.includes('cs')?'#44aaff':m.type==='torpedo'?'#ff4444':'#ffaa00';
-    var priceStr=m.price?'<span style="color:var(--warn);font-family:var(--fmono);font-size:9px">'+m.price.toLocaleString()+' aUEC</span> · ':'';
+    var priceStr=m.price?'<span style="color:var(--warn);font-family:var(--fmono);font-size:9px">'+m.price.toLocaleString()+' aUEC</span> Â&middot; ':'';
     return '<span style="color:'+typeCol+';font-size:9px;font-family:var(--fmono)">'+m.type.replace('missile-','').toUpperCase()+'</span>'
       +' <span style="color:var(--warn);font-family:var(--fmono);font-size:9px">Î±'+m.alpha.toLocaleString()+'</span>'
       +' <span style="color:var(--t2);font-family:var(--fmono);font-size:9px">'+m.range.toLocaleString()+'m</span>'
@@ -3739,10 +3739,10 @@ function generate(){
   }
   function compLabel(key,val){
     var db=COMP_DB[key]&&COMP_DB[key][val];if(!db)return val;
-    if(key==='pp')return val+' | '+db.out+'EU · '+db.heat+'ht';
-    if(key==='sg')return val+' | '+db.totalHP.toLocaleString()+'HP · '+db.regen+'/s';
+    if(key==='pp')return val+' | '+db.out+'EU Â&middot; '+db.heat+'ht';
+    if(key==='sg')return val+' | '+db.totalHP.toLocaleString()+'HP Â&middot; '+db.regen+'/s';
     if(key==='cooler')return val+' | '+db.cool+'/s';
-    if(key==='qd')return val+' | '+db.range+'Gm · '+db.spool+'s spool';
+    if(key==='qd')return val+' | '+db.range+'Gm Â&middot; '+db.spool+'s spool';
     return val;
   }
   function compOpts(key,curVal){
@@ -3937,7 +3937,7 @@ function generate(){
     '<div class="lo">'
     +'<div class="ship-banner">'
     +'<h2 class="sname">'+selShip+'</h2>'
-    +'<div class="srole">'+def.role+' · CREW '+def.crew+' · CLASS '+def.size+'</div>'
+    +'<div class="srole">'+def.role+' Â&middot; CREW '+def.crew+' Â&middot; CLASS '+def.size+'</div>'
     +'<div class="badge-row"><span class="pill pill-g">â WIKI VERIFIED</span>'
     +'<span class="pill pill-a">SCM '+def.scm+'m/s</span>'
     +'<span class="pill pill-a">'+def.slots.length+'Ã GUN</span>'
@@ -3977,13 +3977,13 @@ function getCompStatHTML(key,val){
   var db=COMP_DB[key]&&COMP_DB[key][val];
   if(!db)return '<span style="color:var(--muted);font-size:8px;font-family:var(--fmono)">â</span>';
   var cg='color:var(--green)';
-  var priceStr=db.price?'<span style="color:var(--warn);font-family:var(--fmono);font-size:9px">'+db.price.toLocaleString()+' aUEC</span> · ':'';
+  var priceStr=db.price?'<span style="color:var(--warn);font-family:var(--fmono);font-size:9px">'+db.price.toLocaleString()+' aUEC</span> Â&middot; ':'';
   var locStr=db.loc?'<div class="si-loc">'+db.loc+'</div>':'';
-  if(key==='pp')return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.out+' EU · '+db.heat+' heat/s · EM '+db.em+'</span><br>'+priceStr+locStr;
-  if(key==='sg'){var sgDraw=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.totalHP.toLocaleString()+' HP · +'+db.regen+'/s · '+sgDraw+'</span><br>'+priceStr+locStr;}
-  if(key==='cooler'){var drawStr=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.cool+' cool/s · '+drawStr+'</span><br>'+priceStr+locStr;}
-  if(key==='qd'){var qdDraw=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.range+' Gm · '+Math.round(db.speed/1000)+'k km/s · Spool '+db.spool+'s</span><br>'+priceStr+locStr;}
-  if(key==='radar'){var rLocStr=db.loc?'<div class="si-loc">'+db.loc+'</div>':'';var rPriceStr=db.price?'<span style="color:var(--warn);font-family:var(--fmono);font-size:9px">'+db.price.toLocaleString()+' aUEC</span> · ':'';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">S'+db.sz+' '+db.cls+' '+db.grade+'</span><br>'+rPriceStr+rLocStr;}
+  if(key==='pp')return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.out+' EU Â&middot; '+db.heat+' heat/s Â&middot; EM '+db.em+'</span><br>'+priceStr+locStr;
+  if(key==='sg'){var sgDraw=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.totalHP.toLocaleString()+' HP Â&middot; +'+db.regen+'/s Â&middot; '+sgDraw+'</span><br>'+priceStr+locStr;}
+  if(key==='cooler'){var drawStr=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.cool+' cool/s Â&middot; '+drawStr+'</span><br>'+priceStr+locStr;}
+  if(key==='qd'){var qdDraw=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.range+' Gm Â&middot; '+Math.round(db.speed/1000)+'k km/s Â&middot; Spool '+db.spool+'s</span><br>'+priceStr+locStr;}
+  if(key==='radar'){var rLocStr=db.loc?'<div class="si-loc">'+db.loc+'</div>':'';var rPriceStr=db.price?'<span style="color:var(--warn);font-family:var(--fmono);font-size:9px">'+db.price.toLocaleString()+' aUEC</span> Â&middot; ':'';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">S'+db.sz+' '+db.cls+' '+db.grade+'</span><br>'+rPriceStr+rLocStr;}
   return '';
 }
 
@@ -3997,7 +3997,7 @@ function onWepChange(sel){
   var el=document.getElementById('si'+i);
   if(el){
     if(!w)el.innerHTML='<span style="color:var(--muted);font-size:9px;font-family:var(--fmono)">[empty]</span>';
-    else if(el){var tc=w.type==='ballistic'?'si-b':'si-e';el.innerHTML='<span class="'+tc+'">'+w.type+'</span> <span class="si-dps">'+w.dps+' DPS</span><br><span style="color:var(--t2);font-family:var(--fmono);font-size:9px">'+w.range+'m · S'+w.sz+' · Draw:'+w.draw+'EU</span><div class="si-loc">'+w.loc+'</div>';}
+    else if(el){var tc=w.type==='ballistic'?'si-b':'si-e';el.innerHTML='<span class="'+tc+'">'+w.type+'</span> <span class="si-dps">'+w.dps+' DPS</span><br><span style="color:var(--t2);font-family:var(--fmono);font-size:9px">'+w.range+'m Â&middot; S'+w.sz+' Â&middot; Draw:'+w.draw+'EU</span><div class="si-loc">'+w.loc+'</div>';}
   }
   updatePower();
   updateTargetAnalysis();
@@ -5064,7 +5064,7 @@ function syncFromWiki(){
     lastSyncTime=new Date();
     var patchStr=results[0]&&results[0].items[0]?'4.7.2':'?';
     var t=lastSyncTime.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    status.textContent='â '+updated+' components synced · '+t;
+    status.textContent='â '+updated+' components synced Â&middot; '+t;
     status.style.color='var(--green)';
 
     // Rebuild comp option labels then refresh power panel
@@ -8979,7 +8979,7 @@ function _eWepInfo(wid){
   if(!w)return '<span style="color:var(--t3);font-size:9px;font-family:var(--fmono)">'+wid+'</span>';
   var tc=w.type==='ballistic'?'si-b':'si-e';
   return '<span class="'+tc+'">'+w.type+'</span> <span class="si-dps">'+w.dps+' DPS</span>'
-    +'<br><span style="color:var(--t2);font-family:var(--fmono);font-size:9px">'+w.range+'m · S'+w.sz+' · Draw:'+w.draw+'EU</span>'
+    +'<br><span style="color:var(--t2);font-family:var(--fmono);font-size:9px">'+w.range+'m Â&middot; S'+w.sz+' Â&middot; Draw:'+w.draw+'EU</span>'
     +(w.loc?'<div class="si-loc">'+w.loc+'</div>':'');
 }
 function _eMisInfo(mid){
@@ -8995,12 +8995,12 @@ function _eCompStat(key,val){
   var db=COMP_DB[key]&&COMP_DB[key][val];
   if(!db)return '<span style="color:var(--t3);font-size:9px;font-family:var(--fmono)">â</span>';
   var cg='color:#38d282';
-  var priceStr=db.price?'<span style="color:var(--warn);font-family:var(--fmono);font-size:9px">'+db.price.toLocaleString()+' aUEC</span> · ':'';
+  var priceStr=db.price?'<span style="color:var(--warn);font-family:var(--fmono);font-size:9px">'+db.price.toLocaleString()+' aUEC</span> Â&middot; ':'';
   var locStr=db.loc?'<div class="si-loc">'+db.loc+'</div>':'';
-  if(key==='pp')return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.out+' EU · '+db.heat+' heat/s · EM '+db.em+'</span><br>'+priceStr+locStr;
-  if(key==='sg'){var sgDraw=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.totalHP.toLocaleString()+' HP · +'+db.regen+'/s · '+sgDraw+'</span><br>'+priceStr+locStr;}
-  if(key==='cooler'){var drawStr=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.cool+' cool/s · '+drawStr+'</span><br>'+priceStr+locStr;}
-  if(key==='qd'){var qdDraw=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.range+' Gm · Spool '+db.spool+'s</span><br>'+priceStr+locStr;}
+  if(key==='pp')return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.out+' EU Â&middot; '+db.heat+' heat/s Â&middot; EM '+db.em+'</span><br>'+priceStr+locStr;
+  if(key==='sg'){var sgDraw=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.totalHP.toLocaleString()+' HP Â&middot; +'+db.regen+'/s Â&middot; '+sgDraw+'</span><br>'+priceStr+locStr;}
+  if(key==='cooler'){var drawStr=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.cool+' cool/s Â&middot; '+drawStr+'</span><br>'+priceStr+locStr;}
+  if(key==='qd'){var qdDraw=db.drawMin!=null?db.drawMin+'-'+db.drawMax+'EU':(db.draw||'?')+'EU';return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">'+db.range+' Gm Â&middot; Spool '+db.spool+'s</span><br>'+priceStr+locStr;}
   if(key==='radar')return '<span style="'+cg+';font-family:var(--fmono);font-size:9px">S'+(db.sz||'?')+' '+( db.cls||'')+' '+(db.grade||'')+'</span><br>'+priceStr+locStr;
   return '';
 }
@@ -9931,7 +9931,7 @@ function buildShipBuilder(shipName){
   var badgeEl=document.getElementById('sbShipSizeBadge');
   if(nameBar){nameBar.style.display='block';}
   if(nameEl) nameEl.textContent=shipName.toUpperCase();
-  if(badgeEl&&def) badgeEl.textContent=(def.role||'')+(def.size?' · SIZE '+(def.size||'').toUpperCase():'');
+  if(badgeEl&&def) badgeEl.textContent=(def.role||'')+(def.size?' Â&middot; SIZE '+(def.size||'').toUpperCase():'');
   /* Ship info rows */
   var infoEl=document.getElementById('sbShipInfo');
   if(infoEl&&def){
@@ -10764,7 +10764,7 @@ function buildCard(name){
   var roleBasic=sd.role||'';
   var sizeBasic=sd.size||'';
   var crewBasic=sd.crew||'';
-  card.innerHTML='<div class="eic-img-wrap loading"><img class="eic-img" alt="" style="display:none"><div class="eic-name-overlay"><div class="eic-name">'+name+'</div><div class="eic-role">'+(roleBasic?roleBasic+' · ':'')+(sizeBasic?'Size '+sizeBasic:'')+'</div></div></div><div class="eic-info"><div class="eic-row"><span class="eic-lbl">Manufacturer</span><span class="eic-val eic-manf">â</span></div><div class="eic-row"><span class="eic-lbl">Career</span><span class="eic-val eic-career">â</span></div><div class="eic-row"><span class="eic-lbl">Role</span><span class="eic-val eic-role-detail">'+(roleBasic||'â')+'</span></div><div class="eic-row"><span class="eic-lbl">Size</span><span class="eic-val eic-size">â</span></div><div class="eic-row"><span class="eic-lbl">Crew</span><span class="eic-val eic-crew">â</span></div><div class="eic-row"><span class="eic-lbl">Cargo</span><span class="eic-val eic-cargo">â</span></div><div class="eic-row"><span class="eic-lbl">Length</span><span class="eic-val eic-length">â</span></div><div class="eic-row"><span class="eic-lbl">Width</span><span class="eic-val eic-width">â</span></div><div class="eic-row"><span class="eic-lbl">Height</span><span class="eic-val eic-height">â</span></div><div class="eic-row"><span class="eic-lbl">Status</span><span class="eic-val eic-status">â</span></div><div class="eic-row"><span class="eic-lbl">Pledge</span><span class="eic-val eic-cost eic-pledge">â</span></div><div class="eic-row"><span class="eic-lbl">Warbond</span><span class="eic-val eic-warbond">â</span></div><div class="eic-buy-info"><b>In-game:</b> <span class="eic-dealer">â</span><br><b>Availability:</b> <span class="eic-avail">â</span></div></div>';
+  card.innerHTML='<div class="eic-img-wrap loading"><img class="eic-img" alt="" style="display:none"><div class="eic-name-overlay"><div class="eic-name">'+name+'</div><div class="eic-role">'+(roleBasic?roleBasic+' Â&middot; ':'')+(sizeBasic?'Size '+sizeBasic:'')+'</div></div></div><div class="eic-info"><div class="eic-row"><span class="eic-lbl">Manufacturer</span><span class="eic-val eic-manf">â</span></div><div class="eic-row"><span class="eic-lbl">Career</span><span class="eic-val eic-career">â</span></div><div class="eic-row"><span class="eic-lbl">Role</span><span class="eic-val eic-role-detail">'+(roleBasic||'â')+'</span></div><div class="eic-row"><span class="eic-lbl">Size</span><span class="eic-val eic-size">â</span></div><div class="eic-row"><span class="eic-lbl">Crew</span><span class="eic-val eic-crew">â</span></div><div class="eic-row"><span class="eic-lbl">Cargo</span><span class="eic-val eic-cargo">â</span></div><div class="eic-row"><span class="eic-lbl">Length</span><span class="eic-val eic-length">â</span></div><div class="eic-row"><span class="eic-lbl">Width</span><span class="eic-val eic-width">â</span></div><div class="eic-row"><span class="eic-lbl">Height</span><span class="eic-val eic-height">â</span></div><div class="eic-row"><span class="eic-lbl">Status</span><span class="eic-val eic-status">â</span></div><div class="eic-row"><span class="eic-lbl">Pledge</span><span class="eic-val eic-cost eic-pledge">â</span></div><div class="eic-row"><span class="eic-lbl">Warbond</span><span class="eic-val eic-warbond">â</span></div><div class="eic-buy-info"><b>In-game:</b> <span class="eic-dealer">â</span><br><b>Availability:</b> <span class="eic-avail">â</span></div></div>';
   sel.appendChild(card);Array.prototype.forEach.call(sel.children,function(c){if(c!==card&&!c.classList.contains('enemy-info-card')&&c.id!=='sdPowerPanel'){c.style.setProperty('display','none','important');}});
   /* Ensure power panel is always last child (below ship card) */
   var pwrPnl=document.getElementById('sdPowerPanel');
@@ -10836,12 +10836,12 @@ tick();
 #sdModalBox::-webkit-scrollbar{width:4px}
 #sdModalBox::-webkit-scrollbar-thumb{background:#252d3a;border-radius:2px}
 .sdm-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(79,195,247,.12);flex-shrink:0}
-.sdm-title{font-size:11px;letter-spacing:3px;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 8px rgba(232,164,39,.4)}
+.sdm-title{font-size:11px;letter-spacing:3px;font-family:var(--fmono);color:#e8a427;text-shadow:0 0 8px rgba(77,255,110,.4)}
 .sdm-close{background:none;border:none;color:#4a5a6a;font-size:20px;cursor:pointer;padding:0;line-height:1;transition:color .15s}
 .sdm-close:hover{color:#e8a427}
 .sdm-verdict{text-align:center;padding:18px 20px 12px;flex-shrink:0}
 .sdm-verdict-badge{display:inline-block;font-size:22px;font-weight:900;font-family:var(--fmono);letter-spacing:4px;padding:8px 28px;border-radius:6px;margin-bottom:6px}
-.sdm-verdict-badge.win{color:#e8a427;background:rgba(232,164,39,.1);border:1px solid rgba(232,164,39,.3);text-shadow:0 0 20px rgba(232,164,39,.5);box-shadow:0 0 20px rgba(232,164,39,.1)}
+.sdm-verdict-badge.win{color:#e8a427;background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);text-shadow:0 0 20px rgba(77,255,110,.5);box-shadow:0 0 20px rgba(77,255,110,.1)}
 .sdm-verdict-badge.lose{color:#f87171;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);text-shadow:0 0 20px rgba(220,38,38,.4);box-shadow:0 0 20px rgba(220,38,38,.08)}
 .sdm-verdict-badge.close{color:#ffd54f;background:rgba(255,213,79,.08);border:1px solid rgba(255,213,79,.25);text-shadow:0 0 16px rgba(255,213,79,.4)}
 .sdm-ttk-summary{font-size:11px;color:#6a9070;font-family:var(--fmono);letter-spacing:.5px}
@@ -10861,7 +10861,7 @@ tick();
 .sdm-vs-badge{font-size:13px;font-weight:900;font-family:var(--fmono);color:#252d3a;letter-spacing:2px}
 .sdm-divider{height:1px;background:rgba(79,195,247,.06);margin:0 20px 16px}
 .sdm-why{padding:0 20px 20px}
-.sdm-why-title{font-size:9px;letter-spacing:2px;color:#e8a427;font-family:var(--fmono);margin-bottom:10px;text-shadow:0 0 6px rgba(232,164,39,.3)}
+.sdm-why-title{font-size:9px;letter-spacing:2px;color:#e8a427;font-family:var(--fmono);margin-bottom:10px;text-shadow:0 0 6px rgba(77,255,110,.3)}
 .sdm-reason{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,.02);border-radius:4px;border-left:2px solid transparent}
 .sdm-reason.good{border-left-color:#e8a427}
 .sdm-reason.bad{border-left-color:#f87171}
@@ -10873,7 +10873,7 @@ tick();
 .sdm-btn{flex:1;padding:9px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--fmono);letter-spacing:1.5px;cursor:pointer;transition:all .15s;border:1px solid}
 .sdm-btn-primary{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.35);color:#f87171}
 .sdm-btn-primary:hover{background:rgba(220,38,38,.2);box-shadow:0 0 12px rgba(220,38,38,.2)}
-.sdm-btn-secondary{background:rgba(232,164,39,.06);border-color:rgba(232,164,39,.3);color:#e8a427}
+.sdm-btn-secondary{background:rgba(77,255,110,.06);border-color:rgba(77,255,110,.3);color:#e8a427}
 .sdm-btn-secondary:hover{background:rgba(79,195,247,.1);box-shadow:0 0 8px rgba(79,195,247,.12)}
 
 </style>
@@ -10985,7 +10985,7 @@ tick();
     var career=live.career||ship.career||'';
     var role=live.role||ship.role||'';
     var sz=live.size||ship.size||'';
-    var sub=[career,role,sz?('SIZE '+sz):''].filter(Boolean).join(' · ');
+    var sub=[career,role,sz?('SIZE '+sz):''].filter(Boolean).join(' Â&middot; ');
     set('ssShipSub', sub);
     var thumb=el('ssThumb');
     if(thumb){
@@ -11300,9 +11300,9 @@ function _wf_placeholder(){
       _hint = document.createElement('div');
       _hint.id = 'sdWorkflowHint';
       _hint.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#141820;border:1px solid rgba(79,195,247,.25);border-left:3px solid #e8a427;border-radius:8px;padding:20px 28px;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 20px rgba(79,195,247,.06);font-family:var(--fmono,monospace)';
-      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#e8a427;margin-bottom:10px;text-shadow:0 0 8px rgba(232,164,39,.4)">&#9872; HOW TO USE</div>'
+      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#e8a427;margin-bottom:10px;text-shadow:0 0 8px rgba(77,255,110,.4)">&#9872; HOW TO USE</div>'
         + '<div style="font-size:13px;color:#e8f4e8;line-height:1.7;margin-bottom:16px">Build your ship in the <strong style="color:#e8a427">SC ShipForge Builder</strong>, then click <strong style="color:#f87171">&#9876; TEST IN SHOWDOWN</strong> to test your loadout against other ships.</div>'
-        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(232,164,39,.1);border:1px solid rgba(232,164,39,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#e8a427;cursor:pointer">GOT IT</button>';
+        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#e8a427;cursor:pointer">GOT IT</button>';
       document.body.appendChild(_hint);
     } else {
       _hint.style.display = 'block';
@@ -11379,7 +11379,7 @@ function openShowdownModal(myShip, enemyShip, me, them, myTTK, oppTTK, verdict){
   /* My ship stats */
   var myDef = window.SHIP_DATA && window.SHIP_DATA[myShip];
   document.getElementById('sdmMyName').textContent = myShip.toUpperCase();
-  document.getElementById('sdmMyRole').textContent = (myDef && myDef.role ? myDef.role.toUpperCase() + ' · ' : '') + 'YOUR BUILD';
+  document.getElementById('sdmMyRole').textContent = (myDef && myDef.role ? myDef.role.toUpperCase() + ' Â&middot; ' : '') + 'YOUR BUILD';
   document.getElementById('sdmMyDps').textContent   = me.dps.toLocaleString();
   document.getElementById('sdmMyShield').textContent = me.shieldHP.toLocaleString() + ' HP';
   document.getElementById('sdmMyTtk').textContent   = myTTK.toFixed(1) + 's';
@@ -11387,7 +11387,7 @@ function openShowdownModal(myShip, enemyShip, me, them, myTTK, oppTTK, verdict){
   /* Enemy ship stats */
   var enDef = window.SHIP_DATA && window.SHIP_DATA[enemyShip];
   document.getElementById('sdmEnemyName').textContent = enemyShip.toUpperCase();
-  document.getElementById('sdmEnemyRole').textContent = (enDef && enDef.role ? enDef.role.toUpperCase() + ' · ' : '') + 'ENEMY';
+  document.getElementById('sdmEnemyRole').textContent = (enDef && enDef.role ? enDef.role.toUpperCase() + ' Â&middot; ' : '') + 'ENEMY';
   document.getElementById('sdmEnemyDps').textContent   = them.dps.toLocaleString();
   document.getElementById('sdmEnemyShield').textContent = them.shieldHP.toLocaleString() + ' HP';
   document.getElementById('sdmEnemyTtk').textContent   = oppTTK > 9000 ? 'N/A' : oppTTK.toFixed(1) + 's';
@@ -11585,12 +11585,12 @@ window.openShowdownModal = function(myShip, enemyShip, me, them, myTTK, oppTTK, 
   var myDef = window.SHIP_DATA && window.SHIP_DATA[myShip];
   var enDef = window.SHIP_DATA && window.SHIP_DATA[enemyShip];
   document.getElementById('sdmMyName').textContent    = myShip.toUpperCase();
-  document.getElementById('sdmMyRole').textContent    = (myDef&&myDef.role?myDef.role.toUpperCase()+' · ':'')+' YOUR BUILD';
+  document.getElementById('sdmMyRole').textContent    = (myDef&&myDef.role?myDef.role.toUpperCase()+' Â&middot; ':'')+' YOUR BUILD';
   document.getElementById('sdmMyDps').textContent     = me.dps.toLocaleString();
   document.getElementById('sdmMyShield').textContent  = me.shieldHP.toLocaleString()+' HP';
   document.getElementById('sdmMyTtk').textContent     = myTTK.toFixed(1)+'s';
   document.getElementById('sdmEnemyName').textContent = enemyShip.toUpperCase();
-  document.getElementById('sdmEnemyRole').textContent = (enDef&&enDef.role?enDef.role.toUpperCase()+' · ':'')+'ENEMY';
+  document.getElementById('sdmEnemyRole').textContent = (enDef&&enDef.role?enDef.role.toUpperCase()+' Â&middot; ':'')+'ENEMY';
   document.getElementById('sdmEnemyDps').textContent  = them.dps.toLocaleString();
   document.getElementById('sdmEnemyShield').textContent = them.shieldHP.toLocaleString()+' HP';
   document.getElementById('sdmEnemyTtk').textContent  = oppTTK>9000?'N/A':oppTTK.toFixed(1)+'s';
@@ -11634,9 +11634,9 @@ window.openShowdownWithBuild = function(){
       _hint = document.createElement('div');
       _hint.id = 'sdWorkflowHint';
       _hint.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#141820;border:1px solid rgba(79,195,247,.25);border-left:3px solid #e8a427;border-radius:8px;padding:20px 28px;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 20px rgba(79,195,247,.06);font-family:var(--fmono,monospace)';
-      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#e8a427;margin-bottom:10px;text-shadow:0 0 8px rgba(232,164,39,.4)">&#9872; HOW TO USE</div>'
+      _hint.innerHTML = '<div style="font-size:11px;letter-spacing:2px;color:#e8a427;margin-bottom:10px;text-shadow:0 0 8px rgba(77,255,110,.4)">&#9872; HOW TO USE</div>'
         + '<div style="font-size:13px;color:#e8f4e8;line-height:1.7;margin-bottom:16px">Build your ship in the <strong style="color:#e8a427">SC ShipForge Builder</strong>, then click <strong style="color:#f87171">&#9876; TEST IN SHOWDOWN</strong> to test your loadout against other ships.</div>'
-        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(232,164,39,.1);border:1px solid rgba(232,164,39,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#e8a427;cursor:pointer">GOT IT</button>';
+        + '<button onclick="document.getElementById(\'sdWorkflowHint\').remove()" style="background:rgba(77,255,110,.1);border:1px solid rgba(77,255,110,.3);border-radius:4px;padding:7px 20px;font-size:11px;font-weight:700;font-family:var(--fmono,monospace);letter-spacing:1px;color:#e8a427;cursor:pointer">GOT IT</button>';
       document.body.appendChild(_hint);
     } else { _hint.style.display = 'block'; }
     return;
@@ -11730,7 +11730,7 @@ function refreshFleetBadges() {
       if (mName) {
         fleetBtn.textContent = isInFleet(mName) ? 'â IN MY FLEET' : '+ ADD TO FLEET';
         fleetBtn.style.color = isInFleet(mName) ? '#e8a427' : '#38bdf8';
-        fleetBtn.style.borderColor = isInFleet(mName) ? 'rgba(232,164,39,.4)' : 'rgba(56,189,248,.3)';
+        fleetBtn.style.borderColor = isInFleet(mName) ? 'rgba(77,255,110,.4)' : 'rgba(56,189,248,.3)';
       }
     }
   }
@@ -11856,7 +11856,7 @@ function renderFleetTab() {
     footer.className = 'fleet-card-footer';
     var roleTag = document.createElement('span');
     roleTag.className = 'fleet-card-role';
-    roleTag.textContent = role + (size ? ' · ' + size : '');
+    roleTag.textContent = role + (size ? ' Â&middot; ' + size : '');
     var btnRow = document.createElement('div');
     btnRow.style.display = 'flex';
     btnRow.style.gap = '4px';
@@ -11881,7 +11881,7 @@ function renderFleetTab() {
         showFleetDetail(n);
         // Highlight selected card
         document.querySelectorAll('.fleet-card').forEach(function(c){ c.style.borderColor=''; });
-        e.currentTarget.style.borderColor = 'rgba(232,164,39,.7)';
+        e.currentTarget.style.borderColor = 'rgba(77,255,110,.7)';
       }
     }; })(name);
     grid.appendChild(card);
@@ -11986,7 +11986,7 @@ function fleetHandleJsonFile(input) {
         renderFleetTab();
         closeFleetImport();
         var toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a1a;border:1px solid rgba(232,164,39,.4);border-radius:6px;padding:10px 20px;font-family:var(--fmono);font-size:12px;color:#e8a427;z-index:99999;letter-spacing:1px';
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a1a;border:1px solid rgba(77,255,110,.4);border-radius:6px;padding:10px 20px;font-family:var(--fmono);font-size:12px;color:#e8a427;z-index:99999;letter-spacing:1px';
         toast.textContent = '\u2713 ' + added + ' ship' + (added !== 1 ? 's' : '') + ' imported from shiplist.json';
         document.body.appendChild(toast);
         setTimeout(function(){ toast.remove(); }, 3500);
@@ -12054,7 +12054,7 @@ function _patchShipModal() {
       btn.textContent = isInFleet(name) ? '\u2713 IN MY FLEET' : '+ ADD TO FLEET';
       btn.style.cssText = 'display:block;width:100%;margin-top:8px;padding:8px;font-family:var(--fmono);font-size:11px;font-weight:700;letter-spacing:1.5px;border-radius:6px;cursor:pointer;transition:all .2s;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8';
       btn.style.color = isInFleet(name) ? '#e8a427' : '#38bdf8';
-      btn.style.borderColor = isInFleet(name) ? 'rgba(232,164,39,.4)' : 'rgba(56,189,248,.3)';
+      btn.style.borderColor = isInFleet(name) ? 'rgba(77,255,110,.4)' : 'rgba(56,189,248,.3)';
       btn.onclick = function() {
         if (isInFleet(name)) {
           removeFromFleet(name);
@@ -12065,7 +12065,7 @@ function _patchShipModal() {
           addToFleet(name);
           btn.textContent = '\u2713 IN MY FLEET';
           btn.style.color = '#e8a427';
-          btn.style.borderColor = 'rgba(232,164,39,.4)';
+          btn.style.borderColor = 'rgba(77,255,110,.4)';
         }
       };
       mc.appendChild(btn);
