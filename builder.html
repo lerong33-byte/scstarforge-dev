@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SC-ShipForge Builder</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Barlow Condensed',monospace,sans-serif;background:#01000a;color:#fff;overflow:hidden;height:100vh;}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:#01000a;
+  background-image:
+    radial-gradient(ellipse 80% 55% at 78% 14%,rgba(55,10,90,.72) 0%,rgba(28,4,62,.42) 30%,transparent 80%),
+    radial-gradient(ellipse 48% 36% at 84% 4%,rgba(130,16,160,.30) 0%,transparent 70%),
+    radial-gradient(ellipse 52% 40% at 8% 88%,rgba(0,52,158,.48) 0%,transparent 72%),
+    radial-gradient(ellipse 26% 20% at 5% 60%,rgba(0,128,172,.18) 0%,transparent 68%),
+    radial-gradient(1.5px 1.5px at 4% 9%,#fff 0%,transparent 100%),
+    radial-gradient(2px 2px at 16% 16%,rgba(255,240,195,1) 0%,transparent 100%),
+    radial-gradient(2.5px 2.5px at 49% 7%,#fff 0%,transparent 100%),
+    radial-gradient(1px 1px at 10% 34%,rgba(255,255,255,.75) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 38% 26%,rgba(200,212,255,.9) 0%,transparent 100%),
+    radial-gradient(2px 2px at 84% 20%,rgba(218,198,255,.88) 0%,transparent 100%),
+    radial-gradient(1px 1px at 60% 40%,rgba(255,255,255,.68) 0%,transparent 100%),
+    radial-gradient(1px 1px at 95% 44%,rgba(255,255,255,.68) 0%,transparent 100%),
+    radial-gradient(2px 2px at 73% 92%,rgba(255,255,255,.78) 0%,transparent 100%),
+    radial-gradient(1px 1px at 27% 48%,rgba(255,255,255,.48) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 75% 4%,rgba(255,238,195,.82) 0%,transparent 100%);}
+
+/* NAV */
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;height:52px;
+  background:rgba(4,2,14,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;padding:0 16px;gap:0;}
+#logo{font-size:12px;font-weight:700;letter-spacing:3px;
+  background:linear-gradient(155deg,#b0b0c0,#e8e8f0,#fff,#c4c4d0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-right:20px;white-space:nowrap;}
+.nb{font-size:9px;letter-spacing:1.5px;padding:6px 10px;border:none;background:none;
+  color:rgba(148,142,166,.40);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
+.nb.on{color:rgba(210,170,60,.92);border-bottom-color:rgba(200,148,40,.70);}
+#ship-sel-wrap{margin-left:auto;position:relative;}
+#ship-sel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  color:rgba(200,192,178,.85);font-size:10px;font-family:inherit;
+  padding:5px 30px 5px 10px;border-radius:4px;cursor:pointer;min-width:180px;
+  appearance:none;-webkit-appearance:none;}
+#ship-sel-arr{position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  font-size:9px;color:rgba(200,160,50,.55);pointer-events:none;}
+#live-pill{display:flex;align-items:center;gap:5px;font-size:8px;
+  color:rgba(155,150,172,.45);letter-spacing:1px;margin-left:16px;white-space:nowrap;}
+#ldot{width:5px;height:5px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#80ffa0,#28a858);
+  box-shadow:0 0 5px rgba(50,180,90,.45);}
+
+/* SCENE */
+#scene{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden;}
+
+/* SHIP CENTER */
+#ship-center{position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:360px;height:270px;z-index:5;display:flex;align-items:center;justify-content:center;}
+#ship-glow{position:absolute;inset:0;
+  background:radial-gradient(ellipse 55% 42% at 50% 60%,rgba(200,168,76,.07) 0%,transparent 75%);
+  border-radius:50%;}
+#ship-nameplate{position:absolute;top:4px;left:50%;transform:translateX(-50%);
+  text-align:center;white-space:nowrap;z-index:8;}
+#ship-nm{font-size:17px;font-weight:700;letter-spacing:4px;
+  background:linear-gradient(155deg,#b0b0c0,#e8e8f0,#fff,#c4c4d0,#a0a0b4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+#ship-type{font-size:7px;letter-spacing:2px;color:rgba(160,148,118,.36);margin-top:2px;}
+#ship-img{width:100%;height:230px;object-fit:contain;margin-top:26px;
+  filter:drop-shadow(0 0 24px rgba(200,168,76,.10)) drop-shadow(0 0 44px rgba(60,100,200,.07));}
+#ship-shadow{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  width:200px;height:8px;
+  background:radial-gradient(ellipse,rgba(200,168,76,.08) 0%,transparent 70%);
+  border-radius:50%;filter:blur(4px);}
+
+/* HUD LEFT ARC */
+#hud-left{position:absolute;top:8px;left:6px;width:180px;z-index:10;
+  display:flex;flex-direction:column;}
+/* HUD RIGHT ARC */
+#hud-right{position:absolute;top:8px;right:6px;width:175px;z-index:10;
+  display:flex;flex-direction:column;align-items:flex-end;}
+
+.hs{padding:3px 0 3px 10px;position:relative;display:flex;flex-direction:column;}
+.hs::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;border-radius:1px;}
+.hs.fire::before{background:linear-gradient(to bottom,transparent,rgba(220,70,40,.82),transparent);}
+.hs.def::before{background:linear-gradient(to bottom,transparent,rgba(28,160,210,.82),transparent);}
+.hs.ch::before{background:linear-gradient(to bottom,transparent,rgba(175,170,195,.45),transparent);}
+.hs-r{padding:3px 10px 3px 0;position:relative;text-align:right;}
+.hs-r::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:2px;border-radius:1px;}
+.hs-r.pwr::after{background:linear-gradient(to bottom,transparent,rgba(200,158,48,.82),transparent);}
+.hs-r.teal::after{background:linear-gradient(to bottom,transparent,rgba(18,178,148,.82),transparent);}
+.hs-r.ch::after{background:linear-gradient(to bottom,transparent,rgba(175,170,195,.45),transparent);}
+.hlbl{font-size:7px;letter-spacing:1.8px;color:rgba(130,122,148,.40);white-space:nowrap;}
+.hval{font-size:15px;font-weight:700;line-height:1.1;}
+.hval.sm{font-size:11px;}
+.hval.fire{background:linear-gradient(135deg,#c03820,#e85030);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hval.def{background:linear-gradient(135deg,#0e6898,#1cb8d8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hval.gd{background:linear-gradient(135deg,#a07020,#d4a040,#f0c848);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hval.tl{background:linear-gradient(135deg,#0a6858,#18b898);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hval.ch{background:linear-gradient(155deg,#b0b0c0,#e8e8f0,#fff,#c4c4d0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hdiv{height:1px;background:linear-gradient(to right,rgba(175,170,195,.07),transparent);margin:1px 0 1px 10px;}
+.hdiv-r{height:1px;background:linear-gradient(to left,rgba(175,170,195,.07),transparent);margin:1px 10px 1px 0;}
+.hgap{height:6px;}
+
+/* POWER RIBBON */
+#pwr-ribbon{position:absolute;bottom:92px;left:0;right:0;z-index:15;
+  padding:7px 16px 6px;
+  background:linear-gradient(180deg,transparent,rgba(4,2,14,.60) 28%,rgba(4,2,14,.88) 100%);
+  backdrop-filter:blur(4px);}
+.peu-row{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.peu-lbl{font-size:7px;letter-spacing:2px;color:rgba(140,132,110,.36);white-space:nowrap;}
+.pmode{display:flex;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:3px;padding:2px;position:relative;margin-right:3px;flex-shrink:0;}
+.pmpill{position:absolute;top:2px;height:calc(100% - 4px);
+  background:linear-gradient(135deg,rgba(160,120,28,.28),rgba(210,158,48,.14));
+  border:1px solid rgba(195,152,42,.36);border-radius:2px;
+  transition:left .22s cubic-bezier(.34,1.4,.64,1),width .22s;}
+.pmopt{padding:3px 7px;font-size:8px;letter-spacing:1.2px;cursor:pointer;
+  position:relative;z-index:1;color:rgba(130,125,148,.35);white-space:nowrap;
+  border:none;background:none;}
+.pmopt.on{color:rgba(218,172,68,.92);}
+.peu-track{flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;}
+.peu-fill{height:100%;border-radius:2px;transition:width .32s cubic-bezier(.34,1.4,.64,1),background .3s;}
+.peu-nums{font-size:9px;font-weight:700;white-space:nowrap;min-width:62px;text-align:right;
+  background:linear-gradient(135deg,#a07020,#d4a040,#f0c848);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.peu-status{font-size:7px;letter-spacing:1px;white-space:nowrap;min-width:56px;}
+#pwr-comps{display:flex;gap:0;align-items:flex-start;}
+.pc{display:flex;flex-direction:column;padding:0 9px 0 0;position:relative;flex:1;min-width:0;}
+.pc.offline{opacity:.35;}
+.pc:not(:last-child)::after{content:'';position:absolute;right:4px;top:8%;bottom:8%;width:1px;
+  background:linear-gradient(to bottom,transparent,rgba(200,180,100,.09),transparent);}
+.pc-head{display:flex;align-items:center;gap:3px;margin-bottom:2px;}
+.ptog{width:22px;height:11px;border-radius:6px;position:relative;cursor:pointer;flex-shrink:0;
+  border:1px solid transparent;transition:background .20s,box-shadow .20s;}
+.ptog.on{background:linear-gradient(135deg,rgba(18,70,22,.95),rgba(10,52,14,.90));
+  border-color:rgba(38,140,52,.30);box-shadow:0 0 5px rgba(38,140,52,.16);}
+.ptog.off{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.07);}
+.ptog-k{position:absolute;top:1px;width:7px;height:7px;border-radius:50%;
+  transition:left .20s cubic-bezier(.34,1.56,.64,1),background .20s;}
+.ptog.on .ptog-k{left:12px;background:radial-gradient(circle at 35% 35%,#78ff88,#22ae36);}
+.ptog.off .ptog-k{left:1px;background:rgba(130,124,142,.42);}
+.pc-name{font-size:8px;font-weight:700;white-space:nowrap;}
+.pc-sub{font-size:6px;color:rgba(120,114,100,.36);margin-bottom:2px;white-space:nowrap;}
+.pp-track{display:flex;gap:1px;margin-bottom:3px;}
+.pp{flex:1;height:5px;border-radius:1px;cursor:pointer;
+  transition:transform .10s cubic-bezier(.34,1.8,.64,1);}
+.pp:hover{transform:scaleY(1.4);}
+.pp:active{transform:scaleY(.80);}
+.pp.e{background:rgba(255,255,255,.06);}
+.pp.pp-c{background:linear-gradient(135deg,#987818,#d09838);}
+.pp.sg{background:linear-gradient(135deg,#0c6090,#18a8c8);}
+.pp.wp{background:linear-gradient(135deg,#b83018,#e04828);}
+.pp.en{background:linear-gradient(135deg,#887818,#c8a828);}
+.pp.co{background:linear-gradient(135deg,#088060,#14a888);}
+.pp.qd{background:linear-gradient(135deg,#086880,#12a0b8);}
+.pp.rd{background:linear-gradient(135deg,#686870,#9898a0);}
+.pc-foot{display:flex;align-items:center;gap:2px;}
+.padj{display:flex;gap:1px;}
+.padb{width:12px;height:12px;border-radius:2px;border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.03);color:rgba(155,148,138,.55);font-size:10px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;}
+.padb:hover{background:rgba(255,255,255,.08);}
+.padb:active{transform:scale(.78);}
+.pc-eu{font-size:7px;font-weight:700;margin-left:auto;}
+#pwr-warn{font-size:7px;color:rgba(220,70,40,.75);background:rgba(220,40,20,.06);
+  border:1px solid rgba(220,40,20,.12);border-radius:2px;padding:2px 5px;
+  margin-top:3px;display:none;}
+
+/* HARDPOINTS BAND */
+#hp-band{position:absolute;bottom:0;left:0;right:0;z-index:16;
+  background:linear-gradient(180deg,transparent,rgba(4,2,14,.88) 20%,rgba(4,2,14,.97) 100%);
+  backdrop-filter:blur(10px);padding:7px 16px 10px;
+  border-top:1px solid rgba(255,255,255,.04);}
+#hp-flow{display:flex;gap:0;}
+.hpi{flex:1;padding:0 10px 0 0;position:relative;min-width:0;}
+.hpi:not(:last-child)::after{content:'';position:absolute;right:5px;top:10%;bottom:10%;width:1px;
+  background:linear-gradient(to bottom,transparent,rgba(200,180,100,.09),transparent);}
+.hpi-slot{font-size:6px;letter-spacing:1.5px;color:rgba(118,110,135,.34);
+  margin-bottom:2px;display:block;}
+.hpi-nr{display:flex;align-items:center;gap:3px;margin-bottom:1px;flex-wrap:nowrap;}
+.hpi-sz{font-size:7px;font-weight:700;padding:1px 4px;border-radius:10px;flex-shrink:0;}
+.hpi-sz.w{background:rgba(200,60,28,.18);color:rgba(232,92,54,.90);border:1px solid rgba(212,72,36,.20);}
+.hpi-sz.s{background:rgba(28,140,200,.18);color:rgba(52,172,212,.90);border:1px solid rgba(36,152,202,.20);}
+.hpi-sz.p{background:rgba(178,136,36,.18);color:rgba(212,162,52,.90);border:1px solid rgba(192,150,40,.20);}
+.hpi-nm{font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:linear-gradient(155deg,#b0b0c0,#e8e8f0,#fff,#c4c4d0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hpi-on{font-size:6px;padding:1px 4px;border-radius:2px;font-weight:700;
+  background:rgba(10,60,18,.85);color:#56e678;border:1px solid rgba(36,138,52,.20);}
+.hpi-dv{display:flex;align-items:baseline;gap:2px;}
+.hpi-dps{font-size:13px;font-weight:700;}
+.hpi-u{font-size:7px;color:rgba(118,110,135,.38);letter-spacing:1px;}
+.hpi-dps.gd{background:linear-gradient(135deg,#a07020,#d4a040,#f0c848);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hpi-dps.df{background:linear-gradient(135deg,#0e6898,#1cb8d8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hpi-dps.tl{background:linear-gradient(135deg,#0a6858,#18b898);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* 3D DROPDOWN */
+.hpi.ddw{position:relative;}
+.dd{position:absolute;bottom:calc(100% + 4px);left:0;min-width:200px;z-index:50;
+  background:linear-gradient(168deg,rgba(44,40,60,.99),rgba(28,24,44,.99));
+  border:1px solid rgba(200,168,76,.26);border-radius:5px 5px 3px 3px;overflow:hidden;
+  box-shadow:0 -10px 26px rgba(0,0,0,.68),0 -18px 40px rgba(0,0,0,.38),
+    inset 0 1px 0 rgba(255,218,100,.08);
+  transform:perspective(460px) rotateX(2deg);transform-origin:bottom center;
+  display:none;}
+.hpi.ddw:hover .dd{display:block;}
+.dd-stats{display:flex;border-bottom:1px solid rgba(200,168,76,.09);}
+.dd-s{flex:1;text-align:center;padding:5px 2px;border-right:1px solid rgba(200,168,76,.07);}
+.dd-s:last-child{border-right:none;}
+.dd-sv{font-size:12px;font-weight:700;line-height:1;}
+.dd-sl{font-size:6px;letter-spacing:1.5px;color:rgba(126,116,98,.40);margin-top:1px;}
+.dd-sv.gd{background:linear-gradient(135deg,#a07020,#d4a040,#f0c848);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dd-sv.fr{background:linear-gradient(135deg,#c03820,#e85030);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dd-sv.df{background:linear-gradient(135deg,#0e6898,#1cb8d8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dd-sv.ch{background:linear-gradient(155deg,#b0b0c0,#e8e8f0,#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dd-opts{padding:2px 0;}
+.dd-opt{display:flex;align-items:center;justify-content:space-between;
+  padding:4px 9px;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;}
+.dd-opt:hover,.dd-opt.sel{background:rgba(200,168,76,.07);}
+.dd-on{font-size:9px;color:rgba(182,170,140,.70);}
+.dd-os{font-size:9px;font-weight:700;}
+.dd-osub{font-size:7px;color:rgba(115,108,98,.38);margin-top:1px;}
+.dd-loc{padding:4px 9px;font-size:7px;color:rgba(175,155,76,.46);
+  border-top:1px solid rgba(255,255,255,.04);}
+
+/* WEAPON SELECT MODAL */
+#wsel-modal{display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;}
+#wsel-modal.open{display:flex;}
+#wsel-box{background:linear-gradient(160deg,rgba(28,24,42,.98),rgba(18,14,30,.98));
+  border:1px solid rgba(200,168,76,.25);border-radius:8px;width:500px;max-height:70vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.70);}
+#wsel-hdr{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+#wsel-title{font-size:10px;letter-spacing:2px;color:rgba(200,168,76,.80);}
+#wsel-close{cursor:pointer;font-size:14px;color:rgba(160,152,140,.50);background:none;border:none;}
+#wsel-search{padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0;}
+#wsel-inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+  color:rgba(200,192,178,.80);font-size:10px;font-family:inherit;
+  padding:5px 10px;border-radius:3px;}
+#wsel-list{overflow-y:auto;flex:1;}
+#wsel-list::-webkit-scrollbar{width:3px;}
+#wsel-list::-webkit-scrollbar-thumb{background:rgba(200,168,76,.20);}
+.wsel-item{display:flex;align-items:center;justify-content:space-between;
+  padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;}
+.wsel-item:hover{background:rgba(200,168,76,.06);}
+.wsel-item.cur{background:rgba(200,168,76,.10);}
+.wi-name{font-size:10px;font-weight:700;
+  background:linear-gradient(155deg,#b0b0c0,#e8e8f0,#fff,#c4c4d0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.wi-sub{font-size:7px;color:rgba(120,114,100,.40);margin-top:1px;}
+.wi-dps{font-size:11px;font-weight:700;
+  background:linear-gradient(135deg,#a07020,#d4a040,#f0c848);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* LOADING */
+#loading{position:fixed;inset:0;z-index:300;background:#01000a;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+  transition:opacity .4s;}
+#loading.done{opacity:0;pointer-events:none;}
+#load-nm{font-size:14px;letter-spacing:3px;
+  background:linear-gradient(155deg,#b0b0c0,#e8e8f0,#fff,#c4c4d0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+#load-bar{width:200px;height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+#load-fill{height:100%;width:0%;background:linear-gradient(to right,#7a5010,#c08020,#e8b030);
+  transition:width .3s;}
+#load-st{font-size:8px;letter-spacing:2px;color:rgba(140,132,110,.45);}
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loading">
+  <div id="load-nm">SC-SHIPFORGE</div>
+  <div id="load-bar"><div id="load-fill"></div></div>
+  <div id="load-st">LOADING SHIP DATA...</div>
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <div id="logo">SC-SHIPFORGE <span style="font-size:7px;letter-spacing:1px;color:rgba(140,132,158,.34);margin-left:4px">v8.97</span></div>
+  <a href="/" class="nb">DASHBOARD</a>
+  <div class="nb on">BUILDER</div>
+  <div class="nb">WEAPONS &amp; COMPS</div>
+  <div class="nb">SHOWDOWN</div>
+  <div class="nb">SAVE LOADOUTS</div>
+  <div id="ship-sel-wrap">
+    <select id="ship-sel"><option value="">Select a ship...</option></select>
+    <span id="ship-sel-arr">&#9660;</span>
+  </div>
+  <div id="live-pill"><div id="ldot"></div><span id="hull-count">-- HULLS</span> &middot; PU 4.7.2 LIVE</div>
+</div>
+
+<!-- SCENE -->
+<div id="scene">
+
+  <!-- SHIP CENTER -->
+  <div id="ship-center">
+    <div id="ship-glow"></div>
+    <div id="ship-nameplate">
+      <div id="ship-nm">SELECT A SHIP</div>
+      <div id="ship-type"></div>
+    </div>
+    <img id="ship-img" src="" alt="" onerror="this.style.opacity='0'">
+    <div id="ship-shadow"></div>
+  </div>
+
+  <!-- HUD LEFT -->
+  <div id="hud-left">
+    <div class="hs fire">
+      <span class="hlbl">TOTAL DPS</span>
+      <span class="hval fire" id="h-dps">--</span>
+    </div>
+    <div class="hdiv"></div>
+    <div class="hs fire">
+      <span class="hlbl">ALPHA DAMAGE</span>
+      <span class="hval sm fire" id="h-alpha">--</span>
+    </div>
+    <div class="hdiv"></div>
+    <div class="hgap"></div>
+    <div class="hs def">
+      <span class="hlbl">SHIELD HP</span>
+      <span class="hval def" id="h-shp">--</span>
+    </div>
+    <div class="hdiv"></div>
+    <div class="hs def">
+      <span class="hlbl">REGEN / S</span>
+      <span class="hval sm def" id="h-regen">--</span>
+    </div>
+    <div class="hdiv"></div>
+    <div class="hgap"></div>
+    <div class="hs ch">
+      <span class="hlbl">SCM SPEED</span>
+      <span class="hval sm ch" id="h-scm">-- <span style="font-size:7px;color:rgba(140,132,155,.38)">m/s</span></span>
+    </div>
+    <div class="hdiv"></div>
+    <div class="hs ch">
+      <span class="hlbl">CREW</span>
+      <span class="hval sm ch" id="h-crew">--</span>
+    </div>
+  </div>
+
+  <!-- HUD RIGHT -->
+  <div id="hud-right">
+    <div class="hs-r pwr">
+      <span class="hlbl" style="text-align:right">EU OUTPUT</span>
+      <span class="hval gd" id="h-eu">-- <span style="font-size:7px;color:rgba(140,132,110,.38)">EU</span></span>
+    </div>
+    <div class="hdiv-r"></div>
+    <div class="hs-r pwr">
+      <span class="hlbl" style="text-align:right">POWER LOAD</span>
+      <span class="hval sm gd" id="h-load">--%</span>
+    </div>
+    <div class="hdiv-r"></div>
+    <div class="hgap"></div>
+    <div class="hs-r teal">
+      <span class="hlbl" style="text-align:right">Q-DRIVE</span>
+      <span class="hval tl" id="h-qd">-- <span style="font-size:7px;color:rgba(120,140,132,.38)">Mm/s</span></span>
+    </div>
+    <div class="hdiv-r"></div>
+    <div class="hs-r teal">
+      <span class="hlbl" style="text-align:right">QD RANGE</span>
+      <span class="hval sm tl" id="h-range">-- Gm</span>
+    </div>
+    <div class="hdiv-r"></div>
+    <div class="hgap"></div>
+    <div class="hs-r ch">
+      <span class="hlbl" style="text-align:right">SIZE</span>
+      <span class="hval sm ch" id="h-size">--</span>
+    </div>
+    <div class="hdiv-r"></div>
+    <div class="hs-r ch">
+      <span class="hlbl" style="text-align:right">ROLE</span>
+      <span class="hval sm gd" id="h-role">--</span>
+    </div>
+  </div>
+
+  <!-- POWER RIBBON -->
+  <div id="pwr-ribbon">
+    <div class="peu-row">
+      <span class="peu-lbl">POWER</span>
+      <div class="pmode" id="pmode-row">
+        <div class="pmpill" id="pmpill"></div>
+        <div class="pmopt on" id="pscm" onclick="setMode('scm')">SCM</div>
+        <div class="pmopt" id="pnav" onclick="setMode('nav')">NAV</div>
+      </div>
+      <div class="peu-track"><div class="peu-fill" id="peu-fill"></div></div>
+      <div class="peu-nums" id="peu-nums">-- EU</div>
+      <div class="peu-status" id="peu-status"></div>
+    </div>
+    <div id="pwr-comps"></div>
+    <div id="pwr-warn"></div>
+  </div>
+
+  <!-- HARDPOINTS BAND -->
+  <div id="hp-band">
+    <div id="hp-flow"></div>
+  </div>
+
+</div><!-- /scene -->
+
+<!-- WEAPON SELECT MODAL -->
+<div id="wsel-modal">
+  <div id="wsel-box">
+    <div id="wsel-hdr">
+      <span id="wsel-title">SELECT WEAPON</span>
+      <button id="wsel-close" onclick="closeWsel()">&#10005;</button>
+    </div>
+    <div id="wsel-search">
+      <input id="wsel-inp" type="text" placeholder="Search weapons..." oninput="filterWsel(this.value)">
+    </div>
+    <div id="wsel-list"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA — loaded from parent window or fetched
+// ============================================================
+var SHIP_DATA = {}, WEAPONS = [], COMP_DB = {}, WEAP_BY_ID = {};
+var _curShip = null, _curShipName = '', _loadout = {}, _pwrComps = null, _mode = 'scm';
+var _wselSlotIdx = -1;
+
+var CC = {pp:'rgba(200,158,48,.82)',sg:'rgba(28,160,210,.82)',wp:'rgba(220,72,40,.82)',en:'rgba(180,168,48,.82)',co:'rgba(18,178,148,.82)',qd:'rgba(18,148,178,.82)',rd:'rgba(158,152,172,.55)'};
+var CL = {pp:'Pwr Plant',sg:'Shield',wp:'Weapons',en:'Engines',co:'Cooler',qd:'Q-Drive',rd:'Radar'};
+
+// ============================================================
+// INIT — try to grab data from parent window
+// ============================================================
+function init() {
+  progress(10, 'LOADING SHIP DATA...');
+  
+  // Try parent window first (embedded in index.html iframe)
+  try {
+    if (window.parent && window.parent.SHIP_DATA) {
+      SHIP_DATA = window.parent.SHIP_DATA;
+      WEAPONS = Object.values(window.parent.WEAPONS || {});
+      COMP_DB = window.parent.COMP_DB || {};
+      WEAPONS.forEach(function(w){ WEAP_BY_ID[w.id] = w; });
+      progress(100, 'READY');
+      setTimeout(function(){ document.getElementById('loading').classList.add('done'); }, 300);
+      populateShipSel();
+      return;
+    }
+  } catch(e) {}
+  
+  // Fetch from the main app's data endpoint
+  fetch('/').then(function(r){ return r.text(); }).then(function(html) {
+    progress(40, 'PARSING DATA...');
+    // Extract SHIP_DATA
+    var sdMatch = html.match(/var SHIP_DATA\s*=\s*(\{[\s\S]+?\});\s*\n/);
+    var wMatch  = html.match(/var WEAPONS\s*=\s*(\[[\s\S]+?\]);\s*\n/);
+    var dbMatch = html.match(/var COMP_DB\s*=\s*(\{[\s\S]+?\});\s*\n/);
+    try { if(sdMatch) SHIP_DATA = eval('('+sdMatch[1]+')'); } catch(e){}
+    try { if(wMatch)  WEAPONS = eval('('+wMatch[1]+')'); } catch(e){}
+    try { if(dbMatch) COMP_DB = eval('('+dbMatch[1]+')'); } catch(e){}
+    if(Array.isArray(WEAPONS)) WEAPONS.forEach(function(w){ WEAP_BY_ID[w.id] = w; });
+    else { WEAPONS = Object.values(WEAPONS||{}); WEAPONS.forEach(function(w){ WEAP_BY_ID[w.id] = w; }); }
+    progress(100, 'READY');
+    setTimeout(function(){ document.getElementById('loading').classList.add('done'); }, 300);
+    populateShipSel();
+  }).catch(function() {
+    progress(100, 'ERROR LOADING DATA');
+  });
+}
+
+function progress(pct, txt) {
+  document.getElementById('load-fill').style.width = pct + '%';
+  document.getElementById('load-st').textContent = txt;
+}
+
+function populateShipSel() {
+  var sel = document.getElementById('ship-sel');
+  var names = Object.keys(SHIP_DATA).sort();
+  document.getElementById('hull-count').textContent = names.length + ' HULLS';
+  names.forEach(function(n) {
+    var o = document.createElement('option');
+    o.value = n; o.textContent = n;
+    sel.appendChild(o);
+  });
+  sel.addEventListener('change', function(){ if(this.value) loadShip(this.value); });
+  // Auto-load from URL
+  var urlShip = new URLSearchParams(location.search).get('ship');
+  if (urlShip && SHIP_DATA[urlShip]) { sel.value = urlShip; loadShip(urlShip); }
+}
+
+// ============================================================
+// LOAD SHIP
+// ============================================================
+function loadShip(name) {
+  _curShipName = name;
+  _curShip = SHIP_DATA[name];
+  if (!_curShip) return;
+  
+  // Init loadout with defaults
+  _loadout = {};
+  var slots = _curShip.slots || [];
+  slots.forEach(function(sl, i) {
+    _loadout[i] = sl.default || '';
+  });
+  
+  // Ship nameplate
+  document.getElementById('ship-nm').textContent = name.toUpperCase();
+  document.getElementById('ship-type').textContent =
+    (_curShip.role||'').toUpperCase() + ' \u00b7 SIZE ' + (_curShip.size||'?') + ' \u00b7 ' + (mfrName(name)||'');
+
+  // Ship image
+  var img = document.getElementById('ship-img');
+  var slug = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  img.style.opacity = '1';
+  img.src = 'https://cdn.fleetyards.net/ships/' + slug + '/store_final_jpeg.jpg';
+  img.onerror = function() {
+    this.style.opacity = '0.0';
+    // Try alternative slug
+    var alt = slug.replace(/-/g,'_');
+    this.src = 'https://cdn.fleetyards.net/ships/' + alt + '/store_final_jpeg.jpg';
+    this.onerror = function(){ this.style.opacity='0'; };
+  };
+
+  // Update URL
+  history.replaceState(null,'','?ship='+encodeURIComponent(name));
+
+  buildPwrComps();
+  buildHpBand();
+  updateStats();
+}
+
+function mfrName(shipName) {
+  var mfrs = {Gladius:'Aegis Dynamics',Hammerhead:'Aegis Dynamics',Arrow:'RSI',Hornet:'Anvil Aerospace',Hurricane:'Anvil Aerospace',Eclipse:'Aegis Dynamics',Carrack:'Anvil Aerospace',Constellation:'RSI',Freelancer:'MISC',Cutlass:'Drake Interplanetary',Vanguard:'Aegis Dynamics',Redeemer:'Crusader Industries',Polaris:'RSI',Reclaimer:'Aegis Dynamics'};
+  for (var k in mfrs) { if (shipName.indexOf(k) > -1) return mfrs[k]; }
+  return '';
+}
+
+// ============================================================
+// POWER SYSTEM
+// ============================================================
+function cDraw(c,p){ if(c.output) return 0; if(!c.dMax) return c.dMin||0; return c.dMin+(p/c.max)*(c.dMax-c.dMin); }
+function pMult(p,m){ return 0.5+(p/m); }
+
+function buildPwrComps() {
+  var ship = _curShip, co = JSON.parse(ship.comps||'{}');
+  var cnt = co.counts||{}, db = COMP_DB||{};
+  var list = [];
+  var ppN = co.pp||'Power Plant', ppC = cnt.pp||1;
+  for(var i=0;i<ppC;i++){var d=(db.pp&&db.pp[ppN])||null;list.push({id:'pp'+i,cat:'pp',name:ppN+(ppC>1?' '+(i+1):''),pips:8,max:8,output:d?d.out:16,on:true});}
+  var sgN = co.sg||'Shield Gen', sgC = cnt.sg||1;
+  for(var i=0;i<sgC;i++){var d=(db.sg&&db.sg[sgN])||null;list.push({id:'sg'+i,cat:'sg',name:sgN+(sgC>1?' '+(i+1):''),pips:5,max:10,dMin:d?d.drawMin:3,dMax:d?d.drawMax:6,on:true});}
+  list.push({id:'wp',cat:'wp',name:'Hardpoints',pips:5,max:10,dMin:0,dMax:13,on:true});
+  list.push({id:'en',cat:'en',name:'Thrusters',pips:5,max:10,dMin:0,dMax:6,on:true});
+  var coN = co.cooler||'Cooler', coC = cnt.cooler||1;
+  for(var i=0;i<coC;i++)list.push({id:'co'+i,cat:'co',name:coN+(coC>1?' '+(i+1):''),pips:5,max:5,dMin:6,dMax:6,on:true});
+  list.push({id:'qd',cat:'qd',name:co.qd||'Q-Drive',pips:3,max:3,dMin:3,dMax:3,on:true});
+  list.push({id:'rd',cat:'rd',name:co.radar||'Radar',pips:2,max:2,dMin:1,dMax:1,on:true});
+  _pwrComps = list;
+  renderPwrComps();
+  initModePill();
+}
+
+function renderPwrComps() {
+  var flow = document.getElementById('pwr-comps'); flow.innerHTML = '';
+  _pwrComps.forEach(function(c){
+    var hp = ['wp','sg','en'].indexOf(c.cat) > -1;
+    var el = document.createElement('div');
+    el.id = 'prc-'+c.id; el.className = 'pc'+(c.on?'':' offline');
+    el.innerHTML =
+      '<div class="pc-head">' +
+        '<div class="ptog '+(c.on?'on':'off')+'" id="ptog-'+c.id+'" onclick="togComp(\''+c.id+'\')"><div class="ptog-k"></div></div>' +
+        '<span class="pc-name" style="color:'+CC[c.cat]+'">'+CL[c.cat]+'</span>' +
+      '</div>' +
+      '<div class="pc-sub">'+c.name+'</div>' +
+      '<div class="pp-track" id="ppt-'+c.id+'"></div>' +
+      '<div class="pc-foot">' +
+        (hp?'<div class="padj"><div class="padb" onclick="adjPip(\''+c.id+'\',-1)">\u2212</div><div class="padb" onclick="adjPip(\''+c.id+'\',1)">+</div></div>':'') +
+        '<div class="pc-eu" style="color:'+CC[c.cat]+'" id="pce-'+c.id+'"></div>' +
+      '</div>';
+    flow.appendChild(el);
+  });
+  updatePwr();
+}
+
+function bpips(c) {
+  var el = document.getElementById('ppt-'+c.id); if(!el) return;
+  el.innerHTML = '';
+  for(var i=0;i<c.max;i++){
+    var d = document.createElement('div');
+    d.className = 'pp '+(i<(c.on?c.pips:0)?c.cat+' pp-c':'e').replace('pp-c','pp-c');
+    // fix class: use cat as pip class
+    d.className = 'pp '+(i<(c.on?c.pips:0)?c.cat:'e');
+    (function(idx,comp){d.onclick=function(){if(!comp.on)return;comp.pips=idx+1;updatePwr();};}(i,c));
+    el.appendChild(d);
+  }
+}
+
+function togComp(id) {
+  var c = _pwrComps.find(function(x){return x.id===id;}); if(!c) return;
+  c.on = !c.on;
+  document.getElementById('ptog-'+id).className = 'ptog '+(c.on?'on':'off');
+  document.getElementById('prc-'+id).className = 'pc'+(c.on?'':' offline');
+  updatePwr();
+}
+function adjPip(id,d) {
+  var c = _pwrComps.find(function(x){return x.id===id;}); if(!c||!c.on) return;
+  c.pips = Math.max(0,Math.min(c.max,c.pips+d)); updatePwr();
+}
+
+function setMode(m) {
+  _mode = m;
+  document.getElementById('pscm').className = 'pmopt'+(m==='scm'?' on':'');
+  document.getElementById('pnav').className = 'pmopt'+(m==='nav'?' on':'');
+  initModePill(); updatePwr();
+}
+function initModePill() {
+  var mr = document.getElementById('pmode-row'), pill = document.getElementById('pmpill');
+  if(!mr||!pill) return;
+  var pw = mr.offsetWidth/2-2;
+  pill.style.left = (_mode==='scm'?2:pw+2)+'px'; pill.style.width = pw+'px';
+}
+
+function updatePwr() {
+  if(!_pwrComps) return;
+  var out=0,draw=0,wpM=0,enM=0,sgHP=0;
+  var sgs = _pwrComps.filter(function(c){return c.cat==='sg';});
+  var db = COMP_DB||{};
+  var coObj = _curShip ? JSON.parse(_curShip.comps||'{}') : {};
+  var sgN = coObj.sg||'';
+  var sgD = db.sg&&db.sg[sgN] ? db.sg[sgN] : null;
+  var baseSHP = sgD ? sgD.totalHP * sgs.length : 5400;
+
+  _pwrComps.forEach(function(c){
+    bpips(c);
+    if(c.output){var o=c.on?c.output:0;out+=o;var el=document.getElementById('pce-'+c.id);if(el)el.textContent=o+' EU';return;}
+    var dr=c.on?cDraw(c,c.pips):0; draw+=dr;
+    var el=document.getElementById('pce-'+c.id);if(el)el.textContent=Math.round(dr)+' EU';
+    if(c.cat==='wp'&&c.on) wpM=pMult(c.pips,c.max);
+    if(c.cat==='en'&&c.on) enM=pMult(c.pips,c.max);
+    if(c.cat==='sg'&&c.on) sgHP+=Math.round((baseSHP/sgs.length)*pMult(c.pips,c.max));
+  });
+
+  var lp = out>0?(draw/out)*100:999;
+  var bg = lp>100?'linear-gradient(to right,#c02020,#e03030)':lp>85?'linear-gradient(to right,#b07820,#e0b030,#f0c040)':'linear-gradient(to right,#7a5010,#c08020,#e8b030)';
+  var ef = document.getElementById('peu-fill'); if(ef){ef.style.width=Math.min(100,lp)+'%';ef.style.background=bg;}
+  var en = document.getElementById('peu-nums'); if(en) en.textContent=Math.round(draw)+'/'+out+' EU';
+  var es = document.getElementById('peu-status');
+  if(es){if(lp>100){es.style.color='rgba(220,60,38,.75)';es.textContent='OVERDRAW';}else{es.style.color='rgba(70,188,100,.55)';es.textContent=Math.round(lp)+'% load';}}
+
+  var wb = document.getElementById('pwr-warn');
+  if(wb){
+    var off=_pwrComps.filter(function(c){return !c.on&&['pp','sg','en'].indexOf(c.cat)>-1;}).map(function(c){return c.cat.toUpperCase();});
+    if(lp>100) off.unshift('OVERDRAW');
+    if(off.length){wb.style.display='block';wb.textContent='\u26a0 '+off.join(' \u00b7 ');}
+    else wb.style.display='none';
+  }
+
+  // Update HUD
+  var ship = _curShip || {};
+  var dps = wpM>0 ? Math.round(calcTotalDPS()*wpM) : calcTotalDPS();
+  var spd = enM>0 ? Math.round((_mode==='scm'?(ship.scm||226):(ship.nav||1193))*enM) : (_mode==='scm'?ship.scm||226:ship.nav||1193);
+  setText('h-dps', dps.toLocaleString());
+  setText('h-shp', sgHP ? sgHP.toLocaleString() : (baseSHP?baseSHP.toLocaleString():'--'));
+  setText('h-eu', out+' EU');
+  setText('h-load', Math.round(lp)+'%');
+  setText('h-scm', (_mode==='scm'?spd:ship.scm||226)+' ');
+  
+  // Rebuild hp band dps display
+  buildHpBand();
+}
+
+function setText(id, v) { var el=document.getElementById(id); if(el) el.firstChild ? (el.childNodes[0].textContent=v) : (el.textContent=v); }
+
+// ============================================================
+// STATS
+// ============================================================
+function calcTotalDPS() {
+  var total = 0;
+  var slots = (_curShip&&_curShip.slots) || [];
+  slots.forEach(function(sl,i){
+    var wid = _loadout[i] || sl.default || '';
+    var w = WEAP_BY_ID[wid];
+    if(w) total += (w.dps||0) * (sl.count||1);
+  });
+  return Math.round(total);
+}
+
+function updateStats() {
+  if(!_curShip) return;
+  var ship = _curShip;
+  var db = COMP_DB||{};
+  var coObj = JSON.parse(ship.comps||'{}');
+  var sgN = coObj.sg||''; var sgD = db.sg&&db.sg[sgN] ? db.sg[sgN] : null;
+  var cnt = coObj.counts||{}; var sgC = cnt.sg||1;
+  var totalSHP = sgD ? sgD.totalHP*sgC : '--';
+  var regen = sgD ? '+' + Math.round(sgD.regen*sgC) + '/s' : '--';
+
+  setText('h-shp', totalSHP !== '--' ? totalSHP.toLocaleString() : '--');
+  setText('h-regen', regen);
+  setText('h-alpha', calcAlpha());
+  setText('h-crew', ship.crew||'1');
+  setText('h-size', 'SIZE '+(ship.size||'?'));
+  setText('h-role', ship.role||'--');
+  var qdN = coObj.qd||''; var qdD = db.qd&&db.qd[qdN] ? db.qd[qdN] : null;
+  setText('h-qd', (qdD?qdD.speed||'84':'84')+' ');
+  setText('h-range', (qdD?qdD.range||'50':'50')+' Gm');
+}
+
+function calcAlpha() {
+  var maxAlpha = 0;
+  var slots = (_curShip&&_curShip.slots) || [];
+  slots.forEach(function(sl,i){
+    var wid = _loadout[i] || sl.default || '';
+    var w = WEAP_BY_ID[wid];
+    if(w && (w.alpha||0) > maxAlpha) maxAlpha = w.alpha;
+  });
+  return maxAlpha ? maxAlpha.toFixed(1) : '--';
+}
+
+// ============================================================
+// HARDPOINTS BAND
+// ============================================================
+function buildHpBand() {
+  var flow = document.getElementById('hp-flow'); if(!flow||!_curShip) return;
+  flow.innerHTML = '';
+  var ship = _curShip;
+  var slots = ship.slots || [];
+  var db = COMP_DB||{};
+  var coObj = JSON.parse(ship.comps||'{}');
+  var cnt = coObj.counts||{};
+
+  // Weapon slots
+  slots.forEach(function(sl,i){
+    var wid = _loadout[i] || sl.default || '';
+    var w = WEAP_BY_ID[wid];
+    var dps = w ? Math.round((w.dps||0)*(sl.count||1)) : 0;
+
+    var dd = '';
+    if(w){
+      dd = '<div class="dd">' +
+        '<div class="dd-stats">' +
+          '<div class="dd-s"><div class="dd-sv gd">'+Math.round(w.dps||0)+'</div><div class="dd-sl">DPS</div></div>' +
+          '<div class="dd-s"><div class="dd-sv fr">'+Math.round(w.alpha||0)+'</div><div class="dd-sl">ALPHA</div></div>' +
+          '<div class="dd-s"><div class="dd-sv df">'+(w.range||0)+'m</div><div class="dd-sl">RANGE</div></div>' +
+          '<div class="dd-s"><div class="dd-sv ch">'+(w.draw||0)+' EU</div><div class="dd-sl">DRAW</div></div>' +
+        '</div>' +
+        '<div class="dd-opts">';
+      // Show top alternatives of same size
+      var alts = WEAPONS.filter(function(x){return x.sz===sl.sz;}).sort(function(a,b){return (b.dps||0)-(a.dps||0);}).slice(0,4);
+      alts.forEach(function(aw){
+        dd += '<div class="dd-opt'+(aw.id===wid?' sel':'')+'" onclick="pickWep('+i+',\''+aw.id+'\')">'+
+          '<div><div class="dd-on">'+aw.name+'</div><div class="dd-osub">'+aw.type+' &middot; S'+aw.sz+'</div></div>'+
+          '<div class="dd-os gd">'+Math.round(aw.dps||0)+' DPS</div>'+
+        '</div>';
+      });
+      dd += '</div><div class="dd-loc">&#10022; '+(w.loc||'CenterMass')+'</div></div>';
+    }
+
+    var div = document.createElement('div');
+    div.className = 'hpi'+(w?' ddw':'');
+    div.innerHTML = dd +
+      '<span class="hpi-slot">S'+sl.sz+' '+(sl.lbl||'HARDPOINT').toUpperCase()+'</span>' +
+      '<div class="hpi-nr">' +
+        '<span class="hpi-sz w">S'+sl.sz+'</span>' +
+        '<span class="hpi-nm">'+(w?w.name:'Empty')+'</span>' +
+        (w?'<span class="hpi-on">ON</span>':'') +
+      '</div>' +
+      '<div class="hpi-dv">' +
+        '<span class="hpi-dps gd">'+(dps||'--')+'</span>' +
+        '<span class="hpi-u">DPS</span>' +
+      '</div>';
+    flow.appendChild(div);
+  });
+
+  // Systems
+  var sysList = [];
+  var ppOut = _pwrComps ? _pwrComps.filter(function(c){return c.cat==='pp';}).reduce(function(s,c){return s+(c.on?c.output:0);},0) : 0;
+  sysList.push({slot:'POWER PLANT'+(cnt.pp>1?' x'+cnt.pp:''),sz:'p',name:coObj.pp||'--',val:ppOut,unit:'EU',cls:'gd'});
+  var sgD2 = db.sg&&db.sg[coObj.sg] ? db.sg[coObj.sg] : null;
+  var sgC2 = cnt.sg||1;
+  sysList.push({slot:'SHIELD GEN'+(sgC2>1?' x'+sgC2:''),sz:'s',name:coObj.sg||'--',val:sgD2?Math.round(sgD2.totalHP*sgC2):0,unit:'HP',cls:'df'});
+  sysList.push({slot:'COOLER'+(cnt.cooler>1?' x'+cnt.cooler:''),sz:'p',name:coObj.cooler||'--',val:'',unit:'',cls:'tl'});
+  sysList.push({slot:'Q-DRIVE',sz:'s',name:coObj.qd||'--',val:'',unit:'',cls:'tl'});
+
+  sysList.forEach(function(it){
+    var div = document.createElement('div');
+    div.className = 'hpi';
+    div.innerHTML =
+      '<span class="hpi-slot">'+it.slot+'</span>' +
+      '<div class="hpi-nr"><span class="hpi-sz '+it.sz+'">S?</span><span class="hpi-nm">'+it.name+'</span></div>' +
+      '<div class="hpi-dv">' +
+        '<span class="hpi-dps '+it.cls+'">'+(it.val||'')+'</span>' +
+        (it.unit?'<span class="hpi-u">'+it.unit+'</span>':'') +
+      '</div>';
+    flow.appendChild(div);
+  });
+}
+
+// ============================================================
+// WEAPON PICKER
+// ============================================================
+function pickWep(slotIdx, wid) {
+  _loadout[slotIdx] = wid;
+  buildHpBand();
+  updatePwr();
+}
+
+function openWsel(slotIdx) {
+  _wselSlotIdx = slotIdx;
+  var sl = (_curShip&&_curShip.slots) ? _curShip.slots[slotIdx] : null;
+  document.getElementById('wsel-title').textContent = 'SELECT WEAPON - S'+(sl?sl.sz:'?')+' SLOT';
+  filterWsel('', sl ? sl.sz : null);
+  document.getElementById('wsel-modal').classList.add('open');
+  document.getElementById('wsel-inp').value = '';
+  document.getElementById('wsel-inp').focus();
+}
+
+function closeWsel() { document.getElementById('wsel-modal').classList.remove('open'); }
+
+function filterWsel(q, szFilter) {
+  var list = document.getElementById('wsel-list'); list.innerHTML = '';
+  var curWid = _wselSlotIdx >= 0 ? (_loadout[_wselSlotIdx]||'') : '';
+  var sl = (_curShip&&_curShip.slots) ? _curShip.slots[_wselSlotIdx] : null;
+  var sz = szFilter !== undefined ? szFilter : (sl ? sl.sz : null);
+  var weaps = WEAPONS.filter(function(w){
+    if(sz && w.sz !== sz) return false;
+    if(!q) return true;
+    return (w.name||'').toLowerCase().indexOf(q.toLowerCase()) > -1;
+  }).sort(function(a,b){return (b.dps||0)-(a.dps||0);});
+
+  weaps.slice(0,50).forEach(function(w){
+    var div = document.createElement('div');
+    div.className = 'wsel-item'+(w.id===curWid?' cur':'');
+    div.innerHTML = '<div><div class="wi-name">'+w.name+'</div><div class="wi-sub">'+w.type+' &middot; S'+w.sz+' &middot; '+w.mfr+'</div></div><div class="wi-dps">'+Math.round(w.dps||0)+' DPS</div>';
+    div.onclick = function(){
+      pickWep(_wselSlotIdx, w.id);
+      closeWsel();
+    };
+    list.appendChild(div);
+  });
+}
+
+// Close modal on backdrop click
+document.getElementById('wsel-modal').addEventListener('click', function(e){
+  if(e.target === this) closeWsel();
+});
+
+// ============================================================
+// START
+// ============================================================
+window.addEventListener('load', function(){
+  init();
+  // Init mode pill after layout
+  setTimeout(initModePill, 200);
+});
+</script>
+</body>
+</html>
