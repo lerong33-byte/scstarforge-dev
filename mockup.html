@@ -276,20 +276,35 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .ptog.off .ptog-k{left:1px;}
 .pc-name{display:none;}
 .pc-sub{display:none;}
-.pp-track{order:2;display:flex;flex-direction:column-reverse;gap:1px;
-  width:100%;flex:1;min-height:140px;margin:0;
-  background:rgba(255,255,255,.018);border:1px solid rgba(86,230,120,.06);padding:2px;}
+.pp-track{order:2;display:flex;flex-direction:column-reverse;gap:3px;
+  width:100%;flex:1;min-height:170px;margin:0;
+  background:none;border:none;padding:0;}
 .pp{width:100%;flex:1;height:auto;cursor:pointer;
-  transition:transform .10s cubic-bezier(.34,1.8,.64,1),opacity .15s;min-height:6px;}
-.pp:hover{transform:scaleX(1.18);}
-.pp.e{background:rgba(255,255,255,.025);}
-.pp.pp-c{background:linear-gradient(180deg,#e8b830,#a07020);box-shadow:inset 0 0 0 1px rgba(255,200,80,.20);}
-.pp.sg{background:linear-gradient(180deg,#28b8e0,#0c6090);box-shadow:inset 0 0 0 1px rgba(60,200,240,.20);}
-.pp.wp{background:linear-gradient(180deg,#e85838,#b83018);box-shadow:inset 0 0 0 1px rgba(255,120,80,.20);}
-.pp.en{background:linear-gradient(180deg,#d8b828,#887818);box-shadow:inset 0 0 0 1px rgba(232,200,60,.20);}
-.pp.co{background:linear-gradient(180deg,#1ce0a8,#08a070);box-shadow:inset 0 0 0 1px rgba(60,232,180,.20);}
-.pp.qd{background:linear-gradient(180deg,#28b0d0,#086880);box-shadow:inset 0 0 0 1px rgba(60,200,232,.20);}
-.pp.rd{background:linear-gradient(180deg,#b8b8c0,#787880);box-shadow:inset 0 0 0 1px rgba(220,220,228,.20);}
+  border-radius:3px;position:relative;
+  transition:transform .10s cubic-bezier(.34,1.8,.64,1),opacity .15s;min-height:11px;}
+.pp::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,.06) 35%,transparent 50%,rgba(0,0,0,.18) 100%);}
+.pp:hover{transform:scaleX(1.10);}
+/* empty pip — dark brown grid cell */
+.pp.e{background:linear-gradient(180deg,#3a1c12 0%,#2a140c 50%,#1a0a06 100%);
+  box-shadow:inset 0 1px 0 rgba(160,60,30,.16),inset 0 -1px 0 rgba(0,0,0,.4),
+    0 0 0 1px rgba(80,28,14,.45);}
+.pp.e::after{background:linear-gradient(180deg,rgba(180,80,40,.10) 0%,transparent 60%);}
+/* filled pip variants — vibrant chiclets with 3D */
+.pp.pp-c{background:linear-gradient(180deg,#ffd040 0%,#e8b020 55%,#a06808 100%);
+  box-shadow:inset 0 1px 0 rgba(255,240,180,.50),0 0 0 1px rgba(255,200,60,.30),0 0 5px rgba(232,176,32,.40);}
+.pp.sg{background:linear-gradient(180deg,#5ce0f8 0%,#28b0e0 55%,#0c5890 100%);
+  box-shadow:inset 0 1px 0 rgba(190,240,255,.55),0 0 0 1px rgba(86,224,248,.30),0 0 5px rgba(40,184,224,.40);}
+.pp.wp{background:linear-gradient(180deg,#ff8050 0%,#e85030 55%,#a02810 100%);
+  box-shadow:inset 0 1px 0 rgba(255,200,170,.50),0 0 0 1px rgba(255,128,80,.30),0 0 5px rgba(232,80,48,.40);}
+.pp.en{background:linear-gradient(180deg,#f8d848 0%,#d0a818 55%,#806808 100%);
+  box-shadow:inset 0 1px 0 rgba(255,240,180,.50),0 0 0 1px rgba(248,216,72,.30),0 0 5px rgba(208,168,24,.40);}
+.pp.co{background:linear-gradient(180deg,#54f8a8 0%,#1cc878 55%,#087840 100%);
+  box-shadow:inset 0 1px 0 rgba(180,255,220,.55),0 0 0 1px rgba(84,248,168,.30),0 0 5px rgba(28,200,120,.40);}
+.pp.qd{background:linear-gradient(180deg,#c890f8 0%,#9858d8 55%,#5028a0 100%);
+  box-shadow:inset 0 1px 0 rgba(220,180,255,.55),0 0 0 1px rgba(200,144,248,.30),0 0 5px rgba(152,88,216,.40);}
+.pp.rd{background:linear-gradient(180deg,#a8d8f8 0%,#5898d0 55%,#2858a0 100%);
+  box-shadow:inset 0 1px 0 rgba(200,224,255,.55),0 0 0 1px rgba(168,216,248,.30),0 0 5px rgba(88,152,208,.40);}
 .pc-foot{order:3;display:flex;flex-direction:column;align-items:center;gap:2px;
   width:100%;margin-top:2px;}
 .padj{display:none;}
@@ -1045,9 +1060,9 @@ function updatePwr() {
   var lp = out>0?(draw/out)*100:999;
   var bg = lp>100?'linear-gradient(to right,#c02020,#e03030)':lp>85?'linear-gradient(to right,#b07820,#e0b030,#f0c040)':'linear-gradient(to right,#7a5010,#c08020,#e8b030)';
   var ef = document.getElementById('peu-fill'); if(ef){ef.style.width=Math.min(100,lp)+'%';ef.style.background=bg;}
-  var en = document.getElementById('peu-nums'); if(en) en.textContent=Math.round(draw)+'/'+out+' EU';
+  var en = document.getElementById('peu-nums'); if(en) en.textContent=Math.round(draw)+' / '+out+' EU';
   var es = document.getElementById('peu-status');
-  if(es){if(lp>100){es.style.color='rgba(220,60,38,.75)';es.textContent='OVERDRAW';}else{es.style.color='rgba(70,188,100,.55)';es.textContent=Math.round(lp)+'% load';}}
+  if(es){if(lp>100){es.style.color='rgba(220,60,38,.85)';es.textContent='OVERDRAW';}else{es.style.color='';es.textContent=Math.round(lp)+'%';}}
 
   var wb = document.getElementById('pwr-warn');
   if(wb){
