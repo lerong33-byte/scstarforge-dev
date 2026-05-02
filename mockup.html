@@ -104,20 +104,21 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   filter:blur(.5px);}
 
 /* SHIP CENTER */
-#ship-center{position:absolute;top:120px;left:50%;transform:translateX(-50%);
-  width:380px;height:200px;z-index:5;display:flex;align-items:center;justify-content:center;}
+#ship-center{position:absolute;top:170px;left:50%;transform:translateX(-50%);
+  width:380px;height:170px;z-index:5;display:flex;align-items:center;justify-content:center;}
 #ship-glow{position:absolute;inset:0;
   background:radial-gradient(ellipse 55% 42% at 50% 60%,rgba(212,168,76,.08) 0%,transparent 75%);
   border-radius:50%;}
-#ship-nameplate{position:absolute;top:0;left:50%;transform:translateX(-50%);
-  text-align:center;white-space:nowrap;z-index:8;}
+#ship-nameplate{position:absolute;top:118px;left:50%;transform:translateX(-50%);
+  text-align:center;white-space:nowrap;z-index:20;
+  padding:4px 18px;}
 #ship-nm{font-size:24px;font-weight:700;letter-spacing:8px;color:var(--w);
   text-shadow:0 0 12px rgba(212,168,76,.42),0 0 28px rgba(212,168,76,.18);}
 #ship-type{font-size:9px;letter-spacing:4px;color:var(--g-d);margin-top:5px;}
-#ship-wire{position:absolute;top:46px;left:0;right:0;width:100%;height:200px;
+#ship-wire{position:absolute;top:0;left:0;right:0;width:100%;height:170px;
   filter:drop-shadow(0 0 14px rgba(212,168,76,.25)) drop-shadow(0 0 30px rgba(212,168,76,.10));
   z-index:1;}
-#ship-img{position:absolute;top:46px;left:0;width:100%;height:200px;object-fit:contain;
+#ship-img{position:absolute;top:0;left:0;width:100%;height:170px;object-fit:contain;
   opacity:0;z-index:2;
   filter:drop-shadow(0 0 18px rgba(212,168,76,.18));
   transition:opacity .4s;}
@@ -724,13 +725,15 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     <div class="strut r"></div>
   </div>
 
+  <!-- SHIP NAMEPLATE (independent floating element) -->
+  <div id="ship-nameplate">
+    <div id="ship-nm">SELECT A SHIP</div>
+    <div id="ship-type"></div>
+  </div>
+
   <!-- SHIP CENTER -->
   <div id="ship-center">
     <div id="ship-glow"></div>
-    <div id="ship-nameplate">
-      <div id="ship-nm">SELECT A SHIP</div>
-      <div id="ship-type"></div>
-    </div>
     <svg id="ship-wire" viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="rgba(212,168,76,.62)" stroke-width="1" stroke-linejoin="round">
       <!-- fuselage -->
       <path d="M 130 100 L 175 70 L 240 80 L 255 100 L 240 120 L 175 130 Z"/>
