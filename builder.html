@@ -1455,16 +1455,29 @@ function pMult(p,m){ return 0.5+(p/m); }
 function buildPwrComps() {
   var ship = _curShip, co = ship.comps||{};
   var cnt = co.counts||{}, db = COMP_DB||{};
+  var L = _loadout || {};
   var list = [];
-  var ppN = co.pp||'Power Plant', ppC = cnt.pp||1;
-  for(var i=0;i<ppC;i++){var d=(db.pp&&db.pp[ppN])||null;list.push({id:'pp'+i,cat:'pp',name:ppN+(ppC>1?' '+(i+1):''),pips:8,max:8,output:d?d.out:16,on:true});}
-  var sgN = co.sg||'Shield Gen', sgC = cnt.sg||1;
-  for(var i=0;i<sgC;i++){var d=(db.sg&&db.sg[sgN])||null;list.push({id:'sg'+i,cat:'sg',name:sgN+(sgC>1?' '+(i+1):''),pips:5,max:10,dMin:d?d.drawMin:3,dMax:d?d.drawMax:6,on:true});}
+  var ppC = cnt.pp||1;
+  for(var i=0;i<ppC;i++){
+    var ppN = L['c_pp_'+i] || L['c_pp'] || co.pp || 'Power Plant';
+    var d = (db.pp && db.pp[ppN]) || null;
+    list.push({id:'pp'+i,cat:'pp',name:ppN,pips:8,max:8,output:d?d.out:16,on:true});
+  }
+  var sgC = cnt.sg||1;
+  for(var i=0;i<sgC;i++){
+    var sgN = L['c_sg_'+i] || L['c_sg'] || co.sg || 'Shield Gen';
+    var d = (db.sg && db.sg[sgN]) || null;
+    list.push({id:'sg'+i,cat:'sg',name:sgN,pips:5,max:10,dMin:d?d.drawMin:3,dMax:d?d.drawMax:6,on:true});
+  }
   list.push({id:'wp',cat:'wp',name:'Hardpoints',pips:5,max:10,dMin:0,dMax:13,on:true});
   list.push({id:'en',cat:'en',name:'Thrusters',pips:5,max:10,dMin:0,dMax:6,on:true});
-  var coN = co.cooler||'Cooler', coC = cnt.cooler||1;
-  for(var i=0;i<coC;i++)list.push({id:'co'+i,cat:'co',name:coN+(coC>1?' '+(i+1):''),pips:5,max:5,dMin:6,dMax:6,on:true});
-  list.push({id:'qd',cat:'qd',name:co.qd||'Q-Drive',pips:3,max:3,dMin:3,dMax:3,on:true});
+  var coC = cnt.cooler||1;
+  for(var i=0;i<coC;i++){
+    var coN = L['c_cooler_'+i] || L['c_cooler'] || co.cooler || 'Cooler';
+    list.push({id:'co'+i,cat:'co',name:coN,pips:5,max:5,dMin:6,dMax:6,on:true});
+  }
+  var qdN = L['c_qd_0'] || L['c_qd'] || co.qd || 'Q-Drive';
+  list.push({id:'qd',cat:'qd',name:qdN,pips:3,max:3,dMin:3,dMax:3,on:true});
   list.push({id:'rd',cat:'rd',name:co.radar||'Radar',pips:2,max:2,dMin:1,dMax:1,on:true});
   _pwrComps = list;
   renderPwrComps();
@@ -1651,7 +1664,7 @@ function computeLoadoutEconomy() {
     }
   });
   var co = _curShip.comps || {};
-  var coolerName = _loadout['c_cooler'] || co.cooler;
+  var coolerName = _loadout['c_cooler_0'] || _loadout['c_cooler'] || co.cooler;
   var coData = COMP_DB && COMP_DB.cooler && COMP_DB.cooler[coolerName];
   var coolerCount = (co.counts||{}).cooler||1;
   var coolRate = coData ? ((coData.rate||coData.cooling||40) * coolerCount) : (40 * coolerCount);
@@ -1684,9 +1697,14 @@ function calcTotalDPS() {
   var total = 0;
   var slots = (_curShip&&_curShip.slots) || [];
   slots.forEach(function(sl,i){
-    var wid = _loadout[i] || sl.default || '';
-    var w = WEAP_BY_ID[wid];
-    if(w) total += (w.dps||0) * (sl.count||1);
+    var cnt = sl.count||1;
+    for(var u=0; u<cnt; u++){
+      var key = 'w'+i+'_'+u;
+      var wid = _loadout[key] || _loadout['w'+i] || sl.default || '';
+      var w = WEAP_BY_ID[wid];
+      var on = !(_loadout._off && _loadout._off[key]);
+      if(w && on) total += (w.dps||0);
+    }
   });
   return Math.round(total);
 }
@@ -1696,8 +1714,12 @@ function updateStats() {
   var ship = _curShip;
   var db = COMP_DB||{};
   var coObj = ship.comps||{};
-  var sgN = coObj.sg||''; var sgD = db.sg&&db.sg[sgN] ? db.sg[sgN] : null;
-  var cnt = coObj.counts||{}; var sgC = cnt.sg||1;
+  var cnt = coObj.counts||{};
+
+  // Shield gen — honor loadout override
+  var sgN = _loadout['c_sg_0'] || _loadout['c_sg'] || coObj.sg || '';
+  var sgD = db.sg && db.sg[sgN] ? db.sg[sgN] : null;
+  var sgC = cnt.sg||1;
   var totalSHP = sgD ? sgD.totalHP*sgC : '--';
   var regen = sgD ? '+' + Math.round(sgD.regen*sgC) + '/s' : '--';
 
@@ -1707,20 +1729,27 @@ function updateStats() {
   setText('h-crew', ship.crew||'1');
   setText('h-size', 'SIZE '+(ship.size||'?'));
   setText('h-role', ship.role||'--');
-  var qdN = coObj.qd||''; var qdD = db.qd&&db.qd[qdN] ? db.qd[qdN] : null;
+
+  // Q-drive — honor loadout override
+  var qdN = _loadout['c_qd_0'] || _loadout['c_qd'] || coObj.qd || '';
+  var qdD = db.qd && db.qd[qdN] ? db.qd[qdN] : null;
   setText('h-qd', (qdD?qdD.speed||'84':'84')+' ');
   setText('h-range', (qdD?qdD.range||'50':'50')+' Gm');
 }
 
 function calcAlpha() {
-  var maxAlpha = 0;
+  var total = 0;
   var slots = (_curShip&&_curShip.slots) || [];
   slots.forEach(function(sl,i){
-    var wid = _loadout[i] || sl.default || '';
-    var w = WEAP_BY_ID[wid];
-    if(w && (w.alpha||0) > maxAlpha) maxAlpha = w.alpha;
+    var cnt = sl.count||1;
+    for(var u=0; u<cnt; u++){
+      var key = 'w'+i+'_'+u;
+      var wid = _loadout[key] || _loadout['w'+i] || sl.default || '';
+      var w = WEAP_BY_ID[wid];
+      if(w) total += (w.alpha||0);
+    }
   });
-  return maxAlpha ? maxAlpha.toFixed(1) : '--';
+  return total ? total.toFixed(1) : '--';
 }
 
 // ============================================================
