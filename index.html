@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.95</title>
+<title>SC-ShipForge v8.96</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -33,7 +33,7 @@
 <link rel="sitemap" type="application/xml" href="/sitemap.xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
 /* #app sizing handled below in APP SHELL block */
@@ -42,11 +42,11 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
 /* ── TOKENS ── */
 button{background:transparent;border:none;cursor:pointer;font-family:inherit;outline:none}
 :root{
-  --bg: #0d0f12;--bg2: #161a1f;--bg3: #1d2129;--bg4:#1f2530;
-  --border: #2c3140;--b2:#2e3a4a;
+  --bg:#0d0f12;--bg2:#161a1f;--bg3:#1d2129;--bg4:#1f2530;
+  --border:#252d3a;--b2:#2e3a4a;
   --text:#c8d4e0;--t2:#6a7f96;--t3:#3a4a5a;
-  --accent: #e8a427;--accent-bg:rgba(77,255,110,.10);--accent-border:rgba(77,255,110,.30);
-  --green: #e8a427;--green-bg:rgba(77,255,110,.10);--green-border:rgba(77,255,110,.30);
+  --accent:#e8a427;--accent-bg:rgba(77,255,110,.10);--accent-border:rgba(77,255,110,.30);
+  --green:#e8a427;--green-bg:rgba(77,255,110,.10);--green-border:rgba(77,255,110,.30);
   --warn:#ffd54f;--warn-bg:rgba(255,213,79,.10);--warn-border:rgba(255,213,79,.30);
   --red:#e85060;--red-bg:rgba(232,80,96,.1);--red-border:rgba(232,80,96,.3);
   --cyan:#40e0ff;--purple:#9080d8;--muted:#3a4a5a;--blue:#e8a427;
@@ -54,7 +54,7 @@ button{background:transparent;border:none;cursor:pointer;font-family:inherit;out
   --r:8px;--r-sm:5px;--r-lg:12px
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:transparent;color:var(--text);font-family:var(--fhud)}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--fhud)}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:#141820}
 ::-webkit-scrollbar-thumb{background:#2e3a4a;border-radius:3px;opacity:.9}
@@ -62,7 +62,7 @@ input,select,button,textarea{font-family:var(--fhud)}
 option,optgroup{background:var(--bg2)}
 
 /* ── APP SHELL ── */
-#app{display:flex;flex-direction:column;height:100vh;width:100%;max-width:1600px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+#app{display:flex;flex-direction:column;height:100vh;width:100%;max-width:1400px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
 
 /* ── TOP NAV ── */
 .nav{height:54px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;position:relative;z-index:20}
@@ -92,7 +92,7 @@ option,optgroup{background:var(--bg2)}
 .body{display:flex;flex:1;min-height:0;overflow:hidden}
 
 /* ── LEFT PANEL ── */
-.lp{width:20%;min-width:200px;max-width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--bg2);overflow:hidden}
+.lp{width:210px;min-width:210px;max-width:210px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--bg2);overflow:hidden}
 
 /* Ship image */
 .ship-img-wrap{height:150px;background:var(--bg3);flex-shrink:0;border-bottom:1px solid var(--border);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -1107,26 +1107,12 @@ option,optgroup{background:var(--bg2)}
 
 /* Fix: hide duplicate ship name overlay on ship cards */
 .fleet-card-img-name { display: none !important; }
-/* ===== DEEP SPACE BACKGROUND ===== */
-#space-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
-html,body{background:#00000a!important;}
-#app{background:transparent!important;}
-.nav{background:rgba(14,16,24,0.82)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important;}
-.sub-nav{background:rgba(12,14,22,0.80)!important;backdrop-filter:blur(8px)!important;}
-.lp{background:rgba(16,18,28,0.88)!important;backdrop-filter:blur(8px)!important;}
-.rp{background:rgba(16,18,28,0.88)!important;backdrop-filter:blur(8px)!important;}
-.pane{background:rgba(13,15,22,0.82)!important;backdrop-filter:blur(6px)!important;}
-.sb-dashboard{background:transparent!important;}
-.lp-card{background:rgba(20,22,34,0.92)!important;}
-.hp-row,.ms-row,.sys-row{background:rgba(18,20,30,0.78)!important;}
-.hp-row:hover,.ms-row:hover,.sys-row:hover{background:rgba(28,32,50,0.92)!important;}
-.body{background:transparent!important;}
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a427;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.95</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a427;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.96</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
@@ -6716,9 +6702,7 @@ function _exportPDF(lo, rows, fname) {
     + 'h2{font-size:13px;letter-spacing:2px;color:#555;margin:16px 0 6px;border-left:3px solid #38bdf8;padding-left:8px}'
     + 'table{width:100%;border-collapse:collapse;margin-bottom:10px}'
     + 'td{padding:4px 8px;border-bottom:1px solid #eee}td:first-child{color:#555;width:40%}'
-    + '</style></head><body>
-<script id="space-bg">(function(){var canvas=document.createElement("canvas");canvas.id="space-canvas";document.body.insertBefore(canvas,document.body.firstChild);var ctx=canvas.getContext("2d");var W,H,stars=[],nebulas=[];function rand(a,b){return Math.random()*(b-a)+a;}function initScene(){stars=[];for(var i=0;i<600;i++)stars.push({x:rand(0,W),y:rand(0,H),r:rand(0.2,0.6),a:rand(0.3,0.8),tw:rand(0,6.28)});for(var i=0;i<200;i++)stars.push({x:rand(0,W),y:rand(0,H),r:rand(0.6,1.2),a:rand(0.5,1.0),tw:rand(0,6.28)});for(var i=0;i<40;i++)stars.push({x:rand(0,W),y:rand(0,H),r:rand(1.2,2.2),a:rand(0.7,1.0),tw:rand(0,6.28)});for(var c=0;c<4;c++){var cx=rand(W*0.1,W*0.9),cy=rand(H*0.1,H*0.9);for(var i=0;i<25;i++)stars.push({x:cx+rand(-50,50),y:cy+rand(-50,50),r:rand(0.3,0.9),a:rand(0.4,0.9),tw:rand(0,6.28)});}nebulas=[{x:W*0.78,y:H*0.22,rx:W*0.35,ry:H*0.40,stops:[[0,"rgba(40,60,140,0.13)"],[0.3,"rgba(80,30,120,0.08)"],[0.6,"rgba(20,80,160,0.05)"],[1,"rgba(0,0,20,0)"]],rot:-0.3},{x:W*0.18,y:H*0.72,rx:W*0.28,ry:H*0.32,stops:[[0,"rgba(0,100,140,0.10)"],[0.4,"rgba(0,60,100,0.06)"],[1,"rgba(0,0,20,0)"]],rot:0.5},{x:W*0.45,y:H*0.55,rx:W*0.20,ry:H*0.18,stops:[[0,"rgba(120,40,20,0.05)"],[0.5,"rgba(80,20,10,0.03)"],[1,"rgba(0,0,0,0)"]],rot:0.1},{x:W*0.12,y:H*0.15,rx:W*0.25,ry:H*0.09,stops:[[0,"rgba(180,160,255,0.07)"],[0.4,"rgba(140,120,220,0.04)"],[1,"rgba(0,0,20,0)"]],rot:-0.6},{x:W*0.60,y:H*0.80,rx:W*0.18,ry:H*0.15,stops:[[0,"rgba(60,200,200,0.06)"],[0.5,"rgba(20,120,160,0.03)"],[1,"rgba(0,0,0,0)"]],rot:0.8}];}function drawNebulas(){nebulas.forEach(function(n){ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.rot);var mx=Math.max(n.rx,n.ry);var gr=ctx.createRadialGradient(0,0,0,0,0,mx);n.stops.forEach(function(s){gr.addColorStop(s[0],s[1]);});ctx.fillStyle=gr;ctx.scale(n.rx/mx,n.ry/mx);ctx.beginPath();ctx.arc(0,0,mx,0,Math.PI*2);ctx.fill();ctx.restore();});}var t=0;function draw(){t+=0.008;ctx.fillStyle="#00000a";ctx.fillRect(0,0,W,H);drawNebulas();stars.forEach(function(s){var tw=Math.sin(t*1.5+s.tw)*0.3+0.7;ctx.globalAlpha=s.a*tw;ctx.fillStyle="#ffffff";ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();if(s.r>1.8){ctx.globalAlpha=s.a*tw*0.25;ctx.strokeStyle="#aaccff";ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(s.x-s.r*4,s.y);ctx.lineTo(s.x+s.r*4,s.y);ctx.moveTo(s.x,s.y-s.r*4);ctx.lineTo(s.x,s.y+s.r*4);ctx.stroke();}});ctx.globalAlpha=1;requestAnimationFrame(draw);}function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;initScene();}window.addEventListener("resize",resize);resize();draw();})();</script>
-';
+    + '</style></head><body>';
   html += '<h1>&#9632; ' + _xe(lo.name||lo.ship) + '</h1>';
   var lastSec = '';
   html += '<table>';
