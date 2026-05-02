@@ -1480,7 +1480,7 @@ function buildPwrComps() {
     var d = (db.sg && db.sg[sgN]) || null;
     list.push({id:'sg'+i,cat:'sg',name:sgN,pips:P('sg'+i,5),max:10,dMin:d?d.drawMin:3,dMax:d?d.drawMax:6,on:ON('sg'+i)});
   }
-  list.push({id:'wp',cat:'wp',name:'Hardpoints',pips:P('wp',5),max:10,dMin:0,dMax:13,on:ON('wp')});
+  list.push({id:'wp',cat:'wp',name:'Hardpoints',pips:P('wp',0),max:10,dMin:0,dMax:13,on:ON('wp')});
   list.push({id:'en',cat:'en',name:'Thrusters',pips:P('en',5),max:10,dMin:0,dMax:6,on:ON('en')});
   var coC = cnt.cooler||1;
   for(var i=0;i<coC;i++){
@@ -1488,7 +1488,7 @@ function buildPwrComps() {
     list.push({id:'co'+i,cat:'co',name:coN,pips:P('co'+i,5),max:5,dMin:6,dMax:6,on:ON('co'+i)});
   }
   var qdN = L['c_qd_0'] || L['c_qd'] || co.qd || 'Q-Drive';
-  list.push({id:'qd',cat:'qd',name:qdN,pips:P('qd',3),max:3,dMin:3,dMax:3,on:ON('qd')});
+  list.push({id:'qd',cat:'qd',name:qdN,pips:P('qd',0),max:3,dMin:0,dMax:3,on:ON('qd')});
   var rdN = L['c_radar_0'] || L['c_radar'] || co.radar || 'Radar';
   list.push({id:'rd',cat:'rd',name:rdN,pips:P('rd',2),max:2,dMin:1,dMax:1,on:ON('rd')});
   _pwrComps = list;
