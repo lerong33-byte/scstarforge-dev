@@ -450,9 +450,22 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .unit-loc{font-size:8px;letter-spacing:1.5px;color:rgba(180,150,80,.70);
   padding:3px 0 2px;border-top:1px dashed rgba(180,150,80,.20);margin-top:3px;}
 
-/* HARDPOINTS — MIDDLE BOTTOM (dashboard) */
-#hp-band{position:absolute;top:340px;left:340px;right:340px;bottom:30px;
-  z-index:16;padding:14px 22px 18px;overflow-y:auto;overflow-x:hidden;}
+/* WEAPONS — MIDDLE-LEFT (curved flatscreen) */
+#hp-band{position:absolute;top:340px;left:340px;right:calc(50% + 12px);bottom:30px;
+  z-index:16;padding:14px 22px 18px;overflow-y:auto;overflow-x:hidden;
+  transform:perspective(2400px) rotateY(2deg);transform-origin:left center;}
+/* MISSILES — MIDDLE-RIGHT (curved flatscreen) */
+#ms-band{position:absolute;top:340px;left:calc(50% + 12px);right:340px;bottom:30px;
+  z-index:16;padding:14px 22px 18px;overflow-y:auto;overflow-x:hidden;
+  transform:perspective(2400px) rotateY(-2deg);transform-origin:right center;
+  background:
+    radial-gradient(ellipse 100% 120% at 50% 0%,rgba(40,42,48,.55) 0%,rgba(18,20,24,.72) 70%,rgba(10,12,14,.85) 100%),
+    repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.010) 2px,rgba(255,255,255,.010) 3px);
+  border:none;
+  box-shadow:inset 0 1px 0 rgba(220,210,190,.18),inset 0 -22px 30px rgba(0,0,0,.40),0 0 32px rgba(0,0,0,.30);
+  clip-path:polygon(28px 0,calc(100% - 28px) 0,100% 30px,100% calc(100% - 12px),calc(100% - 16px) 100%,16px 100%,0 calc(100% - 12px),0 30px);}
+#ms-band::-webkit-scrollbar{width:0;}
+#ms-flow{display:flex;flex-direction:column;gap:0;}
 #hp-band::-webkit-scrollbar{width:0;}
 #hp-flow{max-height:none;overflow:visible;display:flex;flex-direction:column;gap:0;}
 #hp-flow::-webkit-scrollbar{width:0;}
@@ -907,10 +920,14 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     <div id="comp-flow"></div>
   </div>
 
-  <!-- HARDPOINTS BAND -->
+  <!-- WEAPONS BAND -->
   <div id="hp-band">
-    <div class="zone-hdr">HARDPOINTS</div>
     <div id="hp-flow"></div>
+  </div>
+
+  <!-- MISSILES BAND -->
+  <div id="ms-band">
+    <div id="ms-flow"></div>
   </div>
 
 </div><!-- /scene -->
@@ -1254,15 +1271,25 @@ function buildHpBand() {
   var co = ship.comps || {};
   var cnt = co.counts || {};
 
-  // ===== WEAPONS =====
+  // ===== WEAPONS (in #hp-flow) =====
   if(slots.length){
     flow.appendChild(makeSecHdr('WEAPONS', slots.length + ' HARDPOINTS'));
     slots.forEach(function(sl, i){ flow.appendChild(makeSlot('weapon', sl, i, sl.sz)); });
   }
-  // ===== MISSILES =====
-  if(missiles.length){
-    flow.appendChild(makeSecHdr('MISSILES'));
-    missiles.forEach(function(sl, i){ flow.appendChild(makeSlot('missile', sl, i, sl.sz)); });
+  // ===== MISSILES (in #ms-flow) =====
+  var msFlow = document.getElementById('ms-flow');
+  if(msFlow){
+    msFlow.innerHTML = '';
+    if(missiles.length){
+      msFlow.appendChild(makeSecHdr('MISSILES', missiles.length + ' RACK' + (missiles.length>1?'S':'')));
+      missiles.forEach(function(sl, i){ msFlow.appendChild(makeSlot('missile', sl, i, sl.sz)); });
+    } else {
+      msFlow.appendChild(makeSecHdr('MISSILES', 'none'));
+      var empty = document.createElement('div');
+      empty.style.cssText='padding:14px 8px;color:rgba(140,130,116,.55);font-size:9px;letter-spacing:1.5px;text-align:center;';
+      empty.textContent = 'NO MISSILE RACKS';
+      msFlow.appendChild(empty);
+    }
   }
   // ===== SYSTEMS (in right comp-zone) =====
   var compFlow = document.getElementById('comp-flow');
