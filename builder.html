@@ -418,7 +418,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
 <script>
 // ============================================================
-// DATA — loaded from parent window or fetched
+// DATA â loaded from parent window or fetched
 // ============================================================
 var SHIP_DATA = {}, WEAPONS = [], COMP_DB = {}, WEAP_BY_ID = {};
 var _curShip = null, _curShipName = '', _loadout = {}, _pwrComps = null, _mode = 'scm';
@@ -428,7 +428,7 @@ var CC = {pp:'rgba(200,158,48,.82)',sg:'rgba(28,160,210,.82)',wp:'rgba(220,72,40
 var CL = {pp:'Pwr Plant',sg:'Shield',wp:'Weapons',en:'Engines',co:'Cooler',qd:'Q-Drive',rd:'Radar'};
 
 // ============================================================
-// INIT — try to grab data from parent window
+// INIT â try to grab data from parent window
 // ============================================================
 function init() {
   progress(10, 'LOADING SHIP DATA...');
@@ -448,23 +448,18 @@ function init() {
   } catch(e) {}
   
   // Fetch from the main app's data endpoint
-  fetch('/').then(function(r){ return r.text(); }).then(function(html) {
-    progress(40, 'PARSING DATA...');
-    // Extract SHIP_DATA
-    var sdMatch = html.match(/var SHIP_DATA\s*=\s*(\{[\s\S]+?\});\s*\n/);
-    var wMatch  = html.match(/var WEAPONS\s*=\s*(\[[\s\S]+?\]);\s*\n/);
-    var dbMatch = html.match(/var COMP_DB\s*=\s*(\{[\s\S]+?\});\s*\n/);
-    try { if(sdMatch) SHIP_DATA = eval('('+sdMatch[1]+')'); } catch(e){}
-    try { if(wMatch)  WEAPONS = eval('('+wMatch[1]+')'); } catch(e){}
-    try { if(dbMatch) COMP_DB = eval('('+dbMatch[1]+')'); } catch(e){}
-    if(Array.isArray(WEAPONS)) WEAPONS.forEach(function(w){ WEAP_BY_ID[w.id] = w; });
-    else { WEAPONS = Object.values(WEAPONS||{}); WEAPONS.forEach(function(w){ WEAP_BY_ID[w.id] = w; }); }
-    progress(100, 'READY');
-    setTimeout(function(){ document.getElementById('loading').classList.add('done'); }, 300);
+  fetch('/').then(function(r){return r.text();}).then(function(src){
+    progress(40,'PARSING DATA...');
+    var scripts=src.match(/<script[^>]*>([\s\S]*?)<\/script>/g)||[];
+    scripts.forEach(function(s){var c=s.replace(/<\/?script[^>]*>/g,'');try{(new Function(c))();}catch(e){}});
+    SHIP_DATA=window.SHIP_DATA||{};
+    WEAPONS=Object.values(window.WEAPONS||window.WEAPONS||{});
+    COMP_DB=window.COMP_DB||{};
+    WEAPONS.forEach(function(w){if(w&&w.id)WEAP_BY_ID[w.id]=w;});
+    progress(100,'READY');
+    setTimeout(function(){document.getElementById('loading').classList.add('done');},300);
     populateShipSel();
-  }).catch(function() {
-    progress(100, 'ERROR LOADING DATA');
-  });
+  }).catch(function(){progress(100,'ERROR');});
 }
 
 function progress(pct, txt) {
