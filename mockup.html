@@ -1607,9 +1607,7 @@ function bpips(c) {
   };
   for(var i=0;i<c.max;i++){
     var d = document.createElement('div');
-    d.className = 'pp '+(i<(c.on?c.pips:0)?c.cat+' pp-c':'e').replace('pp-c','pp-c');
-    // fix class: use cat as pip class
-    d.className = 'pp '+(i<(c.on?c.pips:0)?c.cat:'e');
+    d.className = 'pp '+(i<(c.on?c.pips:0)?c.cat+' pp-c':'e');
     (function(idx,comp){d.onclick=function(){if(!comp.on)return;comp.pips=idx+1;if(!_loadout._pips)_loadout._pips={};_loadout._pips[comp.id]=comp.pips;updatePwr();};}(i,c));
     el.appendChild(d);
   }
