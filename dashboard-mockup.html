@@ -182,24 +182,63 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .sl-go:hover{background:rgba(212,168,76,.16);border-color:var(--g);color:var(--g2);
   box-shadow:0 0 12px rgba(212,168,76,.30);}
 
-/* TOP-RIGHT: ROLE BROWSER */
-#roles{top:170px;right:14px;width:520px;height:340px;z-index:14;
+/* TOP-RIGHT: FLEET ACTIVITY */
+#fleet{top:170px;right:14px;width:480px;height:340px;z-index:14;
   transform:perspective(2400px) rotateY(-6deg);transform-origin:right center;
   clip-path:polygon(8px 6px,calc(100% - 30px) 0,100% 22px,100% calc(100% - 22px),calc(100% - 30px) 100%,8px calc(100% - 6px),0 calc(100% - 30px),0 30px);}
-#roles-inner{position:absolute;inset:36px 24px 18px;display:flex;flex-wrap:wrap;
-  align-content:flex-start;justify-content:center;gap:12px 16px;}
-.role{position:relative;width:120px;height:90px;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 50% 35%,rgba(40,42,48,.78),rgba(18,20,24,.48) 70%);
+#fleet-inner{position:absolute;inset:36px 22px 56px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;}
+#fleet-inner::-webkit-scrollbar{width:0;}
+.fl-row{display:flex;align-items:center;gap:10px;padding:6px 10px 7px 14px;position:relative;
+  background:linear-gradient(90deg,rgba(212,168,76,.04),transparent 70%);
+  border-left:2px solid var(--g);
+  cursor:pointer;transition:background .15s,border-color .15s;}
+.fl-row:hover{background:linear-gradient(90deg,rgba(212,168,76,.10),transparent 70%);}
+.fl-dot{width:7px;height:7px;border-radius:50%;background:var(--g);
+  box-shadow:0 0 5px rgba(212,168,76,.65);flex-shrink:0;}
+.fl-dot.off{background:var(--char);box-shadow:none;}
+.fl-info{flex:1;min-width:0;}
+.fl-nm{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--w);
+  text-shadow:0 0 4px rgba(212,168,76,.20);}
+.fl-meta{font-size:8px;letter-spacing:1px;color:var(--g-d);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fl-dps{font-size:11px;font-weight:700;color:var(--g);
+  text-shadow:0 0 4px rgba(212,168,76,.30);}
+.fl-dps.r{color:#ff8060;}
+.fl-go{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+  font-family:inherit;font-size:9px;letter-spacing:3px;font-weight:700;
+  color:var(--g);background:rgba(212,168,76,.06);
+  border:1px solid var(--g-m);padding:6px 22px;cursor:pointer;
+  text-decoration:none;
+  transition:background .15s,border-color .15s,box-shadow .15s,color .15s;}
+.fl-go:hover{background:rgba(212,168,76,.16);border-color:var(--g);color:var(--g2);
+  box-shadow:0 0 12px rgba(212,168,76,.30);}
+
+/* CENTER: ROLE BROWSER STRIP (curved horizontal floating bar) */
+#role-strip{position:absolute;top:54%;left:50%;transform:translate(-50%,-50%);z-index:15;
+  padding:14px 28px 18px;
+  background:radial-gradient(ellipse 100% 100% at 50% 50%,rgba(28,30,34,.78) 0%,rgba(18,20,24,.55) 60%,rgba(10,12,14,.20) 100%),
+    repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 3px);
+  box-shadow:inset 0 1px 0 rgba(220,210,190,.16),0 0 28px rgba(0,0,0,.45);
+  clip-path:polygon(22px 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,22px 100%,0 50%);
+  display:flex;flex-direction:column;align-items:center;gap:10px;}
+.rs-hdr{font-size:10px;letter-spacing:8px;font-weight:700;color:var(--g);
+  text-shadow:0 0 8px rgba(212,168,76,.45);text-align:center;}
+.rs-hdr .brk{color:var(--g);opacity:.62;font-weight:300;letter-spacing:0;margin:0 6px;}
+#rs-inner{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:nowrap;}
+.role{position:relative;width:78px;height:78px;cursor:pointer;text-decoration:none;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  background:radial-gradient(circle at 50% 35%,rgba(40,42,48,.86),rgba(18,20,24,.56) 70%);
   border:1px solid var(--g-m);
   clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px);
   transition:border-color .15s,background .15s,transform .15s;}
-.role:hover{border-color:var(--g);transform:scale(1.04);
-  background:radial-gradient(circle at 50% 35%,rgba(60,52,32,.78),rgba(28,22,12,.55) 70%);}
-.role-icon{font-size:24px;color:var(--g);text-shadow:0 0 8px rgba(212,168,76,.55);
-  margin-bottom:5px;line-height:1;}
-.role-name{font-size:9px;letter-spacing:2.5px;color:var(--w);font-weight:700;}
-.role-count{font-size:7px;letter-spacing:1.5px;color:var(--g-d);margin-top:2px;}
+.role:hover{border-color:var(--g);transform:scale(1.08);
+  background:radial-gradient(circle at 50% 35%,rgba(60,52,32,.86),rgba(28,22,12,.65) 70%);
+  box-shadow:0 0 14px rgba(212,168,76,.30);}
+.role-icon{font-size:22px;color:var(--g);text-shadow:0 0 8px rgba(212,168,76,.55);
+  margin-bottom:1px;line-height:1;}
+.role-name{font-size:8px;letter-spacing:1.5px;color:var(--w);font-weight:700;}
+.role-count{font-size:9px;letter-spacing:1px;color:var(--g);font-weight:700;
+  text-shadow:0 0 4px rgba(212,168,76,.40);}
 
 /* BOTTOM-LEFT: POPULAR BUILDS */
 #popular{bottom:14px;left:14px;width:560px;height:280px;z-index:14;
@@ -326,19 +365,33 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     </div>
   </div>
 
-  <!-- ROLE BROWSER (top-right) -->
-  <div class="panel" id="roles">
-    <div class="panel-hdr">BROWSE BY ROLE</div>
-    <div id="roles-inner">
-      <a href="builder.html" class="role"><div class="role-icon">⚔</div><div class="role-name">FIGHTER</div><div class="role-count">23 HULLS</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">✈</div><div class="role-name">BOMBER</div><div class="role-count">7 HULLS</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">⚡</div><div class="role-name">GUNSHIP</div><div class="role-count">9 HULLS</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">▣</div><div class="role-name">FREIGHTER</div><div class="role-count">18 HULLS</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">⛏</div><div class="role-name">MINING</div><div class="role-count">6 HULLS</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">⚒</div><div class="role-name">SALVAGE</div><div class="role-count">4 HULLS</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">🜨</div><div class="role-name">EXPLORE</div><div class="role-count">12 HULLS</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">✚</div><div class="role-name">MEDICAL</div><div class="role-count">3 HULLS</div></a>
-      <a href="builder.html" class="role"><div class="role-icon">▤</div><div class="role-name">CAPITAL</div><div class="role-count">8 HULLS</div></a>
+  <!-- TOP-RIGHT: FLEET ACTIVITY -->
+  <div class="panel" id="fleet">
+    <div class="panel-hdr">FLEET ACTIVITY</div>
+    <div id="fleet-inner">
+      <div class="fl-row"><div class="fl-dot"></div><div class="fl-info"><div class="fl-nm">HAMMERHEAD</div><div class="fl-meta">Capital · Last loaded 2h ago</div></div><div class="fl-dps">6,240 DPS</div></div>
+      <div class="fl-row"><div class="fl-dot"></div><div class="fl-info"><div class="fl-nm">PALADIN</div><div class="fl-meta">Gunship · Saved · 9,831 DPS build</div></div><div class="fl-dps">9,831 DPS</div></div>
+      <div class="fl-row"><div class="fl-dot off"></div><div class="fl-info"><div class="fl-nm">ECLIPSE</div><div class="fl-meta">Bomber · Stealth bomber loadout</div></div><div class="fl-dps r">540k α</div></div>
+      <div class="fl-row"><div class="fl-dot"></div><div class="fl-info"><div class="fl-nm">CARRACK</div><div class="fl-meta">Exploration · Survey loadout</div></div><div class="fl-dps">--</div></div>
+      <div class="fl-row"><div class="fl-dot off"></div><div class="fl-info"><div class="fl-nm">CUTLASS BLACK</div><div class="fl-meta">Multi-role · Stock</div></div><div class="fl-dps">820 DPS</div></div>
+      <div class="fl-row"><div class="fl-dot"></div><div class="fl-info"><div class="fl-nm">ARROW</div><div class="fl-meta">Light Fighter · Meta build</div></div><div class="fl-dps">1,240 DPS</div></div>
+    </div>
+    <a href="#" class="fl-go">▶ MY FLEET</a>
+  </div>
+
+  <!-- CENTER: ROLE BROWSER (curved strip floating between corners) -->
+  <div id="role-strip">
+    <div class="rs-hdr"><span class="brk">⟦</span> BROWSE BY ROLE <span class="brk">⟧</span></div>
+    <div id="rs-inner">
+      <a href="builder.html" class="role"><div class="role-icon">⚔</div><div class="role-name">FIGHTER</div><div class="role-count">23</div></a>
+      <a href="builder.html" class="role"><div class="role-icon">✈</div><div class="role-name">BOMBER</div><div class="role-count">7</div></a>
+      <a href="builder.html" class="role"><div class="role-icon">⚡</div><div class="role-name">GUNSHIP</div><div class="role-count">9</div></a>
+      <a href="builder.html" class="role"><div class="role-icon">▣</div><div class="role-name">FREIGHT</div><div class="role-count">18</div></a>
+      <a href="builder.html" class="role"><div class="role-icon">⛏</div><div class="role-name">MINING</div><div class="role-count">6</div></a>
+      <a href="builder.html" class="role"><div class="role-icon">⚒</div><div class="role-name">SALVAGE</div><div class="role-count">4</div></a>
+      <a href="builder.html" class="role"><div class="role-icon">🜨</div><div class="role-name">EXPLORE</div><div class="role-count">12</div></a>
+      <a href="builder.html" class="role"><div class="role-icon">✚</div><div class="role-name">MEDICAL</div><div class="role-count">3</div></a>
+      <a href="builder.html" class="role"><div class="role-icon">▤</div><div class="role-name">CAPITAL</div><div class="role-count">8</div></a>
     </div>
   </div>
 
