@@ -195,10 +195,10 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
 /* DEEP SPACE FX */
 .bg-fx{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.saturn{position:absolute;top:64px;left:80px;width:280px;height:180px;
-  opacity:.78;
+.saturn{position:absolute;top:80px;right:14px;width:280px;height:180px;
+  opacity:.62;
   filter:drop-shadow(0 0 14px rgba(220,196,164,.18)) drop-shadow(0 0 32px rgba(220,180,120,.10));
-  transform:rotate(-3deg);}
+  transform:rotate(-8deg);}
 .galaxy{position:absolute;border-radius:50%;pointer-events:none;}
 .galaxy::after{content:'';position:absolute;inset:30% 20%;border-radius:50%;
   background:radial-gradient(circle,rgba(255,250,235,.45),transparent 70%);
@@ -275,9 +275,17 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 #ship-nm{font-size:24px;font-weight:700;letter-spacing:8px;color:var(--w);
   text-shadow:0 0 12px rgba(212,168,76,.42),0 0 28px rgba(212,168,76,.18);}
 #ship-type{font-size:9px;letter-spacing:4px;color:var(--g-d);margin-top:5px;}
-#ship-wire{position:absolute;top:0;left:0;right:0;width:100%;height:170px;
-  filter:drop-shadow(0 0 14px rgba(212,168,76,.25)) drop-shadow(0 0 30px rgba(212,168,76,.10));
-  z-index:1;}
+#ship-diagram{position:absolute;top:96px;left:24px;width:280px;height:170px;z-index:11;
+  padding:18px 12px 8px;
+  background:radial-gradient(ellipse 100% 100% at 30% 50%,rgba(28,30,34,.62),rgba(12,14,18,.45) 65%,transparent);
+  clip-path:polygon(18px 0,calc(100% - 8px) 0,100% 22px,100% 100%,12px 100%,0 calc(100% - 12px),0 22px);
+  box-shadow:inset 0 1px 0 rgba(220,210,190,.15),inset 0 -16px 22px rgba(0,0,0,.40);
+  pointer-events:none;}
+.diag-hdr{position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  font-size:7px;letter-spacing:3px;color:rgba(220,180,80,.65);font-weight:700;
+  white-space:nowrap;}
+#ship-wire{width:100%;height:130px;display:block;
+  filter:drop-shadow(0 0 10px rgba(212,168,76,.25)) drop-shadow(0 0 22px rgba(212,168,76,.10));}
 #ship-img{position:absolute;top:0;left:0;width:100%;height:170px;object-fit:contain;
   opacity:0;z-index:2;
   filter:drop-shadow(0 0 18px rgba(212,168,76,.18));
@@ -553,7 +561,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .slot-sz.p{color:#f0c870;border-color:rgba(220,180,80,.45);}
 .slot-info{min-width:0;display:flex;flex-direction:column;gap:1px;}
 .slot-nm{font-size:11px;font-weight:600;color:var(--w);letter-spacing:.5px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  word-break:break-word;line-height:1.25;}
+#comp-flow .slot-nm{font-size:11.5px;}
 .slot-cnt{font-size:9px;font-weight:400;color:rgba(220,180,80,.70);letter-spacing:1px;margin-left:3px;}
 .slot-meta{font-size:7px;letter-spacing:1.5px;color:rgba(140,130,116,.55);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1041,9 +1050,9 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     <div id="ship-type"></div>
   </div>
 
-  <!-- SHIP CENTER -->
-  <div id="ship-center">
-    <div id="ship-glow"></div>
+  <!-- SHIP DIAGRAM (separated from image) -->
+  <div id="ship-diagram">
+    <div class="diag-hdr">TACTICAL · HARDPOINTS</div>
     <svg id="ship-wire" viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="rgba(212,168,76,.62)" stroke-width="1" stroke-linejoin="round">
       <!-- fuselage -->
       <path d="M 130 100 L 175 70 L 240 80 L 255 100 L 240 120 L 175 130 Z"/>
@@ -1073,6 +1082,11 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
       <circle class="comp-marker" data-cm="pp" cx="100" cy="100" r="4" fill="rgba(180,150,90,.18)" stroke="none"/>
       <circle class="comp-marker" data-cm="sg" cx="200" cy="100" r="4" fill="rgba(180,150,90,.18)" stroke="none"/>
     </svg>
+  </div>
+
+  <!-- SHIP CENTER (real image) -->
+  <div id="ship-center">
+    <div id="ship-glow"></div>
     <img id="ship-img" src="" alt="" onerror="this.style.opacity='0'">
     <div id="ship-shadow"></div>
   </div>
