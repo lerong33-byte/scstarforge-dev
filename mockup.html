@@ -236,19 +236,19 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   color:var(--g-d);text-align:center;display:block;
   padding-bottom:8px;border-bottom:1px solid var(--g-m);margin-bottom:4px;}
 .peu-row{display:grid;
-  grid-template-areas:"lbl num" "trk trk" "sts sts" "mode mode";
-  grid-template-columns:auto 1fr;align-items:center;gap:5px 10px;
-  padding:6px 14px 10px;border-bottom:1px solid var(--g-m);margin-bottom:8px;}
+  grid-template-areas:"lbl num" "cl cv" "trk trk";
+  grid-template-columns:auto 1fr;align-items:center;gap:6px 10px;
+  padding:8px 14px 10px;border-bottom:1px solid var(--g-m);margin-bottom:6px;}
 .peu-lbl{grid-area:lbl;font-size:9px;letter-spacing:3px;color:var(--g-d);white-space:nowrap;}
 .peu-nums{grid-area:num;font-size:14px;font-weight:700;white-space:nowrap;text-align:right;
   color:var(--g);text-shadow:0 0 6px rgba(86,230,120,.32);letter-spacing:.5px;}
-.peu-track{grid-area:trk;height:3px;background:rgba(86,230,120,.06);}
+.peu-cons-lbl{grid-area:cl;font-size:8px;letter-spacing:2.5px;color:var(--g-d);white-space:nowrap;}
+.peu-cons-pct{grid-area:cv;font-size:11px;font-weight:700;white-space:nowrap;text-align:right;
+  color:var(--g);text-shadow:0 0 4px rgba(86,230,120,.30);letter-spacing:.5px;}
+.peu-track{grid-area:trk;height:3px;background:rgba(86,230,120,.06);margin-top:2px;}
 .peu-fill{height:100%;background:var(--g);box-shadow:0 0 6px rgba(86,230,120,.5);
   transition:width .32s ease,background .3s;}
-.peu-status{grid-area:sts;font-size:7px;letter-spacing:1.5px;white-space:nowrap;color:var(--g-d);
-  text-transform:uppercase;}
-.pmode{grid-area:mode;display:flex;border:1px solid var(--g-m);position:relative;
-  margin-top:3px;justify-self:stretch;}
+.pmode{display:flex;border:1px solid var(--g-m);position:relative;}
 .pmpill{position:absolute;top:0;height:100%;
   background:rgba(86,230,120,.14);
   border-left:1px solid var(--g);border-right:1px solid var(--g);
@@ -296,6 +296,42 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .pc-eu{font-size:8px;font-weight:700;letter-spacing:.5px;text-align:center;
   text-shadow:0 0 4px rgba(86,230,120,.30);margin:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+/* category icons via ::before on .pc */
+.pc::after{content:'';display:block;width:14px;height:14px;order:0;margin-bottom:2px;
+  background-position:center;background-repeat:no-repeat;background-size:contain;
+  opacity:.86;}
+.pc-pp::after{content:'\26a1';display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:#e8b830;text-shadow:0 0 4px rgba(232,184,48,.45);background:none;}
+.pc-sg::after{content:'\25cb';font-size:13px;color:#28b8e0;
+  text-shadow:0 0 4px rgba(40,184,224,.45);background:none;display:flex;align-items:center;justify-content:center;}
+.pc-wp::after{content:'\27a4';font-size:11px;color:#e85838;
+  text-shadow:0 0 4px rgba(232,88,56,.45);background:none;display:flex;align-items:center;justify-content:center;}
+.pc-en::after{content:'\00bb';font-size:14px;color:#d8b828;
+  text-shadow:0 0 4px rgba(216,184,40,.45);background:none;display:flex;align-items:center;justify-content:center;}
+.pc-co::after{content:'\2744';font-size:12px;color:#1ce0a8;
+  text-shadow:0 0 4px rgba(28,224,168,.45);background:none;display:flex;align-items:center;justify-content:center;}
+.pc-qd::after{content:'\2295';font-size:12px;color:#28b0d0;
+  text-shadow:0 0 4px rgba(40,176,208,.45);background:none;display:flex;align-items:center;justify-content:center;}
+.pc-rd::after{content:'\25c9';font-size:12px;color:#b8b8c0;
+  text-shadow:0 0 4px rgba(184,184,192,.30);background:none;display:flex;align-items:center;justify-content:center;}
+
+/* POWER FOOTER — mode toggle + speed + reset */
+.pwr-foot{display:flex;flex-direction:column;gap:8px;
+  padding:10px 14px 12px;margin-top:6px;
+  border-top:1px solid var(--g-m);}
+.pwr-foot .pmode{justify-self:stretch;}
+.pwr-foot .pmopt{flex:1;text-align:center;padding:5px 0;}
+.pwr-speed{display:flex;justify-content:space-between;align-items:baseline;padding:2px 0;}
+.pwr-speed-l{font-size:8px;letter-spacing:2.5px;color:var(--g-d);}
+.pwr-speed-v{font-size:13px;font-weight:700;color:var(--g);
+  text-shadow:0 0 5px rgba(86,230,120,.32);letter-spacing:.5px;}
+.pwr-reset{font-family:inherit;font-size:9px;letter-spacing:2.5px;font-weight:700;
+  color:var(--g);background:transparent;cursor:pointer;
+  border:1px solid var(--g-m);padding:6px 0;
+  transition:background .15s,border-color .15s,box-shadow .15s;}
+.pwr-reset:hover{background:rgba(86,230,120,.08);border-color:var(--g);
+  box-shadow:0 0 8px rgba(86,230,120,.18) inset;}
+.pwr-reset:active{transform:scale(.98);}
 
 #pwr-comps{display:flex;flex-direction:column;gap:6px;}
 .pc{display:flex;flex-direction:column;gap:2px;padding:7px 14px;position:relative;
@@ -442,48 +478,115 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   box-shadow:0 0 6px rgba(86,230,120,.6);transition:width .3s;}
 #load-st{font-size:8px;letter-spacing:3px;color:var(--g-d);}
 
-/* DEEP SPACE BACKGROUND */
+/* DEEP SPACE BACKGROUND — milky way, planet, dense stars */
 body{
   background:
-    radial-gradient(ellipse 32% 22% at 78% 18%,rgba(180,160,128,.16),rgba(120,108,86,.06) 30%,transparent 60%),
-    radial-gradient(circle 4px at 78% 18%,rgba(220,200,170,.85),rgba(160,140,110,.50) 60%,transparent 80%),
-    radial-gradient(ellipse 90% 60% at 25% 35%,rgba(38,16,82,.30),transparent 60%),
-    radial-gradient(ellipse 70% 55% at 75% 75%,rgba(8,30,68,.40),transparent 60%),
-    radial-gradient(ellipse 50% 40% at 20% 78%,rgba(20,60,108,.22),transparent 65%),
+    /* PLANET top right — large dim moon with terminator */
+    radial-gradient(circle 70px at 86% 22%,rgba(40,30,18,.38) 0%,rgba(40,30,18,.38) 32%,transparent 33%),
+    radial-gradient(circle 70px at 86% 22%,transparent 0%,transparent 30%,rgba(220,196,164,.65) 31%,rgba(220,196,164,.65) 36%,transparent 37%),
+    radial-gradient(circle 90px at 86% 22%,rgba(180,148,108,.30) 0%,rgba(120,96,72,.10) 60%,transparent 90%),
+    radial-gradient(ellipse 220px 240px at 86% 22%,rgba(220,196,164,.10),transparent 65%),
+    /* small accent planet bottom left */
+    radial-gradient(circle 18px at 12% 78%,rgba(140,90,180,.38),rgba(70,38,100,.20) 80%,transparent 100%),
+    radial-gradient(ellipse 60px 60px at 12% 78%,rgba(140,90,180,.18),transparent 70%),
+    /* MILKY WAY diagonal band */
+    linear-gradient(118deg,
+      transparent 0%,transparent 28%,
+      rgba(180,160,200,.030) 36%,rgba(220,200,240,.055) 46%,rgba(255,235,210,.038) 54%,rgba(180,160,200,.030) 64%,
+      transparent 72%,transparent 100%),
+    /* milky way denser band core */
+    linear-gradient(118deg,
+      transparent 38%,rgba(140,120,180,.045) 46%,rgba(220,200,240,.075) 50%,rgba(140,120,180,.045) 54%,transparent 62%),
+    /* dust lanes */
+    linear-gradient(118deg,
+      transparent 44%,rgba(20,8,28,.18) 47%,rgba(20,8,28,.18) 49%,transparent 52%,
+      transparent 50%,rgba(20,8,28,.16) 53%,rgba(20,8,28,.16) 55%,transparent 58%),
+    /* nebula tints */
+    radial-gradient(ellipse 50% 35% at 28% 38%,rgba(60,30,140,.22),transparent 60%),
+    radial-gradient(ellipse 40% 30% at 70% 62%,rgba(20,80,160,.18),transparent 65%),
+    radial-gradient(ellipse 35% 25% at 50% 58%,rgba(140,40,80,.10),transparent 70%),
     var(--bg);}
+/* dense starfield layer */
 body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   background-image:
+    /* bright milky way core stars */
+    radial-gradient(2px 2px at 45% 42%,#fff,transparent),
+    radial-gradient(1.6px 1.6px at 50% 50%,rgba(255,248,232,.95),transparent),
+    radial-gradient(1.8px 1.8px at 55% 56%,#fff,transparent),
+    radial-gradient(1.4px 1.4px at 48% 54%,rgba(255,250,240,.94),transparent),
+    radial-gradient(2.2px 2.2px at 52% 46%,#fff,transparent),
+    radial-gradient(1.6px 1.6px at 56% 50%,rgba(255,250,240,.92),transparent),
+    /* row 1 */
     radial-gradient(1.2px 1.2px at 4% 9%,#fff,transparent),
-    radial-gradient(1px 1px at 12% 17%,rgba(220,232,250,.92),transparent),
-    radial-gradient(1.6px 1.6px at 18% 26%,#fff,transparent),
-    radial-gradient(1px 1px at 24% 38%,rgba(190,210,232,.88),transparent),
-    radial-gradient(1.2px 1.2px at 32% 14%,rgba(255,248,232,.95),transparent),
-    radial-gradient(1px 1px at 38% 48%,rgba(220,232,250,.85),transparent),
-    radial-gradient(1.6px 1.6px at 42% 22%,#fff,transparent),
-    radial-gradient(1px 1px at 48% 36%,rgba(180,200,225,.80),transparent),
-    radial-gradient(1.2px 1.2px at 56% 10%,rgba(255,250,235,.92),transparent),
-    radial-gradient(1px 1px at 62% 44%,rgba(220,235,255,.88),transparent),
-    radial-gradient(1.4px 1.4px at 68% 32%,#fff,transparent),
-    radial-gradient(1px 1px at 72% 52%,rgba(200,215,232,.78),transparent),
-    radial-gradient(1.2px 1.2px at 78% 8%,rgba(225,235,250,.88),transparent),
-    radial-gradient(1px 1px at 82% 28%,rgba(180,200,225,.80),transparent),
-    radial-gradient(1.4px 1.4px at 88% 18%,#fff,transparent),
-    radial-gradient(1px 1px at 92% 38%,rgba(220,232,250,.86),transparent),
-    radial-gradient(1.2px 1.2px at 96% 8%,rgba(240,245,255,.94),transparent),
-    radial-gradient(1px 1px at 8% 56%,rgba(200,218,240,.85),transparent),
-    radial-gradient(1.4px 1.4px at 16% 64%,#fff,transparent),
-    radial-gradient(1px 1px at 22% 78%,rgba(190,210,232,.82),transparent),
-    radial-gradient(1.2px 1.2px at 28% 86%,rgba(220,232,250,.90),transparent),
-    radial-gradient(1px 1px at 34% 70%,rgba(180,200,225,.78),transparent),
-    radial-gradient(1.4px 1.4px at 42% 92%,rgba(255,250,235,.94),transparent),
-    radial-gradient(1px 1px at 48% 76%,rgba(200,218,240,.85),transparent),
-    radial-gradient(1.2px 1.2px at 56% 88%,rgba(220,232,250,.90),transparent),
-    radial-gradient(1px 1px at 62% 64%,rgba(180,200,225,.78),transparent),
-    radial-gradient(1.6px 1.6px at 68% 78%,#fff,transparent),
-    radial-gradient(1px 1px at 74% 92%,rgba(220,232,250,.86),transparent),
-    radial-gradient(1.2px 1.2px at 82% 64%,rgba(180,200,225,.82),transparent),
-    radial-gradient(1px 1px at 88% 80%,rgba(220,232,250,.88),transparent),
-    radial-gradient(1.4px 1.4px at 94% 70%,#fff,transparent);}
+    radial-gradient(1px 1px at 8% 14%,rgba(220,232,250,.85),transparent),
+    radial-gradient(1.4px 1.4px at 12% 6%,#fff,transparent),
+    radial-gradient(1px 1px at 16% 12%,rgba(190,210,232,.78),transparent),
+    radial-gradient(1.6px 1.6px at 22% 8%,rgba(255,248,232,.95),transparent),
+    radial-gradient(1px 1px at 26% 16%,rgba(180,200,225,.72),transparent),
+    radial-gradient(1.2px 1.2px at 32% 5%,#fff,transparent),
+    radial-gradient(1px 1px at 38% 13%,rgba(220,232,250,.82),transparent),
+    radial-gradient(1.4px 1.4px at 44% 8%,#fff,transparent),
+    radial-gradient(1px 1px at 50% 14%,rgba(200,218,240,.78),transparent),
+    radial-gradient(1.2px 1.2px at 56% 6%,rgba(255,250,235,.92),transparent),
+    radial-gradient(1.6px 1.6px at 62% 12%,#fff,transparent),
+    radial-gradient(1px 1px at 68% 4%,rgba(190,210,232,.80),transparent),
+    radial-gradient(1.2px 1.2px at 74% 10%,rgba(220,232,250,.88),transparent),
+    radial-gradient(1.4px 1.4px at 78% 5%,#fff,transparent),
+    radial-gradient(1px 1px at 82% 14%,rgba(200,218,240,.78),transparent),
+    radial-gradient(1.2px 1.2px at 92% 8%,rgba(255,250,235,.94),transparent),
+    radial-gradient(1px 1px at 96% 14%,rgba(180,200,225,.72),transparent),
+    /* row 2 */
+    radial-gradient(1.2px 1.2px at 6% 22%,rgba(220,232,250,.88),transparent),
+    radial-gradient(1.6px 1.6px at 14% 28%,#fff,transparent),
+    radial-gradient(1px 1px at 20% 22%,rgba(180,200,225,.78),transparent),
+    radial-gradient(1.4px 1.4px at 28% 32%,#fff,transparent),
+    radial-gradient(1px 1px at 34% 26%,rgba(220,232,250,.82),transparent),
+    radial-gradient(1.2px 1.2px at 40% 30%,rgba(255,248,232,.92),transparent),
+    radial-gradient(1.6px 1.6px at 46% 26%,#fff,transparent),
+    radial-gradient(1px 1px at 52% 32%,rgba(200,218,240,.80),transparent),
+    radial-gradient(1.4px 1.4px at 58% 24%,#fff,transparent),
+    radial-gradient(1px 1px at 64% 30%,rgba(190,210,232,.78),transparent),
+    radial-gradient(1.2px 1.2px at 70% 26%,rgba(255,250,240,.92),transparent),
+    radial-gradient(1.4px 1.4px at 76% 32%,#fff,transparent),
+    radial-gradient(1px 1px at 92% 30%,rgba(220,232,250,.85),transparent),
+    /* row 3 - middle */
+    radial-gradient(1px 1px at 4% 42%,rgba(180,200,225,.74),transparent),
+    radial-gradient(1.2px 1.2px at 12% 48%,rgba(220,232,250,.86),transparent),
+    radial-gradient(1.6px 1.6px at 20% 42%,#fff,transparent),
+    radial-gradient(1px 1px at 28% 48%,rgba(200,218,240,.78),transparent),
+    radial-gradient(1.4px 1.4px at 36% 44%,rgba(255,248,232,.94),transparent),
+    radial-gradient(1px 1px at 64% 42%,rgba(220,232,250,.84),transparent),
+    radial-gradient(1.2px 1.2px at 72% 48%,#fff,transparent),
+    radial-gradient(1.4px 1.4px at 80% 44%,rgba(180,200,225,.78),transparent),
+    radial-gradient(1px 1px at 88% 48%,rgba(220,232,250,.82),transparent),
+    radial-gradient(1.2px 1.2px at 94% 42%,rgba(255,250,240,.94),transparent),
+    /* row 4 */
+    radial-gradient(1.2px 1.2px at 4% 62%,rgba(220,232,250,.86),transparent),
+    radial-gradient(1.6px 1.6px at 10% 68%,#fff,transparent),
+    radial-gradient(1px 1px at 18% 62%,rgba(190,210,232,.78),transparent),
+    radial-gradient(1.4px 1.4px at 26% 70%,rgba(255,248,232,.92),transparent),
+    radial-gradient(1px 1px at 34% 64%,rgba(220,232,250,.82),transparent),
+    radial-gradient(1.2px 1.2px at 42% 70%,#fff,transparent),
+    radial-gradient(1.6px 1.6px at 50% 64%,rgba(255,250,240,.95),transparent),
+    radial-gradient(1px 1px at 58% 70%,rgba(200,218,240,.78),transparent),
+    radial-gradient(1.4px 1.4px at 66% 64%,#fff,transparent),
+    radial-gradient(1px 1px at 74% 70%,rgba(180,200,225,.78),transparent),
+    radial-gradient(1.2px 1.2px at 80% 64%,rgba(220,232,250,.86),transparent),
+    radial-gradient(1px 1px at 90% 70%,rgba(190,210,232,.78),transparent),
+    radial-gradient(1.2px 1.2px at 96% 64%,#fff,transparent),
+    /* row 5 - bottom */
+    radial-gradient(1px 1px at 8% 84%,rgba(220,232,250,.84),transparent),
+    radial-gradient(1.4px 1.4px at 16% 90%,#fff,transparent),
+    radial-gradient(1px 1px at 24% 82%,rgba(190,210,232,.78),transparent),
+    radial-gradient(1.6px 1.6px at 32% 88%,rgba(255,250,240,.94),transparent),
+    radial-gradient(1px 1px at 40% 84%,rgba(220,232,250,.82),transparent),
+    radial-gradient(1.2px 1.2px at 48% 90%,#fff,transparent),
+    radial-gradient(1px 1px at 56% 84%,rgba(200,218,240,.78),transparent),
+    radial-gradient(1.4px 1.4px at 64% 88%,rgba(220,232,250,.92),transparent),
+    radial-gradient(1.2px 1.2px at 72% 82%,#fff,transparent),
+    radial-gradient(1px 1px at 80% 90%,rgba(180,200,225,.74),transparent),
+    radial-gradient(1.6px 1.6px at 88% 84%,rgba(255,250,240,.94),transparent),
+    radial-gradient(1px 1px at 94% 92%,rgba(200,218,240,.78),transparent);}
 </style>
 </head>
 <body>
@@ -671,17 +774,25 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   <div id="pwr-ribbon">
     <div class="peu-row">
       <span class="peu-lbl">POWER</span>
-      <div class="pmode" id="pmode-row">
-        <div class="pmpill" id="pmpill"></div>
-        <div class="pmopt on" id="pscm" onclick="setMode('scm')">SCM</div>
-        <div class="pmopt" id="pnav" onclick="setMode('nav')">NAV</div>
-      </div>
+      <div class="peu-nums" id="peu-nums">-- / -- EU</div>
+      <div class="peu-cons-lbl">CONSUMPTION</div>
+      <div class="peu-cons-pct" id="peu-status">--%</div>
       <div class="peu-track"><div class="peu-fill" id="peu-fill"></div></div>
-      <div class="peu-nums" id="peu-nums">-- EU</div>
-      <div class="peu-status" id="peu-status"></div>
     </div>
     <div id="pwr-comps"></div>
     <div id="pwr-warn"></div>
+    <div class="pwr-foot">
+      <div class="pmode" id="pmode-row">
+        <div class="pmpill" id="pmpill"></div>
+        <div class="pmopt on" id="pscm" onclick="setMode('scm')">SCM MODE</div>
+        <div class="pmopt" id="pnav" onclick="setMode('nav')">NAV MODE</div>
+      </div>
+      <div class="pwr-speed">
+        <span class="pwr-speed-l">SPEED</span>
+        <span class="pwr-speed-v" id="h-scm-foot">-- m/s</span>
+      </div>
+      <button class="pwr-reset" onclick="resetPower()">↺ RESET POWER</button>
+    </div>
   </div>
 
   <!-- SHIP COMPONENTS (middle, below ship) -->
@@ -856,7 +967,7 @@ function renderPwrComps() {
   _pwrComps.forEach(function(c){
     var hp = ['wp','sg','en'].indexOf(c.cat) > -1;
     var el = document.createElement('div');
-    el.id = 'prc-'+c.id; el.className = 'pc'+(c.on?'':' offline');
+    el.id = 'prc-'+c.id; el.className = 'pc pc-'+c.cat+(c.on?'':' offline');
     el.innerHTML =
       '<div class="pc-head">' +
         '<div class="ptog '+(c.on?'on':'off')+'" id="ptog-'+c.id+'" onclick="togComp(\''+c.id+'\')"><div class="ptog-k"></div></div>' +
@@ -955,9 +1066,24 @@ function updatePwr() {
   setText('h-eu', out+' EU');
   setText('h-load', Math.round(lp)+'%');
   setText('h-scm', (_mode==='scm'?spd:ship.scm||226)+' ');
-  
+  setText('h-scm-foot', spd+' m/s '+_mode.toUpperCase());
+
   // Rebuild hp band dps display
   buildHpBand();
+}
+
+function resetPower() {
+  if(!_pwrComps) return;
+  _pwrComps.forEach(function(c){
+    c.on = true;
+    if(['wp','sg','en'].indexOf(c.cat) > -1) c.pips = 5;
+    else c.pips = c.max;
+    var tog = document.getElementById('ptog-'+c.id);
+    if(tog) tog.className = 'ptog on';
+    var pr = document.getElementById('prc-'+c.id);
+    if(pr) pr.className = 'pc pc-'+c.cat;
+  });
+  updatePwr();
 }
 
 function setText(id, v) { var el=document.getElementById(id); if(el) el.textContent=v; }
