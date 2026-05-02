@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SC-ShipForge v8.96</title>
+<title>SC-ShipForge v8.97</title>
 <meta name="description" content="SC-ShipForge LIVE — Star Citizen ship loadout builder with live game data. Compare weapons, analyze TTK, optimize power for PvP and PvE combat."/>
 <meta name="keywords" content="Star Citizen, ship loadout builder, weapon comparison, TTK calculator, PvP builds, shield analysis, SC ship tools, scstarforge"/>
 <meta name="author" content="SC-ShipForge"/>
@@ -1107,12 +1107,109 @@ option,optgroup{background:var(--bg2)}
 
 /* Fix: hide duplicate ship name overlay on ship cards */
 .fleet-card-img-name { display: none !important; }
+
+/* ===== DEEP SPACE BACKGROUND ===== */
+html,body{background:#01000a!important;}
+body::before{
+  content:'';
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:-1;pointer-events:none;
+  background-color:#01000a;
+  background-image:
+    radial-gradient(ellipse 80% 55% at 78% 14%,rgba(55,10,90,0.72) 0%,rgba(28,4,62,0.42) 30%,rgba(8,0,25,0.16) 60%,transparent 80%),
+    radial-gradient(ellipse 48% 36% at 84% 4%,rgba(130,16,160,0.32) 0%,transparent 70%),
+    radial-gradient(ellipse 52% 40% at 8% 88%,rgba(0,52,158,0.50) 0%,transparent 72%),
+    radial-gradient(ellipse 26% 20% at 5% 60%,rgba(0,128,172,0.20) 0%,transparent 68%),
+    radial-gradient(ellipse 20% 16% at 46% 96%,rgba(128,6,68,0.24) 0%,transparent 70%),
+    radial-gradient(1.5px 1.5px at 4% 9%,#fff 0%,transparent 100%),
+    radial-gradient(2px 2px at 16% 16%,rgba(255,240,195,1.0) 0%,transparent 100%),
+    radial-gradient(1px 1px at 10% 34%,rgba(255,255,255,0.75) 0%,transparent 100%),
+    radial-gradient(1px 1px at 21% 70%,rgba(255,255,255,0.60) 0%,transparent 100%),
+    radial-gradient(1px 1px at 33% 88%,rgba(255,255,255,0.52) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 38% 26%,rgba(200,212,255,0.90) 0%,transparent 100%),
+    radial-gradient(2.5px 2.5px at 49% 7%,#fff 0%,transparent 100%),
+    radial-gradient(1px 1px at 54% 80%,rgba(255,255,255,0.48) 0%,transparent 100%),
+    radial-gradient(1px 1px at 60% 40%,rgba(255,255,255,0.68) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 64% 14%,rgba(200,218,255,0.88) 0%,transparent 100%),
+    radial-gradient(2px 2px at 73% 92%,rgba(255,255,255,0.78) 0%,transparent 100%),
+    radial-gradient(2px 2px at 84% 20%,rgba(218,198,255,0.88) 0%,transparent 100%),
+    radial-gradient(1px 1px at 90% 66%,rgba(255,255,255,0.52) 0%,transparent 100%),
+    radial-gradient(1px 1px at 95% 44%,rgba(255,255,255,0.68) 0%,transparent 100%),
+    radial-gradient(1px 1px at 27% 48%,rgba(255,255,255,0.48) 0%,transparent 100%),
+    radial-gradient(1px 1px at 56% 18%,rgba(255,255,255,0.62) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 75% 4%,rgba(255,238,195,0.82) 0%,transparent 100%),
+    radial-gradient(1px 1px at 88% 55%,rgba(255,255,255,0.52) 0%,transparent 100%);
+}
+#app{background:transparent!important;}
+.nav{background:rgba(4,2,14,0.86)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;}
+.sub-nav,#subNav{background:rgba(3,1,12,0.82)!important;backdrop-filter:blur(10px)!important;}
+.lp{background:rgba(8,6,18,0.88)!important;backdrop-filter:blur(10px)!important;}
+.rp{background:rgba(8,6,18,0.88)!important;backdrop-filter:blur(10px)!important;}
+.pane{background:rgba(6,4,14,0.80)!important;backdrop-filter:blur(6px)!important;}
+.lp-card{background:rgba(14,10,26,0.90)!important;}
+.hp-row,.ms-row,.sys-row{background:rgba(10,8,20,0.75)!important;}
+.hp-row:hover,.ms-row:hover,.sys-row:hover{background:rgba(18,14,32,0.90)!important;}
+.body{background:transparent!important;}
+
+/* ===== POWER RIBBON ===== */
+.pwr-ribbon{
+  padding:8px 16px;
+  background:linear-gradient(180deg,transparent,rgba(4,2,14,0.60) 28%,rgba(4,2,14,0.84) 100%);
+  backdrop-filter:blur(4px);
+  border-top:1px solid rgba(255,255,255,0.04);
+  flex-shrink:0;
+}
+.pwr-eu-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.pwr-eu-label{font-size:7px;letter-spacing:2px;color:rgba(140,132,110,0.36);white-space:nowrap;}
+.pwr-mode-tog{display:flex;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:2px;position:relative;margin-right:4px;flex-shrink:0;}
+.pwr-mpill{position:absolute;top:2px;height:calc(100% - 4px);background:linear-gradient(135deg,rgba(160,120,28,0.28),rgba(210,158,48,0.14));border:1px solid rgba(195,152,42,0.36);border-radius:2px;transition:left 0.22s cubic-bezier(0.34,1.4,0.64,1),width 0.22s;}
+.pwr-mopt{padding:3px 8px;font-size:8px;letter-spacing:1.2px;cursor:pointer;position:relative;z-index:1;transition:color 0.2s;color:rgba(130,125,148,0.35);white-space:nowrap;}
+.pwr-mopt.on{color:rgba(218,172,68,0.92);}
+.pwr-eu-track{flex:1;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
+.pwr-eu-fill{height:100%;border-radius:2px;transition:width 0.32s cubic-bezier(0.34,1.4,0.64,1),background 0.3s;}
+.pwr-eu-nums{font-size:9px;font-weight:700;white-space:nowrap;min-width:65px;text-align:right;}
+.pwr-eu-status{font-size:7px;letter-spacing:1px;white-space:nowrap;min-width:60px;}
+.pwr-comps{display:flex;gap:0;align-items:flex-start;overflow-x:auto;}
+.pwr-comps::-webkit-scrollbar{height:2px;}
+.pwr-comps::-webkit-scrollbar-thumb{background:rgba(200,168,76,0.15);}
+.pwr-comp{display:flex;flex-direction:column;padding:0 10px 0 0;position:relative;flex:1;min-width:0;}
+.pwr-comp:not(:last-child)::after{content:'';position:absolute;right:5px;top:8%;bottom:8%;width:1px;background:linear-gradient(to bottom,transparent,rgba(200,180,100,0.10),transparent);}
+.pwr-comp-head{display:flex;align-items:center;gap:3px;margin-bottom:2px;}
+.pwr-ctog{width:22px;height:11px;border-radius:6px;position:relative;cursor:pointer;flex-shrink:0;border:1px solid transparent;transition:background 0.20s,box-shadow 0.20s;}
+.pwr-ctog.on{background:linear-gradient(135deg,rgba(18,70,22,0.95),rgba(10,52,14,0.90));border-color:rgba(38,140,52,0.32);box-shadow:0 0 5px rgba(38,140,52,0.18);}
+.pwr-ctog.off{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.07);}
+.pwr-ctog-k{position:absolute;top:1px;width:7px;height:7px;border-radius:50%;transition:left 0.20s cubic-bezier(0.34,1.56,0.64,1),background 0.20s;}
+.pwr-ctog.on .pwr-ctog-k{left:12px;background:radial-gradient(circle at 35% 35%,#78ff88,#22ae36);}
+.pwr-ctog.off .pwr-ctog-k{left:1px;background:rgba(130,124,142,0.42);}
+.pwr-cname{font-size:8px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pwr-csub{font-size:6px;color:rgba(120,114,100,0.36);margin-bottom:2px;white-space:nowrap;}
+.pwr-pip-track{display:flex;gap:1px;margin-bottom:3px;}
+.pwr-pip{flex:1;height:5px;border-radius:1px;cursor:pointer;transition:transform 0.10s cubic-bezier(0.34,1.8,0.64,1);}
+.pwr-pip:hover{transform:scaleY(1.4);}
+.pwr-pip:active{transform:scaleY(0.80);}
+.pwr-pip.e{background:rgba(255,255,255,0.06);}
+.pwr-pip.pp{background:linear-gradient(135deg,#987818,#d09838);}
+.pwr-pip.sg{background:linear-gradient(135deg,#0c6090,#18a8c8);}
+.pwr-pip.wp{background:linear-gradient(135deg,#b83018,#e04828);}
+.pwr-pip.en{background:linear-gradient(135deg,#887818,#c8a828);}
+.pwr-pip.co{background:linear-gradient(135deg,#088060,#14a888);}
+.pwr-pip.qd{background:linear-gradient(135deg,#086880,#12a0b8);}
+.pwr-pip.rd{background:linear-gradient(135deg,#686870,#9898a0);}
+.pwr-comp-foot{display:flex;align-items:center;gap:2px;}
+.pwr-adj{display:flex;gap:1px;}
+.pwr-adb{width:12px;height:12px;border-radius:2px;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.03);color:rgba(155,148,138,0.55);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.1s,transform 0.1s cubic-bezier(0.34,1.8,0.64,1);line-height:1;user-select:none;}
+.pwr-adb:hover{background:rgba(255,255,255,0.08);}
+.pwr-adb:active{transform:scale(0.78);}
+.pwr-ceu{font-size:7px;font-weight:700;margin-left:auto;}
+.pwr-comp.offline{opacity:0.35;}
+.pwr-warn{font-size:7px;color:rgba(220,70,40,0.75);background:rgba(220,40,20,0.06);border:1px solid rgba(220,40,20,0.14);border-radius:2px;padding:2px 6px;margin-top:4px;display:none;}
+
 </style>
 
 <div id="app">
 
   <nav class="nav">
-    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a427;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.96</span></div>
+    <div class="nav-logo" onclick="_liveSync && _liveSync.forceSync()" title="Click to force sync live data" style="cursor:pointer">SC-ShipForge LIVE <span style="font-size:9px;color:#e8a427;font-family:var(--fmono);font-weight:400;letter-spacing:1px;text-shadow:0 0 6px rgba(77,255,110,.4)">v8.97</span></div>
 <!-- nav search removed -->
     
     <div class="nav-divider" style="display:none"></div>
