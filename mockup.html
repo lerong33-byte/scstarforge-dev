@@ -292,10 +292,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
   perspective:1800px;perspective-origin:50% 0;}
 .top-mfd{display:flex;align-items:stretch;gap:0;
   padding:24px 18px 12px;position:relative;
-  background:
+  background-color:#0a0d14;
+  background-image:
     radial-gradient(ellipse 130% 100% at 50% 60%, transparent 30%, rgba(0,0,0,.55) 100%),
     repeating-linear-gradient(0deg, rgba(170,200,230,.045) 0px, transparent 1px, transparent 3px),
-    radial-gradient(ellipse 110% 130% at 50% 100%,rgba(36,40,46,.85) 0%,rgba(16,18,22,.62) 80%,rgba(8,10,16,.42) 100%);
+    radial-gradient(ellipse 110% 130% at 50% 100%,rgba(36,40,46,.95) 0%,rgba(16,18,22,.85) 80%,rgba(10,12,18,.78) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(190,200,215,.22),
     inset 0 0 0 5px rgba(14,16,22,.95),
@@ -479,28 +480,21 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
 .pp.e{background:linear-gradient(180deg,#1a1814 0%,#0e0d0b 50%,#080706 100%);
   box-shadow:inset 0 1px 0 rgba(72,66,56,.28),inset 0 -1px 0 rgba(0,0,0,.60);}
 .pp.e::after{opacity:.40;}
-/* filled pips — backlit METALLIC plates with strong inner glow */
-.pp.pp-c{background:linear-gradient(180deg,#ff2818 0%,#d80808 50%,#600000 100%);
-  box-shadow:inset 0 0 10px rgba(255,80,60,.95),inset 0 1px 0 rgba(255,170,150,.92),
-    0 0 6px rgba(232,16,8,.75),0 0 1px rgba(255,40,24,.60);}
-.pp.sg{background:linear-gradient(180deg,#b8c8e0 0%,#7088a8 50%,#3c4c68 100%);
-  box-shadow:inset 0 0 8px rgba(208,224,248,.55),inset 0 1px 0 rgba(232,240,252,.65),
-    0 0 4px rgba(120,144,184,.40);}
-.pp.wp{background:linear-gradient(180deg,#ffc068 0%,#e09028 50%,#805808 100%);
-  box-shadow:inset 0 0 8px rgba(255,210,140,.65),inset 0 1px 0 rgba(255,232,180,.75),
-    0 0 4px rgba(232,160,40,.50);}
-.pp.en{background:linear-gradient(180deg,#f4dc78 0%,#c8a040 50%,#88680c 100%);
-  box-shadow:inset 0 0 8px rgba(255,236,160,.55),inset 0 1px 0 rgba(255,244,180,.65),
-    0 0 4px rgba(216,176,52,.40);}
-.pp.co{background:linear-gradient(180deg,#e0e4e8 0%,#a0a8b0 50%,#5c6068 100%);
-  box-shadow:inset 0 0 8px rgba(232,236,240,.55),inset 0 1px 0 rgba(248,250,252,.70),
-    0 0 4px rgba(168,176,184,.30);}
-.pp.qd{background:linear-gradient(180deg,#d480ff 0%,#9028e0 50%,#3a0670 100%);
-  box-shadow:inset 0 0 10px rgba(216,144,255,.90),inset 0 1px 0 rgba(232,184,255,.92),
-    0 0 6px rgba(144,40,224,.70),0 0 1px rgba(196,80,255,.55);}
-.pp.rd{background:linear-gradient(180deg,#cccfd2 0%,#90949a 50%,#4c4f54 100%);
-  box-shadow:inset 0 0 8px rgba(232,236,240,.45),inset 0 1px 0 rgba(244,246,248,.55),
-    0 0 4px rgba(140,144,150,.30);}
+/* Filled pips — unified backlit chrome (no rainbow). Subtle brightness variation per category for legibility. */
+.pp.pp-c, .pp.sg, .pp.wp, .pp.en, .pp.co, .pp.qd, .pp.rd{
+  background:linear-gradient(180deg,#dbe3ec 0%,#8c98a8 50%,#3e4654 100%);
+  box-shadow:inset 0 0 8px rgba(220,232,248,.55),inset 0 1px 0 rgba(240,246,252,.70),
+    0 0 4px rgba(160,176,196,.34);}
+/* Tiny tonal differentiation so categories remain visually distinguishable side-by-side */
+.pp.pp-c{background:linear-gradient(180deg,#ecf0f6 0%,#a0acbc 50%,#48505e 100%);   /* PP brightest */
+  box-shadow:inset 0 0 10px rgba(232,240,252,.75),inset 0 1px 0 rgba(248,252,255,.85),
+    0 0 5px rgba(190,208,232,.45);}
+.pp.qd{background:linear-gradient(180deg,#c8d2e0 0%,#788698 50%,#34404f 100%);     /* QD slightly cool */
+  box-shadow:inset 0 0 8px rgba(196,212,232,.50),inset 0 1px 0 rgba(220,232,248,.62),
+    0 0 4px rgba(120,144,176,.35);}
+.pp.rd{background:linear-gradient(180deg,#c8ccd2 0%,#78808c 50%,#363a44 100%);     /* RD muted */
+  box-shadow:inset 0 0 7px rgba(220,228,236,.42),inset 0 1px 0 rgba(232,236,240,.55),
+    0 0 3px rgba(140,150,164,.28);}
 .pc-foot{order:3;display:flex;flex-direction:column;align-items:center;gap:0;
   width:100%;margin-top:2px;}
 .padj{display:none;}
@@ -813,13 +807,14 @@ body{
    MFD MONITOR STYLING — additive bezel + scanlines + backlit header
    ============================================================ */
 #pwr-ribbon, #hp-band, #ms-band, #comp-zone{
-  /* Add chunky bezel + scanlines on top of existing gradients */
+  /* Solid dark backplate so galaxy/stars don't bleed through, plus scanlines + edge vignette on top */
+  background-color:#0a0d14;
   background-image:
     repeating-linear-gradient(0deg, rgba(170,200,230,.045) 0px, transparent 1px, transparent 3px),
     radial-gradient(ellipse 130% 90% at 50% 60%, transparent 30%, rgba(0,0,0,.55) 100%),
-    radial-gradient(ellipse 100% 100% at 50% 50%, rgba(110,140,180,.05) 0%, transparent 80%);
-  background-blend-mode:screen, normal, normal;
-  /* Extra outer drop shadow for monitor depth */
+    radial-gradient(ellipse 100% 100% at 50% 50%, rgba(110,140,180,.05) 0%, transparent 80%),
+    linear-gradient(180deg, rgba(14,18,26,.96), rgba(8,10,16,.98));
+  background-blend-mode:screen, normal, normal, normal;
   filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));
   padding-top:28px;}
 /* The chunky inset bezel uses outline (sits inside clip-path correctly) */
