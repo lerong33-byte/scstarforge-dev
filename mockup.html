@@ -44,11 +44,16 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
   box-shadow:inset 0 0 8px rgba(180,195,215,.10);text-shadow:0 0 4px rgba(180,195,215,.30);}
 .nb:hover:not(.on){color:var(--g);border-color:rgba(180,195,215,.10);}
 #ship-sel-wrap{margin-left:auto;position:relative;}
-#ship-sel{background:transparent;border:1px solid var(--g-m);
-  color:var(--g);font-size:10px;letter-spacing:1px;font-family:inherit;
-  padding:4px 26px 4px 10px;cursor:pointer;min-width:200px;
+#ship-sel{background:rgba(8,10,16,.95);border:1px solid var(--g-m);
+  color:var(--w);font-size:10px;letter-spacing:1px;font-family:inherit;
+  padding:4px 26px 4px 10px;cursor:pointer;min-width:220px;
   appearance:none;-webkit-appearance:none;}
-#ship-sel:focus{outline:none;border-color:var(--g);}
+#ship-sel:focus{outline:none;border-color:var(--g);box-shadow:0 0 8px rgba(180,195,215,.30);}
+#ship-sel option{background:rgba(8,10,16,.98);color:rgba(220,235,255,.92);
+  padding:4px 8px;font-family:inherit;}
+#ship-sel optgroup{background:rgba(20,28,40,.98);color:rgba(140,200,255,.85);
+  font-weight:700;letter-spacing:2px;font-size:9px;
+  padding:4px 4px;text-transform:uppercase;}
 #ship-sel-arr{position:absolute;right:8px;top:50%;transform:translateY(-50%);
   font-size:9px;color:var(--g-d);pointer-events:none;}
 #live-pill{display:flex;align-items:center;gap:5px;font-size:8px;
@@ -339,7 +344,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
   z-index:9;padding:14px 14px 16px 14px;
   display:flex;flex-direction:column;gap:6px;
   overflow:hidden;
-  transform:perspective(2400px) rotateY(-6deg);transform-origin:right center;
+  transform:perspective(1600px) rotateY(-22deg) rotateX(2deg);transform-origin:right center;
   background:
     radial-gradient(ellipse 100% 100% at 100% 50%,rgba(40,42,48,.62) 0%,rgba(20,22,26,.45) 60%,rgba(10,12,14,.18) 100%),
     repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.010) 2px,rgba(255,255,255,.010) 3px);
@@ -379,7 +384,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
   bottom:30px;max-height:600px;z-index:15;
   padding:14px 14px 16px 14px;display:flex;flex-direction:column;
   overflow:hidden;
-  transform:perspective(2400px) rotateY(6deg);transform-origin:left center;
+  transform:perspective(1600px) rotateY(22deg) rotateX(2deg);transform-origin:left center;
   background:
     radial-gradient(ellipse 100% 100% at 0% 50%,rgba(40,42,48,.62) 0%,rgba(20,22,26,.45) 60%,rgba(10,12,14,.18) 100%),
     repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.010) 2px,rgba(255,255,255,.010) 3px);
@@ -631,11 +636,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
 /* WEAPONS — MIDDLE-LEFT (curved flatscreen) */
 #hp-band{position:absolute;top:340px;left:340px;width:min(560px,calc(50% - 352px));min-width:340px;bottom:30px;max-height:490px;
   z-index:16;padding:14px 22px 18px;overflow-y:auto;overflow-x:hidden;
-  transform:perspective(2400px) rotateY(2deg);transform-origin:left center;}
+  transform:perspective(1800px) rotateY(10deg) rotateX(2deg);transform-origin:left center;}
 /* MISSILES — MIDDLE-RIGHT (curved flatscreen) */
 #ms-band{position:absolute;top:340px;left:calc(50% + 12px);width:min(560px,calc(50% - 424px));min-width:340px;bottom:30px;max-height:490px;
   z-index:16;padding:14px 22px 18px;overflow-y:auto;overflow-x:hidden;
-  transform:perspective(2400px) rotateY(-2deg);transform-origin:right center;
+  transform:perspective(1800px) rotateY(-10deg) rotateX(2deg);transform-origin:right center;
   background:
     radial-gradient(ellipse 100% 120% at 50% 0%,rgba(40,42,48,.55) 0%,rgba(18,20,24,.72) 70%,rgba(10,12,14,.85) 100%),
     repeating-linear-gradient(90deg,transparent 0,transparent 2px,rgba(255,255,255,.010) 2px,rgba(255,255,255,.010) 3px);
@@ -1561,6 +1566,10 @@ function progress(pct, txt) {
 
 function populateShipSel() {
   var sel = document.getElementById('ship-sel');
+  // Capture local loadHudShip reference to avoid shadowing by index.html
+  var _doLoadShip = loadHudShip;
+  // Clear any prior options/listeners (idempotent if init runs more than once)
+  sel.innerHTML = '<option value="">Select a ship...</option>';
   var qs = new URLSearchParams(location.search);
   var roleFilter = (qs.get('role')||'').toLowerCase();
   var allNames = Object.keys(SHIP_DATA).sort();
@@ -1570,15 +1579,29 @@ function populateShipSel() {
   var filtered = roleFilter && names.length > 0;
   if (roleFilter && names.length === 0) names = allNames;
   document.getElementById('hull-count').textContent = names.length + ' HULLS' + (filtered ? ' · ' + roleFilter.toUpperCase() : '');
-  names.forEach(function(n) {
-    var o = document.createElement('option');
-    o.value = n; o.textContent = n;
-    sel.appendChild(o);
+
+  // Group by manufacturer
+  var byMfr = {};
+  names.forEach(function(n){
+    var m = mfrName(n) || 'Other';
+    (byMfr[m] = byMfr[m] || []).push(n);
   });
-  sel.addEventListener('change', function(){ if(this.value) loadShip(this.value); });
+  Object.keys(byMfr).sort().forEach(function(mfr){
+    var grp = document.createElement('optgroup');
+    grp.label = mfr;
+    byMfr[mfr].sort().forEach(function(n){
+      var o = document.createElement('option');
+      o.value = n; o.textContent = n;
+      grp.appendChild(o);
+    });
+    sel.appendChild(grp);
+  });
+
+  // Use onchange (single-handler) to avoid duplicate listeners on re-init
+  sel.onchange = function(){ if(this.value) _doLoadShip(this.value); };
   var urlShip = qs.get('ship');
-  if (urlShip && SHIP_DATA[urlShip]) { sel.value = urlShip; loadShip(urlShip); }
-  else if (filtered) { sel.value = names[0]; loadShip(names[0]); }
+  if (urlShip && SHIP_DATA[urlShip]) { sel.value = urlShip; _doLoadShip(urlShip); }
+  else if (filtered) { sel.value = names[0]; _doLoadShip(names[0]); }
 }
 
 // ============================================================
@@ -1699,7 +1722,7 @@ function applyShipWireframe(ship){
   svg.innerHTML = body + hpDots + compDots;
 }
 
-function loadShip(name) {
+function loadHudShip(name) {
   _curShipName = name;
   _curShip = SHIP_DATA[name];
   if (!_curShip) return;
@@ -1725,18 +1748,28 @@ function loadShip(name) {
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
         if(!data || !data.items || !data.items.length){ tryNext(i+1); return; }
-        // Skip layout/sprite/diagram artifacts that aren't actual ship renders
+        // Skip non-exterior images (sprites, diagrams, AND interior shots: pool/bedroom/cockpit/bay/etc)
         function isRender(it){
           var n = (it.name||'').toLowerCase();
           if(/sprite|deck|map|diagram|comparison|spec|chart|sizecomp/.test(n)) return false;
-          // PNGs are usually transparent diagrams; JPGs are renders. Allow PNGs only if name suggests a render.
+          if(/pool|bedroom|office|bay|kitchen|bar|lounge|hangar|bridge|cockpit|interior|room|dining|medbay|engine_room|lobby|corridor|cabin/.test(n)) return false;
           if(it.contentType === 'image/png' && !/store|render|gallery|sku|hero|jpeg/i.test(n)) return false;
           return true;
         }
+        // Score: prefer items whose name looks like a render (SKU/store/promo/hero) AND whose dims are landscape & big
+        function score(it){
+          var s = 0; var n = (it.name||'').toLowerCase();
+          if(/sku|store|render|promo|hero|isometric/.test(n)) s += 10;
+          if((it.width||0) >= 1000 && (it.height||0) >= 500) s += 5;
+          if((it.width||0) > (it.height||0) * 1.3) s += 4;            // landscape
+          if(!it.background) s += 2;
+          if(/transparent|alpha/.test(n)) s -= 6;                       // avoid alpha cutouts
+          return s;
+        }
         var renders = data.items.filter(isRender);
-        if(!renders.length) renders = data.items;          // fallback if filter rejects everything
-        var nonBg = renders.find(function(it){ return !it.background; });
-        var pick = nonBg || renders[0];
+        if(!renders.length) renders = data.items;
+        renders.sort(function(a,b){ return score(b) - score(a); });
+        var pick = renders[0];
         var url = pick.mediumUrl || pick.smallUrl || pick.url;
         if(url){
           img.onload = function(){ img.style.opacity = '0.85'; };
@@ -1759,7 +1792,48 @@ function loadShip(name) {
 }
 
 function mfrName(shipName) {
-  var mfrs = {Gladius:'Aegis Dynamics',Hammerhead:'Aegis Dynamics',Arrow:'RSI',Hornet:'Anvil Aerospace',Hurricane:'Anvil Aerospace',Eclipse:'Aegis Dynamics',Carrack:'Anvil Aerospace',Constellation:'RSI',Freelancer:'MISC',Cutlass:'Drake Interplanetary',Vanguard:'Aegis Dynamics',Redeemer:'Crusader Industries',Polaris:'RSI',Reclaimer:'Aegis Dynamics'};
+  // Pattern → manufacturer (case-insensitive, longest matches first via Array order)
+  var map = [
+    // Aegis Dynamics
+    [/gladius|sabre|avenger|eclipse|vanguard|retaliator|reclaimer|hammerhead|idris|javelin|redeemer/i, 'Aegis Dynamics'],
+    // Anvil Aerospace
+    [/hornet|hurricane|carrack|terrapin|crucible|valkyrie|pisces|ballista|spartan|centurion|arrow|paladin|c8|f7c|f8c/i, 'Anvil Aerospace'],
+    // RSI
+    [/aurora|constellation|polaris|ursa|lynx|apollo|mantis|galaxy|scorpius|zeus|perseus/i, 'RSI'],
+    // Drake Interplanetary
+    [/cutlass|caterpillar|buccaneer|dragonfly|herald|vulture|cutter|corsair|mule|ironclad|kraken/i, 'Drake Interplanetary'],
+    // MISC
+    [/freelancer|reliant|prospector|hull|starfarer|razor|expanse|fortune|endeavor|odyssey/i, 'MISC'],
+    // Origin Jumpworks
+    [/100i|125a|135c|300i|315p|325a|350r|400i|600i|890|^x1|m50/i, 'Origin Jumpworks'],
+    // Crusader Industries
+    [/mercury|genesis|hercules|spirit|intrepid|ares|c1|a1|a2|c2|m2|e1/i, 'Crusader Industries'],
+    // Argo Astronautics
+    [/mole|mpuv|raft|srv|atls|argo/i, 'Argo Astronautics'],
+    // Esperia
+    [/talon|prowler|blade|glaive/i, 'Esperia'],
+    // Tumbril
+    [/cyclone|nova|ranger|storm/i, 'Tumbril'],
+    // Banu
+    [/defender|merchantman/i, 'Banu'],
+    // Aopoa (Xian)
+    [/khartu|nox|santokyai|san'tok/i, 'Aopoa'],
+    // Greycat
+    [/^stv|^roc|^ptv|^pulse|industrial/i, 'Greycat'],
+    // Consolidated Outland
+    [/mustang|pioneer|nomad/i, 'Consolidated Outland'],
+    // Kruger Intergalactic
+    [/p-?52|p-?72|merlin|archimedes/i, 'Kruger Intergalactic'],
+    // Vanduul
+    [/scythe/i, 'Vanduul'],
+    // Mirai
+    [/razor|fury|guardian/i, 'Mirai'],
+  ];
+  for (var i = 0; i < map.length; i++) {
+    if (map[i][0].test(shipName)) return map[i][1];
+  }
+  // legacy literal map fallback
+  var mfrs = {Gladius:'Aegis Dynamics',Hammerhead:'Aegis Dynamics',Arrow:'Anvil Aerospace',Hornet:'Anvil Aerospace',Hurricane:'Anvil Aerospace',Eclipse:'Aegis Dynamics',Carrack:'Anvil Aerospace',Constellation:'RSI',Freelancer:'MISC',Cutlass:'Drake Interplanetary',Vanguard:'Aegis Dynamics',Redeemer:'Crusader Industries',Polaris:'RSI',Reclaimer:'Aegis Dynamics'};
   for (var k in mfrs) { if (shipName.indexOf(k) > -1) return mfrs[k]; }
   return '';
 }
