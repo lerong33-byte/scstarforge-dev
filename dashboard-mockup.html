@@ -19,6 +19,7 @@
   --char:rgba(140,130,116,.36);
   --bg:#08070d;
 }
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Eurostile','Bahnschrift','Segoe UI Variable',monospace,sans-serif;
   background:var(--bg);color:var(--w);overflow:hidden;height:100vh;
@@ -138,10 +139,36 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   perspective:1800px;transform-style:preserve-3d;
   padding:10px 0;}
 .stat{display:flex;flex-direction:column;align-items:center;position:relative;
-  padding:8px 18px 10px;min-width:148px;cursor:pointer;text-decoration:none;
-  background:linear-gradient(180deg,rgba(20,22,26,.40),rgba(10,12,14,.20));
-  transition:background .15s,transform .25s,box-shadow .25s;
-  transform-origin:center center;}
+  padding:14px 18px 12px;min-width:160px;cursor:pointer;text-decoration:none;
+  background:linear-gradient(180deg,rgba(38,40,46,.95) 0%,rgba(22,24,28,.95) 50%,rgba(12,14,18,.95) 100%);
+  border:1px solid rgba(72,76,84,.70);
+  box-shadow:
+    0 0 0 1px rgba(8,8,10,.80),
+    inset 0 1px 0 rgba(140,144,152,.32),
+    inset 0 -1px 0 rgba(0,0,0,.85),
+    inset 1px 0 0 rgba(96,100,108,.28),
+    inset -1px 0 0 rgba(96,100,108,.28),
+    0 6px 16px rgba(0,0,0,.55);
+  transform-origin:center center;
+  transition:transform .25s,box-shadow .25s,filter .25s;}
+/* INNER SCREEN — scanlines + CRT vignette */
+.stat::before{content:'';position:absolute;inset:6px;pointer-events:none;z-index:0;
+  background:
+    repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,.020) 2px,rgba(255,255,255,.020) 3px),
+    radial-gradient(ellipse 100% 80% at 50% 30%,rgba(60,64,76,.42) 0%,rgba(8,8,10,.85) 100%);
+  box-shadow:inset 0 0 28px rgba(0,0,0,.65),inset 0 0 4px rgba(180,200,230,.08);}
+/* CORNER MOUNTING BRACKETS */
+.stat::after{content:'';position:absolute;inset:5px;pointer-events:none;z-index:1;
+  background:
+    linear-gradient(to right,rgba(180,200,230,.55) 0,rgba(180,200,230,.55) 9px,transparent 9px) top left/9px 1px no-repeat,
+    linear-gradient(to bottom,rgba(180,200,230,.55) 0,rgba(180,200,230,.55) 9px,transparent 9px) top left/1px 9px no-repeat,
+    linear-gradient(to left,rgba(180,200,230,.55) 0,rgba(180,200,230,.55) 9px,transparent 9px) top right/9px 1px no-repeat,
+    linear-gradient(to bottom,rgba(180,200,230,.55) 0,rgba(180,200,230,.55) 9px,transparent 9px) top right/1px 9px no-repeat,
+    linear-gradient(to right,rgba(180,200,230,.55) 0,rgba(180,200,230,.55) 9px,transparent 9px) bottom left/9px 1px no-repeat,
+    linear-gradient(to top,rgba(180,200,230,.55) 0,rgba(180,200,230,.55) 9px,transparent 9px) bottom left/1px 9px no-repeat,
+    linear-gradient(to left,rgba(180,200,230,.55) 0,rgba(180,200,230,.55) 9px,transparent 9px) bottom right/9px 1px no-repeat,
+    linear-gradient(to top,rgba(180,200,230,.55) 0,rgba(180,200,230,.55) 9px,transparent 9px) bottom right/1px 9px no-repeat;}
+.stat > *{position:relative;z-index:2;}
 .stat:nth-child(1){transform:perspective(1100px) rotateY(45deg) translateZ(-110px);}
 .stat:nth-child(2){transform:perspective(1100px) rotateY(28deg) translateZ(-60px);}
 .stat:nth-child(3){transform:perspective(1100px) rotateY(10deg) translateZ(-12px);}
@@ -159,18 +186,33 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .stat::before{left:0;} .stat::after{right:0;}
 .stat:hover{transform:translateY(-3px);
   background:linear-gradient(180deg,rgba(40,42,48,.55),rgba(20,22,26,.30));}
-.stat-tag{font-size:7px;letter-spacing:2.5px;color:var(--g-d);font-weight:700;margin-bottom:4px;
-  white-space:nowrap;}
-.stat-v{font-size:26px;font-weight:700;line-height:1;letter-spacing:1px;color:var(--w);
-  text-shadow:0 0 10px rgba(212,168,76,.32);}
-.stat-v.r{color:#ff8060;text-shadow:0 0 10px rgba(232,80,48,.45);}
-.stat-v.b{color:#7bc8e8;text-shadow:0 0 10px rgba(80,180,232,.45);}
-.stat-v.g{color:#7be0a8;text-shadow:0 0 10px rgba(80,224,168,.45);}
-.stat-u{font-size:11px;font-weight:400;color:var(--g-d);margin-left:3px;letter-spacing:1px;}
-.stat-name{font-size:10px;letter-spacing:2.5px;font-weight:700;color:var(--w);margin-top:5px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
-.stat-l{font-size:7px;letter-spacing:2px;color:var(--char);margin-top:2px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
+.stat-tag{font-family:'Share Tech Mono','Consolas',monospace;
+  font-size:8px;letter-spacing:3.5px;color:rgba(180,200,230,.70);font-weight:400;margin-bottom:6px;
+  white-space:nowrap;text-transform:uppercase;
+  text-shadow:0 0 6px rgba(180,200,230,.40);}
+.stat-tag::before{content:'> ';opacity:.55;}
+.stat-v{font-family:'Share Tech Mono','Orbitron','Consolas',monospace;
+  font-size:32px;font-weight:700;line-height:1;letter-spacing:2px;color:rgba(232,240,250,.95);
+  text-shadow:0 0 6px currentColor,0 0 16px currentColor;
+  filter:drop-shadow(0 0 4px rgba(0,0,0,.85));}
+.stat-v.r{color:#ff8060;}
+.stat-v.b{color:#7bc8e8;}
+.stat-v.g{color:#7be0a8;}
+.stat-u{font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:400;
+  color:rgba(180,200,230,.55);margin-left:3px;letter-spacing:1.5px;
+  text-shadow:none;}
+.stat-name{font-family:'Share Tech Mono','Consolas',monospace;
+  font-size:11px;letter-spacing:3.5px;font-weight:700;color:rgba(232,240,250,.92);margin-top:7px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:148px;
+  text-shadow:0 0 4px rgba(180,200,230,.40);}
+.stat-l{font-family:'Share Tech Mono',monospace;
+  font-size:8px;letter-spacing:2.5px;color:rgba(140,160,180,.55);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:148px;}
+/* status LED indicator on each card */
+.stat .led{position:absolute;top:9px;right:11px;width:5px;height:5px;border-radius:50%;
+  background:#7be0a8;box-shadow:0 0 5px rgba(80,224,168,.85);
+  animation:led-blink 1.6s ease-in-out infinite;z-index:3;}
+@keyframes led-blink{0%,55%,100%{opacity:1;}65%{opacity:.25;}}
 
 /* PANEL — generic curved-flatscreen card */
 .panel{position:absolute;
@@ -543,37 +585,37 @@ body{background-attachment:fixed;}
   </div>
 
   <div id="stats">
-    <a href="builder.html?ship=Hammerhead" class="stat top">
+    <a href="builder.html?ship=Hammerhead" class="stat top"><span class="led"></span>
       <div class="stat-tag">META · TOP DPS</div>
       <div class="stat-v r">6,240</div>
       <div class="stat-name">HAMMERHEAD</div>
       <div class="stat-l">CAPITAL · 6 CREW</div>
     </a>
-    <a href="builder.html?ship=Polaris" class="stat top">
+    <a href="builder.html?ship=Polaris" class="stat top"><span class="led"></span>
       <div class="stat-tag">TOP SHIELD HP</div>
       <div class="stat-v b">320k</div>
       <div class="stat-name">POLARIS</div>
       <div class="stat-l">CORVETTE · 4 CREW</div>
     </a>
-    <a href="builder.html?ship=Arrow" class="stat top">
+    <a href="builder.html?ship=Arrow" class="stat top"><span class="led"></span>
       <div class="stat-tag">FASTEST IN COMBAT</div>
       <div class="stat-v">220<span class="stat-u">m/s</span></div>
       <div class="stat-name">ARROW</div>
       <div class="stat-l">LIGHT FIGHTER</div>
     </a>
-    <a href="builder.html?ship=Eclipse" class="stat top">
+    <a href="builder.html?ship=Eclipse" class="stat top"><span class="led"></span>
       <div class="stat-tag">HIGHEST ALPHA</div>
       <div class="stat-v r">540k</div>
       <div class="stat-name">ECLIPSE</div>
       <div class="stat-l">BOMBER · STEALTH</div>
     </a>
-    <div class="stat top">
+    <div class="stat top"><span class="led"></span>
       <div class="stat-tag">NEW THIS PATCH</div>
       <div class="stat-v g">+3</div>
       <div class="stat-name">PALADIN · POLARIS · A2</div>
       <div class="stat-l">PU 4.7.2</div>
     </div>
-    <div class="stat top">
+    <div class="stat top"><span class="led"></span>
       <div class="stat-tag">DATA SYNC</div>
       <div class="stat-v g">LIVE</div>
       <div class="stat-name">2026-05-02</div>
