@@ -132,13 +132,27 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 #title-sub{font-size:9px;letter-spacing:6px;color:var(--g-d);margin-top:5px;}
 .brk{color:var(--g);opacity:.62;font-weight:300;}
 
-/* TOP STATS — meta highlights */
+/* TOP STATS — meta highlights, bowed inward like a curved display */
 #stats{position:absolute;top:108px;left:50%;transform:translateX(-50%);z-index:18;
-  display:flex;align-items:stretch;gap:18px;}
+  display:flex;align-items:stretch;gap:14px;
+  perspective:1800px;transform-style:preserve-3d;}
 .stat{display:flex;flex-direction:column;align-items:center;position:relative;
   padding:8px 18px 10px;min-width:148px;cursor:pointer;text-decoration:none;
   background:linear-gradient(180deg,rgba(20,22,26,.40),rgba(10,12,14,.20));
-  transition:background .15s,transform .15s;}
+  transition:background .15s,transform .25s,box-shadow .25s;
+  transform-origin:center center;}
+.stat:nth-child(1){transform:perspective(1600px) rotateY(26deg) translateZ(-44px);}
+.stat:nth-child(2){transform:perspective(1600px) rotateY(15deg) translateZ(-22px);}
+.stat:nth-child(3){transform:perspective(1600px) rotateY(5deg) translateZ(-6px);}
+.stat:nth-child(4){transform:perspective(1600px) rotateY(-5deg) translateZ(-6px);}
+.stat:nth-child(5){transform:perspective(1600px) rotateY(-15deg) translateZ(-22px);}
+.stat:nth-child(6){transform:perspective(1600px) rotateY(-26deg) translateZ(-44px);}
+.stat:nth-child(1):hover{transform:perspective(1600px) rotateY(26deg) translateZ(-44px) translateY(-3px);}
+.stat:nth-child(2):hover{transform:perspective(1600px) rotateY(15deg) translateZ(-22px) translateY(-3px);}
+.stat:nth-child(3):hover{transform:perspective(1600px) rotateY(5deg) translateZ(-6px) translateY(-3px);}
+.stat:nth-child(4):hover{transform:perspective(1600px) rotateY(-5deg) translateZ(-6px) translateY(-3px);}
+.stat:nth-child(5):hover{transform:perspective(1600px) rotateY(-15deg) translateZ(-22px) translateY(-3px);}
+.stat:nth-child(6):hover{transform:perspective(1600px) rotateY(-26deg) translateZ(-44px) translateY(-3px);}
 .stat::before,.stat::after{content:'';position:absolute;top:10%;bottom:10%;width:1px;
   background:linear-gradient(to bottom,transparent,var(--g-m),transparent);}
 .stat::before{left:0;} .stat::after{right:0;}
@@ -756,7 +770,7 @@ body{background-attachment:fixed;}
     return { num: parseFloat(m[1].replace(/,/g,'')), suffix: m[2], orig: s };
   }
   function formatNum(n, orig){
-    if(orig.indexOf('k') > -1) return (n/1000).toFixed(0)+'k';
+    if(orig.indexOf('k') > -1) return Math.round(n)+'k';
     if(orig.indexOf(',') > -1) return Math.round(n).toLocaleString();
     if(orig.indexOf('.') > -1) return n.toFixed(2);
     return Math.round(n).toString();
