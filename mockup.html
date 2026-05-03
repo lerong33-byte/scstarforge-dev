@@ -335,7 +335,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
 .hgap{height:6px;}
 
 /* SHIP COMPONENTS — RIGHT VERTICAL ZONE (curved flatscreen) */
-#comp-zone{position:absolute;top:230px;right:14px;width:380px;bottom:30px;max-height:640px;
+#comp-zone{position:absolute;top:230px;right:14px;width:380px;bottom:30px;max-height:600px;
   z-index:9;padding:14px 14px 16px 14px;
   display:flex;flex-direction:column;gap:6px;
   overflow:hidden;
@@ -376,7 +376,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
 
 /* POWER MGMT — LEFT VERTICAL ZONE (curved flatscreen) */
 #pwr-ribbon{position:absolute;top:230px;left:14px;width:308px;
-  bottom:30px;max-height:640px;z-index:15;
+  bottom:30px;max-height:600px;z-index:15;
   padding:14px 14px 16px 14px;display:flex;flex-direction:column;
   overflow:hidden;
   transform:perspective(2400px) rotateY(6deg);transform-origin:left center;
@@ -629,11 +629,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
 .unit-loc-inline{grid-column:1/3;border-top:1px dotted rgba(180,150,80,.18);margin-top:1px;}
 
 /* WEAPONS — MIDDLE-LEFT (curved flatscreen) */
-#hp-band{position:absolute;top:340px;left:340px;width:min(560px,calc(50% - 352px));bottom:30px;max-height:540px;
+#hp-band{position:absolute;top:340px;left:340px;width:min(560px,calc(50% - 352px));bottom:30px;max-height:490px;
   z-index:16;padding:14px 22px 18px;overflow-y:auto;overflow-x:hidden;
   transform:perspective(2400px) rotateY(2deg);transform-origin:left center;}
 /* MISSILES — MIDDLE-RIGHT (curved flatscreen) */
-#ms-band{position:absolute;top:340px;left:calc(50% + 12px);width:min(560px,calc(50% - 424px));bottom:30px;max-height:540px;
+#ms-band{position:absolute;top:340px;left:calc(50% + 12px);width:min(560px,calc(50% - 424px));bottom:30px;max-height:490px;
   z-index:16;padding:14px 22px 18px;overflow-y:auto;overflow-x:hidden;
   transform:perspective(2400px) rotateY(-2deg);transform-origin:right center;
   background:
