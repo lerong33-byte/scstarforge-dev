@@ -227,7 +227,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:linear-gradient(to right,transparent,var(--g-m),transparent);}
 
 /* TOP-LEFT: SPOTLIGHT */
-#spotlight{top:240px;left:14px;width:460px;height:300px;z-index:14;
+#spotlight{top:240px;left:14px;width:420px;height:300px;z-index:14;
   transform:perspective(1600px) rotateY(14deg);transform-origin:left center;
   clip-path:polygon(0 22px,30px 0,calc(100% - 8px) 6px,100% 30px,100% calc(100% - 30px),calc(100% - 8px) calc(100% - 6px),30px 100%,0 calc(100% - 22px));}
 #spotlight-inner{position:absolute;inset:36px 24px 18px;display:flex;flex-direction:column;align-items:center;}
@@ -254,7 +254,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   box-shadow:0 0 12px rgba(212,168,76,.30);}
 
 /* TOP-RIGHT: FLEET ACTIVITY */
-#fleet{top:240px;right:14px;width:460px;height:300px;z-index:14;
+#fleet{top:240px;right:14px;width:420px;height:300px;z-index:14;
   transform:perspective(1600px) rotateY(-14deg);transform-origin:right center;
   clip-path:polygon(8px 6px,calc(100% - 30px) 0,100% 22px,100% calc(100% - 22px),calc(100% - 30px) 100%,8px calc(100% - 6px),0 calc(100% - 30px),0 30px);}
 #fleet-inner{position:absolute;inset:36px 22px 56px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;}
@@ -286,18 +286,18 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
 /* CENTER: ROLE CONSTELLATION (organic curve of ship-silhouette nodes) */
 #role-const{position:absolute;top:54%;left:50%;transform:translate(-50%,-50%);
-  width:1100px;height:240px;z-index:15;pointer-events:none;}
+  width:860px;height:200px;z-index:15;pointer-events:none;}
 #rc-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
 .rc-hdr{position:absolute;top:-2px;left:50%;transform:translateX(-50%);
   font-size:10px;letter-spacing:8px;font-weight:700;color:var(--g);
   text-shadow:0 0 8px rgba(212,168,76,.55);white-space:nowrap;z-index:5;
   padding:0 18px;background:linear-gradient(90deg,transparent,rgba(8,7,13,.85) 20%,rgba(8,7,13,.85) 80%,transparent);}
 .rc-hdr .brk{color:var(--g);opacity:.62;font-weight:300;letter-spacing:0;margin:0 6px;}
-.rnode{position:absolute;width:120px;height:80px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+.rnode{position:absolute;width:96px;height:70px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   text-decoration:none;cursor:pointer;pointer-events:auto;z-index:3;
   transition:transform .25s ease;}
-.rnode svg{width:88px;height:50px;
+.rnode svg{width:72px;height:42px;
   filter:drop-shadow(0 0 6px rgba(212,168,76,.45));
   transition:filter .25s,transform .25s;}
 .rnode .rn-nm{font-size:9px;letter-spacing:2.5px;font-weight:700;color:var(--w);
@@ -667,7 +667,7 @@ body{background-attachment:fixed;}
 
   <!-- CENTER: ROLE CONSTELLATION (organic node layout with ship silhouettes) -->
   <div id="role-const">
-    <svg id="rc-lines" viewBox="0 0 1200 220" preserveAspectRatio="none"></svg>
+    <svg id="rc-lines" viewBox="0 0 860 200" preserveAspectRatio="none"></svg>
     <div class="rc-hdr"><span class="brk">⟦</span> SELECT A ROLE <span class="brk">⟧</span></div>
     <a href="builder.html" class="rnode" style="left:4%;top:46%">
       <svg viewBox="0 0 100 60"><path d="M 38 30 L 50 18 L 70 22 L 78 30 L 70 38 L 50 42 Z M 50 18 L 18 12 L 8 22 L 22 30 L 50 30 M 50 42 L 18 48 L 8 38 L 22 30 L 50 30 M 78 30 L 92 28 L 96 30 L 92 32 Z" fill="none" stroke="rgba(232,200,120,.85)" stroke-width="1"/></svg>
@@ -897,7 +897,7 @@ body{background-attachment:fixed;}
     {x:0.35,y:0.22},{x:0.46,y:0.54},{x:0.57,y:0.22},
     {x:0.68,y:0.50},{x:0.79,y:0.18},{x:0.88,y:0.50}
   ];
-  var W = 1200, H = 220, paths = '';
+  var W = 860, H = 200, paths = '';
   for(var i=0; i<centers.length-1; i++){
     var a = centers[i], b = centers[i+1];
     var x1=a.x*W,y1=a.y*H,x2=b.x*W,y2=b.y*H;
