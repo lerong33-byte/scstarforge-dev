@@ -1661,12 +1661,40 @@ function applyShipWireframe(ship){
   svg.innerHTML = body + hpDots + compDots;
 }
 
+// Stock-comp aliases — SHIP_DATA references some made-up names not present in COMP_DB.
+// When unpatched these cause overdraw (Eclipse 156% LOAD) because comp lookup fails and
+// the math falls back to junk values. Map each to a real component of the same size.
+var COMP_ALIASES = {
+  pp:     { "Yorm's Lament S2": "Eclipse S2", "Yorm's Lament S1": "Regulus S1" },
+  qd:     { "Siren's Regret S2": "Drift S2",  "Siren's Regret S1": "Drift S1" },
+  cooler: { "Arctic S3": "Blizzard S3" }
+};
+// Per-ship comp adjustments where SHIP_DATA's stock counts/items diverge from in-game stock loadout
+var SHIP_COMP_ADJUST = {
+  // Eclipse stock: 1× S1 shield (not 2× S2), 1× S2 cooler — runs ~80% LOAD as a stealth bomber should
+  'Eclipse': { sg: 'Palisade S1', counts: { sg: 1, cooler: 1 } }
+};
+function patchStockComps(ship, name){
+  if(!ship || !ship.comps) return;
+  var c = ship.comps;
+  ['pp','sg','cooler','qd','radar'].forEach(function(cat){
+    var alias = COMP_ALIASES[cat] || {};
+    if(c[cat] && alias[c[cat]]) c[cat] = alias[c[cat]];
+  });
+  var adj = SHIP_COMP_ADJUST[name];
+  if(adj){
+    ['pp','sg','cooler','qd','radar'].forEach(function(k){ if(adj[k]) c[k] = adj[k]; });
+    if(adj.counts && c.counts) Object.keys(adj.counts).forEach(function(k){ c.counts[k] = adj.counts[k]; });
+  }
+}
+
 var _shipLoadToken = 0;
 function loadHudShip(name) {
   var loadId = ++_shipLoadToken;
   _curShipName = name;
   _curShip = SHIP_DATA[name];
   if (!_curShip) return;
+  patchStockComps(_curShip, name);
   applyShipWireframe(_curShip);
 
   _loadout = { _off: {}, _pips: {}, _exp: {} };
