@@ -799,15 +799,12 @@ body{background-attachment:fixed;}
 </div>
 
 <script>
-// ===== VIEWPORT-FIT SCALING =====
-// Designed for 1600×900 base — auto-scales UP on big screens, DOWN on small ones.
-// Always fills the viewport regardless of aspect ratio.
+// ===== VIEWPORT-FIT SCALING (smaller base = larger render) =====
 (function(){
-  var DESIGN_W = 1600, DESIGN_H = 900;
+  var DESIGN_W = 1100, DESIGN_H = 640;
   var html = document.documentElement;
   function fit(){
     var w = window.innerWidth, h = window.innerHeight;
-    // Use the smaller scale factor so nothing gets cut off, but allow >1 to fill big screens
     var s = Math.min(w/DESIGN_W, h/DESIGN_H);
     html.style.zoom = s.toFixed(3);
   }
@@ -924,6 +921,15 @@ body{background-attachment:fixed;}
   var last = centers[centers.length-1];
   paths += '<circle cx="'+(last.x*W)+'" cy="'+(last.y*H)+'" r="3" fill="rgba(232,200,120,.85)"/>';
   svg.innerHTML = paths;
+})();
+
+(function viewportScale(){
+  function apply(){
+    var s = Math.min(window.innerWidth/1440, window.innerHeight/900, 2.2);
+    document.documentElement.style.zoom = s > 1.05 ? s.toFixed(3) : '';
+  }
+  apply();
+  window.addEventListener('resize', apply);
 })();
 </script>
 
