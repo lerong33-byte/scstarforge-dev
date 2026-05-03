@@ -1858,22 +1858,30 @@ function buildPwrComps() {
     list.push({id:'pp'+i,cat:'pp',name:ppN,pips:P('pp'+i,8),max:8,output:d?d.out:16,on:ON('pp'+i)});
   }
   var sgC = cnt.sg||1;
+  // Shields: 1 generator at 50% / 2+ generators load-share at 35% pip default each (passive idle)
+  var sgDefaultPip = sgC === 1 ? 5 : 4;
   for(var i=0;i<sgC;i++){
     var sgN = L['c_sg_'+i] || L['c_sg'] || co.sg || 'Shield Gen';
     var d = (db.sg && db.sg[sgN]) || null;
-    list.push({id:'sg'+i,cat:'sg',name:sgN,pips:P('sg'+i,5),max:10,dMin:d?d.drawMin:3,dMax:d?d.drawMax:6,on:ON('sg'+i)});
+    list.push({id:'sg'+i,cat:'sg',name:sgN,pips:P('sg'+i,sgDefaultPip),max:10,dMin:d?d.drawMin:3,dMax:d?d.drawMax:6,on:ON('sg'+i)});
   }
   list.push({id:'wp',cat:'wp',name:'Hardpoints',pips:P('wp',0),max:10,dMin:0,dMax:13,on:ON('wp')});
-  list.push({id:'en',cat:'en',name:'Thrusters',pips:P('en',5),max:10,dMin:0,dMax:6,on:ON('en')});
+  // Engines at idle: pip default 3/10 (coasting), draw scales with pips
+  list.push({id:'en',cat:'en',name:'Thrusters',pips:P('en',3),max:10,dMin:0,dMax:6,on:ON('en')});
   var coC = cnt.cooler||1;
+  // Load-share: 1 cooler runs hotter, 2+ coolers split the work (each one runs cooler at idle)
+  var coDefaultPip = coC === 1 ? 2 : 1;
   for(var i=0;i<coC;i++){
     var coN = L['c_cooler_'+i] || L['c_cooler'] || co.cooler || 'Cooler';
-    list.push({id:'co'+i,cat:'co',name:coN,pips:P('co'+i,5),max:5,dMin:6,dMax:6,on:ON('co'+i)});
+    var d = (db.cooler && db.cooler[coN]) || null;
+    var coMin = d ? Math.min(d.drawMin, 3) : 2;
+    var coMax = d ? Math.min(d.drawMax, 6) : 6;
+    list.push({id:'co'+i,cat:'co',name:coN,pips:P('co'+i,coDefaultPip),max:5,dMin:coMin,dMax:coMax,on:ON('co'+i)});
   }
   var qdN = L['c_qd_0'] || L['c_qd'] || co.qd || 'Q-Drive';
   list.push({id:'qd',cat:'qd',name:qdN,pips:P('qd',0),max:3,dMin:0,dMax:3,on:ON('qd')});
   var rdN = L['c_radar_0'] || L['c_radar'] || co.radar || 'Radar';
-  list.push({id:'rd',cat:'rd',name:rdN,pips:P('rd',2),max:2,dMin:1,dMax:1,on:ON('rd')});
+  list.push({id:'rd',cat:'rd',name:rdN,pips:P('rd',1),max:2,dMin:0,dMax:1,on:ON('rd')});
   _pwrComps = list;
   renderPwrComps();
   initModePill();
