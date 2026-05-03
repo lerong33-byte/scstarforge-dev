@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HUD Manager v9.80-DEV — Fleet</title>
+<style>
+:root{--bg:#08070d;--w:rgba(232,236,242,.95);--g:rgba(190,205,222,.95);--g-d:rgba(190,205,225,.82);--led:#7bc8e8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{font-family:'Eurostile','Bahnschrift','Segoe UI Variable',monospace,sans-serif;background:var(--bg);color:var(--w);
+  font-feature-settings:"tnum" 1;cursor:default;transition:opacity .35s, transform .35s, filter .35s;}
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&display=swap');
+body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:#01000a url('/bg-space.jpg?v=63') center / cover no-repeat fixed;}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(2,4,10,.78) 0%,rgba(2,4,10,.55) 50%,rgba(2,4,10,.78) 100%);}
+
+#nav{position:fixed;top:0;left:0;right:0;z-index:50;height:32px;display:flex;align-items:center;padding:0 18px;gap:10px;pointer-events:none;}
+#nav > *{pointer-events:auto;}
+#logo{font-size:11px;font-weight:700;letter-spacing:4px;color:var(--g);text-shadow:0 0 8px rgba(180,195,215,.40);margin-right:auto;white-space:nowrap;}
+#logo .ver{font-size:9.5px;letter-spacing:1px;color:rgba(140,132,158,.34);margin-left:4px;}
+
+/* NAV switch box (same as builder) */
+#nav-mfds{position:fixed;top:38px;right:18px;z-index:60;width:160px;padding:14px 8px 8px;
+  background-color:#0a0d14;background-image:repeating-linear-gradient(90deg,transparent 0,transparent 4px,rgba(0,0,0,.32) 4px,rgba(0,0,0,.32) 5px),linear-gradient(180deg, rgba(36,40,48,.72), rgba(16,20,26,.92));
+  border:1px solid rgba(72,78,88,.65);
+  box-shadow:inset 0 1px 0 rgba(160,168,180,.32),inset 0 -2px 0 rgba(0,0,0,.85),inset 0 0 18px rgba(0,0,0,.55),0 4px 14px rgba(0,0,0,.55);}
+#nav-mfds::before{content:'· NAV ·';position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:3px;font-weight:700;color:rgba(220,235,255,.92);
+  padding:2px 12px 2px 22px;border:1px solid rgba(80,140,200,.45);border-top:none;
+  background:radial-gradient(circle 2.5px at 11px 50%, var(--led) 0%, #1c4880 55%, transparent 80%),linear-gradient(180deg, rgba(20,26,36,.83), rgba(8,10,16,.96));white-space:nowrap;}
+.nav-mfd{position:relative;display:flex;align-items:center;gap:8px;padding:5px 8px 5px 11px;margin-bottom:4px;text-decoration:none;cursor:pointer;
+  background:linear-gradient(180deg,rgba(28,32,40,.82),rgba(12,14,20,.95));border:1px solid rgba(72,80,92,.75);
+  box-shadow:inset 0 1px 0 rgba(140,148,160,.18),inset 0 -1px 0 rgba(0,0,0,.85);transition:background .15s,border-color .15s;}
+.nav-mfd:last-child{margin-bottom:0;}
+.nav-mfd::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--led);box-shadow:0 0 6px rgba(140,200,255,.85);animation:led 2.4s ease-in-out infinite;}
+@keyframes led{0%,55%,100%{opacity:1;}65%{opacity:.35;}}
+.nav-mfd-icon{font-size:11px;color:rgba(220,235,255,.78);line-height:1;flex-shrink:0;}
+.nav-mfd-name{font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(232,240,250,.92);white-space:nowrap;flex:1;font-family:'Share Tech Mono',monospace;}
+.nav-mfd:hover{background:linear-gradient(180deg,rgba(40,46,56,.82),rgba(20,24,32,.95));border-color:rgba(140,200,255,.55);}
+.nav-mfd[data-status="wip"]::before{background:#ffc850;box-shadow:0 0 6px rgba(255,200,80,.85);}
+.nav-mfd.current{border-color:rgba(140,200,255,.85);background:linear-gradient(180deg,rgba(40,52,72,.82),rgba(20,28,42,.95));box-shadow:inset 0 0 10px rgba(76,160,230,.30);}
+.nav-mfd.current .nav-mfd-name{color:rgba(180,220,255,.95);text-shadow:0 0 8px rgba(140,200,255,.65);}
+
+#title{position:absolute;top:34px;left:50%;transform:translateX(-50%);z-index:20;text-align:center;}
+#title h1{font-size:28px;letter-spacing:13px;font-weight:700;color:var(--w);background:linear-gradient(155deg,#b0b0c0,#fff,#e8e8f0,#c4c4d0,#a0a0b4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-flex;align-items:center;gap:14px;}
+#title .brk{color:rgba(190,205,222,.55);font-weight:300;-webkit-text-fill-color:initial;background:none;}
+#title-sub{font-size:11px;letter-spacing:6px;color:rgba(190,205,225,.82);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:6px;}
+
+#scene{position:fixed;top:120px;left:18px;right:200px;bottom:18px;overflow:hidden;display:flex;flex-direction:column;}
+
+/* Mode tabs — ALL / MY FLEET */
+#fleet-tabs{display:flex;gap:4px;margin-bottom:10px;padding:0 4px;flex-shrink:0;}
+.fl-tab{font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:2px;font-weight:600;
+  padding:5px 14px;cursor:pointer;color:rgba(190,215,240,.82);
+  background:transparent;border:1px solid rgba(120,150,180,.22);transition:all .15s;}
+.fl-tab:hover{color:rgba(220,235,255,.95);border-color:rgba(140,200,255,.55);}
+.fl-tab.active{color:rgba(245,250,255,.95);border-color:rgba(180,220,255,.85);background:rgba(60,90,140,.18);}
+
+/* Filter chip rows — auto-built from data */
+#chip-rows{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;padding:0 4px;flex-shrink:0;}
+.chip-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
+.chip-row-lbl{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(170,200,230,.82);text-shadow:0 1px 3px rgba(0,0,0,.85);
+  padding:2px 6px 2px 0;min-width:50px;}
+.chip{font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:1.2px;font-weight:600;
+  padding:3px 8px;cursor:pointer;color:rgba(190,215,240,.85);text-shadow:0 1px 3px rgba(0,0,0,.75);
+  background:transparent;border:1px solid rgba(120,150,180,.20);transition:all .12s;white-space:nowrap;}
+.chip:hover{color:rgba(220,235,255,.95);border-color:rgba(140,200,255,.55);}
+.chip.active{color:rgba(245,250,255,.95);border-color:rgba(180,220,255,.85);background:rgba(60,90,140,.18);}
+.chip-clear{color:rgba(190,205,225,.82);}
+
+#fleet-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;padding:0 4px;flex-shrink:0;}
+#fleet-search{flex:1;background:transparent;border:none;border-bottom:1px solid rgba(140,200,255,.22);
+  color:var(--w);font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:3px;padding:8px 10px;outline:none;}
+#fleet-search::placeholder{color:rgba(195,215,235,.85);font-weight:300;}
+#fleet-search:focus{border-bottom-color:rgba(140,200,255,.65);}
+.tb-stat{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:rgba(180,215,245,.85);
+  padding:4px 10px 4px 18px;border:1px solid rgba(80,140,200,.35);
+  background:radial-gradient(circle 2.5px at 8px 50%, var(--led) 0%, #1c4880 55%, transparent 80%),linear-gradient(180deg, rgba(20,26,36,.79), rgba(8,10,16,.92));}
+
+#fleet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;
+  grid-auto-rows:max-content;align-content:start;
+  flex:1;overflow-y:auto;padding:4px;}
+#fleet-grid.list-view{display:flex;flex-direction:column;gap:5px;}
+
+/* LIST VIEW row — thumb + name + meta + stat strip */
+.f-row{position:relative;cursor:pointer;display:grid;
+  grid-template-columns:78px 1fr auto auto;gap:14px;align-items:center;
+  padding:6px 10px 6px 6px;
+  background:rgba(8,10,16,.78);border:1px solid rgba(140,200,255,.16);
+  clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,0 calc(100% - 4px),0 8px);
+  transition:transform .15s,border-color .15s,background .15s,box-shadow .15s;}
+.f-row:hover{transform:translateX(2px);border-color:rgba(140,200,255,.55);background:rgba(14,20,32,.85);
+  box-shadow:0 0 12px rgba(140,200,255,.18),inset 0 0 12px rgba(140,200,255,.10);}
+.f-row.owned{border-color:rgba(140,200,255,.55);background:rgba(20,38,64,.45);}
+.f-row .f-thumb{width:78px;height:50px;background-size:cover;background-position:center;background-color:rgba(0,0,0,.5);
+  border:1px solid rgba(120,150,180,.28);}
+.f-row .f-mid{min-width:0;}
+.f-row .f-name{font-family:'Share Tech Mono',monospace;font-size:12.5px;letter-spacing:2px;font-weight:700;
+  color:rgba(245,250,255,.96);text-shadow:0 1px 4px rgba(0,0,0,.85);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.f-row .f-meta{font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:1.5px;
+  color:rgba(190,205,225,.78);margin-top:2px;text-shadow:0 1px 3px rgba(0,0,0,.85);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.f-row .f-strip{display:flex;gap:10px;flex-wrap:nowrap;}
+.f-row .f-stat{display:flex;flex-direction:column;align-items:center;min-width:46px;
+  font-family:'Share Tech Mono',monospace;line-height:1;}
+.f-row .f-stat .l{font-size:9px;letter-spacing:1.2px;color:rgba(170,200,230,.60);}
+.f-row .f-stat .v{font-size:13px;font-weight:700;color:rgba(232,240,250,.95);
+  margin-top:3px;text-shadow:0 0 4px currentColor,0 1px 3px rgba(0,0,0,.85);}
+.f-row .f-stat .v.b{color:#7bc8e8;} .f-row .f-stat .v.r{color:#ff8060;} .f-row .f-stat .v.g{color:#7be0a8;}
+.f-row .f-own{position:relative;top:auto;right:auto;
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;font-weight:700;padding:3px 6px;
+  border:1px solid rgba(140,200,255,.55);background:rgba(28,72,136,.30);color:rgba(140,200,255,.95);
+  text-shadow:0 0 4px rgba(140,200,255,.65);white-space:nowrap;}
+.f-row:not(.owned) .f-own{border-color:rgba(170,185,205,.25);background:rgba(8,10,16,.85);color:rgba(190,205,225,.82);}
+.f-row:not(.owned) .f-own::before{content:'+ '; opacity:.65;}
+@media (max-width: 900px){
+  .f-row{grid-template-columns:60px 1fr auto;}
+  .f-row .f-strip{display:none;}
+  .f-row .f-thumb{width:60px;height:40px;}
+}
+
+/* GRID/LIST view toggle (right side of tabs) */
+.fl-view{font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:2px;font-weight:600;
+  padding:5px 12px;cursor:pointer;color:rgba(190,215,240,.82);
+  background:transparent;border:1px solid rgba(120,150,180,.22);transition:all .15s;}
+.fl-view:hover{color:rgba(220,235,255,.95);border-color:rgba(140,200,255,.55);}
+.fl-view.active{color:rgba(245,250,255,.95);border-color:rgba(180,220,255,.85);background:rgba(60,90,140,.18);}
+#fleet-empty{padding:60px 20px;text-align:center;color:rgba(190,205,225,.82);
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;line-height:2;}
+#fleet-empty .acc{color:rgba(140,200,255,.85);}
+#fleet-grid::-webkit-scrollbar{width:6px;} #fleet-grid::-webkit-scrollbar-thumb{background:rgba(170,185,205,.20);}
+.f-card{position:relative;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;
+  background:rgba(8,10,16,.88);border:1px solid rgba(140,200,255,.18);overflow:hidden;
+  clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,0 calc(100% - 6px),0 10px);
+  transition:transform .2s,border-color .2s,box-shadow .2s;}
+.f-card:hover{transform:scale(1.03);border-color:rgba(140,200,255,.55);
+  box-shadow:0 0 14px rgba(140,200,255,.30),inset 0 0 14px rgba(140,200,255,.14);}
+.f-card.owned{border-color:rgba(140,200,255,.65);box-shadow:0 0 12px rgba(140,200,255,.20);}
+.f-img{width:100%;height:124px;background-size:cover;background-position:center;background-color:rgba(0,0,0,.5);flex-shrink:0;}
+.f-info{padding:8px 10px;}
+.f-name{font-size:11px;letter-spacing:2px;font-weight:700;color:rgba(245,250,255,.95);text-shadow:0 1px 4px rgba(0,0,0,.85);
+  font-family:'Share Tech Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.f-meta{font-size:10.5px;letter-spacing:1.5px;color:rgba(190,205,225,.82);margin-top:2px;text-shadow:0 1px 3px rgba(0,0,0,.85);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.f-own{position:absolute;top:6px;right:6px;font-family:'Share Tech Mono',monospace;
+  font-size:10.5px;letter-spacing:1.5px;font-weight:700;padding:2px 5px;
+  border:1px solid rgba(140,200,255,.55);background:rgba(28,72,136,.30);color:rgba(140,200,255,.95);
+  text-shadow:0 0 4px rgba(140,200,255,.65);}
+.f-card:not(.owned) .f-own{border-color:rgba(170,185,205,.25);background:rgba(8,10,16,.85);color:rgba(190,205,225,.82);}
+.f-card:not(.owned) .f-own::before{content:'+ '; opacity:.65;}
+
+/* SHIP DETAIL modal — opens on card click */
+#ship-modal{position:fixed;inset:0;z-index:10000;display:none;
+  background:rgba(2,4,10,.82);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;}
+#ship-modal[aria-hidden="false"]{display:flex;}
+#ship-card{position:relative;width:min(720px,92vw);max-height:90vh;
+  padding:24px 28px 22px;
+  background:linear-gradient(180deg, rgba(14,18,28,.96), rgba(6,10,18,.98));
+  border-top:1px solid rgba(140,200,255,.45);
+  border-bottom:1px solid rgba(140,200,255,.18);
+  overflow-y:auto;}
+#ship-close{position:absolute;top:10px;right:14px;z-index:6;
+  width:28px;height:28px;border:none;background:transparent;
+  color:rgba(180,200,230,.65);font-size:22px;line-height:1;cursor:pointer;}
+#ship-close:hover{color:rgba(245,250,255,.95);}
+#ship-img{width:100%;height:240px;object-fit:contain;display:block;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.65)) drop-shadow(0 0 18px rgba(140,200,255,.20));}
+#ship-name{font-family:'Orbitron','Share Tech Mono',monospace;
+  font-size:24px;font-weight:700;letter-spacing:5px;text-align:center;color:rgba(245,250,255,.96);
+  text-shadow:0 0 10px rgba(180,200,235,.40);margin-top:14px;}
+#ship-meta{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:rgba(195,215,240,.85);
+  text-align:center;margin-top:5px;text-shadow:0 1px 3px rgba(0,0,0,.85);}
+#ship-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:18px;}
+.s-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 4px;
+  background:linear-gradient(180deg,rgba(20,24,32,.85),rgba(8,12,18,.92));
+  border:1px solid rgba(120,150,180,.35);}
+.s-stat .l{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1.2px;color:rgba(170,200,230,.72);
+  text-shadow:0 1px 3px rgba(0,0,0,.85);}
+.s-stat .v{font-family:'Share Tech Mono','Orbitron',monospace;font-size:14px;font-weight:700;
+  color:rgba(232,240,250,.95);letter-spacing:.5px;line-height:1;margin-top:3px;
+  text-shadow:0 0 5px currentColor,0 1px 3px rgba(0,0,0,.85);}
+.s-stat .v.r{color:#ff8060;} .s-stat .v.b{color:#7bc8e8;} .s-stat .v.g{color:#7be0a8;}
+.ship-actions{margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.s-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;font-weight:700;
+  padding:9px 22px 9px 30px;cursor:pointer;text-decoration:none;
+  background:radial-gradient(circle 3px at 12px 50%, var(--led) 0%, #1c4880 55%, transparent 80%),
+    linear-gradient(180deg, rgba(20,30,50,.88), rgba(8,14,28,.96));
+  border:1px solid rgba(140,200,255,.55);
+  color:rgba(220,235,255,.95);text-shadow:0 0 5px rgba(140,200,255,.65);
+  transition:all .15s;}
+.s-btn:hover{border-color:rgba(180,220,255,.85);color:rgba(245,250,255,.95);}
+.s-btn.owned{background:radial-gradient(circle 3px at 12px 50%, #7be0a8 0%, #1c8848 55%, transparent 80%),
+    linear-gradient(180deg, rgba(20,50,32,.88), rgba(8,20,14,.96));
+  border-color:rgba(123,224,168,.55);color:rgba(220,250,230,.95);text-shadow:0 0 5px rgba(123,224,168,.65);}
+.s-btn.builder{background:radial-gradient(circle 3px at 12px 50%, #ff8060 0%, #882018 55%, transparent 80%),
+    linear-gradient(180deg, rgba(50,16,18,.88), rgba(20,8,10,.96));
+  border-color:rgba(255,140,80,.55);color:rgba(255,220,210,.95);text-shadow:0 0 5px rgba(255,140,80,.65);}
+
+/* IMPORT FROM RSI button + modal */
+.fl-import-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;font-weight:700;
+  padding:5px 14px 5px 22px;cursor:pointer;color:rgba(220,235,255,.92);
+  background:radial-gradient(circle 2.5px at 8px 50%, var(--led) 0%, #1c4880 55%, transparent 80%),
+    linear-gradient(180deg, rgba(20,30,50,.79), rgba(8,14,28,.92));
+  border:1px solid rgba(140,200,255,.55);text-shadow:0 0 4px rgba(140,200,255,.55);
+  transition:all .15s;}
+.fl-import-btn:hover{border-color:rgba(180,220,255,.85);color:rgba(245,250,255,.95);}
+
+#fl-import{position:fixed;inset:0;z-index:10000;display:none;
+  background:rgba(2,4,10,.82);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;}
+#fl-import[aria-hidden="false"]{display:flex;}
+#fl-import-card{position:relative;width:min(640px,92vw);max-height:88vh;
+  padding:24px 28px 22px;
+  background:linear-gradient(180deg, rgba(14,18,28,.96), rgba(6,10,18,.98));
+  border-top:1px solid rgba(140,200,255,.45);
+  border-bottom:1px solid rgba(140,200,255,.18);
+  overflow-y:auto;}
+#fl-import-hdr{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:6px;font-weight:700;
+  color:rgba(220,235,255,.85);text-align:center;margin-bottom:16px;
+  text-shadow:0 0 6px rgba(140,200,255,.45);}
+#fl-import-close{position:absolute;top:10px;right:14px;z-index:6;
+  width:28px;height:28px;border:none;background:transparent;
+  color:rgba(180,200,230,.65);font-size:22px;line-height:1;cursor:pointer;}
+#fl-import-close:hover{color:rgba(245,250,255,.95);}
+.fl-step{font-family:'Share Tech Mono',monospace;font-size:11.5px;letter-spacing:1px;
+  color:rgba(200,215,235,.85);line-height:1.85;padding:5px 0;}
+.fl-step b{color:rgba(180,220,255,.95);font-weight:700;letter-spacing:1.5px;margin-right:6px;}
+.fl-step a{color:#7bc8e8;text-decoration:none;border-bottom:1px solid rgba(123,200,232,.4);}
+.fl-step a:hover{color:#aadcf0;border-bottom-color:rgba(170,220,240,.85);}
+.fl-step code{background:rgba(8,14,28,.82);padding:1px 6px;font-family:'Share Tech Mono',monospace;
+  font-size:10.5px;border:1px solid rgba(120,150,180,.30);color:rgba(220,235,255,.92);}
+#fl-upload-area{margin-top:18px;padding:18px;text-align:center;cursor:pointer;
+  background:rgba(60,90,140,.10);border:1px dashed rgba(140,200,255,.45);
+  transition:all .15s;}
+#fl-upload-area:hover{background:rgba(60,90,140,.20);border-color:rgba(180,220,255,.75);}
+#fl-upload-area .lbl{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;font-weight:700;
+  color:rgba(180,220,255,.95);margin-bottom:4px;}
+#fl-upload-area .sub{font-size:11px;color:rgba(185,205,225,.85);}
+#fl-import-result{margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;
+  color:rgba(195,215,235,.85);min-height:20px;}
+#fl-import-result.ok{color:#7be0a8;}
+#fl-import-result.err{color:#ff8060;}
+</style>
+</head>
+<body>
+<div id="nav"><div id="logo">H.U.D MANAGER <span class="ver">v9.80-DEV</span></div></div>
+<div id="nav-mfds">
+  <a class="nav-mfd" href="/"><div class="nav-mfd-icon">⌂</div><div class="nav-mfd-name">DASHBOARD</div></a>
+  <a class="nav-mfd" href="builder.html"><div class="nav-mfd-icon">⚙</div><div class="nav-mfd-name">BUILDER</div></a>
+  <a class="nav-mfd current" href="fleet.html"><div class="nav-mfd-icon">⛟</div><div class="nav-mfd-name">FLEET</div></a>
+  <a class="nav-mfd" href="weapons.html"><div class="nav-mfd-icon">⛯</div><div class="nav-mfd-name">WEAPONS</div></a>
+  <a class="nav-mfd" href="showdown.html"><div class="nav-mfd-icon">⚔</div><div class="nav-mfd-name">SHOWDOWN</div></a>
+  <a class="nav-mfd" href="loadouts.html"><div class="nav-mfd-icon">⛃</div><div class="nav-mfd-name">LOADOUTS</div></a>
+</div>
+<div id="title">
+  <h1><span class="brk">⟦</span>FLEET MANAGER<span class="brk">⟧</span></h1>
+  <div id="title-sub">YOUR HANGAR · CLICK TO TOGGLE OWNED · OPEN IN BUILDER</div>
+</div>
+<div id="scene">
+  <div id="fleet-tabs">
+    <span class="fl-tab active" data-mode="all">⊞ ALL SHIPS</span>
+    <span class="fl-tab" data-mode="owned">★ MY FLEET</span>
+    <span style="flex:1"></span>
+    <span class="fl-view active" data-view="grid">▦ GRID</span>
+    <span class="fl-view" data-view="list">☰ LIST</span>
+  </div>
+  <div id="fleet-toolbar">
+    <input id="fleet-search" type="text" placeholder="SEARCH BY NAME" autocomplete="off">
+    <span class="fl-import-btn" onclick="openFleetImport()">⇓ IMPORT FROM RSI</span>
+    <div class="tb-stat" id="tb-owned">— OWNED</div>
+    <div class="tb-stat" id="tb-total">— TOTAL</div>
+  </div>
+  <div id="chip-rows"></div>
+  <div id="fleet-grid"></div>
+</div>
+
+<!-- SHIP DETAIL modal -->
+<div id="ship-modal" aria-hidden="true">
+  <div id="ship-card">
+    <button id="ship-close" aria-label="Close" onclick="closeShipModal()">×</button>
+    <img id="ship-img" alt="">
+    <div id="ship-name">—</div>
+    <div id="ship-meta">—</div>
+    <div id="ship-stats"></div>
+    <div class="ship-actions">
+      <span class="s-btn" id="ship-toggle" onclick="toggleShipOwned()">+ MARK OWNED</span>
+      <a class="s-btn builder" id="ship-build" href="#">▶ OPEN IN BUILDER</a>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT FROM RSI modal — bring over the legacy 4-step instruction flow -->
+<div id="fl-import" aria-hidden="true">
+  <div id="fl-import-card">
+    <button id="fl-import-close" aria-label="Close" onclick="closeFleetImport()">×</button>
+    <div id="fl-import-hdr">⏵ HOW TO IMPORT YOUR RSI HANGAR</div>
+    <div class="fl-step"><b>Step 1</b> Install the
+      <a href="https://addons.mozilla.org/en-US/firefox/addon/star-citizen-hangar-xplorer/" target="_blank" rel="noopener">Star Citizen Hangar XPLORer</a>
+      browser extension <span style="color:rgba(180,200,220,.82);font-size:10.5px">(Firefox ·
+      <a href="https://chromewebstore.google.com/detail/star-citizen-hangar-xplor/bhkgemjdepodofcnmekdobmmbifemhkc" target="_blank" rel="noopener">Chrome</a> ·
+      <a href="https://addons.opera.com/en/extensions/details/star-citizen-hangar-xplorer/" target="_blank" rel="noopener">Opera</a>)</span></div>
+    <div class="fl-step"><b>Step 2</b> Log in to RSI and visit your
+      <a href="https://robertsspaceindustries.com/account/pledges" target="_blank" rel="noopener">Hangar page</a> — the extension will load all your ships automatically</div>
+    <div class="fl-step"><b>Step 3</b> Click the <b style="color:#7bc8e8">⇓ JSON</b> button added by the extension to download <code>shiplist.json</code></div>
+    <div class="fl-step"><b>Step 4</b> Click the upload box below and select that file</div>
+    <label id="fl-upload-area" for="fl-json-file">
+      <div class="lbl">⇧ UPLOAD shiplist.json</div>
+      <div class="sub">Click to browse or drag &amp; drop your exported JSON file</div>
+    </label>
+    <input type="file" id="fl-json-file" accept=".json,application/json" style="display:none" onchange="handleFleetJsonFile(this)">
+    <div id="fl-import-result"></div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.nav-mfd').forEach(function(a){
+  a.addEventListener('click', function(ev){
+    if(a.classList.contains('current')){ ev.preventDefault(); return; }
+    if(a.getAttribute('data-status') === 'wip'){
+      ev.preventDefault();
+      var t = document.createElement('div');
+      t.textContent = '⏵ ' + (a.querySelector('.nav-mfd-name')?.textContent || 'PAGE') + ' COMING SOON';
+      t.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;padding:14px 28px;background:linear-gradient(180deg,rgba(50,30,8,.79),rgba(28,16,4,.96));border:1px solid rgba(255,180,80,.65);color:rgba(255,200,128,.95);font-family:Share Tech Mono,monospace;font-size:13px;letter-spacing:3px;font-weight:700;opacity:0;transition:opacity .25s;';
+      document.body.appendChild(t);
+      requestAnimationFrame(function(){ t.style.opacity = '1'; });
+      setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){t.remove();},300); }, 1400);
+      return;
+    }
+    var href = a.getAttribute('href');
+    if(!href || href === '#') return;
+    ev.preventDefault();
+    document.body.style.opacity='0';document.body.style.transform='scale(1.06)';document.body.style.filter='blur(8px)';
+    setTimeout(function(){ location.href = href; }, 380);
+  });
+});
+
+var FLEET_KEY = 'sc_fleet_v2';
+function getFleet(){ try { return JSON.parse(localStorage.getItem(FLEET_KEY)||'[]'); } catch(e){ return []; } }
+function saveFleet(arr){ localStorage.setItem(FLEET_KEY, JSON.stringify(arr)); }
+
+// === IMPORT FROM RSI ============================================================
+function openFleetImport(){ document.getElementById('fl-import').setAttribute('aria-hidden','false'); }
+function closeFleetImport(){
+  document.getElementById('fl-import').setAttribute('aria-hidden','true');
+  var res = document.getElementById('fl-import-result');
+  if(res){ res.textContent = ''; res.className = ''; }
+}
+// Match an RSI ship name against our SHIPS catalog (case-insensitive + substring fallback)
+function matchShipName(rsiName){
+  if(!SHIPS || !rsiName) return null;
+  var name = rsiName.trim();
+  if(SHIPS[name]) return name;  // exact
+  var lower = name.toLowerCase();
+  var keys = Object.keys(SHIPS);
+  for(var i=0;i<keys.length;i++){ if(keys[i].toLowerCase() === lower) return keys[i]; }
+  // Substring (RSI might have 'Aegis Hammerhead', wiki has 'Hammerhead')
+  for(var i=0;i<keys.length;i++){
+    var kl = keys[i].toLowerCase();
+    if(lower.indexOf(kl) > -1 || kl.indexOf(lower) > -1) return keys[i];
+  }
+  return null;
+}
+function handleFleetJsonFile(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  var res = document.getElementById('fl-import-result');
+  res.className = ''; res.textContent = '⏵ READING ' + file.name + '…';
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var data = JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('Expected a JSON array of {ship_name, ...} objects');
+      var fleet = getFleet();
+      var added = 0, skipped = 0, missed = 0;
+      data.forEach(function(entry){
+        var raw = (entry.ship_name || entry.name || '').trim();
+        if(!raw) return;
+        var matched = matchShipName(raw);
+        if(matched){
+          if(fleet.indexOf(matched) < 0){ fleet.push(matched); added++; }
+          else { skipped++; }
+        } else { missed++; }
+      });
+      saveFleet(fleet);
+      res.className = 'ok';
+      res.innerHTML = '✓ ADDED ' + added + ' SHIP' + (added===1?'':'S')
+        + (skipped ? ' · ' + skipped + ' ALREADY OWNED' : '')
+        + (missed ? ' · ' + missed + ' COULD NOT MATCH' : '');
+      render();
+      setTimeout(closeFleetImport, 1800);
+    } catch(err){
+      res.className = 'err';
+      res.textContent = '✗ COULD NOT PARSE JSON · ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+// Close on Escape
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeFleetImport();
+});
+
+var SHIPS = null, FILTERED = null;
+var fleetMode = 'all'; // 'all' | 'owned'
+var fleetView = (function(){ try { return localStorage.getItem('sc_fleet_view') || 'grid'; } catch(e){ return 'grid'; } })(); // 'grid' | 'list'
+var activeChips = { role: new Set(), mfr: new Set(), size: new Set() };
+
+// Map raw role strings to high-level role chips
+function roleBucket(role){
+  var r = (role||'').toLowerCase();
+  if(r.match(/fighter|interceptor|interdict|racing/)) return 'FIGHTER';
+  if(r.match(/bomber|torpedo/)) return 'BOMBER';
+  if(r.match(/gunship/)) return 'GUNSHIP';
+  if(r.match(/cargo|transport|freight|industrial|hauler|passenger/)) return 'FREIGHTER';
+  if(r.match(/mining|prospector/)) return 'MINING';
+  if(r.match(/salvage|reclaim/)) return 'SALVAGE';
+  if(r.match(/exploration|explorer|expedition|pathfinder|science|data/)) return 'EXPLORE';
+  if(r.match(/medical|support|rescue|triage/)) return 'MEDICAL';
+  if(r.match(/capital|command|frigate|corvette|destroyer/)) return 'CAPITAL';
+  if(r.match(/refuel|tanker/)) return 'REFUEL';
+  return 'OTHER';
+}
+
+function uniqueValues(items, getter){
+  var s = new Set();
+  items.forEach(function(o){ var v = getter(o); if(v != null && v !== '') s.add(v); });
+  return Array.from(s).sort(function(a,b){ return ('' + a).localeCompare('' + b); });
+}
+
+function renderChipRows(){
+  if(!SHIPS) return;
+  var entries = Object.values(SHIPS);
+  var roles = uniqueValues(entries, function(s){return roleBucket(s.role);});
+  var mfrs  = uniqueValues(entries, function(s){return s.mfr;}).slice(0, 14);
+  var sizes = uniqueValues(entries, function(s){return s.size;}).filter(function(s){return s !== '';});
+  var rows = [
+    { label:'ROLE', key:'role', values:roles },
+    { label:'MFR',  key:'mfr',  values:mfrs },
+    { label:'SIZE', key:'size', values:sizes },
+  ];
+  document.getElementById('chip-rows').innerHTML = rows.map(function(row){
+    return '<div class=\"chip-row\"><span class=\"chip-row-lbl\">' + row.label + '</span>' +
+      row.values.map(function(v){
+        var on = activeChips[row.key].has(v);
+        return '<span class=\"chip' + (on ? ' active' : '') + '\" data-row=\"' + row.key + '\" data-val=\"' + String(v).replace(/\"/g,'&quot;') + '\">' + v + '</span>';
+      }).join('') +
+    '</div>';
+  }).join('');
+  document.querySelectorAll('#chip-rows .chip').forEach(function(el){
+    el.addEventListener('click', function(){
+      var r = el.dataset.row, v = el.dataset.val;
+      // Convert numeric size keys back to numbers for proper match
+      if(r === 'size' && !isNaN(parseFloat(v))) v = parseFloat(v);
+      var set = activeChips[r];
+      if(set.has(v)) set.delete(v); else set.add(v);
+      render();
+    });
+  });
+}
+fetch('/data/scwiki.json?v=20').then(function(r){return r.json();}).then(function(d){
+  SHIPS = d.ships || {};
+  render();
+});
+
+// Wire tab clicks
+document.querySelectorAll('.fl-tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.fl-tab').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    fleetMode = t.dataset.mode;
+    render();
+  });
+});
+// Wire view toggle (GRID / LIST)
+document.querySelectorAll('.fl-view').forEach(function(t){
+  if(t.dataset.view === fleetView) t.classList.add('active'); else t.classList.remove('active');
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.fl-view').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    fleetView = t.dataset.view;
+    try { localStorage.setItem('sc_fleet_view', fleetView); } catch(e){}
+    render();
+  });
+});
+
+function render(){
+  if(!SHIPS) return;
+  renderChipRows();
+  var fleet = getFleet();
+  var q = (document.getElementById('fleet-search').value || '').toLowerCase();
+  var entries = Object.entries(SHIPS).filter(function(kv){
+    // MY FLEET mode → only owned ships
+    if(fleetMode === 'owned' && fleet.indexOf(kv[0]) < 0) return false;
+    // Chip filters (multi-select within a row, AND across rows)
+    if(activeChips.role.size && !activeChips.role.has(roleBucket(kv[1].role))) return false;
+    if(activeChips.mfr.size  && !activeChips.mfr.has(kv[1].mfr)) return false;
+    if(activeChips.size.size && !activeChips.size.has(kv[1].size)) return false;
+    if(!q) return true;
+    return kv[0].toLowerCase().indexOf(q) > -1 || (kv[1].role||'').toLowerCase().indexOf(q) > -1;
+  }).sort(function(a,b){
+    var ao = fleet.indexOf(a[0]) > -1, bo = fleet.indexOf(b[0]) > -1;
+    if(ao !== bo) return ao ? -1 : 1;
+    return a[0].localeCompare(b[0]);
+  });
+  document.getElementById('tb-owned').textContent = fleet.length + ' OWNED';
+  document.getElementById('tb-total').textContent = entries.length + ' / ' + Object.keys(SHIPS).length + ' SHIPS';
+  var grid = document.getElementById('fleet-grid');
+  grid.classList.toggle('list-view', fleetView === 'list');
+  // Empty state when MY FLEET has no owned ships
+  if(fleetMode === 'owned' && entries.length === 0){
+    grid.innerHTML = '<div id="fleet-empty">⏵ <span class="acc">YOUR HANGAR IS EMPTY</span><br>SWITCH TO <span class="acc">⊞ ALL SHIPS</span> AND CLICK A CARD TO MARK IT OWNED.<br>OWNED SHIPS WILL APPEAR HERE.</div>';
+    return;
+  }
+  if(fleetView === 'list'){
+    grid.innerHTML = entries.slice(0, 240).map(function(kv){
+      var n = kv[0], s = kv[1];
+      var owned = fleet.indexOf(n) > -1;
+      var img = s.image || '';
+      var w = s.weaponry || {};
+      var meta = [(s.role||''), (s.mfr||''), (s.size?'SIZE '+s.size:''), 'CREW '+safeCrew(s.crew)].filter(Boolean).join(' · ').toUpperCase();
+      return '<div class="f-card f-row '+(owned?'owned':'')+'" data-name="'+n.replace(/"/g,'&quot;')+'">'+
+        '<div class="f-thumb" style="background-image:url(\''+img+'\')"></div>'+
+        '<div class="f-mid"><div class="f-name">'+n+'</div><div class="f-meta">'+meta+'</div></div>'+
+        '<div class="f-strip">'+
+          '<div class="f-stat"><span class="l">DPS</span><span class="v r">'+fmtK(w.turretDPS)+'</span></div>'+
+          '<div class="f-stat"><span class="l">ALPHA</span><span class="v r">'+fmtK(w.turretAlpha)+'</span></div>'+
+          '<div class="f-stat"><span class="l">SCM</span><span class="v">'+(s.scm?Math.round(s.scm):'--')+'</span></div>'+
+          '<div class="f-stat"><span class="l">HULL</span><span class="v">'+fmtK(s.health)+'</span></div>'+
+          '<div class="f-stat"><span class="l">CARGO</span><span class="v b">'+(s.cargo||'--')+'</span></div>'+
+          '<div class="f-stat"><span class="l">MSRP</span><span class="v g">'+(s.msrp?'$'+fmtK(s.msrp):'--')+'</span></div>'+
+        '</div>'+
+        '<span class="f-own">'+(owned?'OWNED':'ADD')+'</span>'+
+      '</div>';
+    }).join('');
+  } else {
+    grid.innerHTML = entries.slice(0, 240).map(function(kv){
+      var n = kv[0], s = kv[1];
+      var owned = fleet.indexOf(n) > -1;
+      var img = s.image || '';
+      var meta = (s.role||'').toUpperCase() + (s.mfr?' · '+s.mfr.toUpperCase():'');
+      return '<div class="f-card '+(owned?'owned':'')+'" data-name="'+n.replace(/"/g,'&quot;')+'">'+
+        '<div class="f-img" style="background-image:url(\''+img+'\')"></div>'+
+        '<div class="f-info"><div class="f-name">'+n+'</div><div class="f-meta">'+meta+'</div></div>'+
+        '<span class="f-own">'+(owned?'OWNED':'ADD')+'</span>'+
+      '</div>';
+    }).join('');
+  }
+  Array.prototype.forEach.call(grid.querySelectorAll('.f-card'), function(card){
+    card.onclick = function(ev){
+      // Cmd/Ctrl/Shift-click toggles owned directly without opening modal — power-user shortcut
+      if(ev.shiftKey || ev.metaKey || ev.ctrlKey){
+        var name = card.dataset.name;
+        var f = getFleet();
+        var idx = f.indexOf(name);
+        if(idx > -1) f.splice(idx, 1); else f.push(name);
+        saveFleet(f);
+        render();
+        return;
+      }
+      openShipModal(card.dataset.name);
+    };
+    // Plain ADD/OWNED pill in corner is a quick toggle without opening detail
+    var pill = card.querySelector('.f-own');
+    if(pill){
+      pill.onclick = function(ev){
+        ev.stopPropagation();
+        var name = card.dataset.name;
+        var f = getFleet();
+        var idx = f.indexOf(name);
+        if(idx > -1) f.splice(idx, 1); else f.push(name);
+        saveFleet(f);
+        render();
+      };
+    }
+  });
+}
+document.getElementById('fleet-search').addEventListener('input', function(){ render(); });
+
+// === SHIP DETAIL MODAL ============================================================
+var _shipModalName = null;
+function fmtK(n){ if(!n) return '--'; if(n>=1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M'; if(n>=1e3) return Math.round(n/1e3)+'k'; return Math.round(n).toLocaleString(); }
+function safeCrew(c){
+  if(!c) return 1;
+  if(typeof c === 'number') return c;
+  if(typeof c === 'object') return c.max || c.min || c.weapon || 1;
+  return 1;
+}
+function openShipModal(name){
+  if(!SHIPS || !SHIPS[name]) return;
+  _shipModalName = name;
+  var s = SHIPS[name];
+  var w = s.weaponry || {};
+  var imgEl = document.getElementById('ship-img');
+  if(s.image){ imgEl.src = s.image; imgEl.style.display = 'block'; }
+  else imgEl.style.display = 'none';
+  document.getElementById('ship-name').textContent = name.toUpperCase();
+  document.getElementById('ship-meta').textContent = [(s.role||''), (s.mfr||''), (s.size?'SIZE '+s.size:''), 'CREW '+safeCrew(s.crew)].filter(Boolean).join(' · ').toUpperCase();
+  var msl = w.missileCount ? (w.missileCount + (w.missileDamage?'×'+fmtK(w.missileDamage):'')) : '--';
+  document.getElementById('ship-stats').innerHTML =
+    '<div class="s-stat"><span class="l">DPS</span><span class="v r">'+fmtK(w.turretDPS)+'</span></div>' +
+    '<div class="s-stat"><span class="l">ALPHA</span><span class="v r">'+fmtK(w.turretAlpha)+'</span></div>' +
+    '<div class="s-stat"><span class="l">SUSTAIN</span><span class="v r">'+fmtK(w.turretSustainedDPS)+'</span></div>' +
+    '<div class="s-stat"><span class="l">MISSILES</span><span class="v r">'+msl+'</span></div>' +
+    '<div class="s-stat"><span class="l">SCM</span><span class="v">'+(s.scm?Math.round(s.scm)+' m/s':'--')+'</span></div>' +
+    '<div class="s-stat"><span class="l">BOOST</span><span class="v">'+(s.afterburner?Math.round(s.afterburner)+' m/s':'--')+'</span></div>' +
+    '<div class="s-stat"><span class="l">HULL HP</span><span class="v">'+fmtK(s.health)+'</span></div>' +
+    '<div class="s-stat"><span class="l">CARGO</span><span class="v b">'+(s.cargo?s.cargo+' SCU':'--')+'</span></div>' +
+    '<div class="s-stat"><span class="l">CREW</span><span class="v b">'+safeCrew(s.crew)+'</span></div>' +
+    '<div class="s-stat"><span class="l">MASS</span><span class="v b">'+(s.mass?fmtK(s.mass)+' kg':'--')+'</span></div>' +
+    '<div class="s-stat"><span class="l">SIZE</span><span class="v b">'+(s.size||'--')+'</span></div>' +
+    '<div class="s-stat"><span class="l">MSRP</span><span class="v g">'+(s.msrp?'$'+fmtK(s.msrp):'--')+'</span></div>';
+  // Toggle button reflects current state
+  var fleet = getFleet();
+  var owned = fleet.indexOf(name) > -1;
+  var togBtn = document.getElementById('ship-toggle');
+  togBtn.textContent = owned ? '★ OWNED · CLICK TO REMOVE' : '+ MARK OWNED';
+  togBtn.classList.toggle('owned', owned);
+  // Builder link uses legacyName fallback
+  var legacyName = s.legacyName || name;
+  document.getElementById('ship-build').href = 'builder.html?ship=' + encodeURIComponent(legacyName);
+  document.getElementById('ship-modal').setAttribute('aria-hidden','false');
+}
+function closeShipModal(){
+  document.getElementById('ship-modal').setAttribute('aria-hidden','true');
+  _shipModalName = null;
+}
+function toggleShipOwned(){
+  if(!_shipModalName) return;
+  var f = getFleet();
+  var idx = f.indexOf(_shipModalName);
+  if(idx > -1) f.splice(idx, 1); else f.push(_shipModalName);
+  saveFleet(f);
+  // Update the button label inline without closing
+  var owned = f.indexOf(_shipModalName) > -1;
+  var togBtn = document.getElementById('ship-toggle');
+  togBtn.textContent = owned ? '★ OWNED · CLICK TO REMOVE' : '+ MARK OWNED';
+  togBtn.classList.toggle('owned', owned);
+  // Don't re-render the grid yet — let the user keep the modal open
+}
+document.getElementById('ship-modal').addEventListener('click', function(ev){
+  if(ev.target.id === 'ship-modal') {
+    // Close on backdrop click — and re-render grid in case ownership changed
+    closeShipModal();
+    render();
+  }
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.getElementById('ship-modal').getAttribute('aria-hidden') === 'false'){
+    closeShipModal(); render();
+  }
+});
+</script>
+</body>
+</html>
