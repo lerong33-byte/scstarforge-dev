@@ -1508,10 +1508,19 @@ function loadShip(name) {
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
         if(!data || !data.items || !data.items.length){ tryNext(i+1); return; }
-        // Prefer non-background image, then background
-        var nonBg = data.items.find(function(it){ return !it.background; });
-        var pick = nonBg || data.items[0];
-        var url = pick.smallUrl || pick.url;
+        // Skip layout/sprite/diagram artifacts that aren't actual ship renders
+        function isRender(it){
+          var n = (it.name||'').toLowerCase();
+          if(/sprite|deck|map|diagram|comparison|spec|chart|sizecomp/.test(n)) return false;
+          // PNGs are usually transparent diagrams; JPGs are renders. Allow PNGs only if name suggests a render.
+          if(it.contentType === 'image/png' && !/store|render|gallery|sku|hero|jpeg/i.test(n)) return false;
+          return true;
+        }
+        var renders = data.items.filter(isRender);
+        if(!renders.length) renders = data.items;          // fallback if filter rejects everything
+        var nonBg = renders.find(function(it){ return !it.background; });
+        var pick = nonBg || renders[0];
+        var url = pick.mediumUrl || pick.smallUrl || pick.url;
         if(url){
           img.onload = function(){ img.style.opacity = '0.85'; };
           img.onerror = function(){ tryNext(i+1); };
@@ -2578,17 +2587,6 @@ window.addEventListener('load', function(){
 
 function openWsel(idx){openPicker('weapon',idx,(_curShip&&_curShip.slots[idx]?_curShip.slots[idx].sz:null));}
 function filterWsel(q){filterPicker(q);}
-
-// ===== VIEWPORT-FIT SCALING — fills wide screens by zooming to ref design =====
-(function(){
-  var DESIGN_W = 1440, DESIGN_H = 820;
-  function fit(){
-    var s = Math.min(window.innerWidth/DESIGN_W, window.innerHeight/DESIGN_H, 2.0);
-    document.documentElement.style.zoom = s.toFixed(3);
-  }
-  window.addEventListener('resize', fit);
-  fit();
-})();
 </script>
 </body>
 </html>
