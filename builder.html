@@ -469,17 +469,24 @@ function progress(pct, txt) {
 
 function populateShipSel() {
   var sel = document.getElementById('ship-sel');
-  var names = Object.keys(SHIP_DATA).sort();
-  document.getElementById('hull-count').textContent = names.length + ' HULLS';
+  var qs = new URLSearchParams(location.search);
+  var roleFilter = (qs.get('role')||'').toLowerCase();
+  var allNames = Object.keys(SHIP_DATA).sort();
+  var names = roleFilter
+    ? allNames.filter(function(n){ return (SHIP_DATA[n].role||'').toLowerCase() === roleFilter; })
+    : allNames;
+  var filtered = roleFilter && names.length > 0;
+  if (roleFilter && names.length === 0) names = allNames;
+  document.getElementById('hull-count').textContent = names.length + ' HULLS' + (filtered ? ' · ' + roleFilter.toUpperCase() : '');
   names.forEach(function(n) {
     var o = document.createElement('option');
     o.value = n; o.textContent = n;
     sel.appendChild(o);
   });
   sel.addEventListener('change', function(){ if(this.value) loadShip(this.value); });
-  // Auto-load from URL
-  var urlShip = new URLSearchParams(location.search).get('ship');
+  var urlShip = qs.get('ship');
   if (urlShip && SHIP_DATA[urlShip]) { sel.value = urlShip; loadShip(urlShip); }
+  else if (filtered) { sel.value = names[0]; loadShip(names[0]); }
 }
 
 // ============================================================
