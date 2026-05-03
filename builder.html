@@ -258,40 +258,36 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
   filter:blur(.5px);}
 
 /* SHIP CENTER */
-#ship-center{position:absolute;top:170px;left:50%;transform:translateX(-50%);
-  width:380px;height:170px;z-index:5;display:flex;align-items:center;justify-content:center;}
+#ship-center{position:absolute;top:124px;left:50%;transform:translateX(-50%);
+  width:540px;height:206px;max-width:46vw;z-index:5;display:flex;align-items:center;justify-content:center;}
 #ship-glow{position:absolute;inset:0;
-  background:radial-gradient(ellipse 55% 42% at 50% 60%,rgba(180,195,215,.08) 0%,transparent 75%);
+  background:radial-gradient(ellipse 60% 48% at 50% 55%,rgba(180,195,215,.10) 0%,transparent 75%);
   border-radius:50%;}
-#ship-nameplate{position:absolute;top:118px;left:50%;transform:translateX(-50%);
+#ship-nameplate{position:absolute;top:300px;left:50%;transform:translateX(-50%);
   text-align:center;white-space:nowrap;z-index:20;
-  padding:4px 18px;}
-#ship-nm{font-size:24px;font-weight:700;letter-spacing:8px;color:var(--w);
-  text-shadow:0 0 12px rgba(180,195,215,.42),0 0 28px rgba(180,195,215,.18);}
-#ship-type{font-size:9px;letter-spacing:4px;color:var(--g-d);margin-top:5px;}
-#ship-diagram{position:absolute;top:80px;left:24px;width:236px;height:130px;z-index:11;
-  padding:14px 10px 6px;
-  background:radial-gradient(ellipse 100% 100% at 30% 50%,rgba(28,30,34,.62),rgba(12,14,18,.45) 65%,transparent);
-  clip-path:polygon(18px 0,calc(100% - 8px) 0,100% 22px,100% 100%,12px 100%,0 calc(100% - 12px),0 22px);
-  box-shadow:inset 0 1px 0 rgba(220,210,190,.15),inset 0 -16px 22px rgba(0,0,0,.40);
-  pointer-events:none;}
+  padding:6px 22px;}
+#ship-nm{font-size:30px;font-weight:700;letter-spacing:10px;color:var(--w);
+  text-shadow:0 0 14px rgba(180,195,215,.55),0 0 36px rgba(180,195,215,.22);}
+#ship-type{font-size:10px;letter-spacing:4px;color:rgba(180,210,240,.70);margin-top:5px;}
+/* Tactical diagram — hidden; ship image is the primary visual now */
+#ship-diagram{display:none;}
 .diag-hdr{position:absolute;top:6px;left:50%;transform:translateX(-50%);
   font-size:7px;letter-spacing:3px;color:rgba(170,185,205,.65);font-weight:700;
   white-space:nowrap;}
 #ship-wire{width:100%;height:96px;display:block;
   filter:drop-shadow(0 0 10px rgba(180,195,215,.25)) drop-shadow(0 0 22px rgba(180,195,215,.10));}
-#ship-img{position:absolute;top:0;left:0;width:100%;height:170px;object-fit:contain;
+#ship-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;
   opacity:0;z-index:2;
-  filter:drop-shadow(0 0 18px rgba(180,195,215,.18));
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,.55)) drop-shadow(0 0 24px rgba(180,195,215,.22));
   transition:opacity .4s;}
-#ship-img[src]:not([src=""]){opacity:.78;}
-#ship-shadow{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
-  width:200px;height:6px;
-  background:radial-gradient(ellipse,rgba(180,195,215,.16) 0%,transparent 70%);
-  border-radius:50%;filter:blur(3px);}
+#ship-img[src]:not([src=""]){opacity:.92;}
+#ship-shadow{position:absolute;bottom:38px;left:50%;transform:translateX(-50%);
+  width:60%;height:10px;
+  background:radial-gradient(ellipse,rgba(0,0,0,.50) 0%,transparent 70%);
+  border-radius:50%;filter:blur(6px);z-index:1;}
 
 /* TOP CENTER STATS MFD — SC-style cockpit panel */
-#stats-mfd{position:absolute;top:6px;left:50%;
+#stats-mfd{position:absolute;top:18px;left:50%;
   transform:translateX(-50%) perspective(2400px) rotateX(-3deg);
   transform-origin:top center;z-index:10;
   display:flex;align-items:stretch;gap:0;
@@ -380,8 +376,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
 .zone-hdr{display:none;}
 
 /* POWER MGMT — LEFT VERTICAL ZONE (curved flatscreen) */
-#pwr-ribbon{position:absolute;top:240px;left:14px;width:308px;
-  bottom:30px;max-height:590px;z-index:15;
+#pwr-ribbon{position:absolute;top:230px;left:14px;width:308px;
+  bottom:30px;max-height:600px;z-index:15;
   padding:14px 14px 16px 14px;display:flex;flex-direction:column;
   overflow:hidden;
   transform:perspective(1600px) rotateY(22deg) rotateX(2deg);transform-origin:left center;
@@ -1672,15 +1668,20 @@ function loadHudShip(name) {
         if(!data || !data.items || !data.items.length){ tryNext(i+1); return; }
         function isRender(it){
           var n = (it.name||'').toLowerCase();
-          // HARD reject — non-renders & obvious interiors only (be permissive on edge cases)
-          if(/sprite|sizecomp|comparison|blueprint|schematic|diagram|cutaway/.test(n)) return false;
-          if(/_pool|_bedroom|_office|_bar|_lounge|_kitchen|_dining|_medbay|_room|_cabin|_corridor|_lobby|_bayd|_hold|_ramp|bedroom|kitchen-|cockpit-/.test(n)) return false;
-          if(/_paint|paint-pack|paint_pack|_skind|_weapond|_close.?up/.test(n)) return false;
-          // Reject PNGs only if they look like cutout/transparent diagrams (keep PNG renders)
-          if(it.contentType === 'image/png' && /transparent|alpha|cutout|nobg/.test(n)) return false;
-          // Only reject by dimensions if both width and height are reported AND they're tiny
-          if(it.width && it.height && it.width < 400) return false;
-          if(it.width && it.height && it.width < it.height * 0.7) return false; // very tall portraits
+          // Reject only the truly non-ship artifacts
+          if(/sprite|sizecomp|comparison|blueprint|schematic|diagram|cutaway|outline|silhouette|wireframe/.test(n)) return false;
+          // Reject obvious interior shots (with or without underscore prefixes)
+          if(/(^|[_-])(pool|bedroom|kitchen|dining|medbay|lobby|corridor|cabin|cargo[s_-]?hold|hangar|bridge|cockpit|interior|engine[s_-]?room|lounge|bar|office|deck|gallery)|hangar/.test(n)) return false;
+          // Reject paint/skin variants & component close-ups
+          if(/(^|[_-])(paint|skin|weapon|module|component)[s_-]|paint-pack|close-?up/.test(n)) return false;
+          // Reject obvious wallpapers/promos that aren't ship-focused
+          if(/(^|[_-])(wallpaper|background)[s_-]/.test(n)) return false;
+          // Reject PNG cutouts/transparent diagrams
+          if(it.contentType === 'image/png' && /transparent|alpha|cutout|nobg|silhouette/.test(n)) return false;
+          // Tiny images
+          if(it.width && it.width < 400) return false;
+          // Very tall portrait
+          if(it.width && it.height && it.width < it.height * 0.6) return false;
           return true;
         }
         function score(it){
@@ -1697,13 +1698,17 @@ function loadHudShip(name) {
           return s;
         }
         var renders = data.items.filter(isRender);
-        if(!renders.length){ renders = data.items.slice(); }   // fallback: score over everything
+        if(!renders.length){
+          // Last-resort fallback: skip clearly bad items and take whatever's left
+          renders = data.items.filter(function(it){
+            var n = (it.name||'').toLowerCase();
+            return !/sprite|deck|diagram|blueprint|schematic|sizecomp|hangar/.test(n);
+          });
+          if(!renders.length) renders = data.items.slice();
+        }
         renders.sort(function(a,b){ return score(b) - score(a); });
-        // After scoring, if best item has a clearly bad name (interior keyword), try next slug instead
-        var firstName = (renders[0].name||'').toLowerCase();
-        if(/_pool|_bedroom|_kitchen|_lounge|_dining|_medbay|_office|_bar/.test(firstName)){ tryNext(i+1); return; }
         var pick = renders[0];
-        var url = pick.mediumUrl || pick.smallUrl || pick.url;
+        var url = pick.mediumUrl || pick.smallUrl || pick.url || pick.largeUrl;
         if(url){
           img.onload = function(){ if(loadId === _shipLoadToken) img.style.opacity = '0.85'; };
           img.onerror = function(){ if(loadId === _shipLoadToken) tryNext(i+1); };
@@ -2382,7 +2387,7 @@ function makeSlot(type, sl, slotIdx, sz) {
   hdr.innerHTML = '<span class="chev">' + (slot.classList.contains('expanded')?'\u25BC':'\u25B6') + '</span>'
     + '<span class="slot-sz ' + typeColor + '">S' + sl.sz + '</span>'
     + '<div class="slot-info">'
-      + '<div class="slot-nm">' + (master.w ? master.w.name : (master.wid || 'EMPTY')) + (cnt>1 ? ' <span class="slot-cnt">\u00D7' + cnt + '</span>' : '') + '</div>'
+      + '<div class="slot-nm">' + (master.w ? master.w.name : (master.wid ? '<span style="opacity:.55;font-size:9px;letter-spacing:1.5px;">[' + master.wid.toUpperCase() + ']</span>' : 'EMPTY')) + (cnt>1 ? ' <span class="slot-cnt">\u00D7' + cnt + '</span>' : '') + '</div>'
       + '<div class="slot-meta">' + (sl.lbl||'HARDPOINT').toUpperCase()
         + (master.w&&master.w.type ? ' <span class="slot-tag">' + master.w.type.toUpperCase() + '</span>' : '')
       + '</div>'
