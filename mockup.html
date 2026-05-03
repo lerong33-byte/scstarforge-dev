@@ -528,20 +528,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
 /* Hide the old top toggle */
 .ptog{display:none !important;}
 .pc-head,.pc-sub,.pc-foot{display:none;}
-.pc-pp::after{content:'\26a1';display:flex;align-items:center;justify-content:center;
-  font-size:12px;color:#e8b830;text-shadow:0 0 4px rgba(232,184,48,.45);background:none;}
-.pc-sg::after{content:'\25cb';font-size:13px;color:#28b8e0;
-  text-shadow:0 0 4px rgba(40,184,224,.45);background:none;display:flex;align-items:center;justify-content:center;}
-.pc-wp::after{content:'\27a4';font-size:11px;color:#e85838;
-  text-shadow:0 0 4px rgba(232,88,56,.45);background:none;display:flex;align-items:center;justify-content:center;}
-.pc-en::after{content:'\00bb';font-size:14px;color:#d8b828;
-  text-shadow:0 0 4px rgba(216,184,40,.45);background:none;display:flex;align-items:center;justify-content:center;}
-.pc-co::after{content:'\2744';font-size:12px;color:#1ce0a8;
-  text-shadow:0 0 4px rgba(28,224,168,.45);background:none;display:flex;align-items:center;justify-content:center;}
-.pc-qd::after{content:'\2295';font-size:12px;color:#28b0d0;
-  text-shadow:0 0 4px rgba(40,176,208,.45);background:none;display:flex;align-items:center;justify-content:center;}
-.pc-rd::after{content:'\25c9';font-size:12px;color:#b8b8c0;
-  text-shadow:0 0 4px rgba(184,184,192,.30);background:none;display:flex;align-items:center;justify-content:center;}
+/* Top column glyph icons removed — only the bottom toggle (.pc-icon-btn) shows the category icon now */
+.pc-pp::after,.pc-sg::after,.pc-wp::after,.pc-en::after,.pc-co::after,.pc-qd::after,.pc-rd::after{display:none;content:none;}
 
 /* POWER FOOTER — mode toggle + speed + reset */
 .pwr-foot{display:flex;flex-direction:column;gap:8px;
@@ -1945,7 +1933,9 @@ function togComp(id) {
   if(!_loadout._off) _loadout._off = {};
   _loadout._off['pwr_'+id] = !c.on;
   syncCompFromPwr(id);
-  document.getElementById('ptog-'+id).className = 'ptog '+(c.on?'on':'off');
+  // Keep the icon-button class intact; on/off state is shown via the parent .pc.offline class below
+  var btn = document.getElementById('ptog-'+id);
+  if(btn) btn.className = 'pc-icon-btn';
   document.getElementById('prc-'+id).className = 'pc pc-'+c.cat+(c.on?'':' offline');
   buildHpBand(); updatePwr(); updateStats();
 }
