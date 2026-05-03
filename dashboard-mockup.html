@@ -799,13 +799,12 @@ body{background-attachment:fixed;}
 </div>
 
 <script>
-// ===== VIEWPORT-FIT SCALING (smaller base = larger render) =====
+// ===== VIEWPORT-FIT SCALING (scales up AND down to fit reference design) =====
 (function(){
-  var DESIGN_W = 1100, DESIGN_H = 640;
+  var DESIGN_W = 1440, DESIGN_H = 900;
   var html = document.documentElement;
   function fit(){
-    var w = window.innerWidth, h = window.innerHeight;
-    var s = Math.min(w/DESIGN_W, h/DESIGN_H);
+    var s = Math.min(window.innerWidth/DESIGN_W, window.innerHeight/DESIGN_H, 2.4);
     html.style.zoom = s.toFixed(3);
   }
   window.addEventListener('resize', fit);
@@ -818,15 +817,15 @@ body{background-attachment:fixed;}
     .forEach(function(el, i){ el.style.setProperty('--delay', (i*32)+'ms'); });
 })();
 
-// ===== NUMBER COUNT-UP on load =====
-(function(){
+// ===== NUMBER COUNT-UP — exposed so data loader can re-trigger after live values land =====
+window.__animateNumbers = (function(){
   function parseNum(s){
     var m = s.match(/^([\d,]+\.?\d*)([a-zA-Z%\/]*)$/);
     if(!m) return null;
     return { num: parseFloat(m[1].replace(/,/g,'')), suffix: m[2], orig: s };
   }
   function formatNum(n, orig){
-    if(orig.indexOf('k') > -1) return Math.round(n)+'k';
+    // Suffix is appended separately by animate() — don't double-append
     if(orig.indexOf(',') > -1) return Math.round(n).toLocaleString();
     if(orig.indexOf('.') > -1) return n.toFixed(2);
     return Math.round(n).toString();
@@ -841,16 +840,21 @@ body{background-attachment:fixed;}
     }
     requestAnimationFrame(tick);
   }
-  document.querySelectorAll('.stat-v, .pop-stat-v, .sl-stat-v, .rt-cnt').forEach(function(el){
-    var txt = el.textContent.trim();
-    if(txt === 'LIVE' || txt.indexOf('+') === 0) return;
-    var p = parseNum(txt);
-    if(p && p.num > 0){
-      el.textContent = '0'+p.suffix;
-      setTimeout(function(){ animate(el, p.num, p.suffix, txt, 1200); }, 400 + Math.random()*600);
-    }
-  });
+  return function run(){
+    document.querySelectorAll('.stat-v, .pop-stat-v, .sl-stat-v, .rt-cnt').forEach(function(el){
+      var txt = el.textContent.trim();
+      if(txt === 'LIVE' || txt.indexOf('+') === 0 || el.dataset.animated === '1') return;
+      var p = parseNum(txt);
+      if(p && p.num > 0){
+        el.dataset.animated = '1';
+        el.textContent = '0'+p.suffix;
+        setTimeout(function(){ animate(el, p.num, p.suffix, txt, 1200); }, 200 + Math.random()*400);
+      }
+    });
+  };
 })();
+// Fire animation after a short delay — data loader may update values first
+setTimeout(function(){ window.__animateNumbers(); }, 1500);
 
 // ===== SHIP SPOTLIGHT CYCLE =====
 (function(){
@@ -923,13 +927,114 @@ body{background-attachment:fixed;}
   svg.innerHTML = paths;
 })();
 
-(function viewportScale(){
-  function apply(){
-    var s = Math.min(window.innerWidth/1440, window.innerHeight/900, 2.2);
-    document.documentElement.style.zoom = s > 1.05 ? s.toFixed(3) : '';
+// ===== LIVE DATA WIRING — fetch SHIP_DATA from / and populate stat tiles, role counts =====
+(function(){
+  function fmtK(n){
+    if(!n) return '--';
+    if(n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M';
+    if(n >= 1e3) return (n/1e3).toFixed(0)+'k';
+    return Math.round(n).toLocaleString();
   }
-  apply();
-  window.addEventListener('resize', apply);
+  function loadData(){
+    return fetch('/').then(function(r){return r.text();}).then(function(src){
+      var blocks=[], pos=0, OPEN='<scr'+'ipt', CLOSE='</scr'+'ipt>';
+      while(true){
+        var s=src.indexOf(OPEN,pos); if(s<0) break;
+        var e=src.indexOf(CLOSE,s); if(e<0) break;
+        var inner=src.slice(src.indexOf('>',s)+1,e);
+        if(inner.indexOf('SHIP_DATA')>-1||inner.indexOf('WEAPONS')>-1) blocks.push(inner);
+        pos=e+CLOSE.length;
+      }
+      return new Promise(function(res,rej){
+        var url=URL.createObjectURL(new Blob([blocks.join('\n')],{type:'text/javascript'}));
+        var sc=document.createElement('script');
+        sc.src=url;
+        sc.onload=function(){URL.revokeObjectURL(url);res({ships:window.SHIP_DATA||{},weapons:window.WEAPONS||[],comps:window.COMP_DB||{}});};
+        sc.onerror=function(){URL.revokeObjectURL(url);rej(new Error('script load failed'));};
+        document.head.appendChild(sc);
+      });
+    });
+  }
+  function shipDPS(ship, wById){
+    var t=0; (ship.slots||[]).forEach(function(sl){var w=wById[sl.default]; if(w) t += (w.dps||0)*(sl.count||1);});
+    return t;
+  }
+  function shipShield(ship, comps){
+    var sg = ship.comps && ship.comps.sg;
+    if(!sg || !comps.sg || !comps.sg[sg]) return 0;
+    var c = (ship.comps.counts && ship.comps.counts.sg) || 1;
+    return (comps.sg[sg].totalHP||0)*c;
+  }
+  function shipAlpha(ship, wById){
+    var m=0; (ship.slots||[]).forEach(function(sl){var w=wById[sl.default]; if(w && (w.alpha||0)>m) m=w.alpha;});
+    return m;
+  }
+  // Map dashboard role label → actual SHIP_DATA role keys (lowercased)
+  var ROLE_MAP = {
+    fighter:['fighter'], bomber:['bomber'], gunship:['gunship'],
+    freighter:['cargo','transport'], mining:['mining'], salvage:['salvage'],
+    explore:['exploration'], medical:['support'], capital:['capital']
+  };
+
+  loadData().then(function(d){
+    var ships=d.ships, comps=d.comps;
+    var wById={}; d.weapons.forEach(function(w){if(w&&w.id) wById[w.id]=w;});
+    var arr = Object.keys(ships).map(function(n){
+      var s = ships[n];
+      return {name:n, ship:s, dps:shipDPS(s,wById), shield:shipShield(s,comps), alpha:shipAlpha(s,wById), scm:s.scm||0, role:(s.role||'').toLowerCase()};
+    });
+    var topDps   = arr.reduce(function(a,b){return b.dps>a.dps?b:a;});
+    var topShld  = arr.reduce(function(a,b){return b.shield>a.shield?b:a;});
+    var topAlpha = arr.reduce(function(a,b){return b.alpha>a.alpha?b:a;});
+    var topScm   = arr.reduce(function(a,b){return b.scm>a.scm?b:a;});
+
+    function setTile(idx, valTxt, name, sub, href){
+      var tiles = document.querySelectorAll('#stats .stat');
+      var t = tiles[idx]; if(!t) return;
+      var v = t.querySelector('.stat-v'); if(v) v.textContent = valTxt;
+      var nm = t.querySelector('.stat-name'); if(nm) nm.textContent = name;
+      var lb = t.querySelector('.stat-l'); if(lb) lb.textContent = sub;
+      if(href && t.tagName==='A') t.href = href;
+    }
+    function shipSub(s){
+      return ((s.ship.role||'').toUpperCase()) + ' · ' + (s.ship.crew||1) + ' CREW';
+    }
+    setTile(0, fmtK(topDps.dps),       topDps.name.toUpperCase(),   shipSub(topDps),   'builder.html?ship='+encodeURIComponent(topDps.name));
+    setTile(1, fmtK(topShld.shield),   topShld.name.toUpperCase(),  shipSub(topShld),  'builder.html?ship='+encodeURIComponent(topShld.name));
+    // For "fastest" tile, value has m/s unit baked in - rebuild content
+    (function(){
+      var t = document.querySelectorAll('#stats .stat')[2]; if(!t) return;
+      var v = t.querySelector('.stat-v'); if(v) v.innerHTML = topScm.scm + '<span class="stat-u">m/s</span>';
+      var nm = t.querySelector('.stat-name'); if(nm) nm.textContent = topScm.name.toUpperCase();
+      var lb = t.querySelector('.stat-l'); if(lb) lb.textContent = shipSub(topScm);
+      if(t.tagName==='A') t.href = 'builder.html?ship='+encodeURIComponent(topScm.name);
+    })();
+    setTile(3, fmtK(topAlpha.alpha),   topAlpha.name.toUpperCase(), shipSub(topAlpha), 'builder.html?ship='+encodeURIComponent(topAlpha.name));
+
+    // Update DATA SYNC tile counts (last tile)
+    var tiles = document.querySelectorAll('#stats .stat');
+    var sync = tiles[tiles.length-1];
+    if(sync){
+      var lb = sync.querySelector('.stat-l');
+      if(lb) lb.textContent = arr.length + ' hulls · ' + d.weapons.length + ' wpn';
+    }
+    // Allow count-up animation to re-trigger on the freshly-set values
+    document.querySelectorAll('#stats .stat .stat-v').forEach(function(v){ delete v.dataset.animated; });
+
+    // Role counts + hrefs
+    var roleCounts = {};
+    arr.forEach(function(s){ roleCounts[s.role] = (roleCounts[s.role]||0)+1; });
+    var rnodes = document.querySelectorAll('.rnode');
+    var pulses = document.querySelectorAll('.rn-cnt-pulse');
+    rnodes.forEach(function(rn, i){
+      var nm = rn.querySelector('.rn-nm');
+      var label = nm ? nm.textContent.trim().toLowerCase() : '';
+      var dataRoles = ROLE_MAP[label] || [label];
+      var cnt = dataRoles.reduce(function(s,r){return s+(roleCounts[r]||0);},0);
+      rn.href = 'builder.html?role='+encodeURIComponent(dataRoles[0]);
+      if(pulses[i]) pulses[i].textContent = cnt;
+    });
+  }).catch(function(e){ console.warn('[dash] data load failed:', e.message, e.stack); });
 })();
 </script>
 
