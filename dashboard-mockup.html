@@ -799,6 +799,22 @@ body{background-attachment:fixed;}
 </div>
 
 <script>
+// ===== VIEWPORT-FIT SCALING =====
+// Designed for 1900px wide × 1080px tall. Scale to fit any viewport.
+(function(){
+  var DESIGN_W = 1900, DESIGN_H = 1080;
+  var html = document.documentElement;
+  function fit(){
+    var w = window.innerWidth, h = window.innerHeight;
+    var s = Math.min(w/DESIGN_W, h/DESIGN_H);
+    if(s >= 1){ html.style.removeProperty('zoom'); return; }
+    // Use zoom in webkit/blink for clean 1:1 scaling without breaking position:fixed
+    html.style.zoom = s;
+  }
+  window.addEventListener('resize', fit);
+  fit();
+})();
+
 // Stagger load-in animation
 (function(){
   document.querySelectorAll('#title, #stats, .panel, #role-const, .rnode, .pop, .upd, .fl-row, .stat')
