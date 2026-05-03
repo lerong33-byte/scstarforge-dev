@@ -358,7 +358,49 @@ body{background-attachment:fixed;}
   0%,100%{text-shadow:0 0 14px rgba(212,168,76,.42),0 0 28px rgba(212,168,76,.18);}
   50%{text-shadow:0 0 22px rgba(232,200,120,.65),0 0 44px rgba(212,168,76,.30);}
 }
-#title-name{animation:title-shimmer 5s ease-in-out infinite;}
+#title-name{animation:title-shimmer 5s ease-in-out infinite;animation-delay:1.6s;
+  display:inline-flex;align-items:center;justify-content:center;gap:14px;white-space:nowrap;}
+
+/* Title FLY-IN — H.U.D from the left, MANAGER from the right, impact in the middle */
+@keyframes fly-in-left{
+  0%{opacity:0;transform:translateX(-120vw) scale(2.6) skewX(-22deg);filter:blur(14px);}
+  55%{opacity:1;transform:translateX(20px) scale(1.15) skewX(-4deg);filter:blur(2px);}
+  72%{transform:translateX(-12px) scale(.96) skewX(2deg);filter:blur(0);}
+  85%{transform:translateX(6px) scale(1.04);}
+  100%{opacity:1;transform:translateX(0) scale(1) skewX(0);filter:blur(0);}
+}
+@keyframes fly-in-right{
+  0%{opacity:0;transform:translateX(120vw) scale(2.6) skewX(22deg);filter:blur(14px);}
+  55%{opacity:1;transform:translateX(-20px) scale(1.15) skewX(4deg);filter:blur(2px);}
+  72%{transform:translateX(12px) scale(.96) skewX(-2deg);filter:blur(0);}
+  85%{transform:translateX(-6px) scale(1.04);}
+  100%{opacity:1;transform:translateX(0) scale(1) skewX(0);filter:blur(0);}
+}
+@keyframes fly-impact{
+  0%,55%{opacity:0;transform:scale(0);}
+  62%{opacity:1;transform:scale(1.4);box-shadow:0 0 0 0 rgba(232,200,120,.85);}
+  78%{opacity:.7;transform:scale(2.6);box-shadow:0 0 80px 30px rgba(232,200,120,.0);}
+  100%{opacity:0;transform:scale(3);}
+}
+@keyframes brk-fade{
+  0%,55%{opacity:0;transform:scale(.3);}
+  72%{opacity:.62;transform:scale(1.2);}
+  100%{opacity:.62;transform:scale(1);}
+}
+.ti-l{display:inline-block;
+  background:linear-gradient(155deg,#b0b0c0,#fff,#e8e8f0,#c4c4d0,#a0a0b4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fly-in-left 1.4s cubic-bezier(.18,1.55,.32,1.04) backwards;}
+.ti-r{display:inline-block;
+  background:linear-gradient(155deg,#b0b0c0,#fff,#e8e8f0,#c4c4d0,#a0a0b4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fly-in-right 1.4s cubic-bezier(.18,1.55,.32,1.04) backwards;}
+.ti-impact{display:inline-block;width:10px;height:10px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,250,232,1),rgba(232,200,120,.85) 40%,rgba(212,168,76,0) 80%);
+  animation:fly-impact 1.6s ease-out backwards;animation-delay:0s;
+  position:relative;flex-shrink:0;}
+.ti-brk-l,.ti-brk-r{color:var(--g);opacity:.62;font-weight:300;
+  animation:brk-fade 1.5s ease-out backwards;}
 
 /* Stats — pulsing accent on top values */
 @keyframes stat-glow{
@@ -479,7 +521,9 @@ body{background-attachment:fixed;}
 <div id="scene">
 
   <div id="title">
-    <div id="title-name"><span class="brk">⟦</span> H.U.D MANAGER <span class="brk">⟧</span></div>
+    <div id="title-name">
+      <span class="ti-brk-l">⟦</span><span class="ti-l">H.U.D</span><span class="ti-impact"></span><span class="ti-r">MANAGER</span><span class="ti-brk-r">⟧</span>
+    </div>
     <div id="title-sub">FLEET MANAGEMENT · BUILD CONFIGURATION · SHOWDOWN ANALYSIS</div>
   </div>
 
