@@ -790,6 +790,52 @@ body{
     radial-gradient(ellipse 40% 30% at 70% 62%,rgba(20,80,160,.18),transparent 65%),
     radial-gradient(ellipse 35% 25% at 50% 58%,rgba(140,40,80,.10),transparent 70%),
     var(--bg);}
+
+/* ============================================================
+   MFD MONITOR STYLING — additive bezel + scanlines + backlit header
+   ============================================================ */
+#pwr-ribbon, #hp-band, #ms-band, #comp-zone{
+  /* Add chunky bezel + scanlines on top of existing gradients */
+  background-image:
+    repeating-linear-gradient(0deg, rgba(170,200,230,.045) 0px, transparent 1px, transparent 3px),
+    radial-gradient(ellipse 130% 90% at 50% 60%, transparent 30%, rgba(0,0,0,.55) 100%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, rgba(110,140,180,.05) 0%, transparent 80%);
+  background-blend-mode:screen, normal, normal;
+  /* Extra outer drop shadow for monitor depth */
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.55));
+  padding-top:28px;}
+/* The chunky inset bezel uses outline (sits inside clip-path correctly) */
+#pwr-ribbon, #hp-band, #ms-band, #comp-zone{
+  outline:0;}
+
+/* MFD HEADER LABEL — backlit LCD pill with green LED, replaces existing ::before */
+#pwr-ribbon::before, #hp-band::before, #ms-band::before, #comp-zone::before{
+  position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  font-family:'Share Tech Mono','Consolas',monospace;
+  font-size:9px; letter-spacing:5px; font-weight:700;
+  color:rgba(220,235,255,.92);
+  text-shadow:0 0 6px rgba(140,200,255,.65), 0 0 12px rgba(80,160,230,.30);
+  padding:3px 16px 3px 26px;
+  border:1px solid rgba(80,140,200,.35);
+  border-bottom:1px solid rgba(80,140,200,.35);
+  margin:0;
+  box-shadow:inset 0 1px 0 rgba(160,200,240,.18), 0 0 10px rgba(60,140,210,.22);
+  z-index:5; white-space:nowrap; display:inline-block; width:auto;
+  background:
+    radial-gradient(circle 3px at 12px 50%, #4cff80 0%, #1c8830 55%, transparent 80%),
+    linear-gradient(180deg, rgba(20,26,36,.95), rgba(8,10,16,.95));}
+#pwr-ribbon::before{content:'PWR · DIST';}
+#hp-band::before{content:'WEAPONS';}
+#ms-band::before{content:'MISSILES';}
+#comp-zone::before{content:'SYSTEMS';}
+
+/* Hide the in-DOM section header — MFD pill takes its place. Keep the count subtitle. */
+#pwr-ribbon .sec-hdr .sec-l, #hp-band .sec-hdr .sec-l, #ms-band .sec-hdr .sec-l, #comp-zone .sec-hdr .sec-l{display:none;}
+#pwr-ribbon .sec-hdr, #hp-band .sec-hdr, #ms-band .sec-hdr, #comp-zone .sec-hdr{
+  justify-content:flex-end;padding-top:0;margin-top:2px;border-bottom:1px solid rgba(120,160,200,.18);}
+#pwr-ribbon .sec-hdr .sec-s, #hp-band .sec-hdr .sec-s, #ms-band .sec-hdr .sec-s, #comp-zone .sec-hdr .sec-s{
+  margin-left:0;color:rgba(140,180,220,.70);font-size:7px;letter-spacing:2px;}
+
 /* dense starfield layer */
 </style>
 </head>
