@@ -329,6 +329,115 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   60%{opacity:.85;filter:blur(0);}
   100%{opacity:1;transform:none;filter:blur(0);}
 }
+
+/* ===== AMBIENT MOTION ===== */
+/* Stars twinkle */
+@keyframes twinkle{0%,100%{opacity:.85;}50%{opacity:.32;}}
+body::after{animation:twinkle 6s ease-in-out infinite;}
+
+/* Saturn very slow rotation */
+@keyframes sat-spin{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+body{background-attachment:fixed;}
+
+/* Cockpit scanline drift */
+@keyframes scan-drift{0%{background-position:0 0;}100%{background-position:0 60px;}}
+#scene::after{animation:scan-drift 8s linear infinite;}
+
+/* Panel border glow sweep — gold edge slides around the clip-path */
+@keyframes panel-sweep{
+  0%,100%{box-shadow:inset 0 1px 0 rgba(220,210,190,.16),inset 0 -22px 28px rgba(0,0,0,.30);}
+  50%{box-shadow:inset 0 1px 0 rgba(232,200,120,.55),inset 0 -22px 28px rgba(0,0,0,.30),inset 12px 0 28px rgba(212,168,76,.10),inset -12px 0 28px rgba(212,168,76,.10);}
+}
+.panel{animation:panel-sweep 9s ease-in-out infinite;}
+#fleet{animation-delay:-1.5s;}
+#popular{animation-delay:-3.5s;}
+#updates{animation-delay:-5s;}
+
+/* Title chrome shimmer */
+@keyframes title-shimmer{
+  0%,100%{text-shadow:0 0 14px rgba(212,168,76,.42),0 0 28px rgba(212,168,76,.18);}
+  50%{text-shadow:0 0 22px rgba(232,200,120,.65),0 0 44px rgba(212,168,76,.30);}
+}
+#title-name{animation:title-shimmer 5s ease-in-out infinite;}
+
+/* Stats — pulsing accent on top values */
+@keyframes stat-glow{
+  0%,100%{filter:none;}
+  50%{filter:brightness(1.18);}
+}
+.stat-v{animation:stat-glow 4s ease-in-out infinite;}
+.stat:nth-child(1) .stat-v{animation-delay:-0.5s;}
+.stat:nth-child(2) .stat-v{animation-delay:-1s;}
+.stat:nth-child(3) .stat-v{animation-delay:-1.5s;}
+.stat:nth-child(4) .stat-v{animation-delay:-2s;}
+.stat:nth-child(5) .stat-v{animation-delay:-2.5s;}
+.stat:nth-child(6) .stat-v{animation-delay:-3s;}
+
+/* Constellation lines — pulsing dashed travel */
+@keyframes line-flow{from{stroke-dashoffset:0;}to{stroke-dashoffset:-24;}}
+#rc-lines path{animation:line-flow 1.2s linear infinite;}
+@keyframes line-glow{
+  0%,100%{filter:drop-shadow(0 0 0 transparent);}
+  50%{filter:drop-shadow(0 0 6px rgba(212,168,76,.65));}
+}
+#rc-lines{animation:line-glow 4s ease-in-out infinite;}
+
+/* Constellation node SVG slow pulse */
+@keyframes node-breath{
+  0%,100%{filter:drop-shadow(0 0 6px rgba(212,168,76,.45));}
+  50%{filter:drop-shadow(0 0 12px rgba(232,200,120,.75));}
+}
+.rnode svg{animation:node-breath 3s ease-in-out infinite;}
+.rnode:nth-child(2) svg{animation-delay:-0.3s;}
+.rnode:nth-child(3) svg{animation-delay:-0.6s;}
+.rnode:nth-child(4) svg{animation-delay:-0.9s;}
+.rnode:nth-child(5) svg{animation-delay:-1.2s;}
+.rnode:nth-child(6) svg{animation-delay:-1.5s;}
+.rnode:nth-child(7) svg{animation-delay:-1.8s;}
+.rnode:nth-child(8) svg{animation-delay:-2.1s;}
+.rnode:nth-child(9) svg{animation-delay:-2.4s;}
+.rnode:nth-child(10) svg{animation-delay:-2.7s;}
+
+/* Fleet rows — subtle scan highlight that travels down the list */
+@keyframes fleet-scan{
+  0%{background-position:0 -100%;}
+  100%{background-position:0 200%;}
+}
+#fleet-inner::before{content:'';position:absolute;left:0;right:0;top:0;height:100%;
+  background:linear-gradient(180deg,transparent,rgba(212,168,76,.08) 45%,rgba(232,200,120,.16) 50%,rgba(212,168,76,.08) 55%,transparent);
+  pointer-events:none;
+  animation:fleet-scan 6s linear infinite;}
+
+/* Updates — latest entry has a hot pulse */
+@keyframes upd-hot{
+  0%,100%{box-shadow:none;border-left-color:var(--g);}
+  50%{box-shadow:0 0 14px rgba(232,200,120,.30);border-left-color:var(--g2);}
+}
+.upd:first-child{animation:upd-hot 2.5s ease-in-out infinite;}
+
+/* Live dot blink */
+@keyframes live-blink{
+  0%,55%,100%{box-shadow:0 0 6px rgba(212,168,76,.65);opacity:1;}
+  60%{opacity:.4;}
+}
+#ldot{animation:live-blink 2s ease-in-out infinite;}
+
+/* Spotlight ship slow rotation (wireframe drifts) */
+@keyframes ship-drift{
+  0%,100%{transform:rotateY(0) rotateZ(0);}
+  50%{transform:rotateY(8deg) rotateZ(-1deg);}
+}
+.sl-img svg,.pop-img svg{transform-origin:center;animation:ship-drift 8s ease-in-out infinite;}
+
+/* Spotlight ship name letter-spacing breathe */
+@keyframes name-breathe{
+  0%,100%{letter-spacing:7px;}
+  50%{letter-spacing:9px;}
+}
+.sl-ship-name{animation:name-breathe 6s ease-in-out infinite;}
+
+/* Number count-up — handled in JS, hint via CSS */
+.count-up{display:inline-block;}
 @keyframes card-in-keep{
   0%{opacity:0;transform:perspective(2400px) rotateY(6deg) translateY(28px) scale(.96);filter:blur(10px);}
   100%{opacity:1;transform:perspective(2400px) rotateY(6deg) translateY(0) scale(1);filter:blur(0);}
@@ -593,6 +702,89 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 (function(){
   document.querySelectorAll('#title, #stats, .panel, #role-const, .rnode, .pop, .upd, .fl-row, .stat')
     .forEach(function(el, i){ el.style.setProperty('--delay', (i*32)+'ms'); });
+})();
+
+// ===== NUMBER COUNT-UP on load =====
+(function(){
+  function parseNum(s){
+    var m = s.match(/^([\d,]+\.?\d*)([a-zA-Z%\/]*)$/);
+    if(!m) return null;
+    return { num: parseFloat(m[1].replace(/,/g,'')), suffix: m[2], orig: s };
+  }
+  function formatNum(n, orig){
+    if(orig.indexOf('k') > -1) return (n/1000).toFixed(0)+'k';
+    if(orig.indexOf(',') > -1) return Math.round(n).toLocaleString();
+    if(orig.indexOf('.') > -1) return n.toFixed(2);
+    return Math.round(n).toString();
+  }
+  function animate(el, target, suffix, orig, duration){
+    var start = performance.now();
+    function tick(now){
+      var t = Math.min(1, (now-start)/duration);
+      var eased = 1 - Math.pow(1-t, 3);
+      el.firstChild && (el.firstChild.nodeValue = formatNum(target*eased, orig)+suffix);
+      if(t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  document.querySelectorAll('.stat-v, .pop-stat-v, .sl-stat-v, .rt-cnt').forEach(function(el){
+    var txt = el.textContent.trim();
+    if(txt === 'LIVE' || txt.indexOf('+') === 0) return;
+    var p = parseNum(txt);
+    if(p && p.num > 0){
+      el.textContent = '0'+p.suffix;
+      setTimeout(function(){ animate(el, p.num, p.suffix, txt, 1200); }, 400 + Math.random()*600);
+    }
+  });
+})();
+
+// ===== SHIP SPOTLIGHT CYCLE =====
+(function(){
+  var ships = [
+    { name:'PALADIN', meta:'ANVIL · GUNSHIP · SIZE M · CREW 3', dps:'9,831', shp:'18,000', pwr:'32', scm:'165', crew:'3', wire:'<path d="M 80 100 L 120 60 L 245 65 L 280 90 L 285 110 L 280 110 L 245 135 L 120 140 Z"/><path d="M 120 60 L 80 40 L 30 60 L 70 92 L 120 92"/><path d="M 80 40 L 70 92"/><path d="M 120 140 L 80 160 L 30 140 L 70 108 L 120 108"/><path d="M 80 160 L 70 108"/><path d="M 285 100 L 325 96 L 345 100 L 325 104 L 285 100"/><path d="M 80 100 L 50 92 L 38 100 L 50 108 Z"/><path d="M 230 78 L 250 82 L 258 100 L 250 118 L 230 122" stroke-opacity=".75"/><line x1="180" y1="65" x2="180" y2="135" stroke-opacity=".30"/>' },
+    { name:'HAMMERHEAD', meta:'AEGIS · CAPITAL · SIZE L · CREW 6', dps:'6,240', shp:'128,000', pwr:'88', scm:'128', crew:'6', wire:'<path d="M 50 100 L 90 50 L 270 55 L 320 80 L 332 100 L 320 120 L 270 145 L 90 150 Z"/><path d="M 90 50 L 30 30 L 10 65 L 60 85 L 90 85"/><path d="M 90 150 L 30 170 L 10 135 L 60 115 L 90 115"/><path d="M 332 100 L 348 98 L 354 100 L 348 102 L 332 100"/><rect x="120" y="68" width="120" height="12" stroke-opacity=".50"/><rect x="120" y="120" width="120" height="12" stroke-opacity=".50"/><line x1="160" y1="55" x2="160" y2="145" stroke-opacity=".25"/><line x1="200" y1="55" x2="200" y2="145" stroke-opacity=".25"/>' },
+    { name:'ECLIPSE', meta:'AEGIS · BOMBER · STEALTH · CREW 1', dps:'540', shp:'8,200', pwr:'24', scm:'200', crew:'1', wire:'<path d="M 90 100 L 130 65 L 240 65 L 290 90 L 295 110 L 290 110 L 240 135 L 130 135 Z"/><path d="M 130 65 L 50 55 L 22 75 L 80 95 L 130 95"/><path d="M 50 55 L 80 95"/><path d="M 130 135 L 50 145 L 22 125 L 80 105 L 130 105"/><path d="M 50 145 L 80 105"/><path d="M 295 100 L 330 96 L 350 100 L 330 104 L 295 100"/><rect x="140" y="76" width="20" height="48" stroke-opacity=".40"/>' },
+    { name:'ARROW', meta:'RSI · LIGHT FIGHTER · CREW 1', dps:'1,240', shp:'3,800', pwr:'14', scm:'220', crew:'1', wire:'<path d="M 130 100 L 175 70 L 240 80 L 255 100 L 240 120 L 175 130 Z"/><path d="M 175 70 L 50 50 L 18 70 L 70 92 L 175 92"/><path d="M 50 50 L 70 92"/><path d="M 175 130 L 50 150 L 18 130 L 70 108 L 175 108"/><path d="M 50 150 L 70 108"/><path d="M 255 100 L 300 96 L 322 100 L 300 104 Z"/>' },
+    { name:'CARRACK', meta:'ANVIL · EXPLORATION · CREW 4', dps:'1,820', shp:'22,000', pwr:'42', scm:'140', crew:'4', wire:'<path d="M 110 100 L 150 60 L 240 65 L 280 100 L 240 135 L 150 140 Z"/><path d="M 150 60 L 70 35 L 40 65 L 90 92 L 150 92"/><path d="M 150 140 L 70 165 L 40 135 L 90 108 L 150 108"/><path d="M 280 100 L 320 96 L 342 100 L 320 104 L 280 100"/><circle cx="170" cy="100" r="22" stroke-opacity=".55"/>' }
+  ];
+  var idx = 1;
+  setTimeout(function nextShip(){
+    var s = ships[idx];
+    var nameEl = document.querySelector('.sl-ship-name');
+    var metaEl = document.querySelector('.sl-meta');
+    var imgEl = document.querySelector('.sl-img svg');
+    var stats = document.querySelectorAll('.sl-stat-v');
+    var inner = document.getElementById('spotlight-inner');
+    if(inner){ inner.style.transition='opacity .4s'; inner.style.opacity='0'; }
+    setTimeout(function(){
+      if(nameEl) nameEl.textContent = s.name;
+      if(metaEl) metaEl.textContent = s.meta;
+      if(imgEl) imgEl.innerHTML = s.wire;
+      if(stats[0]) stats[0].textContent = s.dps;
+      if(stats[1]) stats[1].textContent = s.shp;
+      if(stats[2]) stats[2].textContent = s.pwr;
+      if(stats[3]) stats[3].textContent = s.scm;
+      if(stats[4]) stats[4].textContent = s.crew;
+      var go = document.querySelector('.sl-go');
+      if(go) go.href = 'builder.html?ship='+encodeURIComponent(s.name.charAt(0)+s.name.slice(1).toLowerCase());
+      if(inner) inner.style.opacity='1';
+      idx = (idx+1) % ships.length;
+      setTimeout(nextShip, 6500);
+    }, 420);
+  }, 4500);
+})();
+
+// ===== POPULAR BUILDS auto-scroll =====
+(function(){
+  var pop = document.getElementById('popular-inner');
+  if(!pop) return;
+  var dir = 1;
+  setInterval(function(){
+    if(pop.matches(':hover')) return;
+    pop.scrollLeft += dir * 0.6;
+    if(pop.scrollLeft >= pop.scrollWidth - pop.clientWidth - 1) dir = -1;
+    if(pop.scrollLeft <= 0) dir = 1;
+  }, 35);
 })();
 
 // Constellation lines between role nodes
