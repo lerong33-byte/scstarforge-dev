@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HUD Manager v10.48-DEV — AI Build</title>
+<style>
+:root{--bg:#08070d;--w:rgba(232,236,242,.95);--g:rgba(190,205,222,.95);--g-d:rgba(190,205,225,.82);--led:#7bc8e8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;}
+img{max-width:100%;}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--w);
+  font-feature-settings:"tnum" 1;cursor:default;transition:opacity .35s, transform .35s, filter .35s;}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap');
+body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:#01000a url('/bg-space.jpg?v=63') center / cover no-repeat fixed;}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(2,4,10,.88) 0%,rgba(2,4,10,.78) 50%,rgba(2,4,10,.88) 100%);}
+
+#nav{position:fixed;top:0;left:0;right:0;z-index:50;height:32px;display:flex;align-items:center;padding:0 18px;gap:10px;pointer-events:none;}
+#nav > *{pointer-events:auto;}
+#logo{font-size:15px;font-weight:700;letter-spacing:4px;color:var(--g);text-shadow:0 0 8px rgba(180,195,215,.40);margin-right:auto;white-space:nowrap;}
+#logo .ver{font-size:11.5px;letter-spacing:1px;color:rgba(140,132,158,.34);margin-left:4px;}
+
+#nav-mfds{position:fixed;top:38px;right:18px;z-index:60;width:160px;padding:14px 8px 8px;
+  background-color:#0a0d14;background-image:repeating-linear-gradient(90deg,transparent 0,transparent 4px,rgba(0,0,0,.32) 4px,rgba(0,0,0,.32) 5px),linear-gradient(180deg, rgba(36,40,48,.72), rgba(16,20,26,.92));
+  border:1px solid rgba(72,78,88,.65);box-shadow:inset 0 1px 0 rgba(160,168,180,.32),inset 0 -2px 0 rgba(0,0,0,.85),inset 0 0 18px rgba(0,0,0,.55),0 4px 14px rgba(0,0,0,.55);}
+#nav-mfds::before{content:'· NAV ·';position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:14.5px;letter-spacing:3px;font-weight:700;color:rgba(220,235,255,.92);padding:2px 12px 2px 22px;border:1px solid rgba(80,140,200,.45);border-top:none;background:radial-gradient(circle 2.5px at 11px 50%, var(--led) 0%, #1c4880 55%, transparent 80%),linear-gradient(180deg, rgba(20,26,36,.83), rgba(8,10,16,.96));white-space:nowrap;}
+.nav-mfd{position:relative;display:flex;align-items:center;gap:8px;padding:5px 8px 5px 11px;margin-bottom:4px;text-decoration:none;cursor:pointer;background:linear-gradient(180deg,rgba(28,32,40,.82),rgba(12,14,20,.95));border:1px solid rgba(72,80,92,.75);box-shadow:inset 0 1px 0 rgba(140,148,160,.18),inset 0 -1px 0 rgba(0,0,0,.85);transition:background .15s,border-color .15s;}
+.nav-mfd:last-child{margin-bottom:0;}
+.nav-mfd::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--led);box-shadow:0 0 6px rgba(140,200,255,.85);animation:led 2.4s ease-in-out infinite;}
+@keyframes led{0%,55%,100%{opacity:1;}65%{opacity:.35;}}
+.nav-mfd-icon{font-size:15px;color:rgba(220,235,255,.78);line-height:1;flex-shrink:0;}
+.nav-mfd-name{font-size:15px;font-weight:700;letter-spacing:2px;color:rgba(232,240,250,.92);white-space:nowrap;flex:1;font-family:'JetBrains Mono','Roboto Mono',monospace;}
+.nav-mfd:hover{background:linear-gradient(180deg,rgba(40,46,56,.82),rgba(20,24,32,.95));border-color:rgba(140,200,255,.55);}
+.nav-mfd.current{border-color:rgba(140,200,255,.85);background:linear-gradient(180deg,rgba(40,52,72,.82),rgba(20,28,42,.95));box-shadow:inset 0 0 10px rgba(76,160,230,.30);}
+.nav-mfd.current .nav-mfd-name{color:rgba(180,220,255,.95);text-shadow:0 0 8px rgba(140,200,255,.65);}
+
+#title{position:absolute;top:34px;left:50%;transform:translateX(-50%);z-index:20;text-align:center;}
+#title h1{font-family:'Rajdhani','Inter',sans-serif;font-size:32px;letter-spacing:13px;font-weight:700;background:linear-gradient(155deg,#b0b0c0,#fff,#e8e8f0,#c4c4d0,#a0a0b4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-flex;align-items:center;gap:14px;}
+#title .brk{color:rgba(190,205,222,.55);font-weight:300;-webkit-text-fill-color:initial;background:none;}
+#title-sub{font-size:14px;letter-spacing:6px;color:rgba(190,205,225,.82);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:6px;}
+
+#scene{position:fixed;top:120px;left:18px;right:200px;bottom:18px;display:grid;
+  grid-template-columns:minmax(440px,1fr) minmax(560px,1.4fr);gap:24px;overflow:hidden;}
+
+/* === FORM PANEL === */
+#form-panel{overflow-y:auto;padding:14px 18px 14px 4px;display:flex;flex-direction:column;gap:18px;}
+#form-panel::-webkit-scrollbar{width:6px;}
+#form-panel::-webkit-scrollbar-thumb{background:rgba(170,185,205,.20);}
+
+.fp-section{position:relative;padding:18px 20px;background-color:rgba(10,14,22,.72);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(170,200,230,.04) 0px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, rgba(14,18,28,.78), rgba(8,10,16,.92));
+  border:1px solid rgba(80,100,140,.40);
+  box-shadow:inset 0 1px 0 rgba(140,200,255,.18),inset 0 0 14px rgba(0,0,0,.45);
+  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 8px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 8px),0 14px);}
+.fp-hdr{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:11px;letter-spacing:3.5px;font-weight:700;
+  color:rgba(140,200,255,.95);text-shadow:0 0 8px rgba(140,200,255,.45),0 1px 3px rgba(0,0,0,.85);
+  margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(140,200,255,.22);}
+
+/* Build history — last 5 generated builds, clickable to re-open */
+#hist-list{display:flex;flex-direction:column;gap:6px;}
+.hist-row{display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;
+  background:rgba(8,12,20,.55);border-left:2px solid rgba(140,200,255,.45);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  transition:all .2s;}
+.hist-row:hover{background:rgba(140,200,255,.10);border-left-color:rgba(180,220,255,.85);
+  padding-left:14px;}
+.hist-role{font-size:11.5px;letter-spacing:1.5px;font-weight:700;color:rgba(140,200,255,.95);
+  text-shadow:0 0 6px rgba(140,200,255,.45);min-width:90px;}
+.hist-ship{font-size:13px;letter-spacing:1.2px;font-weight:700;color:rgba(245,250,255,1);
+  text-shadow:0 1px 3px rgba(0,0,0,.85);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-when{font-size:10.5px;letter-spacing:.8px;color:rgba(180,200,225,.55);}
+.hist-clear{display:block;width:100%;margin-top:8px;padding:5px 10px;cursor:pointer;
+  font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:11px;letter-spacing:1.5px;font-weight:600;
+  color:rgba(180,200,225,.65);background:transparent;border:none;text-align:center;
+  transition:color .2s;}
+.hist-clear:hover{color:rgba(255,140,128,.95);}
+
+/* Quick-start presets — common SC mission types in one click */
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.quick-tile{position:relative;padding:10px 12px;cursor:pointer;
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  background:rgba(255,200,80,.06);
+  border:1px solid rgba(255,200,80,.32);border-bottom:2px solid rgba(255,200,80,.55);
+  text-shadow:0 1px 3px rgba(0,0,0,.85);
+  transition:all .2s;}
+.quick-tile:hover{background:rgba(255,200,80,.16);border-color:rgba(255,225,170,.95);
+  box-shadow:0 2px 12px rgba(255,200,80,.45);}
+.quick-tile .qt-name{font-size:13px;letter-spacing:1.5px;font-weight:700;color:rgba(255,250,235,1);
+  text-shadow:0 1px 3px rgba(0,0,0,.85),0 0 6px rgba(255,200,80,.45);}
+.quick-tile .qt-sub{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;line-height:1.35;
+  color:rgba(220,232,250,.75);margin-top:3px;}
+
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.role-opt{position:relative;padding:12px 14px;cursor:pointer;
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  background:rgba(8,12,20,.55);
+  border:1px solid rgba(140,200,255,.22);border-bottom:2px solid rgba(140,200,255,.18);
+  transition:all .2s;}
+.role-opt:hover{border-color:rgba(180,220,255,.55);background:rgba(20,32,52,.65);
+  box-shadow:0 0 12px rgba(140,200,255,.20);}
+.role-opt.active{border-color:rgba(255,225,170,.95);border-bottom-color:rgba(255,255,220,.95);
+  background:rgba(255,200,80,.10);
+  box-shadow:0 2px 14px rgba(255,200,80,.55);}
+.role-opt .ro-icon{font-size:18px;line-height:1;color:rgba(180,220,255,.95);
+  text-shadow:0 0 6px rgba(140,200,255,.55);margin-bottom:6px;display:block;}
+.role-opt.active .ro-icon{color:rgba(255,225,170,1);text-shadow:0 0 8px rgba(255,200,80,.65);}
+.role-opt .ro-name{font-size:13px;letter-spacing:1.5px;font-weight:700;color:rgba(245,250,255,1);
+  text-shadow:0 1px 3px rgba(0,0,0,.85);}
+.role-opt .ro-sub{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;line-height:1.4;
+  color:rgba(200,218,238,.75);margin-top:4px;}
+
+.chip-row{display:flex;flex-wrap:wrap;gap:0;align-items:center;}
+.chip-row-lbl{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:11.5px;letter-spacing:2.5px;font-weight:600;
+  color:rgba(140,200,255,.85);min-width:88px;padding:4px 14px 4px 0;text-shadow:0 1px 3px rgba(0,0,0,.85);}
+.fp-chip{position:relative;font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:12.5px;letter-spacing:1.8px;font-weight:600;
+  padding:6px 14px 8px;margin:0 4px 0 0;cursor:pointer;color:rgba(210,225,245,.85);
+  background:transparent;border:none;border-bottom:2px solid rgba(140,200,255,.10);
+  text-shadow:0 1px 3px rgba(0,0,0,.85);transition:all .18s;white-space:nowrap;}
+.fp-chip:hover{color:rgba(255,255,255,1);border-bottom-color:rgba(180,220,255,.55);
+  background:linear-gradient(180deg,transparent 60%,rgba(140,200,255,.08));}
+.fp-chip.active{color:rgba(255,255,255,1);text-shadow:0 0 10px rgba(255,255,255,.55),0 1px 3px rgba(0,0,0,.85);
+  border-bottom-color:rgba(255,255,255,.92);
+  background:linear-gradient(180deg,transparent 55%,rgba(140,200,255,.14));
+  box-shadow:0 2px 10px rgba(140,200,255,.40);}
+
+.fp-input,.fp-select{width:100%;background:rgba(8,12,20,.65);border:1px solid rgba(140,200,255,.35);
+  color:rgba(245,250,255,1);font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14px;letter-spacing:1.5px;padding:10px 12px;outline:none;
+  transition:border-color .2s;}
+.fp-input:focus,.fp-select:focus{border-color:rgba(180,220,255,.85);background:rgba(14,22,38,.75);}
+.fp-select option{background:#0a0e18;color:rgba(232,240,250,.92);}
+.fp-checks{display:flex;flex-wrap:wrap;gap:14px;}
+.fp-check{display:flex;align-items:center;gap:8px;cursor:pointer;
+  font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:12.5px;letter-spacing:1px;font-weight:600;
+  color:rgba(210,225,245,.85);text-shadow:0 1px 3px rgba(0,0,0,.85);}
+.fp-check input{accent-color:#7bc8e8;width:16px;height:16px;cursor:pointer;}
+.fp-check:hover{color:rgba(255,255,255,1);}
+
+.fp-go{position:relative;font-family:'Rajdhani','Inter',sans-serif;font-size:18px;letter-spacing:5px;font-weight:700;
+  padding:14px 28px 16px 50px;cursor:pointer;color:rgba(255,250,235,1);
+  background:radial-gradient(circle 4px at 22px 50%, #ffd070 0%, #c89030 55%, transparent 80%),
+    linear-gradient(180deg, rgba(60,40,12,.82), rgba(28,18,6,.96));
+  border:1px solid rgba(255,200,80,.65);border-bottom:2px solid rgba(255,225,170,.95);
+  text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 8px rgba(255,200,80,.55);
+  box-shadow:0 0 18px rgba(255,200,80,.45),inset 0 1px 0 rgba(255,235,180,.45);
+  transition:all .2s;text-align:left;display:block;width:100%;}
+.fp-go:hover{background:radial-gradient(circle 4px at 22px 50%, #ffe0a0 0%, #d8a040 55%, transparent 80%),
+    linear-gradient(180deg, rgba(80,52,16,.88), rgba(36,22,8,.98));
+  box-shadow:0 0 28px rgba(255,220,140,.85),inset 0 1px 0 rgba(255,250,220,.55);
+  transform:translateY(-1px);}
+.fp-go:active{transform:translateY(0);}
+
+/* === RESULTS PANEL === */
+#results-panel{overflow-y:auto;padding:14px 4px 14px 4px;display:flex;flex-direction:column;gap:14px;
+  border-left:1px solid rgba(140,200,255,.18);padding-left:24px;}
+#results-panel::-webkit-scrollbar{width:6px;}
+#results-panel::-webkit-scrollbar-thumb{background:rgba(170,185,205,.20);}
+
+#rp-empty{margin:auto;padding:60px 24px;text-align:center;color:rgba(220,235,250,.85);
+  font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;font-weight:500;
+  text-shadow:0 1px 3px rgba(0,0,0,.85);}
+#rp-empty .acc{color:rgba(140,200,255,.95);text-shadow:0 0 6px rgba(140,200,255,.45);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;font-weight:700;}
+#rp-empty .icon{font-size:64px;line-height:1;color:rgba(140,200,255,.55);
+  text-shadow:0 0 18px rgba(140,200,255,.45),0 0 36px rgba(140,200,255,.25);
+  display:block;margin-bottom:18px;}
+
+.rp-result{position:relative;padding:18px 20px;background-color:rgba(10,14,22,.78);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(170,200,230,.045) 0px, transparent 1px, transparent 3px),
+    radial-gradient(ellipse 130% 90% at 50% 60%, transparent 30%, rgba(0,0,0,.55) 100%),
+    linear-gradient(180deg, rgba(14,18,28,.78), rgba(8,10,16,.95));
+  border:none;
+  box-shadow:inset 0 0 0 1px rgba(190,210,240,.22),inset 0 0 0 4px rgba(10,14,22,.85),inset 0 0 0 5px rgba(60,80,110,.45),inset 0 0 18px rgba(0,0,0,.55),0 4px 18px rgba(0,0,0,.65),0 0 22px rgba(140,200,255,.18);
+  clip-path:polygon(18px 0,calc(100% - 18px) 0,100% 18px,100% calc(100% - 10px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 10px),0 18px);}
+.rp-result::before{content:'⏵ RECOMMENDED BUILD';position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:11px;letter-spacing:5px;font-weight:700;
+  color:rgba(220,235,255,.95);text-shadow:0 0 6px rgba(140,200,255,.65);
+  padding:3px 14px 3px 24px;border:1px solid rgba(80,140,200,.45);border-top:none;
+  background:radial-gradient(circle 3px at 11px 50%, #4cff80 0%, #1c8830 55%, transparent 80%),linear-gradient(180deg, rgba(20,26,36,.85), rgba(8,10,16,.96));
+  z-index:5;white-space:nowrap;}
+.rp-ship{font-family:'Rajdhani','Inter',sans-serif;font-size:28px;letter-spacing:4px;font-weight:700;
+  color:rgba(255,255,255,1);text-shadow:0 0 10px rgba(180,200,235,.55),0 0 22px rgba(140,200,255,.30);
+  margin-top:18px;padding-bottom:4px;}
+.rp-meta{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:13px;letter-spacing:2px;font-weight:600;
+  color:rgba(210,225,245,.92);text-shadow:0 1px 3px rgba(0,0,0,.85);
+  padding-bottom:14px;border-bottom:1px solid rgba(140,200,255,.22);margin-bottom:14px;}
+.rp-tagline{font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;font-weight:500;
+  color:rgba(225,240,255,.92);font-style:italic;
+  margin-bottom:18px;padding-left:12px;border-left:3px solid rgba(255,200,80,.55);}
+
+/* "ALSO TRY" — quick-swap chips for other ship picks in the same role */
+.rp-altships{margin:6px 0 14px;padding:8px 12px;
+  background:rgba(140,200,255,.06);border-left:2px solid rgba(140,200,255,.45);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:12px;letter-spacing:.5px;line-height:1.5;}
+.rp-altships-lbl{font-weight:700;color:rgba(140,200,255,.85);letter-spacing:1.5px;}
+.rp-altship{cursor:pointer;color:rgba(220,232,250,.92);font-weight:600;
+  text-shadow:0 1px 3px rgba(0,0,0,.85);transition:color .15s,text-shadow .15s;}
+.rp-altship:hover{color:rgba(255,255,255,1);text-shadow:0 0 8px rgba(140,200,255,.65),0 1px 3px rgba(0,0,0,.85);}
+.rp-altship-sep{color:rgba(140,200,255,.35);}
+
+/* Honest advisory — when AI Build picks something the builder doesn't fully support */
+.rp-advisory{margin:0 0 14px;padding:10px 14px;
+  background:rgba(255,200,80,.08);border:1px solid rgba(255,200,80,.45);border-left:3px solid rgba(255,200,80,.85);
+  font-family:'Inter',sans-serif;font-size:13px;line-height:1.5;font-weight:500;
+  color:rgba(255,225,170,.95);text-shadow:0 1px 3px rgba(0,0,0,.85);}
+
+/* Power budget check — visual gauge + verdict */
+.rp-pwrcheck{margin:0 0 18px;padding:12px 16px;
+  background:rgba(140,200,255,.06);border-left:3px solid rgba(140,200,255,.55);}
+.rp-pwrcheck.warn{background:rgba(255,200,80,.10);border-left-color:rgba(255,200,80,.85);}
+.rp-pwrcheck.crit{background:rgba(232,80,48,.12);border-left-color:rgba(232,80,48,.85);}
+.rp-pwr-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-bottom:8px;
+  font-family:'JetBrains Mono','Roboto Mono',monospace;}
+.rp-pwr-l{font-size:11.5px;letter-spacing:2px;font-weight:700;color:rgba(140,200,255,.85);
+  text-shadow:0 0 6px rgba(140,200,255,.35);}
+.rp-pwrcheck.warn .rp-pwr-l{color:rgba(255,210,140,.95);text-shadow:0 0 6px rgba(255,200,80,.45);}
+.rp-pwrcheck.crit .rp-pwr-l{color:rgba(255,160,140,.95);text-shadow:0 0 6px rgba(232,80,48,.45);}
+.rp-pwr-v{font-size:13px;letter-spacing:1.2px;font-weight:700;color:rgba(245,250,255,1);
+  text-shadow:0 1px 3px rgba(0,0,0,.85);}
+.rp-pwr-bar{height:6px;background:rgba(8,12,20,.65);border:1px solid rgba(140,200,255,.30);
+  overflow:hidden;}
+.rp-pwr-fill{height:100%;background:linear-gradient(90deg,rgba(140,200,255,.55),rgba(180,220,255,.95));
+  transition:width .4s cubic-bezier(.2,.9,.3,1);}
+.rp-pwrcheck.warn .rp-pwr-fill{background:linear-gradient(90deg,rgba(255,200,80,.55),rgba(255,225,170,.95));}
+.rp-pwrcheck.crit .rp-pwr-fill{background:linear-gradient(90deg,rgba(232,80,48,.55),rgba(255,140,128,.95));}
+
+/* Tactical advice — "how to fly this build" — gold-accent panel for actionable doctrine */
+.rp-tactics{margin:0 0 18px;padding:14px 16px;
+  background:rgba(255,200,80,.08);
+  border-left:3px solid rgba(255,200,80,.65);
+  box-shadow:inset 0 0 18px rgba(255,200,80,.05);}
+.rp-tac-hdr{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:12px;letter-spacing:3px;font-weight:700;
+  color:rgba(255,225,170,1);text-shadow:0 0 8px rgba(255,200,80,.55),0 1px 3px rgba(0,0,0,.85);
+  margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,200,80,.30);}
+.rp-tac-list{list-style:none;padding:0;margin:0;}
+.rp-tac-list li{font-family:'Inter',sans-serif;font-size:13.5px;line-height:1.55;font-weight:500;
+  color:rgba(225,240,255,.92);padding:5px 0 5px 18px;position:relative;
+  text-shadow:0 1px 3px rgba(0,0,0,.65);}
+.rp-tac-list li::before{content:'▸';position:absolute;left:0;top:5px;
+  color:rgba(255,210,140,.85);font-weight:700;font-size:14px;
+  text-shadow:0 0 5px rgba(255,200,80,.55);}
+.rp-tac-list li + li{border-top:1px dashed rgba(255,200,80,.18);}
+
+/* Summary stats — aggregate numbers from the full pick set */
+.rp-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px;
+  padding:14px;background:rgba(8,12,20,.45);border-left:2px solid rgba(140,200,255,.65);}
+.rp-sum-cell{display:flex;flex-direction:column;align-items:flex-start;gap:3px;}
+.rp-sum-l{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:10.5px;letter-spacing:1.5px;font-weight:700;
+  color:rgba(140,200,255,.85);text-shadow:0 0 5px rgba(140,200,255,.35);}
+.rp-sum-v{font-family:'Rajdhani','Inter',sans-serif;font-size:18px;letter-spacing:1.5px;font-weight:700;
+  color:rgba(245,250,255,1);text-shadow:0 0 8px rgba(180,200,235,.45),0 1px 3px rgba(0,0,0,.85);}
+
+.rp-section{margin-bottom:14px;}
+.rp-sec-hdr{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:12px;letter-spacing:3px;font-weight:700;
+  color:rgba(140,200,255,.95);text-shadow:0 0 6px rgba(140,200,255,.35),0 1px 3px rgba(0,0,0,.85);
+  margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(140,200,255,.14);}
+.rp-pick{padding:8px 12px;margin-bottom:6px;
+  background:rgba(140,200,255,.06);border-left:2px solid rgba(140,200,255,.55);}
+.rp-pick:hover{background:rgba(140,200,255,.10);}
+.rp-pick-name{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:14px;letter-spacing:1.5px;font-weight:700;
+  color:rgba(245,250,255,1);text-shadow:0 1px 3px rgba(0,0,0,.85);}
+.rp-pick-meta{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:11.5px;letter-spacing:1px;font-weight:600;
+  color:rgba(180,210,235,.78);margin-top:3px;text-shadow:0 1px 3px rgba(0,0,0,.85);}
+.rp-pick-why{font-family:'Inter',sans-serif;font-size:13px;line-height:1.55;font-weight:500;
+  color:rgba(220,232,250,.85);margin-top:6px;text-shadow:0 1px 3px rgba(0,0,0,.65);}
+.rp-alts{margin-top:8px;padding-top:6px;border-top:1px dashed rgba(140,200,255,.18);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:11px;letter-spacing:.5px;
+  color:rgba(180,210,235,.72);text-shadow:0 1px 3px rgba(0,0,0,.85);line-height:1.4;}
+.rp-alts-lbl{font-weight:700;color:rgba(140,200,255,.85);letter-spacing:1.5px;}
+.rp-alt{color:rgba(220,232,250,.85);font-weight:600;}
+.rp-alt-sep{color:rgba(140,200,255,.40);}
+
+.rp-actions{margin-top:18px;padding-top:14px;border-top:1px dashed rgba(140,200,255,.22);
+  display:flex;gap:10px;flex-wrap:wrap;}
+.rp-btn{position:relative;font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:13px;letter-spacing:2.5px;font-weight:700;
+  padding:8px 16px 10px;cursor:pointer;color:rgba(220,238,255,.95);
+  background:rgba(140,200,255,.08);border:1px solid rgba(140,200,255,.55);border-bottom:2px solid rgba(140,200,255,.65);
+  text-shadow:0 1px 3px rgba(0,0,0,.95);transition:all .2s;text-decoration:none;display:inline-block;}
+.rp-btn:hover{color:rgba(255,255,255,1);border-color:rgba(180,220,255,.95);
+  background:rgba(140,200,255,.18);box-shadow:0 2px 12px rgba(140,200,255,.40);}
+.rp-btn.fight{color:rgba(255,140,128,.95);border-color:rgba(232,80,48,.55);background:rgba(232,80,48,.08);}
+.rp-btn.fight:hover{background:rgba(232,80,48,.20);border-color:rgba(232,80,48,.85);}
+.rp-btn.save{color:rgba(255,225,170,.95);border-color:rgba(255,200,80,.55);background:rgba(255,200,80,.08);}
+.rp-btn.save:hover{background:rgba(255,200,80,.20);border-color:rgba(255,225,170,.95);}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(140,200,255,.30);
+  border-top-color:rgba(140,200,255,.95);border-radius:50%;animation:spin .8s linear infinite;
+  vertical-align:middle;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Toast */
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;
+  padding:14px 26px;background:linear-gradient(180deg,rgba(20,30,50,.89),rgba(8,14,28,.98));
+  border:1px solid rgba(140,200,255,.65);color:rgba(220,235,255,.95);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:13.5px;letter-spacing:2px;font-weight:600;
+  opacity:0;pointer-events:none;transition:opacity .25s;}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div id="nav"><div id="logo">H.U.D MANAGER <span class="ver">v10.48-DEV</span> <span id="tut-trigger" title="Help / Tutorial">?</span></div></div>
+<div id="nav-mfds">
+  <a class="nav-mfd" href="/"><div class="nav-mfd-icon">⌂</div><div class="nav-mfd-name">DASHBOARD</div></a>
+  <a class="nav-mfd" href="builder.html"><div class="nav-mfd-icon">⚙</div><div class="nav-mfd-name">BUILDER</div></a>
+  <a class="nav-mfd" href="fleet.html"><div class="nav-mfd-icon">⛟</div><div class="nav-mfd-name">FLEET</div></a>
+  <a class="nav-mfd" href="weapons.html"><div class="nav-mfd-icon">⛯</div><div class="nav-mfd-name">WEAPONS</div></a>
+  <a class="nav-mfd" href="showdown.html"><div class="nav-mfd-icon">⚔</div><div class="nav-mfd-name">SHOWDOWN</div></a>
+  <a class="nav-mfd" href="loadouts.html"><div class="nav-mfd-icon">⛃</div><div class="nav-mfd-name">LOADOUTS</div></a>
+  <a class="nav-mfd current" href="recommend.html"><div class="nav-mfd-icon">◈</div><div class="nav-mfd-name">AI BUILD</div></a>
+</div>
+<div id="title">
+  <h1><span class="brk">⟦</span>AI BUILD<span class="brk">⟧</span></h1>
+  <div id="title-sub">PICK A ROLE · GET A LOADOUT · FIGHT WITH IT</div>
+</div>
+
+<div id="scene">
+  <div id="form-panel">
+    <div class="fp-section">
+      <div class="fp-hdr">⚡ QUICK START · COMMON MISSIONS</div>
+      <div class="quick-grid" id="quick-grid"></div>
+      <div style="font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;color:rgba(180,200,225,.65);margin-top:8px;line-height:1.5">
+        Or configure manually below ↓
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <div class="fp-hdr">⏵ STEP 1 · ROLE</div>
+      <div class="role-grid" id="role-grid"></div>
+    </div>
+
+    <div class="fp-section">
+      <div class="fp-hdr">⏵ STEP 2 · COMBAT MODE</div>
+      <div class="chip-row">
+        <span class="chip-row-lbl">MODE</span>
+        <span class="fp-chip active" data-key="mode" data-val="PVE">PVE</span>
+        <span class="fp-chip" data-key="mode" data-val="PVP">PVP</span>
+      </div>
+      <div class="chip-row" style="margin-top:8px">
+        <span class="chip-row-lbl">TARGET</span>
+        <span class="fp-chip active" data-key="target" data-val="LIGHT">LIGHT</span>
+        <span class="fp-chip" data-key="target" data-val="MEDIUM">MEDIUM</span>
+        <span class="fp-chip" data-key="target" data-val="HEAVY">HEAVY</span>
+        <span class="fp-chip" data-key="target" data-val="CAPITAL">CAPITAL</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <div class="fp-hdr">⏵ STEP 3 · BUDGET</div>
+      <div class="chip-row">
+        <span class="chip-row-lbl">aUEC</span>
+        <span class="fp-chip" data-key="budget" data-val="STOCK">STOCK</span>
+        <span class="fp-chip active" data-key="budget" data-val="MID">MID</span>
+        <span class="fp-chip" data-key="budget" data-val="WHALE">WHALE</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <div class="fp-hdr">⏵ STEP 4 · SHIP (OPTIONAL)</div>
+      <input id="ship-pick" class="fp-input" type="text" placeholder="Leave blank to auto-pick best ship for the role" autocomplete="off" />
+      <div style="font-family:'Inter',sans-serif;font-size:12px;color:rgba(180,200,225,.60);margin-top:6px;line-height:1.5">
+        Type a ship name and press <b>Enter</b> to lock it. Otherwise the engine picks the best ship in the role.
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <div class="fp-hdr">⏵ STEP 5 · CONSTRAINTS</div>
+      <div class="fp-checks">
+        <label class="fp-check"><input type="checkbox" data-cn="stealth"> STEALTH PRIORITY</label>
+        <label class="fp-check"><input type="checkbox" data-cn="long_range"> LONG-RANGE BIAS</label>
+        <label class="fp-check"><input type="checkbox" data-cn="sustain"> LONG ENGAGEMENT</label>
+      </div>
+    </div>
+
+    <button class="fp-go" id="go-btn">▶ GENERATE BUILD</button>
+
+    <div class="fp-section" id="hist-section" style="display:none">
+      <div class="fp-hdr">⏱ RECENT BUILDS · CLICK TO RE-OPEN</div>
+      <div id="hist-list"></div>
+    </div>
+  </div>
+
+  <div id="results-panel">
+    <div id="rp-empty">
+      <span class="icon">◈</span>
+      <div>Pick your <span class="acc">ROLE</span>, <span class="acc">MODE</span>, <span class="acc">TARGET</span> and <span class="acc">BUDGET</span> on the left.</div>
+      <div style="margin-top:14px">The AI Build engine will pick the best ship + weapons + components for the task — and explain why each pick was made.</div>
+      <div style="margin-top:14px;font-size:11px;letter-spacing:2px;color:rgba(255,200,80,.85)">PHASE 1 · RULE-BASED RECOMMENDATIONS · CURATED META COMING IN PHASE 2</div>
+    </div>
+    <div id="rp-content" style="display:none"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+document.querySelectorAll('.nav-mfd').forEach(function(a){
+  a.addEventListener('click', function(ev){
+    if(a.classList.contains('current')){ ev.preventDefault(); return; }
+    var href = a.getAttribute('href');if(!href || href === '#') return;
+    ev.preventDefault();document.body.style.opacity='0';document.body.style.transform='scale(1.06)';document.body.style.filter='blur(8px)';
+    setTimeout(function(){ location.href = href; }, 380);
+  });
+});
+
+// ===========================================================================
+// AI BUILD — RULE-BASED RECOMMENDATION ENGINE
+// ===========================================================================
+
+// ── ROLES ─────────────────────────────────────────────────────────────────
+var ROLES = [
+  { key:'BOUNTY',     icon:'⚔',  name:'Bounty Hunter', sub:'Take out PVE bounty targets, fighter to gunship size.' },
+  { key:'PVP_DOG',    icon:'☄',  name:'PVP Dogfight',   sub:'Pure ship-vs-ship combat. Pilot skill matters most.' },
+  { key:'STEALTH',    icon:'☽',  name:'Stealth Ops',    sub:'Low-EM/IR sneaking. First-strike from cover.' },
+  { key:'BOMBER',     icon:'⌖',  name:'Anti-Capital',   sub:'Torpedoes vs frigates and capitals. Single-pass strike.' },
+  { key:'MINER',      icon:'⛏',  name:'Mining',         sub:'Quantanium, gemstones. Solo or fleet support.' },
+  { key:'SALVAGE',    icon:'⚒',  name:'Salvage',        sub:'Strip hulls, recover RMC and CM.' },
+  { key:'CARGO',      icon:'⛟',  name:'Cargo / Trade',  sub:'Move freight legal or grey-market. Survive ambushes.' },
+  { key:'EXPLORER',   icon:'⊚',  name:'Explorer',       sub:'Long-range pathfinding. Self-sufficient.' },
+  { key:'MEDIC',      icon:'+',  name:'Medic / Support',sub:'Rescue ops, ground recovery, in-combat heals.' },
+  { key:'REFUEL',     icon:'⛽',  name:'Refuel / Logistics',sub:'Service-fleet support — stay alive, stay close.' },
+];
+
+// Missile weights per role (separate from main weapon — applied to MISSILE picks)
+var MISSILE_WEIGHTS = {
+  BOUNTY:    { range:0.30, speed:0.20 },
+  PVP_DOG:   { range:0.30, speed:0.40 },
+  STEALTH:   { range:0.50, speed:0.20 },
+  BOMBER:    { range:0.20 }, // bombers prefer torpedoes — handled by primary weapon weight
+  MINER:     { range:0.20 },
+  SALVAGE:   { range:0.20 },
+  CARGO:     { range:0.40, speed:0.30 },
+  EXPLORER:  { range:0.30 },
+  MEDIC:     { range:0.20 },
+  REFUEL:    { range:0.20 },
+};
+
+// Role weights — score components by these stat weights. Sum is meaningful relative.
+// Higher = role wants this stat more. Negative = role wants LESS of it (e.g. EM signature).
+// Component picks use these on stat fields available in scwiki.json.
+// Note: scwiki.json fields actually available per category:
+//   weapons: dps, sustained, alphaTotal, alphaEnergy, alphaPhysical, range, rpm, drawPerShot, capacityMax, capacityRegen, speed
+//   pp:      outEU, em_max, health
+//   sg:      regen, drawEU, em_max, health
+//   cooler:  drawEU, ir, health
+//   qd:      drawEU, em_max
+//   radar:   drawEU, distMax
+//   missiles: speed, range, lifetime
+// Weights below only reference real fields. Anything missing is silently skipped by the scorer.
+var ROLE_WEIGHTS = {
+  BOUNTY: {
+    weapon:    { dps:0.30, alphaTotal:0.20, sustained:0.20, range:0.15, capSustain:0.10, hullDPS:0.05 },
+    pp:        { outEU:0.50, em_max:-0.20, health:0.30 },
+    sg:        { regen:0.40, em_max:-0.15, health:0.30, drawEU:-0.15 },
+    cooler:    { ir:-0.50, drawEU:-0.20, health:0.30 },
+    qd:        { drawEU:-0.30, em_max:-0.20 },
+    radar:     { distMax:0.50, drawEU:-0.20 },
+    tagline:   'Sustained DPS and capacitor longevity for hardened PVE targets. Anti-fighter to anti-gunship coverage.',
+    tactics: [
+      'Identify the target type before engaging — bounty briefing tells you what hardpoints they\'re running.',
+      'Open at max range to chip shields with energy DPS before they get a missile lock.',
+      'Close to optimal range when shields drop; ballistic alpha or mass driver finishes hull fast.',
+      'Save missiles for finishers or breaking heavy shield regen — don\'t spam early.',
+      'Watch your cap; if you\'re burst-limited, hold fire during their evasion windows.',
+    ],
+  },
+  PVP_DOG: {
+    weapon:    { alphaTotal:0.40, dps:0.25, sustained:0.10, range:0.10, speed:0.15 },
+    pp:        { outEU:0.55, em_max:-0.25, health:0.20 },
+    sg:        { regen:0.50, em_max:-0.20, health:0.30 },
+    cooler:    { ir:-0.55, drawEU:-0.20, health:0.25 },
+    qd:        { drawEU:-0.20, em_max:-0.10 },
+    radar:     { distMax:0.40, drawEU:-0.20 },
+    tagline:   'Burst alpha to break shields fast. Pilot skill carries — gear gives first-strike advantage.',
+    tactics: [
+      'First-strike doctrine: full alpha on opening pass, break their shields before they recover.',
+      'Stay angular — flying head-on into someone with similar gear is a flat coin flip.',
+      'Track-and-snap rather than chase; predictive aim with energy weapons beats raw DPS in dogfights.',
+      'Reposition behind them when you\'re below 60% shields; energy regen catches up fast.',
+      'If you can\'t kill in two passes, disengage and re-approach; stalemates favor the worse pilot.',
+    ],
+  },
+  STEALTH: {
+    weapon:    { alphaTotal:0.55, range:0.20, dps:0.15, sustained:0.10 },
+    pp:        { em_max:-0.70, outEU:0.30 },
+    sg:        { em_max:-0.55, regen:0.25, health:0.20 },
+    cooler:    { ir:-0.85, drawEU:-0.25 },
+    qd:        { em_max:-0.50, drawEU:-0.30 },
+    radar:     { distMax:0.30, drawEU:-0.30 },
+    tagline:   'Lowest possible signature. Single high-alpha pass before detection. Disengage cold.',
+    tactics: [
+      'Approach with shield AND power plant cycled OFF — only the QD running. EM signature must stay below their radar threshold.',
+      'Cycle cooler ON only inside ~3km from target. Heat builds fast but you only need a 10-second window.',
+      'Single high-alpha hit, immediate full QT charge — don\'t linger to confirm the kill.',
+      'If detected before contact, abort the run; coming in hot defeats the doctrine.',
+      'Carry distortion or EMP secondary for soft-kill if alpha doesn\'t break shields outright.',
+    ],
+  },
+  BOMBER: {
+    weapon:    { alphaTotal:0.60, dps:0.10, range:0.20, hullDPS:0.10 },
+    pp:        { outEU:0.45, em_max:-0.30, health:0.25 },
+    sg:        { health:0.40, regen:0.30, em_max:-0.30 },
+    cooler:    { ir:-0.50, drawEU:-0.30, health:0.25 },
+    qd:        { drawEU:-0.30, em_max:-0.20 },
+    radar:     { distMax:0.45, drawEU:-0.20 },
+    tagline:   'Torpedo delivery. EM/IR low enough to close, alpha big enough to one-shot. Egress fast.',
+    tactics: [
+      'Designate target with a forward scout if possible — saves your ammo and keeps you out of detection range longer.',
+      'S9/S10 torpedoes from outside SCM — no need to close into their PDC envelope.',
+      'After release, immediate boost away. The target\'s escorts will flush toward your ingress vector — don\'t go back the way you came.',
+      'On capital hulls, focus a single quadrant to take down shield generators before component-killing.',
+      'Carry a defensive missile rack for escort-fighters that intercept your run.',
+    ],
+  },
+  MINER: {
+    weapon:    { dps:0.10, range:0.15, alphaTotal:0.10 },
+    pp:        { outEU:0.55, health:0.35 },
+    sg:        { regen:0.30, health:0.50, drawEU:-0.20 },
+    cooler:    { drawEU:-0.40, health:0.50 },
+    qd:        { drawEU:-0.20, em_max:-0.10 },
+    radar:     { distMax:0.45, drawEU:-0.10 },
+    tagline:   'Heat capacity for mining-laser sustain, durable shields for ambush survival, max radar to see threats early.',
+    tactics: [
+      'Run scanner sweep before approaching any rock — quantanium signatures are distinctive on long-range radar.',
+      'Hit the rock at Inert phase only; overcharge cracks the rock and ejects all gems.',
+      'Mining laser modulation: balance Inner Resistance with Optimal Charge Window — different consumables shift the sweet spot.',
+      'Carry consumables: Cambio-SLI for harder gems, Surge Module for Quantanium runs.',
+      'If you see another player on radar within 8km, prep QD — pirates target loaded miners specifically.',
+    ],
+  },
+  SALVAGE: {
+    weapon:    { dps:0.10, range:0.15 },
+    pp:        { outEU:0.50, health:0.40 },
+    sg:        { health:0.55, regen:0.25 },
+    cooler:    { drawEU:-0.40, health:0.45 },
+    qd:        { drawEU:-0.20 },
+    radar:     { distMax:0.35, drawEU:-0.15 },
+    tagline:   'Heavy duty for sustained scraping ops, hardened shields for grey-market disputes.',
+    tactics: [
+      'Scout the wreck before docking — derelicts can be mission bait. If lighting on the hull is on, leave.',
+      'Disabling phase first — strip RMC across the entire hull surface, then pivot to construction-material extraction.',
+      'Tractor beam to manage hulls that don\'t hold orientation; saves multi-tool bursts on positioning.',
+      'Salvage zones near grey-market hubs see other salvager disputes — keep shields up between targets.',
+      'Sell schedule: RMC at the highest-paying grey-market refinery; vanilla CM is fine at any UEE outpost.',
+    ],
+  },
+  CARGO: {
+    weapon:    { dps:0.20, range:0.20, alphaTotal:0.10 },
+    pp:        { outEU:0.45, em_max:-0.35, health:0.20 },
+    sg:        { health:0.55, regen:0.30, em_max:-0.15 },
+    cooler:    { ir:-0.40, drawEU:-0.25 },
+    qd:        { drawEU:-0.30, em_max:-0.20 },
+    radar:     { distMax:0.60, drawEU:-0.10 },
+    tagline:   'Maximum radar to spot ambushes early, hardened shield to outrun trouble, low signatures to slip past patrols.',
+    tactics: [
+      'Plot indirect quantum routes — pirate camps watch the most-direct lanes between trade hubs.',
+      'Run with shield up, weapons disarmed; armed merchant signature draws security AI.',
+      'Watch radar bookmarks: anything in your QD path that\'s NOT on the route is probably an interceptor.',
+      'For grey-market routes use stealth components; for legal cargo, max radar + speed wins more often.',
+      'Have a panic-route bookmarked — lawful jurisdiction or a populated station you can dock at fast.',
+    ],
+  },
+  EXPLORER: {
+    weapon:    { range:0.30, dps:0.15, alphaTotal:0.10 },
+    pp:        { outEU:0.50, health:0.35 },
+    sg:        { regen:0.50, health:0.30, em_max:-0.10 },
+    cooler:    { drawEU:-0.30, health:0.40 },
+    qd:        { drawEU:-0.40, em_max:-0.10 },
+    radar:     { distMax:0.75, drawEU:-0.10 },
+    tagline:   'Maximum radar pickup and durable shields. Solo encounters far from help; gear must be self-sufficient.',
+    tactics: [
+      'Plot range-extender QDs in series — quantanium fuel costs add up on long expeditions.',
+      'Carry redundant supplies: spare power plant, shield generator, and full med-bay stocks.',
+      'Bookmark every Lagrange and POI — exploration ships earn most of their value in discovered locations.',
+      'Run radar sweep at every system entry; fully scan suspicious signatures before approaching.',
+      'Have an extraction protocol — if you discover something valuable, log location and exfiltrate before broadcasting.',
+    ],
+  },
+  MEDIC: {
+    weapon:    { dps:0.10, range:0.20 },
+    pp:        { outEU:0.55, health:0.40 },
+    sg:        { health:0.65, regen:0.35 },
+    cooler:    { drawEU:-0.30, health:0.40 },
+    qd:        { drawEU:-0.30 },
+    radar:     { distMax:0.55, drawEU:-0.15 },
+    tagline:   'Get there fast, survive while extracting. Combat secondary; durability primary.',
+    tactics: [
+      'Speed and time-to-arrive are the metric — accept rescue beacons within QD range first.',
+      'On approach, identify whether it\'s an active firefight or post-incident; engage cautiously vs disengage to land.',
+      'Land on the dorsal/leeward side of disabled ships — gives you ground recovery cover.',
+      'Always carry a Cambio-SLI med pen kit and oxygen reserves for ground patient stabilization.',
+      'Charge full hospital bay before takeoff — RegenT3 takes a Tier-3 bed which most service ships don\'t have.',
+    ],
+  },
+  REFUEL: {
+    weapon:    { dps:0.10, range:0.25 },
+    pp:        { outEU:0.55, health:0.40 },
+    sg:        { health:0.65, regen:0.30 },
+    cooler:    { drawEU:-0.30, health:0.45 },
+    qd:        { drawEU:-0.30 },
+    radar:     { distMax:0.55, drawEU:-0.10 },
+    tagline:   'Service ops. Stay alive in the support window; max-radar so clients can find you (and threats can\'t surprise you).',
+    tactics: [
+      'Park at high-traffic transit chokepoints — Crusader–microTech, Hurston–ArcCorp lanes.',
+      'Scoop hydrogen at gas giants between client jobs to keep tanks full while waiting.',
+      'Set quote based on client urgency: emergency calls pay 2-3x standard rates.',
+      'Have an escort fighter on standby — refueler signature is unmistakable to pirates.',
+      'Don\'t refuel anyone whose ship is on radar with a Crime Stat — UEE security will engage you both.',
+    ],
+  },
+};
+
+// Ship-class fit per role — rough hint for "auto-pick best ship"
+var ROLE_SHIP_BIAS = {
+  BOUNTY:   { roles:['fighter','interceptor'], sizes:[2,3,4] },
+  PVP_DOG:  { roles:['fighter','interceptor','interdiction'], sizes:[1,2,3] },
+  STEALTH:  { roles:['fighter','interdiction','bomber'], sizes:[2,3,4] },
+  BOMBER:   { roles:['bomber','torpedo'], sizes:[3,4,5] },
+  MINER:    { roles:['mining','prospector'], sizes:[1,2,3,4] },
+  SALVAGE:  { roles:['salvage','reclaim'], sizes:[1,2,3,4] },
+  CARGO:    { roles:['cargo','transport','hauler','freight'], sizes:[3,4,5] },
+  EXPLORER: { roles:['exploration','explorer','expedition','pathfinder'], sizes:[2,3,4,5] },
+  MEDIC:    { roles:['medical','support','rescue'], sizes:[1,2,3,4] },
+  REFUEL:   { roles:['refuel','tanker'], sizes:[3,4,5] },
+};
+
+// ── DATA ────────────────────────────────────────────────────────────────
+var DATA = null;
+var META = null; // /data/meta-knowledge.json — community curation overlay
+var TOOLS = null; // /data/tools.json — mining heads + salvage modules
+Promise.all([
+  fetch('/data/scwiki.json?v=20').then(function(r){return r.json();}),
+  fetch('/data/meta-knowledge.json?v=1').then(function(r){return r.json();}).catch(function(){return null;}),
+  fetch('/data/tools.json?v=1').then(function(r){return r.json();}).catch(function(){return null;})
+]).then(function(out){
+  DATA = out[0];
+  META = out[1];
+  TOOLS = out[2];
+  buildShipTypeahead();
+  document.querySelectorAll('.fp-chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      var k = c.dataset.key;
+      document.querySelectorAll('.fp-chip[data-key="'+k+'"]').forEach(function(o){o.classList.remove('active');});
+      c.classList.add('active');
+    });
+  });
+  // Honor ?ship=<name> URL param (fleet → AI BUILD button passes ship through)
+  var qs = new URLSearchParams(location.search);
+  var preShip = qs.get('ship');
+  if(preShip && DATA && DATA.ships){
+    if(!DATA.ships[preShip]){
+      var lo = preShip.toLowerCase();
+      var key = Object.keys(DATA.ships).find(function(n){return n.toLowerCase() === lo;}) ||
+                Object.keys(DATA.ships).find(function(n){return n.toLowerCase().indexOf(lo) >= 0;});
+      if(key) preShip = key;
+    }
+    var input = document.getElementById('ship-pick');
+    if(input){ input.value = preShip; }
+    setTimeout(generate, 250);
+  }
+}).catch(function(e){
+  console.error('Failed to load data', e);
+  toast('✗ FAILED TO LOAD SHIP DATA');
+});
+
+// Look up meta-knowledge boost for a component picked under a given role
+function metaBoost(role, category, itemName){
+  if(!META || !META.boosts || !META.boosts[role]) return 0;
+  var bucket = META.boosts[role][category];
+  if(!bucket) return 0;
+  var lo = (itemName||'').toLowerCase();
+  // Substring match — keys are short brand/model fragments like "Panther Repeater"
+  for(var k in bucket){
+    if(lo.indexOf(k.toLowerCase()) >= 0) return bucket[k];
+  }
+  return 0;
+}
+function isBlacklisted(itemName){
+  if(!META || !META.blacklist) return false;
+  var lo = (itemName||'').toLowerCase();
+  return META.blacklist.some(function(b){return lo.indexOf(b.toLowerCase()) >= 0;});
+}
+
+// ── ROLE GRID ────────────────────────────────────────────────────────────
+// ── QUICK START PRESETS ──────────────────────────────────────────────
+// Each preset maps to a complete form state (role + mode + target + budget + constraints)
+// Click → populates the form and immediately generates a build
+var QUICK_PRESETS = [
+  { name:'VLRT BOUNTY',     sub:'Very Low Risk Target — solo PVE bounty',         role:'BOUNTY',   mode:'PVE', target:'LIGHT',   budget:'STOCK', constraints:[] },
+  { name:'ERT BOUNTY',      sub:'Extreme Risk — gunship/capital PVE',              role:'BOUNTY',   mode:'PVE', target:'HEAVY',   budget:'WHALE', constraints:['sustain'] },
+  { name:'PVP DOGFIGHT',    sub:'Open-world player combat',                        role:'PVP_DOG',  mode:'PVP', target:'MEDIUM',  budget:'MID',   constraints:[] },
+  { name:'9-TAILS LOCKDOWN',sub:'Stealth strike on pirate base',                   role:'STEALTH',  mode:'PVE', target:'MEDIUM',  budget:'WHALE', constraints:['stealth'] },
+  { name:'TORPEDO RUN',     sub:'Anti-capital bomber doctrine',                    role:'BOMBER',   mode:'PVE', target:'CAPITAL', budget:'WHALE', constraints:['stealth'] },
+  { name:'QUANTANIUM RUN',  sub:'Solo deep-space mining',                          role:'MINER',    mode:'PVE', target:'LIGHT',   budget:'MID',   constraints:[] },
+  { name:'SCRAP HAUL',      sub:'Multi-tool salvage ops',                          role:'SALVAGE',  mode:'PVE', target:'LIGHT',   budget:'MID',   constraints:[] },
+  { name:'TRADE HAUL',      sub:'Long-range cargo with self-defense',              role:'CARGO',    mode:'PVE', target:'LIGHT',   budget:'MID',   constraints:[] },
+];
+
+var quickGrid = document.getElementById('quick-grid');
+quickGrid.innerHTML = QUICK_PRESETS.map(function(p, i){
+  return '<div class="quick-tile" data-idx="'+i+'"><div class="qt-name">'+p.name+'</div><div class="qt-sub">'+p.sub+'</div></div>';
+}).join('');
+quickGrid.querySelectorAll('.quick-tile').forEach(function(el){
+  el.addEventListener('click', function(){
+    var p = QUICK_PRESETS[parseInt(el.dataset.idx, 10)];
+    if(!p) return;
+    SELECTED_ROLE = p.role;
+    document.querySelectorAll('.role-opt').forEach(function(o){
+      o.classList.toggle('active', o.dataset.role === p.role);
+    });
+    ['mode','target','budget'].forEach(function(k){
+      var v = p[k];
+      document.querySelectorAll('.fp-chip[data-key="'+k+'"]').forEach(function(c){
+        c.classList.toggle('active', c.dataset.val === v);
+      });
+    });
+    var allCns = ['stealth','long_range','sustain'];
+    allCns.forEach(function(c){
+      var cb = document.querySelector('.fp-check input[data-cn="'+c+'"]');
+      if(cb) cb.checked = p.constraints.indexOf(c) >= 0;
+    });
+    // Auto-generate so users see result instantly
+    generate();
+  });
+});
+
+var roleGrid = document.getElementById('role-grid');
+var SELECTED_ROLE = 'BOUNTY';
+roleGrid.innerHTML = ROLES.map(function(r, i){
+  return '<div class="role-opt'+(i===0?' active':'')+'" data-role="'+r.key+'">'+
+    '<span class="ro-icon">'+r.icon+'</span>'+
+    '<div class="ro-name">'+r.name+'</div>'+
+    '<div class="ro-sub">'+r.sub+'</div>'+
+  '</div>';
+}).join('');
+roleGrid.querySelectorAll('.role-opt').forEach(function(el){
+  el.addEventListener('click', function(){
+    roleGrid.querySelectorAll('.role-opt').forEach(function(o){o.classList.remove('active');});
+    el.classList.add('active');
+    SELECTED_ROLE = el.dataset.role;
+  });
+});
+
+// ── SHIP TYPEAHEAD ───────────────────────────────────────────────────────
+function buildShipTypeahead(){
+  var input = document.getElementById('ship-pick');
+  if(!input || !DATA || !DATA.ships) return;
+  var names = Object.keys(DATA.ships).sort();
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      var v = input.value.trim().toLowerCase();
+      var match = names.find(function(n){return n.toLowerCase() === v;}) ||
+                  names.find(function(n){return n.toLowerCase().indexOf(v) >= 0;});
+      if(match){ input.value = match; toast('✓ LOCKED · '+match); }
+      else { toast('✗ NO SHIP MATCHES'); }
+    }
+  });
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────
+function getActiveChip(key){
+  var el = document.querySelector('.fp-chip[data-key="'+key+'"].active');
+  return el ? el.dataset.val : null;
+}
+function getConstraints(){
+  var out = {};
+  document.querySelectorAll('.fp-check input:checked').forEach(function(cb){ out[cb.dataset.cn] = true; });
+  return out;
+}
+function fmtK(n){ if(!n) return '--'; if(n>=1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M'; if(n>=1e3) return Math.round(n/1e3)+'k'; return Math.round(n).toLocaleString(); }
+function toast(msg, ms){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ t.classList.remove('show'); }, ms || 1800);
+}
+
+// ── ENGINE: pick best component for a slot given role weights ───────────
+function scoreItem(item, weights){
+  if(!item || !weights) return 0;
+  // Normalize each stat against a generic "good" magnitude before applying weight
+  var s = 0;
+  Object.keys(weights).forEach(function(k){
+    var v = item[k];
+    if(typeof v !== 'number' || !isFinite(v)) return;
+    // Loose normalization based on stat name (rough magnitudes from scwiki data)
+    var norm = 1;
+    if(k === 'em_max' || k === 'ir')                norm = 1/3000;     // smaller is better, weights are negative
+    else if(k === 'distMax' || k === 'em_max')      norm = 1/3000;
+    else if(k === 'outEU')                          norm = 1/100;
+    else if(k === 'regen')                          norm = 1/2000;
+    else if(k === 'rate' || k === 'cooling')        norm = 1/200;
+    else if(k === 'health')                         norm = 1/8000;
+    else if(k === 'drawEU')                         norm = 1/30;       // smaller is better
+    else if(k === 'dps' || k === 'sustained' || k === 'shieldDPS' || k === 'hullDPS') norm = 1/2000;
+    else if(k === 'alphaTotal')                     norm = 1/3000;
+    else if(k === 'range')                          norm = 1/3500;
+    else if(k === 'capSustain')                     norm = 1/30;
+    else if(k === 'speed')                          norm = 1/4000;     // projectile speed
+    s += v * norm * weights[k];
+  });
+  return s;
+}
+
+// Re-roll counter — increments on every RE-ROLL, used to cycle through alternates.
+// Resets when the user changes role / target / budget / etc (different params = fresh top pick).
+var REROLL_OFFSET = 0;
+var LAST_PARAMS_KEY = '';
+
+function pickBest(category, constraints, weights, preferredSize){
+  if(!DATA || !DATA[category]) return null;
+  var src = DATA[category];
+  var items = Object.keys(src).map(function(n){ return Object.assign({_name:n}, src[n]); });
+  if(preferredSize){
+    var sized = items.filter(function(it){ return Math.abs((it.sz||0) - preferredSize) <= 1; });
+    if(sized.length) items = sized;
+  }
+  // Apply constraint hard-filters
+  if(constraints && constraints.stealth){
+    if(category === 'pp')    items = items.sort(function(a,b){return (a.em_max||9999) - (b.em_max||9999);}).slice(0, Math.max(8, Math.ceil(items.length*0.5)));
+    if(category === 'cooler')items = items.sort(function(a,b){return (a.ir||9999) - (b.ir||9999);}).slice(0, Math.max(8, Math.ceil(items.length*0.5)));
+  }
+  // Compute weapons-derived stats for scoring (mirror weapons.html logic)
+  if(category === 'weapons'){
+    items.forEach(function(it){
+      var rps = (it.rpm && it.rpm > 0) ? (it.rpm / 60) : 0;
+      var ae = it.alphaEnergy || 0, ap = it.alphaPhysical || 0;
+      if(rps > 0){
+        if(ae > 0) it.shieldDPS = +(ae * rps).toFixed(1);
+        if(ap > 0) it.hullDPS = +(ap * rps).toFixed(1);
+      }
+      if(it.drawPerShot && rps > 0 && it.capacityMax){
+        var drain = it.drawPerShot * rps;
+        var net   = drain - (it.capacityRegen || 0);
+        it.capSustain = (net <= 0) ? 999 : +(it.capacityMax / net).toFixed(1);
+      }
+    });
+  }
+  // Drop blacklisted items
+  items = items.filter(function(it){ return !isBlacklisted(it._name); });
+  // Score every candidate (rule-based) + apply meta-knowledge boost
+  var scored = items.map(function(it){
+    var base = scoreItem(it, weights);
+    var boost = metaBoost(SELECTED_ROLE, category, it._name);
+    return { it:it, s: base + boost, base:base, boost:boost };
+  });
+  scored.sort(function(a,b){ return b.s - a.s; });
+  if(!scored.length) return null;
+  // RE-ROLL cycles which top-N pick is shown; defaults to 0 (best).
+  // If we run out, wrap around to 0.
+  var pickIdx = REROLL_OFFSET % Math.min(3, scored.length);
+  var top = scored[pickIdx].it;
+  top._score = scored[pickIdx].s;
+  // Show the *other* top picks as alternates (always the unpicked top-3)
+  top._alternates = scored.slice(0, 3)
+    .filter(function(c, i){ return i !== pickIdx; })
+    .map(function(c){ c.it._score = c.s; return c.it; });
+  return top;
+}
+
+// ── ENGINE: pick a ship for the role if user didn't lock one ────────────
+function pickBestShip(roleKey, target){
+  if(!DATA || !DATA.ships) return null;
+  // Phase 2 — if meta-knowledge has a curated primary pick that exists in our data, use it
+  if(META && META.ship_picks && META.ship_picks[roleKey]){
+    var primary = META.ship_picks[roleKey].primary || [];
+    for(var i=0; i<primary.length; i++){
+      var name = primary[i];
+      // Try exact match first
+      if(DATA.ships[name]) return name;
+      // Then case-insensitive substring
+      var found = Object.keys(DATA.ships).find(function(n){
+        return n.toLowerCase().indexOf(name.toLowerCase()) >= 0;
+      });
+      if(found) return found;
+    }
+  }
+  var bias = ROLE_SHIP_BIAS[roleKey] || { roles:[], sizes:[2,3,4] };
+  var names = Object.keys(DATA.ships);
+  // Filter to ships matching role + size hints
+  var candidates = names.filter(function(n){
+    var s = DATA.ships[n];
+    var role = (s.role||'').toLowerCase();
+    var sz = s.size || 0;
+    var roleMatch = bias.roles.some(function(r){return role.indexOf(r) >= 0;});
+    var sizeMatch = bias.sizes.indexOf(sz) >= 0;
+    return roleMatch && sizeMatch;
+  });
+  // If target says HEAVY/CAPITAL prefer larger ships
+  if(target === 'CAPITAL' || target === 'HEAVY'){
+    candidates.sort(function(a,b){ return (DATA.ships[b].size||0) - (DATA.ships[a].size||0); });
+  } else {
+    // Mid ship typically more agile; sort by combat readiness when role is combat
+    candidates.sort(function(a,b){
+      var sa = DATA.ships[a].weaponry||{}, sb = DATA.ships[b].weaponry||{};
+      return (sb.turretDPS||0) - (sa.turretDPS||0);
+    });
+  }
+  return candidates.length ? candidates[0] : null;
+}
+
+// ── ENGINE: pick a mining head / salvage module for industrial roles ─────
+function pickToolForRole(role, shipName){
+  if(!TOOLS) return null;
+  if(role !== 'MINER' && role !== 'SALVAGE') return null;
+  // Gate by ship compatibility: only suggest a tool if the picked ship has the right slots
+  // (Skip the gate if ship isn't in the compatibility table — assume tool may still be relevant)
+  var compat = (TOOLS.ship_tool_compatibility || {})[shipName];
+  if(compat){
+    if(role === 'MINER' && !compat.mining_heads) return null;
+    if(role === 'SALVAGE' && !compat.salvage_modules) return null;
+  }
+  var bucket = role === 'MINER' ? TOOLS.mining_heads : TOOLS.salvage_modules;
+  if(!bucket) return null;
+  var entries = Object.keys(bucket).map(function(n){ return Object.assign({_name:n, _category: role==='MINER'?'mining_head':'salvage_module'}, bucket[n]); });
+  if(!entries.length) return null;
+  // For MINER: score on extract × shatter-resistance × charge-window forgiveness
+  // For SALVAGE: score on rmc_rate × construction_rate (combined throughput)
+  entries.forEach(function(e){
+    if(role === 'MINER'){
+      var safety = (1 - (e.shatter||0)) * (e.optimal_charge||0.5);
+      e._score = (e.extract||0) * safety * 0.0001;
+    } else {
+      e._score = ((e.rmc_rate||0) + (e.construction_rate||0)) * 1.5;
+    }
+  });
+  entries.sort(function(a,b){return b._score - a._score;});
+  var top = entries[0];
+  top._alternates = entries.slice(1, 3);
+  return top;
+}
+
+// ── ENGINE: build full recommendation ───────────────────────────────────
+function generate(opts){
+  opts = opts || {};
+  if(!DATA){ toast('⏵ STILL LOADING SHIP DATA…'); return; }
+  var role     = SELECTED_ROLE;
+  var mode     = getActiveChip('mode');
+  var target   = getActiveChip('target');
+  var budget   = getActiveChip('budget');
+  var typedShip= document.getElementById('ship-pick').value.trim();
+  var constraints = getConstraints();
+  var weights  = ROLE_WEIGHTS[role];
+  if(!weights){ toast('✗ UNKNOWN ROLE'); return; }
+  // Re-roll cycling: if params changed since last generate, reset offset to 0 (best).
+  // If params are same AND opts.reroll is true, increment offset to show next-best alternate.
+  var paramsKey = role+'|'+mode+'|'+target+'|'+budget+'|'+typedShip+'|'+JSON.stringify(constraints);
+  if(paramsKey !== LAST_PARAMS_KEY){
+    REROLL_OFFSET = 0;
+    LAST_PARAMS_KEY = paramsKey;
+  } else if(opts.reroll){
+    REROLL_OFFSET = (REROLL_OFFSET + 1) % 3;
+  }
+
+  // Pick ship
+  var shipName = null;
+  if(typedShip){
+    var key = Object.keys(DATA.ships).find(function(n){return n.toLowerCase() === typedShip.toLowerCase();}) ||
+              Object.keys(DATA.ships).find(function(n){return n.toLowerCase().indexOf(typedShip.toLowerCase()) >= 0;});
+    if(key) shipName = key;
+  }
+  if(!shipName) shipName = pickBestShip(role, target);
+  if(!shipName){ toast('✗ NO SHIP FITS THE ROLE'); return; }
+  var ship = DATA.ships[shipName];
+
+  // Show spinner while we compute
+  document.getElementById('rp-empty').style.display = 'none';
+  var content = document.getElementById('rp-content');
+  content.style.display = 'block';
+  content.innerHTML = '<div class="rp-result"><div class="rp-ship"><span class="spinner"></span>GENERATING…</div></div>';
+
+  setTimeout(function(){
+    // Pick components
+    var preferredSize = Math.max(1, (ship.size||3) - 1);
+    var picks = {
+      weapon: pickBest('weapons', constraints, weights.weapon, preferredSize),
+      missile:pickBest('missiles',constraints, MISSILE_WEIGHTS[role]||{range:0.30}, Math.max(1, (ship.size||3) - 1)),
+      pp:     pickBest('pp',      constraints, weights.pp,     preferredSize),
+      sg:     pickBest('sg',      constraints, weights.sg,     preferredSize),
+      cooler: pickBest('cooler',  constraints, weights.cooler, preferredSize),
+      qd:     pickBest('qd',      constraints, weights.qd,     preferredSize),
+      radar:  pickBest('radar',   constraints, weights.radar,  preferredSize),
+      tool:   pickToolForRole(role, shipName),
+    };
+    // Render
+    var R = {
+      role: role, mode: mode, target: target, budget: budget,
+      shipName: shipName, ship: ship, picks: picks,
+      constraints: constraints, weights: weights
+    };
+    renderResult(R);
+    pushToHistory(R);
+  }, 350);
+}
+
+function renderResult(R){
+  var roleObj = ROLES.find(function(r){return r.key === R.role;});
+  var content = document.getElementById('rp-content');
+
+  // Build pick rationale strings
+  function why(category, pick){
+    if(!pick) return 'No suitable component found in this size class.';
+    var bits = [];
+    if(category === 'weapon'){
+      if(pick.dps)        bits.push('DPS '+fmtK(pick.dps));
+      if(pick.alphaTotal) bits.push('Alpha '+fmtK(pick.alphaTotal));
+      if(pick.range)      bits.push(fmtK(pick.range)+'m range');
+      if(pick.capSustain) bits.push((pick.capSustain >= 999 ? '∞' : pick.capSustain+'s')+' sustain');
+      // Lead with the most-weighted stat
+    } else if(category === 'pp'){
+      if(pick.outEU)   bits.push(pick.outEU+' EU output');
+      if(pick.em_max)  bits.push('EM '+fmtK(pick.em_max));
+      if(pick.health)  bits.push('HP '+fmtK(pick.health));
+    } else if(category === 'sg'){
+      if(pick.regen)   bits.push(pick.regen+'/s regen');
+      if(pick.health)  bits.push('HP '+fmtK(pick.health));
+      if(pick.em_max)  bits.push('EM '+fmtK(pick.em_max));
+    } else if(category === 'cooler'){
+      if(pick.ir)      bits.push('IR '+fmtK(pick.ir));
+      if(pick.drawEU)  bits.push(pick.drawEU+' EU draw');
+      if(pick.health)  bits.push(fmtK(pick.health)+' HP');
+    } else if(category === 'qd'){
+      if(pick.em_max)  bits.push('EM '+fmtK(pick.em_max));
+      if(pick.drawEU)  bits.push(pick.drawEU+' EU draw');
+      if(pick.grade)   bits.push('Grade '+pick.grade);
+    } else if(category === 'radar'){
+      if(pick.distMax) bits.push(fmtK(pick.distMax)+' detection');
+      if(pick.drawEU)  bits.push(pick.drawEU+' EU draw');
+    } else if(category === 'missile'){
+      if(pick.range)    bits.push(fmtK(pick.range)+'m range');
+      if(pick.speed)    bits.push(fmtK(pick.speed)+' m/s');
+      if(pick.lifetime) bits.push(pick.lifetime+'s lifetime');
+      if(pick.cls)      bits.push(pick.cls);
+    } else if(category === 'tool'){
+      if(pick._category === 'mining_head'){
+        if(pick.extract)         bits.push('Extract '+fmtK(pick.extract));
+        if(pick.optimal_charge)  bits.push((pick.optimal_charge*100).toFixed(0)+'% window');
+        if(pick.shatter != null) bits.push((pick.shatter*100).toFixed(0)+'% shatter risk');
+      } else {
+        if(pick.rmc_rate)         bits.push(pick.rmc_rate+'× RMC rate');
+        if(pick.construction_rate)bits.push(pick.construction_rate+'× CM rate');
+        if(pick.range)            bits.push(pick.range+'m range');
+      }
+      if(pick.notes) bits.push(pick.notes);
+    }
+    return bits.join(' · ');
+  }
+
+  function pickCard(catName, label, pick){
+    if(!pick) return '';
+    var meta = ['S' + (pick.sz||'?'), pick.mfr||'', pick.type||pick.cls||''].filter(Boolean).join(' · ').toUpperCase();
+    var alts = '';
+    if(pick._alternates && pick._alternates.length){
+      alts = '<div class="rp-alts"><span class="rp-alts-lbl">ALSO CONSIDER · </span>' +
+        pick._alternates.map(function(a){
+          var altMeta = 'S'+(a.sz||'?')+(a.mfr?' · '+a.mfr:'');
+          return '<span class="rp-alt" title="'+altMeta+'">'+(a._name||a.name||'?')+'</span>';
+        }).join('<span class="rp-alt-sep"> · </span>') +
+      '</div>';
+    }
+    return '<div class="rp-pick">'+
+      '<div class="rp-pick-name">'+label+' · '+(pick._name||pick.name||'?')+'</div>'+
+      '<div class="rp-pick-meta">'+meta+'</div>'+
+      '<div class="rp-pick-why">'+why(catName, pick)+'</div>'+
+      alts+
+    '</div>';
+  }
+
+  // Build a loadout for SAVE / OPEN IN BUILDER (flat shape, matches sc_loadouts_v2 entries)
+  var fakeLoadout = {
+    name: roleObj.name + ' AI Build',
+    ship: R.shipName,
+    act: roleObj.name.toUpperCase() + ' · ' + R.mode,
+    sl: R.picks.weapon ? [R.picks.weapon._name] : [],
+    m:  R.picks.missile ? [R.picks.missile._name] : [],
+    c: {}
+  };
+  if(R.picks.pp)     fakeLoadout.c.pp      = R.picks.pp._name;
+  if(R.picks.sg)     fakeLoadout.c.sg      = R.picks.sg._name;
+  if(R.picks.cooler) fakeLoadout.c.cooler  = R.picks.cooler._name;
+  if(R.picks.qd)     fakeLoadout.c.qd      = R.picks.qd._name;
+  if(R.picks.radar)  fakeLoadout.c.radar   = R.picks.radar._name;
+  // Showdown expects `payload.loadout`, not the loadout at the top level. Wrap accordingly for the FIGHT URL.
+  var showdownPayload = { ship: R.shipName, loadout: fakeLoadout };
+  var code = btoa(unescape(encodeURIComponent(JSON.stringify(showdownPayload))));
+
+  var sizeStr = R.ship.size ? 'SIZE '+R.ship.size+' · ' : '';
+  var meta = sizeStr + (R.ship.role||'').toUpperCase() + ' · ' + (R.ship.mfr||'').toUpperCase();
+  var hp = R.ship.health ? 'HP '+fmtK(R.ship.health)+' · ' : '';
+  var scm = R.ship.scm ? 'SCM '+Math.round(R.ship.scm) : '';
+
+  // Build summary: aggregate stats across the entire pick set so user sees totals
+  // Use ship's actual hardpoint count (varies by ship). Falls back to 1 if unknown.
+  var hardpointCount = 1;
+  if(R.ship.weaponry && R.ship.weaponry.turretAlpha && R.picks.weapon && R.picks.weapon.alphaTotal){
+    // Estimate from existing aggregated turretAlpha; clamp to reasonable count
+    hardpointCount = Math.max(1, Math.min(8, Math.round(R.ship.weaponry.turretAlpha / R.picks.weapon.alphaTotal)));
+  }
+  var summaryBits = [];
+  if(R.picks.weapon){
+    if(R.picks.weapon.dps) summaryBits.push('TOTAL DPS · '+fmtK((R.picks.weapon.dps||0) * hardpointCount));
+    if(R.picks.weapon.alphaTotal) summaryBits.push('TOTAL ALPHA · '+fmtK((R.picks.weapon.alphaTotal||0) * hardpointCount));
+    if(R.picks.weapon.range) summaryBits.push('RANGE · '+fmtK(R.picks.weapon.range)+'m');
+  }
+  if(R.picks.pp && R.picks.pp.outEU)         summaryBits.push('PP OUTPUT · '+R.picks.pp.outEU+' EU');
+  if(R.picks.pp && R.picks.pp.em_max)        summaryBits.push('EM SIG · '+fmtK(R.picks.pp.em_max));
+  if(R.picks.cooler && R.picks.cooler.ir)    summaryBits.push('IR SIG · '+fmtK(R.picks.cooler.ir));
+  if(R.picks.sg && R.picks.sg.regen)         summaryBits.push('SHIELD REGEN · '+R.picks.sg.regen+'/s');
+  if(R.picks.sg && R.picks.sg.health)        summaryBits.push('SHIELD HP · '+fmtK(R.picks.sg.health));
+  if(R.picks.radar && R.picks.radar.distMax) summaryBits.push('RADAR · '+fmtK(R.picks.radar.distMax));
+  var summaryHtml = summaryBits.length ?
+    '<div class="rp-summary">' + summaryBits.map(function(b){
+      var parts = b.split('·');
+      return '<div class="rp-sum-cell"><div class="rp-sum-l">'+parts[0].trim()+'</div><div class="rp-sum-v">'+(parts[1]||'').trim()+'</div></div>';
+    }).join('') + '</div>' : '';
+
+  // Power budget check — does the picked PP cover continuous component draw?
+  var powerCheckHtml = '';
+  if(R.picks.pp && R.picks.pp.outEU){
+    var supply = R.picks.pp.outEU;
+    var draw = 0;
+    if(R.picks.sg     && R.picks.sg.drawEU)     draw += R.picks.sg.drawEU;
+    if(R.picks.cooler && R.picks.cooler.drawEU) draw += R.picks.cooler.drawEU;
+    if(R.picks.qd     && R.picks.qd.drawEU)     draw += R.picks.qd.drawEU;
+    if(R.picks.radar  && R.picks.radar.drawEU)  draw += R.picks.radar.drawEU;
+    var pct = Math.round((draw / supply) * 100);
+    var status, statusClass;
+    if(pct <= 60)       { status = 'HEADROOM'; statusClass = 'ok'; }
+    else if(pct <= 85)  { status = 'BALANCED'; statusClass = 'ok'; }
+    else if(pct <= 100) { status = 'TIGHT';    statusClass = 'warn'; }
+    else                { status = 'OVERLOADED · UPGRADE PP'; statusClass = 'crit'; }
+    powerCheckHtml = '<div class="rp-pwrcheck '+statusClass+'">' +
+      '<div class="rp-pwr-row">' +
+        '<div class="rp-pwr-l">PWR DRAW vs PP OUTPUT</div>' +
+        '<div class="rp-pwr-v">'+draw+' / '+supply+' EU · '+pct+'% · '+status+'</div>' +
+      '</div>' +
+      '<div class="rp-pwr-bar"><div class="rp-pwr-fill" style="width:'+Math.min(100, pct)+'%"></div></div>' +
+    '</div>';
+  }
+
+  // Build tactical advice block from role's `tactics` array
+  var tacticsHtml = '';
+  if(R.weights.tactics && R.weights.tactics.length){
+    tacticsHtml = '<div class="rp-tactics">' +
+      '<div class="rp-tac-hdr">⏵ HOW TO FLY THIS BUILD</div>' +
+      '<ul class="rp-tac-list">' +
+        R.weights.tactics.map(function(t){return '<li>'+t+'</li>';}).join('') +
+      '</ul>' +
+    '</div>';
+  }
+  // Honesty notice for industrial roles — builder doesn't yet edit tool slots
+  var advisoryHtml = '';
+  if((R.role === 'MINER' || R.role === 'SALVAGE') && R.picks.tool){
+    advisoryHtml = '<div class="rp-advisory">⚠ The builder doesn\'t yet have a tool-slot editor. The recommended ' +
+      (R.picks.tool._category === 'mining_head' ? 'mining head' : 'salvage module') +
+      ' is shown below for reference — equip it manually in-game.</div>';
+  }
+
+  // Other ships for this role — quick-swap chips so users can re-roll on a different hull without going back to the form
+  var altShipsHtml = '';
+  if(META && META.ship_picks && META.ship_picks[R.role] && META.ship_picks[R.role].primary){
+    var alts = META.ship_picks[R.role].primary
+      .filter(function(n){return n !== R.shipName && DATA.ships && DATA.ships[n];})
+      .slice(0, 4);
+    if(alts.length){
+      function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+      altShipsHtml = '<div class="rp-altships">' +
+        '<span class="rp-altships-lbl">ALSO TRY · </span>' +
+        alts.map(function(n){
+          return '<span class="rp-altship" data-ship="'+escAttr(n)+'">'+escAttr(n)+'</span>';
+        }).join('<span class="rp-altship-sep"> · </span>') +
+      '</div>';
+    }
+  }
+
+  content.innerHTML = '<div class="rp-result">'+
+    '<div class="rp-ship">'+R.shipName.toUpperCase()+'</div>'+
+    '<div class="rp-meta">'+meta+'<br>'+hp+scm+'</div>'+
+    altShipsHtml+
+    '<div class="rp-tagline">'+R.weights.tagline+'</div>'+
+    summaryHtml+
+    powerCheckHtml+
+    advisoryHtml+
+    tacticsHtml+
+    (R.picks.tool ? '<div class="rp-section"><div class="rp-sec-hdr">⏵ '+(R.picks.tool._category==='mining_head'?'MINING HEAD':'SALVAGE MODULE')+'</div>'+pickCard('tool', R.picks.tool._category==='mining_head'?'HEAD':'TOOL', R.picks.tool)+'</div>' : '')+
+    '<div class="rp-section"><div class="rp-sec-hdr">⏵ PRIMARY WEAPON</div>'+pickCard('weapon','WEAPON',R.picks.weapon)+'</div>'+
+    (R.picks.missile ? '<div class="rp-section"><div class="rp-sec-hdr">⏵ MISSILE</div>'+pickCard('missile','MISSILE',R.picks.missile)+'</div>' : '')+
+    '<div class="rp-section"><div class="rp-sec-hdr">⏵ POWER PLANT</div>'+pickCard('pp','PP',R.picks.pp)+'</div>'+
+    '<div class="rp-section"><div class="rp-sec-hdr">⏵ SHIELD</div>'+pickCard('sg','SHIELD',R.picks.sg)+'</div>'+
+    '<div class="rp-section"><div class="rp-sec-hdr">⏵ COOLER</div>'+pickCard('cooler','COOLER',R.picks.cooler)+'</div>'+
+    '<div class="rp-section"><div class="rp-sec-hdr">⏵ QUANTUM DRIVE</div>'+pickCard('qd','QD',R.picks.qd)+'</div>'+
+    '<div class="rp-section"><div class="rp-sec-hdr">⏵ RADAR</div>'+pickCard('radar','RADAR',R.picks.radar)+'</div>'+
+    '<div class="rp-actions">'+
+      '<span class="rp-btn" onclick="openInBuilder()" style="cursor:pointer">▶ OPEN IN BUILDER</span>'+
+      '<a class="rp-btn fight" href="showdown.html?you='+encodeURIComponent(R.shipName)+'&you_b='+encodeURIComponent(code)+'">⚔ TEST IN SHOWDOWN</a>'+
+      '<span class="rp-btn save" onclick="saveBuild()">⛃ SAVE TO LOADOUTS</span>'+
+      '<span class="rp-btn" onclick="copyBuildCode()" style="cursor:pointer">⇗ COPY CODE</span>'+
+      '<span class="rp-btn" onclick="generate({reroll:true})" title="Cycle to next-best alternate picks">↻ RE-ROLL</span>'+
+    '</div>'+
+  '</div>';
+
+  // Stash for save
+  window._lastBuild = fakeLoadout;
+}
+
+// === BUILD HISTORY — last 5 generated builds, persisted in localStorage ===
+var HIST_KEY = 'sc_ai_hist_v1';
+function loadHistory(){ try { return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch(e){ return []; } }
+function saveHistory(arr){ try { localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0,5))); } catch(e){} }
+function pushToHistory(R){
+  if(!R || !R.shipName) return;
+  var roleObj = ROLES.find(function(r){return r.key === R.role;});
+  var entry = {
+    when: Date.now(),
+    role: R.role,
+    roleName: (roleObj && roleObj.name) || R.role,
+    mode: R.mode, target: R.target, budget: R.budget,
+    shipName: R.shipName,
+    constraints: R.constraints,
+  };
+  var hist = loadHistory();
+  // Dedupe — if last entry has same role+ship+mode, skip
+  if(hist[0] && hist[0].role === entry.role && hist[0].shipName === entry.shipName && hist[0].mode === entry.mode) return;
+  hist.unshift(entry);
+  saveHistory(hist);
+  refreshHistoryPanel();
+}
+function refreshHistoryPanel(){
+  var sect = document.getElementById('hist-section');
+  var list = document.getElementById('hist-list');
+  var hist = loadHistory();
+  if(!hist.length){ sect.style.display = 'none'; return; }
+  sect.style.display = 'block';
+  list.innerHTML = hist.map(function(h, i){
+    var ago = Math.max(1, Math.round((Date.now() - h.when) / 60000));
+    var when = ago < 60 ? ago + 'm ago' : Math.round(ago/60) + 'h ago';
+    return '<div class="hist-row" data-idx="'+i+'">'+
+      '<span class="hist-role">'+h.roleName.toUpperCase()+'</span>'+
+      '<span class="hist-ship">'+h.shipName+'</span>'+
+      '<span class="hist-when">'+when+'</span>'+
+    '</div>';
+  }).join('') + '<button class="hist-clear" onclick="clearHistory()">✗ CLEAR HISTORY</button>';
+  list.querySelectorAll('.hist-row').forEach(function(row){
+    row.addEventListener('click', function(){
+      var h = hist[parseInt(row.dataset.idx, 10)];
+      if(!h) return;
+      // Restore form state and re-generate
+      SELECTED_ROLE = h.role;
+      document.querySelectorAll('.role-opt').forEach(function(o){
+        o.classList.toggle('active', o.dataset.role === h.role);
+      });
+      ['mode','target','budget'].forEach(function(k){
+        var v = h[k];
+        if(v) document.querySelectorAll('.fp-chip[data-key="'+k+'"]').forEach(function(c){
+          c.classList.toggle('active', c.dataset.val === v);
+        });
+      });
+      ['stealth','long_range','sustain'].forEach(function(c){
+        var cb = document.querySelector('.fp-check input[data-cn="'+c+'"]');
+        if(cb) cb.checked = !!(h.constraints && h.constraints[c]);
+      });
+      document.getElementById('ship-pick').value = h.shipName;
+      generate();
+    });
+  });
+}
+function clearHistory(){ saveHistory([]); refreshHistoryPanel(); toast('✓ HISTORY CLEARED'); }
+
+// Quick-swap: regenerate with a different ship locked in (called from "ALSO TRY" chips)
+function reGenWithShip(name){
+  document.getElementById('ship-pick').value = name;
+  generate();
+}
+// Event delegation — handles "ALSO TRY" chip clicks regardless of dynamic re-render
+document.addEventListener('click', function(ev){
+  if(ev.target && ev.target.classList && ev.target.classList.contains('rp-altship')){
+    var n = ev.target.dataset.ship;
+    if(n) reGenWithShip(n);
+  }
+});
+// Build history on page load
+document.addEventListener('DOMContentLoaded', refreshHistoryPanel);
+
+function saveBuild(){
+  if(!window._lastBuild){ toast('✗ NOTHING TO SAVE'); return; }
+  var saved = (function(){try{return JSON.parse(localStorage.getItem('sc_loadouts_v2')||'[]');}catch(e){return [];}})();
+  var entry = Object.assign({}, window._lastBuild, { id: Date.now() });
+  saved.push(entry);
+  localStorage.setItem('sc_loadouts_v2', JSON.stringify(saved));
+  toast('✓ SAVED · OPEN LOADOUTS TAB');
+}
+
+// Copy the build's base64 code to clipboard so it can be shared / imported elsewhere
+function copyBuildCode(){
+  if(!window._lastBuild){ toast('✗ NOTHING TO COPY'); return; }
+  var code = btoa(unescape(encodeURIComponent(JSON.stringify(window._lastBuild))));
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(function(){
+      toast('✓ CODE COPIED · ' + code.length + ' CHARS · PASTE IN LOADOUTS → IMPORT');
+    }, function(){
+      // Fallback — show in a prompt
+      window.prompt('Copy this build code:', code);
+    });
+  } else {
+    window.prompt('Copy this build code:', code);
+  }
+}
+
+// Save the AI build to localStorage (so the builder can reload it by id), then navigate
+function openInBuilder(){
+  if(!window._lastBuild){ toast('✗ NOTHING TO OPEN'); return; }
+  var saved = (function(){try{return JSON.parse(localStorage.getItem('sc_loadouts_v2')||'[]');}catch(e){return [];}})();
+  var id = Date.now();
+  var entry = Object.assign({}, window._lastBuild, { id: id, name: (window._lastBuild.name||'AI Build') + ' (auto)' });
+  saved.push(entry);
+  localStorage.setItem('sc_loadouts_v2', JSON.stringify(saved));
+  // Navigate to builder with both ship + loadout id so it pre-fills components
+  var ship = encodeURIComponent(window._lastBuild.ship||'');
+  location.href = 'builder.html?ship=' + ship + '&loadout=' + id;
+}
+
+document.getElementById('go-btn').addEventListener('click', generate);
+
+// Tutorial
+window.TUTORIAL_PAGE_ID = 'recommend';
+window.TUTORIAL_STEPS = [
+  { selector:'#role-grid', title:'Step 1 · Pick a Role',
+    body:'Choose what you want this ship to DO. Bounty hunter? Miner? Stealth ops? Each role tunes weapons + components differently.' },
+  { selector:'#form-panel', title:'Step 2 · Mode, Target, Budget',
+    body:'<b>PVE/PVP</b> changes weapon priorities. <b>Target size</b> tweaks alpha vs sustain trade-off. <b>Budget</b> filters component pool.' },
+  { selector:'#ship-pick', title:'Step 3 · Optional Ship Lock',
+    body:'Type a ship name + Enter to use that specific ship. Leave blank → AI picks the best ship for your chosen role.' },
+  { selector:'#go-btn', title:'Step 4 · Generate',
+    body:'Hit GENERATE BUILD. The engine scores every component against your role weights, picks the highest-scoring per slot, and explains why each pick was made.' },
+  { selector:'#results-panel', title:'Results',
+    body:'Full loadout with rationale per component. <b>OPEN IN BUILDER</b> to tweak, <b>TEST IN SHOWDOWN</b> to fight with it, or <b>SAVE</b> to your loadouts library.' },
+];
+</script>
+<script src="/tutorial.js" defer></script>
+</body>
+</html>
