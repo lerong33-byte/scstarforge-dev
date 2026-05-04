@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HUD Manager v10.48-DEV — Showdown</title>
+<style>
+:root{
+  --bg:#0a0408;
+  --w:rgba(232,236,242,.95);
+  --g:rgba(190,205,222,.95);
+  --g-d:rgba(190,205,225,.82);
+  --g-m:rgba(150,168,190,.22);
+  --r:rgba(232,80,48,.92);
+  --r2:rgba(255,128,80,.95);
+  --r-d:rgba(232,80,48,.45);
+  --r-m:rgba(70,100,130,.30);
+  --silver:rgba(220,225,235,.95);
+  --char:rgba(120,130,145,.42);
+  --led-r:#ff4040;
+  --led:#7bc8e8;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;}
+img{max-width:100%;}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--w);
+  font-feature-settings:"tnum" 1;cursor:default;
+  transition:opacity .35s, transform .35s, filter .35s;}
+
+/* Deep-space background with red nebula tint */
+body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:#01000a url('/bg-space.jpg?v=63') center / cover no-repeat fixed;}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(2,4,10,.88) 0%,rgba(2,4,10,.78) 50%,rgba(2,4,10,.88) 100%);}
+
+/* ── Top header — open / no chrome ── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:50;height:32px;
+  display:flex;align-items:center;padding:0 18px;gap:10px;pointer-events:none;}
+#nav > *{pointer-events:auto;}
+#logo{font-size:15px;font-weight:700;letter-spacing:4px;color:var(--silver);
+  text-shadow:0 0 8px rgba(180,195,215,.40);margin-right:auto;white-space:nowrap;}
+#logo .ver{font-size:11.5px;letter-spacing:1px;color:rgba(140,132,158,.34);margin-left:4px;}
+#live-pill{display:flex;align-items:center;gap:5px;font-size:14.5px;
+  color:rgba(180,200,220,.62);letter-spacing:2px;white-space:nowrap;}
+#ldot{width:5px;height:5px;border-radius:50%;background:var(--r);
+  box-shadow:0 0 6px rgba(232,80,48,.85);}
+
+/* ── NAV SWITCH BOX — same as builder, top right ── */
+#nav-mfds{position:fixed;top:38px;right:18px;z-index:60;width:160px;padding:14px 8px 8px;
+  background-color:#0a0d14;background-image:repeating-linear-gradient(90deg,transparent 0,transparent 4px,rgba(0,0,0,.32) 4px,rgba(0,0,0,.32) 5px),linear-gradient(180deg, rgba(36,40,48,.72), rgba(16,20,26,.92));
+  border:1px solid rgba(72,78,88,.65);
+  box-shadow:inset 0 1px 0 rgba(160,168,180,.32),inset 0 -2px 0 rgba(0,0,0,.85),inset 0 0 18px rgba(0,0,0,.55),0 4px 14px rgba(0,0,0,.55);}
+#nav-mfds::before{content:'· NAV ·';position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:14.5px;letter-spacing:3px;font-weight:700;color:rgba(220,235,255,.92);
+  padding:2px 12px 2px 22px;border:1px solid rgba(80,140,200,.45);border-top:none;
+  background:radial-gradient(circle 2.5px at 11px 50%, var(--led) 0%, #1c4880 55%, transparent 80%),linear-gradient(180deg, rgba(20,26,36,.83), rgba(8,10,16,.96));white-space:nowrap;}
+.nav-mfd{position:relative;display:flex;align-items:center;gap:8px;padding:5px 8px 5px 11px;margin-bottom:4px;text-decoration:none;cursor:pointer;
+  background:linear-gradient(180deg,rgba(28,32,40,.82),rgba(12,14,20,.95));border:1px solid rgba(72,80,92,.75);
+  box-shadow:inset 0 1px 0 rgba(140,148,160,.18),inset 0 -1px 0 rgba(0,0,0,.85);transition:background .15s,border-color .15s;}
+.nav-mfd:last-child{margin-bottom:0;}
+.nav-mfd::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--led);box-shadow:0 0 6px rgba(140,200,255,.85);animation:nav-led 2.4s ease-in-out infinite;}
+@keyframes nav-led{0%,55%,100%{opacity:1;}65%{opacity:.35;}}
+.nav-mfd-icon{font-size:15px;color:rgba(220,235,255,.78);line-height:1;flex-shrink:0;}
+.nav-mfd-name{font-size:15px;font-weight:700;letter-spacing:2px;color:rgba(232,240,250,.92);white-space:nowrap;flex:1;font-family:'JetBrains Mono','Roboto Mono',monospace;}
+.nav-mfd:hover{background:linear-gradient(180deg,rgba(40,46,56,.82),rgba(20,24,32,.95));border-color:rgba(140,200,255,.55);}
+.nav-mfd[data-status="wip"]::before{background:#ffc850;box-shadow:0 0 6px rgba(255,200,80,.85);}
+.nav-mfd.current{border-color:rgba(140,200,255,.85);background:linear-gradient(180deg,rgba(40,52,72,.82),rgba(20,28,42,.95));box-shadow:inset 0 0 10px rgba(76,160,230,.30);}
+.nav-mfd.current .nav-mfd-name{color:rgba(180,220,255,.95);text-shadow:0 0 8px rgba(140,200,255,.65);}
+
+/* ── PAGE TITLE ── */
+#title{position:absolute;top:34px;left:50%;transform:translateX(-50%);z-index:20;
+  text-align:center;}
+#title h1{font-size:30px;letter-spacing:14px;font-weight:700;
+  background:linear-gradient(155deg,#b0b0c0,#fff,#e8e8f0,#c4c4d0,#a0a0b4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 14px rgba(232,80,48,.30));
+  display:inline-flex;align-items:center;justify-content:center;gap:14px;white-space:nowrap;}
+#title .brk{color:rgba(200,215,235,.55);font-weight:300;
+  background:none;-webkit-text-fill-color:initial;}
+#title .impact{display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle,rgba(220,235,255,1),rgba(255,80,48,.85) 40%,rgba(70,100,130,0) 80%);
+  box-shadow:0 0 14px rgba(255,80,48,.85);}
+#title-sub{font-size:15px;letter-spacing:6px;color:rgba(195,215,235,.85);margin-top:6px;}
+
+/* ── SCENE — main combat layout ── */
+#scene{position:fixed;top:120px;left:0;right:0;bottom:0;overflow:visible;}
+
+/* ── Two-side battle layout — leaves room for the right-side nav switch box (190px) ── */
+#battle{position:absolute;top:0;left:18px;right:200px;bottom:236px;
+  display:grid;grid-template-columns:1fr 92px 1fr;gap:14px;align-items:stretch;
+  padding-top:8px;}
+
+/* Combatant panel (left + right) */
+.fighter{position:relative;padding:14px 14px 14px;overflow-y:auto;max-height:100%;
+  background-color:#160508;
+  background-image:
+    radial-gradient(ellipse 130% 90% at 50% 60%, transparent 30%, rgba(0,0,0,.55) 100%),
+    repeating-linear-gradient(0deg, rgba(180,200,220,.040) 0px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, rgba(36,16,18,.83), rgba(20,10,12,.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(180,200,220,.22),
+    inset 0 0 0 4px rgba(20,10,12,.92),
+    inset 0 0 0 5px rgba(60,80,100,.45),
+    inset 0 0 22px rgba(0,0,0,.65),
+    0 4px 14px rgba(0,0,0,.55);
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.55));
+  clip-path:polygon(20px 0,calc(100% - 20px) 0,100% 20px,100% calc(100% - 8px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 8px),0 20px);}
+.fighter.you{transform:none;}
+.fighter.enemy{transform:none;}
+
+/* Side label pill at top of fighter */
+.fighter::before{
+  content:attr(data-side); position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:5px;font-weight:700;
+  color:rgba(220,235,255,.95);
+  text-shadow:0 0 6px rgba(255,80,48,.85),0 0 14px rgba(232,80,48,.40);
+  padding:3px 14px 3px 22px;
+  border:1px solid rgba(100,130,160,.55);
+  background:radial-gradient(circle 3px at 11px 50%, #7bc8e8 0%, #1c4880 55%, transparent 80%),
+    linear-gradient(180deg, rgba(36,12,14,.83), rgba(16,6,8,.96));
+  white-space:nowrap;z-index:5;}
+.fighter.enemy::before{
+  background:radial-gradient(circle 3px at 11px 50%, #ffa050 0%, #6c4818 55%, transparent 80%),
+    linear-gradient(180deg, rgba(36,16,12,.83), rgba(16,8,6,.96));}
+
+/* SOURCE TABS — choose where the ship's build comes from */
+.src-tabs{display:flex;gap:4px;justify-content:center;margin-top:30px;padding:0 6px;}
+.src-tab{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14.5px;letter-spacing:1.5px;font-weight:700;
+  padding:3px 8px;cursor:pointer;
+  color:rgba(180,200,220,.62);
+  background:rgba(20,8,10,.65);
+  border:1px solid rgba(60,80,100,.45);
+  transition:all .12s;flex:1;text-align:center;
+  white-space:nowrap;}
+.src-tab:hover{color:rgba(210,225,245,.95);
+  border-color:rgba(200,215,235,.65);}
+.src-tab.active{color:rgba(220,235,255,.96);
+  background:rgba(20,30,42,.70);
+  border-color:rgba(200,215,235,.85);
+  text-shadow:0 0 5px rgba(255,80,48,.65);
+  box-shadow:0 0 8px rgba(232,80,48,.30) inset;}
+
+/* AI sub-row — archetype + tier chips, only visible when AI BEST tab is active */
+.ai-sub{display:none;flex-wrap:wrap;gap:3px;justify-content:center;
+  margin-top:5px;padding:0 6px;}
+.fighter[data-aiopen="1"] .ai-sub{display:flex;}
+.ai-chip{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:11.5px;letter-spacing:1px;font-weight:700;
+  padding:2px 6px;cursor:pointer;
+  color:rgba(180,200,220,.62);
+  background:rgba(20,8,10,.55);
+  border:1px solid rgba(60,80,100,.35);
+  transition:all .12s;white-space:nowrap;}
+.ai-chip:hover{color:rgba(210,225,245,.92);
+  border-color:rgba(200,215,235,.55);}
+.ai-chip.active{color:rgba(220,235,255,.96);
+  background:rgba(20,30,42,.65);
+  border-color:rgba(200,215,235,.75);
+  text-shadow:0 0 4px rgba(255,80,48,.55);}
+.ai-chip.tier{font-size:11.5px;letter-spacing:.5px;}
+.ai-divider{width:1px;background:rgba(100,130,160,.35);align-self:stretch;margin:0 2px;}
+
+/* Ship select */
+.f-select{margin:8px 0 12px;display:flex;justify-content:center;}
+.f-select select{
+  background:transparent;border:none;
+  border-bottom:1px solid rgba(180,200,220,.35);
+  color:var(--w);font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14px;letter-spacing:3px;font-weight:700;
+  padding:6px 22px 6px 10px;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  text-shadow:0 0 6px rgba(200,215,235,.45);
+  text-align:center;text-align-last:center;
+  min-width:220px;max-width:90%;
+  transition:border-color .25s;}
+.f-select select:focus{outline:none;border-bottom-color:rgba(200,215,235,.85);}
+.f-select select option{background:#1a0608;color:var(--w);}
+
+/* Ship image — sits in a hangar bay with floor markings, perimeter lighting, and a bay-number badge */
+.f-img-wrap{position:relative;width:100%;height:130px;display:flex;align-items:center;justify-content:center;
+  background:
+    /* perimeter wall safety stripes (chevrons) */
+    repeating-linear-gradient(45deg, rgba(220,200,80,.0) 0 14px, rgba(220,200,80,.10) 14px 18px) bottom/100% 18px no-repeat,
+    /* hangar deck bay lighting (overhead) */
+    radial-gradient(ellipse 90% 28% at 50% 0%, rgba(160,200,235,.18) 0%, rgba(160,200,235,.06) 40%, transparent 78%),
+    /* center spotlight floor pool */
+    radial-gradient(ellipse 65% 50% at 50% 55%,rgba(70,100,130,.18) 0%,rgba(20,30,42,.08) 40%,transparent 78%),
+    /* deck plating gradient */
+    linear-gradient(180deg, rgba(8,12,20,.0) 0%, rgba(8,12,20,.45) 78%, rgba(2,4,8,.78) 100%);
+  margin-bottom:8px;
+  border-bottom:1px solid rgba(140,170,200,.20);
+  overflow:hidden;}
+/* Bay number badge — upper-right corner, like a hangar wall stencil */
+.f-img-wrap::before{content:'BAY 01';position:absolute;top:6px;right:10px;
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:9.5px;letter-spacing:2px;font-weight:700;
+  color:rgba(180,200,225,.45);text-shadow:0 0 4px rgba(80,120,170,.55);
+  padding:2px 6px;border:1px solid rgba(120,150,180,.30);
+  background:rgba(8,14,24,.55);z-index:2;pointer-events:none;}
+.fighter.enemy .f-img-wrap::before{content:'BAY 02';
+  color:rgba(255,210,170,.50);text-shadow:0 0 4px rgba(160,80,40,.55);
+  border-color:rgba(180,120,80,.30);
+  background:rgba(20,10,8,.55);}
+/* Hangar deck strip — chevron landing-zone markings near the bottom edge */
+.f-img-wrap::after{content:'';position:absolute;left:8%;right:8%;bottom:4px;height:6px;
+  background:repeating-linear-gradient(90deg,
+    rgba(255,210,80,.55) 0 8px,
+    rgba(20,14,8,.85) 8px 12px,
+    rgba(255,210,80,.55) 12px 20px,
+    rgba(20,14,8,.85) 20px 24px);
+  opacity:.45;
+  border-top:1px solid rgba(255,210,80,.25);
+  pointer-events:none;z-index:1;}
+.f-img{max-width:96%;max-height:160px;object-fit:contain;position:relative;z-index:1;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.65)) drop-shadow(0 0 14px rgba(255,80,48,.20));}
+.fighter.enemy .f-img{filter:drop-shadow(0 6px 14px rgba(0,0,0,.65)) drop-shadow(0 0 14px rgba(255,80,48,.20)) scaleX(-1);transform:scaleX(-1);}
+
+/* Ship name */
+.f-name{font-size:18px;font-weight:700;letter-spacing:5px;text-align:center;
+  background:linear-gradient(155deg,#b0b0c0,#fff,#e8e8f0,#c4c4d0,#a0a0b4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 6px rgba(200,215,235,.45));margin-top:2px;}
+.f-meta{font-size:15px;letter-spacing:3px;color:rgba(195,215,235,.85);text-align:center;margin-top:4px;}
+
+/* Stat grid */
+.f-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:14px;}
+.f-stat{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:6px 4px;
+  background:linear-gradient(180deg,rgba(48,18,20,.79),rgba(22,8,10,.95));
+  border:1px solid rgba(70,90,110,.65);
+  box-shadow:inset 0 1px 0 rgba(180,200,220,.18),inset 0 -1px 0 rgba(0,0,0,.85);
+  clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 6px,100% calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,0 calc(100% - 4px),0 6px);}
+.f-stat .l{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14.5px;letter-spacing:1.5px;color:rgba(195,215,235,.85);}
+.f-stat .l::before{content:'> ';opacity:.55;}
+.f-stat .v{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14px;font-weight:700;color:rgba(220,235,255,.96);
+  text-shadow:0 0 5px currentColor,0 0 10px rgba(255,80,48,.30);
+  letter-spacing:.5px;line-height:1;margin-top:2px;}
+.f-stat .v.r{color:#ff7060;}
+.f-stat .v.s{color:#d8e4f0;}
+.f-stat .v.b{color:#ffb088;}
+
+/* ── Center VS — between the two fighters ── */
+#vs{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;
+  margin-top:90px;}
+#vs-circle{width:58px;height:58px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,rgba(220,235,255,.92),rgba(80,110,150,.85) 50%,rgba(20,30,42,.95) 100%);
+  border:2px solid rgba(200,215,235,.75);
+  box-shadow:0 0 16px rgba(255,180,80,.55),inset 0 0 12px rgba(255,200,128,.30);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani','Inter',sans-serif;
+  font-size:18px;font-weight:900;letter-spacing:2px;color:#fff;
+  text-shadow:0 0 6px rgba(255,200,128,.65);
+  animation:vs-pulse 2.4s ease-in-out infinite;}
+@keyframes vs-pulse{0%,100%{box-shadow:0 0 16px rgba(255,180,80,.45),inset 0 0 12px rgba(255,200,128,.25);}50%{box-shadow:0 0 24px rgba(255,200,128,.75),inset 0 0 14px rgba(255,220,160,.45);}}
+#vs-arrow-l, #vs-arrow-r{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:18px;color:rgba(200,215,235,.65);
+  text-shadow:0 0 5px rgba(140,200,255,.45);}
+
+/* ── BATTLE PANEL — bottom strip with TTK + verdict ── */
+#battle-panel{position:absolute;bottom:18px;left:18px;right:200px;height:200px;
+  display:grid;grid-template-columns:1fr 220px 1fr;gap:14px;}
+.bp-side{position:relative;
+  background-color:#160508;
+  background-image:
+    radial-gradient(ellipse 130% 90% at 50% 60%, transparent 30%, rgba(0,0,0,.55) 100%),
+    repeating-linear-gradient(0deg, rgba(180,200,220,.04) 0px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, rgba(36,16,18,.83), rgba(20,10,12,.98));
+  border:1px solid rgba(60,80,100,.55);
+  box-shadow:inset 0 1px 0 rgba(180,200,220,.18),inset 0 -1px 0 rgba(0,0,0,.85),inset 0 0 16px rgba(0,0,0,.55);
+  padding:18px 18px 14px;
+  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 6px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 6px),0 14px);}
+.bp-side::before{
+  content:attr(data-label); position:absolute; top:7px; left:50%; transform:translateX(-50%);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14.5px;letter-spacing:4px;font-weight:700;
+  color:rgba(200,215,235,.85);
+  text-shadow:0 0 5px rgba(255,80,48,.45);
+  padding:2px 12px 2px 22px;
+  border:1px solid rgba(100,130,160,.55);
+  background:radial-gradient(circle 2.5px at 11px 50%, var(--led-r) 0%, #6c1810 55%, transparent 80%),
+    linear-gradient(180deg, rgba(36,12,14,.83), rgba(16,6,8,.96));
+  white-space:nowrap;}
+.bp-row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
+  margin-top:6px;font-family:'JetBrains Mono','Roboto Mono',monospace;}
+.bp-row .lbl{font-size:15px;letter-spacing:2px;color:rgba(195,215,235,.85);}
+.bp-row .lbl::before{content:'> ';opacity:.55;}
+.bp-row .v{font-size:14px;font-weight:700;color:rgba(220,235,255,.95);
+  text-shadow:0 0 4px rgba(255,80,48,.45);letter-spacing:1px;text-align:right;}
+.bp-row .v.s{color:#d8e4f0;}
+.bp-row .v.r{color:#ff7060;}
+.bp-row .bar{position:relative;height:6px;
+  background:linear-gradient(180deg,rgba(8,4,6,.82),rgba(20,8,10,.95));
+  border:1px solid rgba(60,80,100,.55);
+  box-shadow:inset 0 0 4px rgba(0,0,0,.85);}
+.bp-row .bar-fill{position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,rgba(232,80,48,.50) 0%,rgba(255,140,80,.85) 100%);
+  box-shadow:0 0 6px rgba(232,80,48,.55);
+  transition:width .35s cubic-bezier(.2,.9,.3,1);}
+.bp-row .bar-fill.s{background:linear-gradient(90deg,rgba(180,200,230,.50) 0%,rgba(220,235,250,.85) 100%);
+  box-shadow:0 0 6px rgba(180,200,230,.55);}
+
+/* Center verdict */
+#bp-verdict{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background:
+    radial-gradient(ellipse 100% 130% at 50% 50%, rgba(20,30,42,.85) 0%, rgba(20,8,10,.98) 80%);
+  border:1px solid rgba(255,80,48,.45);
+  box-shadow:
+    inset 0 1px 0 rgba(200,220,245,.32),
+    inset 0 -1px 0 rgba(0,0,0,.85),
+    inset 0 0 28px rgba(232,80,48,.30),
+    0 0 20px rgba(232,80,48,.20);
+  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 6px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 6px),0 14px);}
+#bp-verdict::before{
+  content:'· VERDICT ·'; position:absolute; top:7px; left:50%; transform:translateX(-50%);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14.5px;letter-spacing:4px;font-weight:700;
+  color:rgba(245,220,220,.95);
+  text-shadow:0 0 6px rgba(200,215,235,.65);
+  padding:2px 14px 2px 24px;
+  border:1px solid rgba(255,80,48,.55);
+  background:radial-gradient(circle 2.5px at 12px 50%, #ff8060 0%, #882018 55%, transparent 80%),
+    linear-gradient(180deg, rgba(36,12,14,.83), rgba(16,6,8,.96));
+  white-space:nowrap;}
+#vd-result{font-family:'Rajdhani','Inter',sans-serif;
+  font-size:18px;font-weight:900;letter-spacing:3px;
+  background:linear-gradient(155deg,#b0b0c0,#fff,#e8e8f0,#c4c4d0,#a0a0b4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 12px rgba(255,80,48,.65));margin-top:24px;
+  white-space:nowrap;text-align:center;}
+#vd-result.win{filter:drop-shadow(0 0 14px rgba(120,255,140,.85));}
+#vd-result.lose{filter:drop-shadow(0 0 14px rgba(255,80,48,.85));}
+#vd-result.close{filter:drop-shadow(0 0 14px rgba(255,200,80,.55));}
+#vd-edge{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:14px;letter-spacing:3px;
+  color:rgba(200,215,235,.72);text-shadow:0 0 5px rgba(200,215,235,.45);}
+#vd-tactics{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:14.5px;letter-spacing:1.5px;
+  color:rgba(180,160,160,.65);text-align:center;line-height:1.5;
+  padding:0 12px;margin-top:2px;}
+
+/* COUNTERS button — sits next to the enemy ship dropdown, slightly different glyph */
+.ctr-btn{margin-left:6px;font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14.5px;letter-spacing:2px;font-weight:700;cursor:pointer;
+  padding:4px 10px 4px 18px;
+  color:rgba(220,235,255,.85);
+  background:radial-gradient(circle 2.5px at 8px 50%, #7bc8e8 0%, #1c4880 55%, transparent 80%),
+    linear-gradient(180deg, rgba(20,30,50,.79), rgba(8,14,28,.96));
+  border:1px solid rgba(140,200,255,.55);
+  text-shadow:0 0 4px rgba(140,200,255,.65);
+  transition:all .15s;}
+.ctr-btn:hover{color:rgba(245,250,255,.96);
+  border-color:rgba(180,220,255,.85);
+  box-shadow:0 0 8px rgba(140,200,255,.45);}
+
+/* COUNTERS modal — open, minimal: thin border, no heavy bezel */
+#ctr{position:fixed;inset:0;z-index:10000;display:none;
+  background:rgba(2,4,10,.82);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;}
+#ctr[aria-hidden="false"]{display:flex;}
+#ctr-card{position:relative;width:min(720px,92vw);max-height:88vh;
+  padding:24px 26px 20px;
+  background:linear-gradient(180deg, rgba(14,18,28,.83), rgba(6,10,18,.98));
+  border-top:1px solid rgba(140,200,255,.45);
+  border-bottom:1px solid rgba(140,200,255,.18);
+  overflow-y:auto;}
+#ctr-card-hdr{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14px;letter-spacing:6px;font-weight:700;
+  color:rgba(220,235,255,.85);text-align:center;margin-bottom:14px;
+  text-shadow:0 0 6px rgba(140,200,255,.45);}
+#ctr-close{position:absolute;top:10px;right:14px;z-index:6;
+  width:28px;height:28px;border:none;background:transparent;
+  color:rgba(180,200,230,.65);font-size:22px;line-height:1;cursor:pointer;
+  transition:color .15s;}
+#ctr-close:hover{color:rgba(245,250,255,.95);}
+#ctr-summary{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:15px;letter-spacing:3px;
+  color:rgba(200,225,245,.92);text-align:center;margin-bottom:14px;}
+#ctr-summary .acc{color:rgba(255,160,140,.92);}
+#ctr-goals{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:18px;padding:0 4px;}
+.ctr-goal{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:1.5px;font-weight:600;
+  padding:5px 12px;cursor:pointer;
+  color:rgba(190,215,240,.82);
+  background:transparent;
+  border:1px solid rgba(120,150,180,.22);
+  transition:all .15s;white-space:nowrap;}
+.ctr-goal:hover{color:rgba(220,235,255,.95);border-color:rgba(140,200,255,.55);}
+.ctr-goal.active{color:rgba(245,250,255,.95);
+  border-color:rgba(180,220,255,.85);
+  background:rgba(60,90,140,.18);}
+.ctr-row{display:grid;grid-template-columns:24px 1fr auto auto;gap:14px;align-items:center;
+  padding:8px 4px;
+  border-bottom:1px solid rgba(120,150,180,.10);}
+.ctr-row:hover{background:rgba(80,120,180,.06);}
+.ctr-row .rank{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;font-weight:700;color:rgba(140,200,255,.55);
+  text-align:center;}
+.ctr-row .info .name{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:15px;font-weight:600;letter-spacing:1px;
+  color:rgba(232,238,248,.95);}
+.ctr-row .info .meta{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:14.5px;letter-spacing:1px;
+  color:rgba(180,200,220,.82);margin-top:2px;}
+.ctr-row .stat{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14px;font-weight:600;color:rgba(200,215,235,.92);text-align:right;min-width:60px;}
+.ctr-row .why{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:14.5px;letter-spacing:1px;font-weight:600;
+  color:rgba(140,200,255,.78);
+  padding:2px 8px;
+  border:1px solid rgba(140,200,255,.30);
+  white-space:nowrap;}
+
+/* CONFIGURE popout button — sits next to the ship dropdown */
+.cfg-btn{margin-left:8px;font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14.5px;letter-spacing:2px;font-weight:700;cursor:pointer;
+  padding:4px 10px;
+  color:rgba(220,235,255,.85);
+  background:radial-gradient(circle 2.5px at 8px 50%, #ff6040 0%, #882018 55%, transparent 80%),
+    linear-gradient(180deg, rgba(14,20,30,.79), rgba(28,8,10,.96));
+  border:1px solid rgba(255,80,48,.55);
+  text-shadow:0 0 4px rgba(200,215,235,.65);
+  transition:all .15s;padding-left:18px;}
+.cfg-btn:hover{color:rgba(225,235,250,.96);
+  border-color:rgba(200,215,235,.85);
+  box-shadow:0 0 8px rgba(232,80,48,.45);}
+.cfg-btn.disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
+
+/* CONFIGURE modal — mini-builder for picking weapons/missiles/comps */
+#cfg{position:fixed;inset:0;z-index:10000;display:none;
+  background:rgba(8,2,4,.78);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;}
+#cfg[aria-hidden="false"]{display:flex;}
+#cfg-card{position:relative;width:min(680px,90vw);max-height:88vh;
+  padding:38px 28px 22px;
+  background-color:#1a0608;
+  background-image:
+    radial-gradient(ellipse 130% 90% at 50% 60%, transparent 30%, rgba(0,0,0,.55) 100%),
+    repeating-linear-gradient(0deg, rgba(180,200,220,.04) 0px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, rgba(48,18,22,.83), rgba(20,8,10,.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(180,200,220,.32),
+    inset 0 0 0 4px rgba(20,8,10,.92),
+    inset 0 0 0 5px rgba(60,80,100,.55),
+    inset 0 0 32px rgba(0,0,0,.75),
+    0 16px 60px rgba(0,0,0,.85);
+  clip-path:polygon(20px 0,calc(100% - 20px) 0,100% 20px,100% calc(100% - 8px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 8px),0 20px);
+  overflow-y:auto;}
+#cfg-card::before{
+  content:attr(data-label); position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:5px;font-weight:700;
+  color:rgba(225,235,250,.95);
+  text-shadow:0 0 6px rgba(200,215,235,.65);
+  padding:3px 16px 3px 26px;
+  border:1px solid rgba(255,80,48,.55);
+  background:radial-gradient(circle 3px at 12px 50%, #ff8060 0%, #882018 55%, transparent 80%),
+    linear-gradient(180deg, rgba(36,12,14,.83), rgba(16,6,8,.96));
+  white-space:nowrap;z-index:5;}
+#cfg-close{position:absolute;top:8px;right:10px;z-index:6;
+  width:26px;height:26px;border:1px solid rgba(180,200,220,.45);
+  background:rgba(20,8,10,.85);color:rgba(225,235,250,.85);
+  font-size:18px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;}
+#cfg-ship{font-family:'Rajdhani','Inter',sans-serif;
+  font-size:18px;font-weight:700;letter-spacing:5px;text-align:center;
+  color:rgba(220,235,255,.96);text-shadow:0 0 8px rgba(255,80,48,.45);
+  margin-bottom:14px;}
+.cfg-section{margin-top:14px;}
+.cfg-section-hdr{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:3px;font-weight:700;color:rgba(225,235,250,.92);
+  margin-bottom:6px;
+  text-shadow:0 0 4px rgba(200,215,235,.55);}
+.cfg-section-hdr::before{content:'· ';opacity:.55;}
+.cfg-row{display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center;
+  padding:5px 0;border-bottom:1px dashed rgba(100,130,160,.20);}
+.cfg-row:last-child{border-bottom:none;}
+.cfg-row .lbl{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:2px;color:rgba(200,215,235,.85);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cfg-row select{
+  background:transparent;border:none;
+  border-bottom:1px solid rgba(180,200,220,.35);
+  color:rgba(232,236,242,.95);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:2px;padding:5px 8px;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  outline:none;}
+.cfg-row select:focus{border-bottom-color:rgba(200,215,235,.85);}
+.cfg-row select option{background:#1a0608;color:rgba(232,236,242,.95);}
+.cfg-actions{margin-top:18px;display:flex;gap:10px;justify-content:center;}
+.cfg-act{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14px;letter-spacing:3px;font-weight:700;cursor:pointer;text-decoration:none;
+  padding:8px 22px 8px 30px;
+  color:rgba(220,235,255,.96);
+  background:radial-gradient(circle 3px at 12px 50%, #ff6040 0%, #882018 55%, transparent 80%),
+    linear-gradient(180deg, rgba(14,20,30,.79), rgba(28,8,10,.96));
+  border:1px solid rgba(255,80,48,.65);
+  text-shadow:0 0 5px rgba(200,215,235,.85);
+  transition:transform .15s, box-shadow .15s;}
+.cfg-act.cancel{background:linear-gradient(180deg, rgba(40,40,48,.79), rgba(20,20,26,.96));
+  border-color:rgba(190,205,225,.78);
+  padding:8px 22px;}
+.cfg-act:hover{transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(232,80,48,.55);}
+
+/* RUN FIGHT button — center-bottom of verdict box */
+#run-fight{margin-top:8px;display:inline-block;cursor:pointer;text-decoration:none;
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:3px;font-weight:700;
+  padding:5px 14px 5px 22px;
+  color:rgba(220,235,255,.96);
+  background:radial-gradient(circle 3px at 11px 50%, #ff6040 0%, #882018 55%, transparent 80%),
+    linear-gradient(180deg, rgba(14,20,30,.79), rgba(28,8,10,.96));
+  border:1px solid rgba(255,80,48,.65);
+  text-shadow:0 0 5px rgba(255,128,80,.85);
+  transition:transform .15s, box-shadow .15s;}
+#run-fight:hover{transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(232,80,48,.55);}
+#run-fight.disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
+
+/* RESULT BREAKDOWN overlay */
+#result{position:fixed;inset:0;z-index:9999;display:none;
+  background:rgba(8,2,4,.78);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;}
+#result[aria-hidden="false"]{display:flex;}
+#result-card{position:relative;width:min(680px,90vw);max-height:88vh;
+  padding:36px 32px 26px;
+  background-color:#1a0608;
+  background-image:
+    radial-gradient(ellipse 130% 90% at 50% 60%, transparent 30%, rgba(0,0,0,.55) 100%),
+    repeating-linear-gradient(0deg, rgba(180,200,220,.04) 0px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, rgba(48,18,22,.83), rgba(20,8,10,.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(180,200,220,.32),
+    inset 0 0 0 4px rgba(20,8,10,.92),
+    inset 0 0 0 5px rgba(60,80,100,.55),
+    inset 0 0 32px rgba(0,0,0,.75),
+    0 16px 60px rgba(0,0,0,.85);
+  clip-path:polygon(20px 0,calc(100% - 20px) 0,100% 20px,100% calc(100% - 8px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 8px),0 20px);
+  overflow-y:auto;}
+#result-card::before{
+  content:'· FIGHT RESULT ·'; position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:5px;font-weight:700;
+  color:rgba(225,235,250,.95);
+  text-shadow:0 0 6px rgba(200,215,235,.65);
+  padding:3px 16px 3px 26px;
+  border:1px solid rgba(255,80,48,.55);
+  background:radial-gradient(circle 3px at 12px 50%, #ff8060 0%, #882018 55%, transparent 80%),
+    linear-gradient(180deg, rgba(36,12,14,.83), rgba(16,6,8,.96));
+  white-space:nowrap;z-index:5;}
+#result-close{position:absolute;top:8px;right:10px;z-index:6;
+  width:26px;height:26px;border:1px solid rgba(180,200,220,.45);
+  background:rgba(20,8,10,.85);color:rgba(225,235,250,.85);
+  font-size:18px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;}
+.r-headline{font-family:'Rajdhani','Inter',sans-serif;
+  font-size:34px;font-weight:900;letter-spacing:6px;text-align:center;
+  background:linear-gradient(155deg,#b0b0c0,#fff,#e8e8f0,#c4c4d0,#a0a0b4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 16px rgba(255,80,48,.65));margin-top:8px;}
+.r-headline.win{filter:drop-shadow(0 0 18px rgba(120,255,140,.85));}
+.r-headline.lose{filter:drop-shadow(0 0 18px rgba(255,80,48,.85));}
+.r-headline.close{filter:drop-shadow(0 0 18px rgba(255,200,80,.65));}
+.r-summary{text-align:center;font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:15px;letter-spacing:3px;color:rgba(200,215,235,.85);margin-top:10px;}
+.r-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:18px;}
+.r-tile{position:relative;padding:10px 12px;
+  background:linear-gradient(180deg,rgba(48,18,22,.79),rgba(22,8,10,.95));
+  border:1px solid rgba(70,90,110,.65);
+  box-shadow:inset 0 1px 0 rgba(180,200,220,.18),inset 0 -1px 0 rgba(0,0,0,.85);
+  clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,0 calc(100% - 4px),0 8px);}
+.r-tile-l{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:14.5px;letter-spacing:1.5px;color:rgba(195,215,235,.85);}
+.r-tile-l::before{content:'> ';opacity:.55;}
+.r-tile-v{font-family:'JetBrains Mono','Roboto Mono',monospace;
+  font-size:18px;font-weight:700;color:rgba(220,235,255,.96);
+  text-shadow:0 0 5px currentColor;letter-spacing:1px;line-height:1;margin-top:3px;}
+.r-tile-v.r{color:#ff7060;} .r-tile-v.s{color:#d8e4f0;} .r-tile-v.g{color:#7be0a8;}
+.r-log{margin-top:18px;padding-top:14px;border-top:1px dashed rgba(100,130,160,.30);}
+.r-log-hdr{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:15px;letter-spacing:3px;font-weight:700;
+  color:rgba(225,235,250,.92);text-shadow:0 0 5px rgba(200,215,235,.55);
+  margin-bottom:8px;}
+.r-log-row{font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:11.5px;letter-spacing:1px;
+  color:rgba(220,200,200,.85);padding:4px 0;line-height:1.5;}
+.r-log-row.win{color:rgba(140,255,160,.92);}
+.r-log-row.lose{color:rgba(200,215,235,.92);}
+.r-log-row.note{color:rgba(180,160,160,.65);font-style:italic;}
+.r-log-row .t{display:inline-block;width:60px;color:rgba(170,140,140,.65);
+  font-family:'JetBrains Mono','Roboto Mono',monospace;}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <div id="logo">H.U.D MANAGER <span class="ver">v10.48-DEV</span> <span id="tut-trigger" title="Help / Tutorial">?</span></div>
+  <div id="live-pill"><div id="ldot"></div>SHOWDOWN · COMBAT TRIAL</div>
+</div>
+
+<!-- NAV SWITCH BOX -->
+<div id="nav-mfds">
+  <a class="nav-mfd" href="/">
+    <div class="nav-mfd-icon">⌂</div>
+    <div class="nav-mfd-name">DASHBOARD</div>
+  </a>
+  <a class="nav-mfd" href="builder.html">
+    <div class="nav-mfd-icon">⚙</div>
+    <div class="nav-mfd-name">BUILDER</div>
+  </a>
+  <a class="nav-mfd" href="fleet.html">
+    <div class="nav-mfd-icon">⛟</div>
+    <div class="nav-mfd-name">FLEET</div>
+  </a>
+  <a class="nav-mfd" href="weapons.html">
+    <div class="nav-mfd-icon">⛯</div>
+    <div class="nav-mfd-name">WEAPONS</div>
+  </a>
+  <a class="nav-mfd current" href="showdown.html">
+    <div class="nav-mfd-icon">⚔</div>
+    <div class="nav-mfd-name">SHOWDOWN</div>
+  </a>
+  <a class="nav-mfd" href="loadouts.html">
+    <div class="nav-mfd-icon">⛃</div>
+    <div class="nav-mfd-name">LOADOUTS</div>
+  </a>
+  <a class="nav-mfd" href="recommend.html">
+    <div class="nav-mfd-icon">◈</div>
+    <div class="nav-mfd-name">AI BUILD</div>
+  </a>
+</div>
+
+<div id="title">
+  <h1><span class="brk">⟦</span>SHOWDOWN<span class="impact"></span>COMBAT TRIAL<span class="brk">⟧</span></h1>
+  <div id="title-sub">PVP MATCHUP · TTK ANALYSIS · TACTICAL VERDICT</div>
+</div>
+
+<div id="scene">
+  <div id="battle">
+    <!-- YOUR SHIP -->
+    <div class="fighter you" data-side="· YOU ·">
+      <div class="src-tabs" data-side="you">
+        <span class="src-tab active" data-src="stock">STOCK</span>
+        <span class="src-tab" data-src="builder">BUILDER</span>
+        <span class="src-tab" data-src="my">MY BUILDS</span>
+        <span class="src-tab" data-src="ai">AI BEST</span>
+      </div>
+      <div class="ai-sub" data-side="you">
+        <span class="ai-chip active" data-arch="auto">AUTO</span>
+        <span class="ai-chip" data-arch="aggressor">AGGRESSOR</span>
+        <span class="ai-chip" data-arch="stealthy">STEALTHY</span>
+        <span class="ai-chip" data-arch="brawler">BRAWLER</span>
+        <span class="ai-chip" data-arch="sniper">SNIPER</span>
+        <span class="ai-chip" data-arch="swarm">SWARM</span>
+        <span class="ai-chip" data-arch="meta">META</span>
+        <span class="ai-divider"></span>
+        <span class="ai-chip tier" data-tier="novice">NOVICE</span>
+        <span class="ai-chip tier active" data-tier="veteran">VETERAN</span>
+        <span class="ai-chip tier" data-tier="ace">ACE</span>
+      </div>
+      <div class="f-select">
+        <select id="ship-you"><option value="">— SELECT YOUR SHIP —</option></select>
+        <span class="cfg-btn" data-side="you" onclick="openCfg('you')">⚙ CONFIGURE</span>
+      </div>
+      <div class="f-img-wrap"><img class="f-img" id="img-you" alt=""></div>
+      <div class="f-name" id="name-you">—</div>
+      <div class="f-meta" id="meta-you">SELECT A SHIP</div>
+      <div class="f-stats" id="stats-you"></div>
+    </div>
+
+    <!-- VS DIVIDER -->
+    <div id="vs">
+      <span id="vs-arrow-l">▶</span>
+      <div id="vs-circle">VS</div>
+      <span id="vs-arrow-r">◀</span>
+    </div>
+
+    <!-- ENEMY SHIP -->
+    <div class="fighter enemy" data-side="· ENEMY ·">
+      <div class="src-tabs" data-side="enemy">
+        <span class="src-tab active" data-src="stock">STOCK</span>
+        <span class="src-tab" data-src="my">MY BUILDS</span>
+        <span class="src-tab" data-src="ai">AI BEST</span>
+      </div>
+      <div class="ai-sub" data-side="enemy">
+        <span class="ai-chip active" data-arch="auto">AUTO</span>
+        <span class="ai-chip" data-arch="aggressor">AGGRESSOR</span>
+        <span class="ai-chip" data-arch="stealthy">STEALTHY</span>
+        <span class="ai-chip" data-arch="brawler">BRAWLER</span>
+        <span class="ai-chip" data-arch="sniper">SNIPER</span>
+        <span class="ai-chip" data-arch="swarm">SWARM</span>
+        <span class="ai-chip" data-arch="meta">META</span>
+        <span class="ai-divider"></span>
+        <span class="ai-chip tier" data-tier="novice">NOVICE</span>
+        <span class="ai-chip tier active" data-tier="veteran">VETERAN</span>
+        <span class="ai-chip tier" data-tier="ace">ACE</span>
+      </div>
+      <div class="f-select">
+        <select id="ship-enemy"><option value="">— SELECT ENEMY —</option></select>
+        <span class="cfg-btn" data-side="enemy" onclick="openCfg('enemy')">⚙ CONFIGURE</span>
+        <span class="ctr-btn" onclick="openCounters()">🎯 COUNTERS</span>
+      </div>
+      <div class="f-img-wrap"><img class="f-img" id="img-enemy" alt=""></div>
+      <div class="f-name" id="name-enemy">—</div>
+      <div class="f-meta" id="meta-enemy">SELECT A SHIP</div>
+      <div class="f-stats" id="stats-enemy"></div>
+    </div>
+  </div>
+
+  <!-- BATTLE PANEL -->
+  <div id="battle-panel">
+    <!-- LEFT: YOUR damage on enemy -->
+    <div class="bp-side" data-label="· YOU vs ENEMY ·">
+      <div class="bp-row"><span class="lbl">YOUR DPS</span><span class="bar"><span class="bar-fill" id="bar-you-dps" style="width:0%"></span></span><span class="v r" id="v-you-dps">--</span></div>
+      <div class="bp-row"><span class="lbl">YOUR ALPHA</span><span class="bar"><span class="bar-fill" id="bar-you-alpha" style="width:0%"></span></span><span class="v r" id="v-you-alpha">--</span></div>
+      <div class="bp-row"><span class="lbl">ENEMY HP</span><span class="bar"><span class="bar-fill s" id="bar-enemy-hp" style="width:0%"></span></span><span class="v s" id="v-enemy-hp">--</span></div>
+      <div class="bp-row"><span class="lbl">YOUR TTK</span><span class="bar"><span class="bar-fill" id="bar-you-ttk" style="width:0%"></span></span><span class="v" id="v-you-ttk">--</span></div>
+    </div>
+
+    <!-- CENTER: VERDICT -->
+    <div id="bp-verdict">
+      <div id="vd-result">SELECT SHIPS</div>
+      <div id="vd-edge">—</div>
+      <div id="vd-tactics">Pick a ship for each side to begin trial</div>
+      <a id="run-fight" class="disabled" href="#">▶ RUN FIGHT</a>
+    </div>
+
+    <!-- RIGHT: ENEMY damage on you -->
+    <div class="bp-side" data-label="· ENEMY vs YOU ·">
+      <div class="bp-row"><span class="lbl">ENEMY DPS</span><span class="bar"><span class="bar-fill" id="bar-enemy-dps" style="width:0%"></span></span><span class="v r" id="v-enemy-dps">--</span></div>
+      <div class="bp-row"><span class="lbl">ENEMY ALPHA</span><span class="bar"><span class="bar-fill" id="bar-enemy-alpha" style="width:0%"></span></span><span class="v r" id="v-enemy-alpha">--</span></div>
+      <div class="bp-row"><span class="lbl">YOUR HP</span><span class="bar"><span class="bar-fill s" id="bar-you-hp" style="width:0%"></span></span><span class="v s" id="v-you-hp">--</span></div>
+      <div class="bp-row"><span class="lbl">ENEMY TTK</span><span class="bar"><span class="bar-fill" id="bar-enemy-ttk" style="width:0%"></span></span><span class="v" id="v-enemy-ttk">--</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- COUNTERS MODAL — tactical advisor / weapon recommendations -->
+<div id="ctr" aria-hidden="true">
+  <div id="ctr-card">
+    <button id="ctr-close" aria-label="Close" onclick="closeCounters()">×</button>
+    <div id="ctr-card-hdr">⏵ COUNTER WEAPONS · TACTICAL ADVISOR</div>
+    <div id="ctr-summary">SELECT AN ENEMY FIRST</div>
+    <div id="ctr-goals"></div>
+    <div id="ctr-list"></div>
+  </div>
+</div>
+
+<!-- CONFIGURE LOADOUT MODAL — mini-builder for picking weapons/missiles/components -->
+<div id="cfg" aria-hidden="true">
+  <div id="cfg-card" data-label="· CONFIGURE LOADOUT ·">
+    <button id="cfg-close" aria-label="Close">×</button>
+    <div id="cfg-ship">—</div>
+    <div id="cfg-body"></div>
+    <div class="cfg-actions">
+      <a class="cfg-act" id="cfg-apply" href="#">▶ APPLY LOADOUT</a>
+      <a class="cfg-act cancel" id="cfg-cancel" href="#">× CANCEL</a>
+    </div>
+  </div>
+</div>
+
+<!-- FIGHT RESULT MODAL -->
+<div id="result" aria-hidden="true">
+  <div id="result-card">
+    <button id="result-close" aria-label="Close">×</button>
+    <div class="r-headline" id="r-headline">VICTORY</div>
+    <div class="r-summary" id="r-summary">— vs —</div>
+    <div class="r-grid" id="r-grid"></div>
+    <div class="r-log">
+      <div class="r-log-hdr">⏵ FIGHT LOG</div>
+      <div id="r-log-rows"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ───────────────────────────────────────────────────────────────────────────
+// SHOWDOWN — advanced TTK + matchup logic
+// ───────────────────────────────────────────────────────────────────────────
+
+document.querySelectorAll('.nav-mfd').forEach(function(a){
+  a.addEventListener('click', function(ev){
+    if(a.classList.contains('current')){ ev.preventDefault(); return; }
+    if(a.getAttribute('data-status') === 'wip'){
+      ev.preventDefault();
+      var t = document.createElement('div');
+      t.textContent = '⏵ ' + (a.querySelector('.nav-mfd-name')?.textContent || 'PAGE') + ' COMING SOON';
+      t.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;'+
+        'padding:14px 28px;background:linear-gradient(180deg,rgba(50,30,8,.79),rgba(28,16,4,.96));'+
+        'border:1px solid rgba(255,180,80,.65);color:rgba(255,200,128,.95);'+
+        'font-family:JetBrains Mono,monospace;font-size:15px;letter-spacing:3px;font-weight:700;'+
+        'text-shadow:0 0 8px rgba(255,180,80,.65);box-shadow:0 0 28px rgba(255,140,40,.45);'+
+        'opacity:0;transition:opacity .25s;';
+      document.body.appendChild(t);
+      requestAnimationFrame(function(){ t.style.opacity = '1'; });
+      setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){t.remove();},300); }, 1400);
+      return;
+    }
+    var href = a.getAttribute('href');
+    if(!href || href === '#') return;
+    ev.preventDefault();
+    document.body.style.opacity='0';document.body.style.transform='scale(1.06)';document.body.style.filter='blur(8px)';
+    setTimeout(function(){ location.href = href; }, 380);
+  });
+});
+
+var WIKI_SHIPS = null;
+var SHIP_DATA = {}, WEAPONS = [], WEAP_BY_ID = {}, COMP_DB = {};
+var YOU = null, ENEMY = null;
+var YOU_LOADOUT = null, ENEMY_LOADOUT = null;  // builder-style loadouts when source != stock
+var YOU_SRC = 'stock', ENEMY_SRC = 'stock';
+var YOU_AI = { arch:'auto', tier:'veteran' };
+var ENEMY_AI = { arch:'auto', tier:'veteran' };
+
+function fmtK(n){ if(!n) return '--'; if(n>=1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M'; if(n>=1e3) return Math.round(n/1e3)+'k'; return Math.round(n).toLocaleString(); }
+function fmtSec(s){ if(!s||!isFinite(s)||s>9000) return '∞'; if(s<1) return s.toFixed(2)+'s'; if(s<10) return s.toFixed(1)+'s'; return Math.round(s)+'s'; }
+
+function loadShips(){
+  return fetch('/data/scwiki.json?v=20').then(function(r){return r.json();}).then(function(d){
+    WIKI_SHIPS = d.ships || {};
+    return WIKI_SHIPS;
+  });
+}
+
+// Builder uses SHIP_DATA names ("Hammerhead"); SC Wiki uses full names ("Aegis Hammerhead").
+// Reconcile: given a name from either source, return the SC Wiki name to use as dropdown value.
+function wikiNameFor(anyName){
+  if(!anyName || !WIKI_SHIPS) return null;
+  if(WIKI_SHIPS[anyName]) return anyName;          // already a wiki name
+  // Reverse: scan for a wiki ship whose legacyName matches
+  for(var n in WIKI_SHIPS){
+    if(WIKI_SHIPS[n].legacyName === anyName) return n;
+  }
+  return null;
+}
+// Inverse: given a wiki name, return the SHIP_DATA legacy name (for combat stat computation).
+function legacyNameFor(wikiName){
+  if(!wikiName) return null;
+  if(SHIP_DATA[wikiName]) return wikiName;    // already a legacy name
+  var s = WIKI_SHIPS[wikiName];
+  if(s && s.legacyName) return s.legacyName;
+  return null;
+}
+
+// Pull the legacy SHIP_DATA / WEAPONS / COMP_DB (same source the builder uses) so we
+// can compute combat stats from a builder-style loadout (custom weapon picks).
+function loadLegacy(){
+  return fetch('/legacy.html').then(function(r){return r.text();}).then(function(src){
+    var blocks = [], pos = 0;
+    while(true){
+      var s = src.indexOf('<script', pos); if(s < 0) break;
+      var e = src.indexOf('</' + 'script>', s); if(e < 0) break;
+      var inner = src.slice(src.indexOf('>', s) + 1, e);
+      if(inner.indexOf('SHIP_DATA') > -1 || inner.indexOf('WEAPONS') > -1) blocks.push(inner);
+      pos = e + 9;
+    }
+    var code = blocks.join('\n');
+    var blob = new Blob([code], {type:'text/javascript'});
+    var url = URL.createObjectURL(blob);
+    return new Promise(function(resolve){
+      var scr = document.createElement('script');
+      scr.src = url;
+      scr.onload = function(){
+        URL.revokeObjectURL(url);
+        if(window.SHIP_DATA) SHIP_DATA = window.SHIP_DATA;
+        if(window.WEAPONS) WEAPONS = Array.isArray(window.WEAPONS) ? window.WEAPONS : Object.values(window.WEAPONS);
+        if(window.COMP_DB) COMP_DB = window.COMP_DB;
+        WEAPONS.forEach(function(w){ if(w && w.id) WEAP_BY_ID[w.id] = w; });
+        resolve();
+      };
+      scr.onerror = function(){ resolve(); };
+      document.head.appendChild(scr);
+    });
+  });
+}
+
+// All ships — let users pick any of the 271; combat math will fall back to size-based
+// shield + zero DPS / alpha if SC Wiki has no weaponry numbers for that ship.
+function combatShipEntries(){
+  return Object.entries(WIKI_SHIPS||{}).sort(function(a,b){ return a[0].localeCompare(b[0]); });
+}
+
+function populateSelectShips(selId){
+  var sel = document.getElementById(selId);
+  var entries = combatShipEntries();
+  // Sort by manufacturer + ship name; flat list so every line is selectable
+  entries.sort(function(a,b){
+    var am = (a[1].mfr || 'zzz'), bm = (b[1].mfr || 'zzz');
+    if(am !== bm) return am.localeCompare(bm);
+    return a[0].localeCompare(b[0]);
+  });
+  sel.innerHTML = '<option value="">— SELECT A SHIP —</option>';
+  entries.forEach(function(kv){
+    var n = kv[0], s = kv[1];
+    var mfrShort = (s.mfr || '').split(/\s+/)[0]; // "Aegis Dynamics" → "Aegis"
+    var opt = document.createElement('option');
+    opt.value = n;
+    opt.textContent = (mfrShort ? mfrShort + ' · ' : '') + n;
+    sel.appendChild(opt);
+  });
+}
+
+function populateSelectMyBuilds(selId){
+  var sel = document.getElementById(selId);
+  var loadouts = (function(){ try { return JSON.parse(localStorage.getItem('sc_loadouts_v2')||'[]'); } catch(e){ return []; } })();
+  sel.innerHTML = '<option value="">— SELECT BUILD —</option>';
+  if(!loadouts.length){
+    var opt = document.createElement('option');
+    opt.value = ''; opt.textContent = '(no saved builds — save one in builder)';
+    opt.disabled = true;
+    sel.appendChild(opt);
+    return;
+  }
+  loadouts.sort(function(a,b){return (b.id||0)-(a.id||0);}).forEach(function(l){
+    var opt = document.createElement('option');
+    // Use the wiki name as value so renderFighter resolves an image; fall back to legacy name
+    var wikiName = wikiNameFor(l.ship) || l.ship || '';
+    opt.value = wikiName;
+    opt.textContent = (l.name || 'Unnamed') + ' · ' + (l.ship || '?');
+    opt.dataset.loadoutId = String(l.id || '');
+    sel.appendChild(opt);
+  });
+}
+
+function populateSelect(side){
+  var src = (side === 'you') ? YOU_SRC : ENEMY_SRC;
+  if(src === 'my'){ populateSelectMyBuilds('ship-' + side); }
+  else { populateSelectShips('ship-' + side); }
+}
+
+// SC Wiki stores `size` as a NUMBER (1=XS, 2=S, 3=M, 4=L, 5=XL, 6=XXL); convert safely.
+function shieldFromSize(sizeVal, hullHP){
+  var sizeMap = { 1:3500, 2:6500, 3:14000, 4:45000, 5:120000, 6:320000,
+                  'XS':3500, 'S':6500, 'M':14000, 'L':45000, 'XL':120000, 'XXL':320000 };
+  var key = (typeof sizeVal === 'string') ? sizeVal.toUpperCase() : sizeVal;
+  return sizeMap[key] || (hullHP ? hullHP * 0.45 : 0) || 5000;
+}
+function safeCrew(c){
+  if(!c) return 1;
+  if(typeof c === 'number') return c;
+  // SC Wiki schema: { min, max, weapon, operation }
+  if(typeof c === 'object') return c.max || c.min || c.weapon || 1;
+  return 1;
+}
+
+// STOCK stats — pull from SC Wiki when available, fall through to SHIP_DATA defaults when wiki has zeros.
+function combatStatsStock(name){
+  var s = WIKI_SHIPS[name]; if(!s) return null;
+  var w = s.weaponry || {};
+  var dps = w.turretDPS || 0;
+  var alpha = w.turretAlpha || 0;
+  var missileTotal = (w.missileCount||0) * (w.missileDamage||0);
+  // If wiki has no weapon numbers, compute from the legacy SHIP_DATA default loadout
+  if((!dps || !alpha) && Object.keys(SHIP_DATA||{}).length && legacyNameFor(name)){
+    var fromLegacy = combatStatsCustom(name, {}, 'STOCK');
+    if(fromLegacy && fromLegacy.dps > 0){
+      return Object.assign({}, fromLegacy, { sourceLabel:'STOCK' });
+    }
+  }
+  var sustain = w.turretSustainedDPS || dps * 0.7;
+  var hull = s.health || 0;
+  var shieldHP = shieldFromSize(s.size, hull);
+  return {
+    name:name, sourceLabel:'STOCK', dps:dps, sustain:sustain, alpha:alpha, missileTotal:missileTotal,
+    hull:hull, shieldHP:shieldHP, totalHP:hull + shieldHP,
+    scm:s.scm || 0, afterburner:s.afterburner || 0, crew:safeCrew(s.crew),
+    size:s.size || '', role:s.role || '', mfr:s.mfr || '', image:s.image || ''
+  };
+}
+
+// CUSTOM stats — compute DPS/Alpha/Shield from a builder-style loadout against legacy SHIP_DATA
+// `name` may be either a SC Wiki name or a SHIP_DATA name; reconcile.
+function combatStatsCustom(name, loadout, label){
+  var wikiName = wikiNameFor(name) || name;
+  var legacyName = legacyNameFor(wikiName) || name;
+  var legacy = SHIP_DATA[legacyName];
+  var wikiShip = WIKI_SHIPS[wikiName];
+  if(!legacy && !wikiShip) return null;
+  loadout = loadout || {};
+  var off = loadout._off || {};
+  var pips = loadout._pips || {};
+  // Weapon power multiplier: pips/5 clamped to [0.5, 2.0]; fallback 1.0 if unset
+  var wpMul = pips.wp ? Math.max(0.5, Math.min(2.0, pips.wp / 5)) : 1.0;
+  var slots = (legacy && legacy.slots) || [];
+  var racks = (legacy && legacy.missiles) || [];
+  var totalDps = 0, totalAlpha = 0, totalSustain = 0, missileTotal = 0;
+  var weaponsList = [], missilesList = [];
+  // GUNS
+  slots.forEach(function(sl, i){
+    var key = 'sl' + i;
+    if(off[key]) return;  // weapon turned off
+    var wid = loadout[key] || sl.default || '';
+    var w = WEAP_BY_ID[wid];
+    if(!w) return;
+    var cnt = sl.count || 1;
+    totalDps += (w.dps||0) * cnt * wpMul;
+    totalSustain += (w.sustained || w.dps || 0) * cnt * 0.7 * wpMul;
+    totalAlpha += (w.alpha || 0) * cnt * wpMul;
+    weaponsList.push(cnt + '× ' + (w.name || wid));
+  });
+  // MISSILES — racks count up to total damage
+  racks.forEach(function(r, i){
+    var rackKey = 'm' + i + '_rack';
+    var missKey = 'm' + i + '_missile';
+    if(off[rackKey]) return;
+    var rackId = loadout[rackKey] || r.default || '';
+    var missId = loadout[missKey] || '';
+    var rackData = (typeof RACK_DB !== 'undefined' && RACK_DB) ? RACK_DB[rackId] : null;
+    var pool = (typeof MISSILE_DB !== 'undefined' && MISSILE_DB && rackData) ? MISSILE_DB[rackData.sz] : null;
+    var m = pool ? (pool.find(function(mm){return mm.id === missId;}) || pool[0]) : null;
+    if(rackData && m){
+      var cnt = r.count || 1;
+      missileTotal += (m.dmg || 0) * (rackData.cap || 1) * cnt;
+      missilesList.push(cnt + '× ' + rackData.cap + '× ' + (m.name || missId));
+    }
+  });
+  // SHIELD — read from configured shield component
+  var shieldHP = 0;
+  if(loadout['c_sg_0'] || loadout['c_sg']){
+    var sgName = loadout['c_sg_0'] || loadout['c_sg'];
+    var sg = (COMP_DB.sg || {})[sgName];
+    if(sg){
+      var sgCount = (legacy && legacy.comps && legacy.comps.sg && legacy.comps.sg.count) || 1;
+      shieldHP = (sg.totalHP || 0) * sgCount;
+    }
+  }
+  if(!shieldHP){
+    shieldHP = shieldFromSize(wikiShip && wikiShip.size, wikiShip && wikiShip.health);
+  }
+  var hull = (wikiShip && wikiShip.health) || 0;
+  return {
+    name:wikiName, sourceLabel:label||'CUSTOM',
+    dps:totalDps, sustain:totalSustain, alpha:totalAlpha,
+    missileTotal:missileTotal, hull:hull, shieldHP:shieldHP, totalHP:hull + shieldHP,
+    scm:(wikiShip && wikiShip.scm)||0, afterburner:(wikiShip && wikiShip.afterburner)||0,
+    crew:safeCrew(wikiShip && wikiShip.crew), size:(wikiShip && wikiShip.size)||'',
+    role:(wikiShip && wikiShip.role)||'', mfr:(wikiShip && wikiShip.mfr)||'',
+    image:(wikiShip && wikiShip.image)||'',
+    loadoutDetail: { weapons:weaponsList, missiles:missilesList }
+  };
+}
+
+// AI archetypes — each defines (a) how to pick a weapon for a slot,
+// (b) how to pick a component, and (c) the power-pip allocation.
+// Tiered: NOVICE = ship default, VETERAN = top-50% pool, ACE = top item.
+var AI_ARCHETYPES = {
+  aggressor: {
+    label:'AGGRESSOR',
+    weaponPick:function(fits){ return fits.slice().sort(function(a,b){return (b.dps||0)-(a.dps||0);}); },
+    compPick:{ pp:'out', sg:'totalHP', cooler:'rate', qd:'speed', radar:'range' },
+    pips:{ wp:8, sg:4, en:5, qd:3 },  // weapons-heavy
+  },
+  stealthy: {
+    label:'STEALTHY',
+    weaponPick:function(fits){ return fits.slice().sort(function(a,b){
+      // ballistic > energy (lower EM); secondary: high alpha
+      var aBal = (a.type||'').toLowerCase().indexOf('ball') > -1 ? 1 : 0;
+      var bBal = (b.type||'').toLowerCase().indexOf('ball') > -1 ? 1 : 0;
+      if(aBal !== bBal) return bBal - aBal;
+      return (b.alpha||0) - (a.alpha||0);
+    }); },
+    compPick:{ pp:'em', sg:'totalHP', cooler:'rate', qd:'speed', radar:'range' },  // pp:em sorted ASC (lower=better)
+    compSortAsc:{ pp:true },  // for em: lower is better
+    pips:{ wp:6, sg:3, en:4, qd:3 },
+  },
+  brawler: {
+    label:'BRAWLER',
+    weaponPick:function(fits){ return fits.slice().sort(function(a,b){
+      // ballistic preferred (no power draw), then by sustained DPS
+      var aBal = (a.type||'').toLowerCase().indexOf('ball') > -1 ? 1 : 0;
+      var bBal = (b.type||'').toLowerCase().indexOf('ball') > -1 ? 1 : 0;
+      if(aBal !== bBal) return bBal - aBal;
+      return ((b.sustained||b.dps)||0) - ((a.sustained||a.dps)||0);
+    }); },
+    compPick:{ pp:'out', sg:'totalHP', cooler:'rate', qd:'speed', radar:'range' },
+    pips:{ wp:5, sg:8, en:5, qd:2 },  // shield-heavy
+  },
+  sniper: {
+    label:'SNIPER',
+    weaponPick:function(fits){ return fits.slice().sort(function(a,b){
+      // longest range, then highest alpha
+      if((b.range||0) !== (a.range||0)) return (b.range||0) - (a.range||0);
+      return (b.alpha||0) - (a.alpha||0);
+    }); },
+    compPick:{ pp:'out', sg:'totalHP', cooler:'rate', qd:'speed', radar:'range' },
+    pips:{ wp:7, sg:4, en:4, qd:5 },
+  },
+  swarm: {
+    label:'SWARM',
+    weaponPick:function(fits){ return fits.slice().sort(function(a,b){return (b.dps||0)-(a.dps||0);}); },
+    compPick:{ pp:'out', sg:'totalHP', cooler:'rate', qd:'speed', radar:'range' },
+    pips:{ wp:5, sg:5, en:5, qd:3 },
+    // Swarm prioritizes loading every missile rack
+  },
+  meta: {
+    label:'META',
+    weaponPick:function(fits){ return fits.slice().sort(function(a,b){return (b.dps||0)-(a.dps||0);}); },
+    compPick:{ pp:'out', sg:'totalHP', cooler:'rate', qd:'speed', radar:'range' },
+    pips:{ wp:7, sg:6, en:5, qd:3 },  // balanced max
+  },
+};
+
+// COUNTER-BUILD — analyze YOU's stats, pick the archetype that exploits weaknesses
+function counterArchetype(youStats){
+  if(!youStats) return 'aggressor';
+  // Glass cannon (low HP, high DPS) → Brawler outlasts
+  if(youStats.totalHP < 8000 && youStats.dps > 1000) return 'brawler';
+  // Tank (high HP, low DPS) → Sniper kites
+  if(youStats.totalHP > 50000 && youStats.dps < 2000) return 'sniper';
+  // Big slow hull (low SCM) → Swarm with missiles
+  if(youStats.scm < 150 && youStats.totalHP > 20000) return 'swarm';
+  // Default — alpha them down
+  return 'aggressor';
+}
+
+// TIER FILTER — narrow component pool by tier
+function tierFilter(items, tier){
+  if(!items.length) return items;
+  if(tier === 'novice') return items.slice(-1);  // worst available
+  if(tier === 'veteran') return items.slice(0, Math.max(1, Math.ceil(items.length / 2)));
+  return items;  // ace = full pool (best at top)
+}
+
+// AI loadout factory — given a ship, archetype id, and tier, return a loadout object
+function aiArchetypeLoadout(name, archId, tier, youStats){
+  var legacyName = legacyNameFor(name) || name;
+  var legacy = SHIP_DATA[legacyName]; if(!legacy) return null;
+  // Resolve AUTO → counter-build pick
+  if(archId === 'auto') archId = counterArchetype(youStats);
+  var arch = AI_ARCHETYPES[archId] || AI_ARCHETYPES.aggressor;
+  tier = tier || 'veteran';
+  var loadout = { _off:{}, _pips:{}, _exp:{} };
+
+  // WEAPONS — pick using archetype's filter, then narrow by tier
+  (legacy.slots || []).forEach(function(sl, i){
+    if(tier === 'novice'){ /* leave default — loadout has no sl<i> key */ return; }
+    var fits = WEAPONS.filter(function(w){ return w && w.sz === sl.sz && !w.missile; });
+    fits = arch.weaponPick(fits);
+    fits = tierFilter(fits, tier);
+    if(fits[0]) loadout['sl' + i] = fits[0].id;
+  });
+
+  // MISSILES — for SWARM, pick the highest-damage rack/missile in each slot
+  if(archId === 'swarm' && legacy.missiles){
+    legacy.missiles.forEach(function(r, i){
+      if(tier === 'novice') return;
+      var racks = (typeof RACK_DB !== 'undefined' && RACK_DB) ? Object.entries(RACK_DB).filter(function(kv){return kv[1].sz === r.sz;}) : [];
+      racks.sort(function(a,b){ return ((b[1].cap||1) - (a[1].cap||1)); });
+      racks = tierFilter(racks, tier);
+      if(racks[0]) loadout['m' + i + '_rack'] = racks[0][0];
+    });
+  }
+
+  // COMPONENTS — pick by archetype's preferred stat key, narrow by tier
+  Object.keys(arch.compPick).forEach(function(cat){
+    if(tier === 'novice') return;
+    var key = arch.compPick[cat];
+    var db = COMP_DB[cat] || {};
+    var ent = Object.entries(db);
+    if(!ent.length) return;
+    var asc = arch.compSortAsc && arch.compSortAsc[cat];
+    ent.sort(function(a,b){
+      var av = (a[1] || {})[key] || 0, bv = (b[1] || {})[key] || 0;
+      return asc ? (av - bv) : (bv - av);
+    });
+    ent = tierFilter(ent, tier);
+    if(ent[0]) loadout['c_' + cat + '_0'] = ent[0][0];
+  });
+
+  // PIPS — power allocation per archetype
+  loadout._pips = Object.assign({}, arch.pips);
+  loadout._archetype = arch.label;  // metadata for the source label
+  return loadout;
+}
+
+// Back-compat wrapper for any older callers
+function aiBestLoadout(name){
+  return aiArchetypeLoadout(name, 'aggressor', 'veteran', null);
+}
+
+// === WEAPON COUNTER RECOMMENDATIONS ============================================
+// Scores every weapon for a given goal + enemy profile and returns top picks.
+// Uses what's available in WEAPONS: dps, alpha, range, rpm, draw, type (energy/ballistic/distortion).
+//
+// Heuristic per goal:
+//   strip-shields: distortion damage > energy alpha > raw DPS, capped EU draw
+//   crush-hull:    ballistic alpha > sustained DPS > range
+//   track-fast:    high RPM + tight tracking (proxy: smaller size, low draw)
+//   long-range:    range > alpha > anything that has bullet-velocity
+//   all-around:    balanced DPS + alpha, prefer mixed energy+ballistic
+//
+// Enemy modifier: ship size affects which weapon sizes make sense (don't suggest a
+// gimbal S1 against a Polaris). We filter weapon size by the slot sizes the YOUR
+// ship has — falling back to the size that matches enemy "weight class" when YOU is null.
+function recommendCounterWeapons(enemyStats, goal, youStats){
+  if(!Array.isArray(WEAPONS) || !WEAPONS.length) return [];
+  // Slot sizes available on YOUR ship (if known) — only these are equippable
+  var allowedSizes = null;
+  if(youStats){
+    var legacy = SHIP_DATA[legacyNameFor(youStats.name) || youStats.name];
+    if(legacy && legacy.slots){
+      allowedSizes = Array.from(new Set(legacy.slots.map(function(sl){return sl.sz;})));
+    }
+  }
+  // Enemy weight class → suggested weapon size band when no YOU is set
+  function targetSizesFromEnemy(){
+    var sz = enemyStats && enemyStats.size;
+    if(typeof sz === 'string'){
+      var map = { XS:[1,2], S:[1,2,3], M:[2,3,4], L:[3,4,5], XL:[4,5,6], XXL:[4,5,6] };
+      return map[sz.toUpperCase()] || [2,3,4];
+    }
+    if(typeof sz === 'number') return [Math.max(1, sz-1), sz, Math.min(6, sz+1)];
+    return [2,3,4];
+  }
+  var sizeFilter = allowedSizes || targetSizesFromEnemy();
+
+  // Score each weapon
+  return WEAPONS.filter(function(w){
+    return w && w.id && w.dps && (sizeFilter.indexOf(w.sz) > -1) && !w.missile;
+  }).map(function(w){
+    var t = (w.type || '').toLowerCase();
+    var isBal = t.indexOf('ball') > -1;
+    var isEng = t.indexOf('energy') > -1 || t.indexOf('laser') > -1;
+    var isDist = t.indexOf('dist') > -1;
+    var dps = w.dps || 0, alpha = w.alpha || 0, range = w.range || 0, rpm = w.rpm || 0, draw = w.draw || w.drawPerShot || 0;
+    var score = 0, why = '';
+    if(goal === 'strip-shields'){
+      // distortion best, then energy alpha, penalty on heavy draw
+      if(isDist) score += 5000;
+      if(isEng) score += alpha * 1.4 + dps * 0.6;
+      else score += alpha * 0.7 + dps * 0.3;
+      score -= draw * 0.05;
+      why = isDist ? 'DISTORTION · DRAINS SHIELD' : (isEng ? 'HIGH ALPHA · POPS SHIELD' : 'CHIPS SHIELD');
+    } else if(goal === 'crush-hull'){
+      // ballistic dominant, then alpha, sustained DPS
+      if(isBal) score += alpha * 1.6 + dps * 1.0;
+      else score += alpha * 0.6 + dps * 0.5;
+      // Bonus for high RPM ballistic (gatling-style) — sustained pressure
+      if(isBal && rpm > 600) score += 1500;
+      why = isBal ? (rpm > 600 ? 'GATLING · SHREDS HULL' : 'BALLISTIC · IGNORES SHIELD-RES') : 'GENERAL DAMAGE';
+    } else if(goal === 'track-fast'){
+      // High RPM + low draw + low alpha (= sustained, gimbal-friendly)
+      score += rpm * 0.5 + dps * 0.6 - draw * 0.15;
+      // Prefer lighter sizes (better gimbal tracking)
+      score -= (w.sz || 1) * 200;
+      why = rpm > 500 ? 'HIGH RPM · LEADS FAST TARGETS' : 'TRACKS WELL';
+    } else if(goal === 'long-range'){
+      score += range * 1.2 + alpha * 0.8;
+      why = (range >= 2000 ? 'LONG REACH · ' + Math.round(range) + 'm' : 'EXTENDED RANGE');
+    } else { // all-around
+      score += dps + alpha * 0.8 + range * 0.2 - draw * 0.1;
+      // Bonus if mixes well (not the absolute meta but balanced)
+      if(isEng && dps > 400) score += 600;
+      if(isBal && alpha > 300) score += 500;
+      why = isBal ? 'BALANCED · BALLISTIC PUNCH' : (isEng ? 'BALANCED · ENERGY DPS' : 'BALANCED');
+    }
+    return { w:w, score:score, why:why };
+  }).sort(function(a,b){return b.score - a.score;}).slice(0, 8);
+}
+
+// Dispatcher — always returns SOMETHING usable; falls back to STOCK if custom path fails
+function combatStats(side){
+  var src = (side === 'you') ? YOU_SRC : ENEMY_SRC;
+  var sel = document.getElementById('ship-' + side);
+  var name = sel && sel.value;
+  if(!name) return null;
+  if(src === 'builder' && side === 'you' && YOU_LOADOUT){
+    var c = combatStatsCustom(name, YOU_LOADOUT, 'BUILDER');
+    if(c && c.dps > 0) return c;
+    // fall through
+  }
+  // CUSTOM (configured inline via ⚙ CONFIGURE modal — works for either side)
+  if(src === 'custom'){
+    var lo = (side === 'you') ? YOU_LOADOUT : ENEMY_LOADOUT;
+    if(lo){
+      var cc = combatStatsCustom(name, lo, 'CUSTOM');
+      if(cc && cc.dps > 0) return cc;
+    }
+  }
+  if(src === 'my'){
+    var loadouts = (function(){ try { return JSON.parse(localStorage.getItem('sc_loadouts_v2')||'[]'); } catch(e){ return []; } })();
+    var pickedOpt = sel.options[sel.selectedIndex];
+    var loadoutId = pickedOpt && pickedOpt.dataset.loadoutId;
+    var picked = loadouts.find(function(l){ return String(l.id) === String(loadoutId); });
+    if(picked){
+      var loadout = { _off:{}, _pips:{}, _exp:{} };
+      Object.assign(loadout, picked.slots||{}, picked.missiles||{});
+      Object.keys(picked.comps||{}).forEach(function(k){ loadout['c_' + k + '_0'] = picked.comps[k]; });
+      var c2 = combatStatsCustom(picked.ship, loadout, 'MY: ' + (picked.name||'Build'));
+      if(c2 && c2.dps > 0) return c2;
+    }
+  }
+  if(src === 'ai'){
+    var profile = (side === 'you') ? YOU_AI : ENEMY_AI;
+    // For ENEMY's AUTO archetype, counter-build against YOU's current stats
+    var youStatsForCounter = (side === 'enemy' && profile.arch === 'auto') ? YOU : null;
+    var ai = aiArchetypeLoadout(name, profile.arch, profile.tier, youStatsForCounter);
+    var label = 'AI · ' + (ai && ai._archetype ? ai._archetype : (profile.arch||'').toUpperCase()) +
+                ' · ' + (profile.tier||'').toUpperCase();
+    var c3 = ai ? combatStatsCustom(name, ai, label) : null;
+    if(c3 && c3.dps > 0) return c3;
+  }
+  return combatStatsStock(name);
+}
+
+function renderFighter(side){
+  var stats = combatStats(side);
+  var imgEl = document.getElementById('img-'+side);
+  var nameEl = document.getElementById('name-'+side);
+  var metaEl = document.getElementById('meta-'+side);
+  var statsEl = document.getElementById('stats-'+side);
+  if(!stats){
+    imgEl.style.display = 'none';
+    nameEl.textContent = '—';
+    metaEl.textContent = 'SELECT A SHIP';
+    statsEl.innerHTML = '';
+    return null;
+  }
+  // Image fallback chain: wiki image → builder's SHIP_IMG_MAP (124 hardcoded URLs)
+  // → legacy/wiki name lookup → hide
+  var img = stats.image
+    || (typeof SHIP_IMG_MAP !== 'undefined' && SHIP_IMG_MAP[stats.name])
+    || (typeof SHIP_IMG_MAP !== 'undefined' && SHIP_IMG_MAP[legacyNameFor(stats.name)])
+    || '';
+  if(img){ imgEl.src = img; imgEl.style.display = 'block'; }
+  else imgEl.style.display = 'none';
+  nameEl.textContent = stats.name.toUpperCase();
+  metaEl.textContent = [stats.sourceLabel, stats.role, stats.size?'SIZE '+stats.size:'', stats.crew?'CREW '+stats.crew:''].filter(Boolean).join(' · ').toUpperCase();
+  statsEl.innerHTML =
+    '<div class="f-stat"><span class="l">DPS</span><span class="v r">'+fmtK(stats.dps)+'</span></div>' +
+    '<div class="f-stat"><span class="l">ALPHA</span><span class="v r">'+fmtK(stats.alpha)+'</span></div>' +
+    '<div class="f-stat"><span class="l">SHIELD</span><span class="v s">'+fmtK(stats.shieldHP)+'</span></div>' +
+    '<div class="f-stat"><span class="l">HULL HP</span><span class="v s">'+fmtK(stats.hull)+'</span></div>' +
+    '<div class="f-stat"><span class="l">SCM</span><span class="v">'+(stats.scm?Math.round(stats.scm)+' m/s':'--')+'</span></div>' +
+    '<div class="f-stat"><span class="l">MISSILES</span><span class="v b">'+(stats.missileTotal?fmtK(stats.missileTotal):'--')+'</span></div>';
+  return stats;
+}
+
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+
+function updateBattle(){
+  // Fill bars + values
+  var maxHP = Math.max((YOU?YOU.totalHP:0),(ENEMY?ENEMY.totalHP:0),1);
+  var maxDPS = Math.max((YOU?YOU.dps:0),(ENEMY?ENEMY.dps:0),1);
+  // YOU vs ENEMY
+  var youDps = YOU ? YOU.dps : 0;
+  var enemyHP = ENEMY ? ENEMY.totalHP : 0;
+  var youTTK = (youDps>0 && enemyHP>0) ? enemyHP/youDps : Infinity;
+  document.getElementById('v-you-dps').textContent = fmtK(youDps);
+  document.getElementById('bar-you-dps').style.width = (clamp(youDps/maxDPS*100,0,100))+'%';
+  document.getElementById('v-enemy-hp').textContent = fmtK(enemyHP);
+  document.getElementById('bar-enemy-hp').style.width = (clamp(enemyHP/maxHP*100,0,100))+'%';
+  document.getElementById('v-you-ttk').textContent = fmtSec(youTTK);
+  var ttkPctYou = isFinite(youTTK) ? clamp(100 - (youTTK/60*100), 0, 100) : 0;
+  document.getElementById('bar-you-ttk').style.width = ttkPctYou + '%';
+  // YOUR ALPHA — fill bar against enemy shield, one-shot highlight if alpha breaks shield
+  var youAlpha = YOU ? (YOU.alpha + YOU.missileTotal) : 0;
+  var enemyShield = ENEMY ? ENEMY.shieldHP : 0;
+  document.getElementById('v-you-alpha').textContent = YOU ? fmtK(youAlpha) + (youAlpha && enemyShield && youAlpha >= enemyShield ? ' ⚡' : '') : '--';
+  var alphaPctYou = enemyShield ? clamp(youAlpha / enemyShield * 100, 0, 100) : 0;
+  var ybar = document.getElementById('bar-you-alpha');
+  ybar.style.width = alphaPctYou + '%';
+  ybar.style.background = (youAlpha >= enemyShield && youAlpha > 0)
+    ? 'linear-gradient(90deg,rgba(120,255,140,.55) 0%,rgba(160,255,180,.92) 100%)'
+    : 'linear-gradient(90deg,rgba(232,80,48,.50) 0%,rgba(255,140,80,.85) 100%)';
+  ybar.style.boxShadow = (youAlpha >= enemyShield && youAlpha > 0) ? '0 0 8px rgba(120,255,140,.65)' : '0 0 6px rgba(232,80,48,.55)';
+
+  // ENEMY vs YOU
+  var enemyDps = ENEMY ? ENEMY.dps : 0;
+  var youHP = YOU ? YOU.totalHP : 0;
+  var enemyTTK = (enemyDps>0 && youHP>0) ? youHP/enemyDps : Infinity;
+  document.getElementById('v-enemy-dps').textContent = fmtK(enemyDps);
+  document.getElementById('bar-enemy-dps').style.width = (clamp(enemyDps/maxDPS*100,0,100))+'%';
+  document.getElementById('v-you-hp').textContent = fmtK(youHP);
+  document.getElementById('bar-you-hp').style.width = (clamp(youHP/maxHP*100,0,100))+'%';
+  document.getElementById('v-enemy-ttk').textContent = fmtSec(enemyTTK);
+  var ttkPctEnemy = isFinite(enemyTTK) ? clamp(100 - (enemyTTK/60*100), 0, 100) : 0;
+  document.getElementById('bar-enemy-ttk').style.width = ttkPctEnemy + '%';
+  // ENEMY ALPHA — same treatment vs YOUR shield
+  var enemyAlpha = ENEMY ? (ENEMY.alpha + ENEMY.missileTotal) : 0;
+  var youShield = YOU ? YOU.shieldHP : 0;
+  document.getElementById('v-enemy-alpha').textContent = ENEMY ? fmtK(enemyAlpha) + (enemyAlpha && youShield && enemyAlpha >= youShield ? ' ⚡' : '') : '--';
+  var alphaPctEnemy = youShield ? clamp(enemyAlpha / youShield * 100, 0, 100) : 0;
+  var ebar = document.getElementById('bar-enemy-alpha');
+  ebar.style.width = alphaPctEnemy + '%';
+  ebar.style.background = (enemyAlpha >= youShield && enemyAlpha > 0)
+    ? 'linear-gradient(90deg,rgba(255,180,80,.55) 0%,rgba(220,225,200,.92) 100%)'
+    : 'linear-gradient(90deg,rgba(232,80,48,.50) 0%,rgba(255,140,80,.85) 100%)';
+  ebar.style.boxShadow = (enemyAlpha >= youShield && enemyAlpha > 0) ? '0 0 8px rgba(255,180,80,.65)' : '0 0 6px rgba(232,80,48,.55)';
+
+  // Verdict
+  var vdEl = document.getElementById('vd-result');
+  var edgeEl = document.getElementById('vd-edge');
+  var tacticsEl = document.getElementById('vd-tactics');
+  vdEl.classList.remove('win','lose','close');
+  if(!YOU || !ENEMY){
+    vdEl.textContent = 'SELECT SHIPS';
+    edgeEl.textContent = '—';
+    tacticsEl.textContent = 'Pick a ship for each side to begin trial';
+    return;
+  }
+  // Verdict math: if your TTK is decisively shorter, you win
+  if(youTTK < enemyTTK * 0.7){
+    vdEl.textContent = 'YOU WIN';
+    vdEl.classList.add('win');
+    var advantage = isFinite(enemyTTK) ? Math.round((1 - youTTK/enemyTTK)*100) : 100;
+    edgeEl.textContent = 'DECISIVE · ' + advantage + '% TTK ADVANTAGE';
+  } else if(enemyTTK < youTTK * 0.7){
+    vdEl.textContent = 'YOU LOSE';
+    vdEl.classList.add('lose');
+    var deficit = isFinite(youTTK) ? Math.round((1 - enemyTTK/youTTK)*100) : 100;
+    edgeEl.textContent = 'OUTGUNNED · ' + deficit + '% TTK DEFICIT';
+  } else {
+    vdEl.textContent = 'CLOSE FIGHT';
+    vdEl.classList.add('close');
+    var diff = Math.round(Math.abs(youTTK-enemyTTK)*10)/10;
+    edgeEl.textContent = '±' + diff + 's TTK · SKILL DECIDES';
+  }
+
+  // Tactics — short flavor based on stats
+  var tactics = [];
+  if(YOU.alpha + YOU.missileTotal > ENEMY.totalHP){
+    tactics.push('🎯 ALPHA STRIKE CAN ONESHOT — open with missiles + main guns');
+  }
+  if(YOU.scm > (ENEMY.scm||0) + 30){
+    tactics.push('⚡ SPEED ADVANTAGE — control range, kite at sweet-spot');
+  } else if((ENEMY.scm||0) > YOU.scm + 30){
+    tactics.push('🐢 ENEMY OUTRUNS YOU — force them in close, use cover');
+  }
+  if(YOU.dps > ENEMY.dps * 1.5){
+    tactics.push('🔥 DPS DOMINATE — face them down, brawl');
+  } else if(ENEMY.dps > YOU.dps * 1.5){
+    tactics.push('⚠ ENEMY DPS DOMINATES — never get caught flat');
+  }
+  if((ENEMY.size||'').toUpperCase() === 'XL' || (ENEMY.size||'').toUpperCase() === 'XXL'){
+    tactics.push('🛡 CAP SHIP — strafe blind spots, avoid main batteries');
+  }
+  if(!tactics.length) tactics.push('Match your range to their dead zone · time alpha + missile salvos');
+  tacticsEl.innerHTML = tactics.slice(0,2).join('<br>');
+}
+
+document.getElementById('ship-you').addEventListener('change', function(){
+  YOU = renderFighter('you'); updateBattle();
+});
+document.getElementById('ship-enemy').addEventListener('change', function(){
+  ENEMY = renderFighter('enemy'); updateBattle();
+});
+
+// SOURCE TAB CLICKS — switch between STOCK / BUILDER / MY BUILDS / AI BEST
+document.querySelectorAll('.src-tabs').forEach(function(tabs){
+  var side = tabs.dataset.side;
+  var aiSubRow = document.querySelector('.ai-sub[data-side="' + side + '"]');
+  tabs.querySelectorAll('.src-tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      var src = t.dataset.src;
+      if(src === 'builder' && side === 'you' && !YOU_LOADOUT){
+        var hint = document.createElement('div');
+        hint.textContent = '⏵ NO BUILDER LOADOUT — OPEN BUILDER, CONFIGURE, CLICK "TEST IN SHOWDOWN"';
+        hint.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;padding:12px 22px;background:rgba(50,30,8,.92);border:1px solid rgba(255,180,80,.65);color:rgba(255,200,128,.95);font-family:JetBrains Mono,monospace;font-size:15px;letter-spacing:2px;font-weight:700;opacity:0;transition:opacity .25s;';
+        document.body.appendChild(hint);
+        requestAnimationFrame(function(){ hint.style.opacity='1'; });
+        setTimeout(function(){ hint.style.opacity='0'; setTimeout(function(){ hint.remove(); }, 300); }, 2200);
+        return;
+      }
+      tabs.querySelectorAll('.src-tab').forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      if(side === 'you') YOU_SRC = src; else ENEMY_SRC = src;
+      // Show/hide AI sub-row based on whether AI BEST is the active source
+      var fighter = tabs.closest('.fighter');
+      if(fighter) fighter.setAttribute('data-aiopen', src === 'ai' ? '1' : '0');
+      populateSelect(side);
+      if(side === 'you'){ YOU = renderFighter('you'); }
+      else { ENEMY = renderFighter('enemy'); }
+      updateBattle();
+    });
+  });
+});
+
+// AI ARCHETYPE + TIER CHIP CLICKS
+document.querySelectorAll('.ai-sub').forEach(function(row){
+  var side = row.dataset.side;
+  row.querySelectorAll('.ai-chip[data-arch]').forEach(function(c){
+    c.addEventListener('click', function(){
+      row.querySelectorAll('.ai-chip[data-arch]').forEach(function(x){x.classList.remove('active');});
+      c.classList.add('active');
+      (side === 'you' ? YOU_AI : ENEMY_AI).arch = c.dataset.arch;
+      if(side === 'you'){ YOU = renderFighter('you'); } else { ENEMY = renderFighter('enemy'); }
+      updateBattle();
+    });
+  });
+  row.querySelectorAll('.ai-chip[data-tier]').forEach(function(c){
+    c.addEventListener('click', function(){
+      row.querySelectorAll('.ai-chip[data-tier]').forEach(function(x){x.classList.remove('active');});
+      c.classList.add('active');
+      (side === 'you' ? YOU_AI : ENEMY_AI).tier = c.dataset.tier;
+      if(side === 'you'){ YOU = renderFighter('you'); } else { ENEMY = renderFighter('enemy'); }
+      updateBattle();
+    });
+  });
+});
+
+// === COUNTERS / TACTICAL ADVISOR MODAL ============================================
+var _counterGoal = 'all-around';
+function openCounters(){
+  if(!ENEMY){ _toast('⏵ PICK AN ENEMY FIRST'); return; }
+  if(!Array.isArray(WEAPONS) || !WEAPONS.length){ _toast('⏵ WEAPON DATA STILL LOADING'); return; }
+  renderCounters();
+  document.getElementById('ctr').setAttribute('aria-hidden','false');
+}
+function closeCounters(){ document.getElementById('ctr').setAttribute('aria-hidden','true'); }
+function renderCounters(){
+  var goalsEl = document.getElementById('ctr-goals');
+  var listEl = document.getElementById('ctr-list');
+  var sumEl = document.getElementById('ctr-summary');
+  if(!ENEMY){ sumEl.textContent = 'SELECT AN ENEMY FIRST'; listEl.innerHTML=''; goalsEl.innerHTML=''; return; }
+  // Summary line
+  sumEl.innerHTML = 'VS · <span class="acc">' + ENEMY.name.toUpperCase() + '</span> · ' +
+    (ENEMY.role||'').toUpperCase() + ' · SHIELD ' + fmtK(ENEMY.shieldHP) + ' · HULL ' + fmtK(ENEMY.hull);
+  // Goal chips
+  var goals = [
+    {id:'all-around', label:'ALL-AROUND'},
+    {id:'strip-shields', label:'STRIP SHIELDS'},
+    {id:'crush-hull', label:'CRUSH HULL'},
+    {id:'track-fast', label:'TRACK FAST'},
+    {id:'long-range', label:'LONG RANGE'},
+  ];
+  goalsEl.innerHTML = goals.map(function(g){
+    return '<span class="ctr-goal'+(_counterGoal===g.id?' active':'')+'" data-goal="'+g.id+'">'+g.label+'</span>';
+  }).join('');
+  goalsEl.querySelectorAll('.ctr-goal').forEach(function(el){
+    el.addEventListener('click', function(){ _counterGoal = el.dataset.goal; renderCounters(); });
+  });
+  // Recommendations
+  var picks = recommendCounterWeapons(ENEMY, _counterGoal, YOU);
+  if(!picks.length){ listEl.innerHTML = '<div style="text-align:center;padding:24px;color:rgba(190,205,225,.82);font-family:JetBrains Mono,monospace;font-size:14px;letter-spacing:2px">NO MATCHING WEAPONS</div>'; return; }
+  // Pick the right primary stat per goal for the right-column display
+  function statFor(w){
+    if(_counterGoal === 'long-range') return Math.round(w.range||0) + 'm';
+    if(_counterGoal === 'track-fast') return Math.round(w.rpm||0) + ' RPM';
+    if(_counterGoal === 'crush-hull') return Math.round(w.alpha||0) + ' α';
+    return Math.round(w.dps||0) + ' DPS';
+  }
+  listEl.innerHTML = picks.map(function(p, i){
+    var w = p.w;
+    var meta = ['S' + (w.sz||'?'), w.mfr||'', w.type||''].filter(Boolean).join(' · ');
+    return '<div class="ctr-row">' +
+      '<div class="rank">'+(i+1)+'</div>' +
+      '<div class="info"><div class="name">'+(w.name||w.id)+'</div><div class="meta">'+meta.toUpperCase()+'</div></div>' +
+      '<div class="stat">'+statFor(w)+'</div>' +
+      '<div class="why">'+p.why+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+// === CONFIGURE LOADOUT MODAL — mini-builder ===
+var _cfgSide = null, _cfgShipName = null, _cfgDraft = null;
+function _toast(msg){
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;padding:14px 28px;background:rgba(50,30,8,.92);border:1px solid rgba(255,180,80,.65);color:rgba(255,200,128,.95);font-family:JetBrains Mono,monospace;font-size:14px;letter-spacing:2px;font-weight:700;text-align:center;max-width:80vw;opacity:0;transition:opacity .25s;';
+  document.body.appendChild(t);
+  requestAnimationFrame(function(){ t.style.opacity='1'; });
+  setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){t.remove();},300); }, 2400);
+}
+
+function openCfg(side){
+  var sel = document.getElementById('ship-' + side);
+  var wikiName = sel && sel.value;
+  if(!wikiName){
+    _toast('⏵ PICK A SHIP FIRST');
+    return;
+  }
+  if(!Object.keys(SHIP_DATA||{}).length){
+    _toast('⏵ SHIP DATA STILL LOADING — TRY AGAIN IN A MOMENT');
+    return;
+  }
+  var legacyName = legacyNameFor(wikiName);
+  if(!legacyName || !SHIP_DATA[legacyName]){
+    _toast('⏵ ' + wikiName.toUpperCase() + ' — NOT IN BUILDER YET, CANNOT CONFIGURE');
+    return;
+  }
+  _cfgSide = side;
+  _cfgShipName = wikiName;
+  var existing = (side === 'you') ? YOU_LOADOUT : ENEMY_LOADOUT;
+  _cfgDraft = JSON.parse(JSON.stringify(existing || { _off:{}, _pips:{}, _exp:{} }));
+  document.getElementById('cfg-ship').textContent = wikiName.toUpperCase();
+  buildCfgBody(SHIP_DATA[legacyName]);
+  document.getElementById('cfg').setAttribute('aria-hidden','false');
+}
+function closeCfg(){
+  document.getElementById('cfg').setAttribute('aria-hidden','true');
+  _cfgSide = null; _cfgShipName = null; _cfgDraft = null;
+}
+function buildCfgBody(legacy){
+  var html = [];
+  // WEAPONS
+  if(legacy.slots && legacy.slots.length){
+    html.push('<div class="cfg-section"><div class="cfg-section-hdr">WEAPONS</div>');
+    legacy.slots.forEach(function(sl, i){
+      var sz = sl.sz;
+      var fits = WEAPONS.filter(function(w){ return w && w.sz === sz && !w.missile; });
+      fits.sort(function(a,b){ return (b.dps||0) - (a.dps||0); });
+      var curId = _cfgDraft['sl' + i] || sl.default || '';
+      html.push('<div class="cfg-row"><span class="lbl">' + (sl.lbl || ('SLOT ' + (i+1))) + ' (S' + sz + ')</span>');
+      html.push('<select data-key="sl' + i + '">');
+      fits.forEach(function(w){
+        var sel = (w.id === curId) ? ' selected' : '';
+        html.push('<option value="' + w.id + '"' + sel + '>' + (w.name || w.id) + ' · ' + Math.round(w.dps||0) + ' DPS</option>');
+      });
+      if(!fits.length) html.push('<option value="">(no S' + sz + ' weapons)</option>');
+      html.push('</select></div>');
+    });
+    html.push('</div>');
+  }
+  // MISSILES — same dual structure as the builder: rack picker + missile picker
+  if(legacy.missiles && legacy.missiles.length){
+    html.push('<div class="cfg-section"><div class="cfg-section-hdr">MISSILES</div>');
+    legacy.missiles.forEach(function(r, i){
+      var rackKey = 'm' + i + '_rack';
+      var missKey = 'm' + i + '_missile';
+      var curRack = _cfgDraft[rackKey] || r.default || '';
+      var rackOpts = (typeof RACK_DB !== 'undefined' && RACK_DB)
+        ? Object.entries(RACK_DB).filter(function(kv){ return kv[1].sz === r.sz; })
+        : [];
+      // RACK row
+      html.push('<div class="cfg-row"><span class="lbl">RACK ' + (i+1) + ' (S' + r.sz + ')</span>');
+      html.push('<select data-key="' + rackKey + '" data-rack-idx="' + i + '">');
+      rackOpts.forEach(function(kv){
+        var rk = kv[0], rd = kv[1];
+        var sel = (rk === curRack) ? ' selected' : '';
+        html.push('<option value="' + rk + '"' + sel + '>' + rk + ' · ' + (rd.cap||1) + '×S' + rd.sz + '</option>');
+      });
+      if(!rackOpts.length) html.push('<option value="">(no S' + r.sz + ' racks)</option>');
+      html.push('</select></div>');
+      // MISSILE row — pool depends on the selected rack's missile size
+      var rackData = (typeof RACK_DB !== 'undefined' && RACK_DB) ? RACK_DB[curRack] : null;
+      var missilePool = (rackData && typeof MISSILE_DB !== 'undefined' && MISSILE_DB && MISSILE_DB[rackData.sz]) ? MISSILE_DB[rackData.sz] : [];
+      var curMiss = _cfgDraft[missKey] || (missilePool[0] && missilePool[0].id) || '';
+      html.push('<div class="cfg-row"><span class="lbl">↳ MISSILE</span>');
+      html.push('<select data-key="' + missKey + '" data-miss-idx="' + i + '">');
+      missilePool.forEach(function(m){
+        var sel = (m.id === curMiss) ? ' selected' : '';
+        html.push('<option value="' + m.id + '"' + sel + '>' + (m.name || m.id) + ' · ' + Math.round(m.dmg||0) + ' dmg</option>');
+      });
+      if(!missilePool.length) html.push('<option value="">(pick a rack first)</option>');
+      html.push('</select></div>');
+    });
+    html.push('</div>');
+  }
+  // COMPONENTS
+  html.push('<div class="cfg-section"><div class="cfg-section-hdr">COMPONENTS</div>');
+  ['pp','sg','cooler','qd','radar'].forEach(function(cat){
+    var label = ({pp:'POWER PLANT',sg:'SHIELD GEN',cooler:'COOLER',qd:'QUANTUM DRIVE',radar:'RADAR'})[cat];
+    var db = (COMP_DB || {})[cat] || {};
+    var keys = Object.keys(db);
+    var cur = _cfgDraft['c_' + cat + '_0'] || ((legacy.comps && legacy.comps[cat]) || '');
+    if(!keys.length) return;
+    html.push('<div class="cfg-row"><span class="lbl">' + label + '</span>');
+    html.push('<select data-key="c_' + cat + '_0">');
+    keys.forEach(function(k){
+      var sel = (k === cur) ? ' selected' : '';
+      var d = db[k] || {};
+      var stat = '';
+      if(cat === 'pp') stat = ' · ' + (d.out||0) + ' EU';
+      else if(cat === 'sg') stat = ' · ' + (d.totalHP||0).toLocaleString() + ' HP';
+      else if(cat === 'qd') stat = ' · ' + (d.speed||0) + ' Mm/s';
+      else if(cat === 'cooler') stat = ' · ' + (d.rate||d.cooling||0) + '/s';
+      html.push('<option value="' + k + '"' + sel + '>' + k + stat + '</option>');
+    });
+    html.push('</select></div>');
+  });
+  html.push('</div>');
+  document.getElementById('cfg-body').innerHTML = html.join('');
+  // Wire change handlers to update _cfgDraft; if a rack changes, repopulate the matching
+  // missile dropdown to reflect the new rack's missile size.
+  document.querySelectorAll('#cfg-body select').forEach(function(s){
+    s.addEventListener('change', function(){
+      _cfgDraft[s.dataset.key] = s.value;
+      if(s.dataset.rackIdx !== undefined){
+        var idx = s.dataset.rackIdx;
+        var newRackId = s.value;
+        var rackData = (typeof RACK_DB !== 'undefined' && RACK_DB) ? RACK_DB[newRackId] : null;
+        var pool = (rackData && typeof MISSILE_DB !== 'undefined' && MISSILE_DB && MISSILE_DB[rackData.sz]) ? MISSILE_DB[rackData.sz] : [];
+        var missSel = document.querySelector('#cfg-body select[data-miss-idx="' + idx + '"]');
+        if(missSel){
+          missSel.innerHTML = pool.length
+            ? pool.map(function(m){ return '<option value="'+m.id+'">' + (m.name||m.id) + ' · ' + Math.round(m.dmg||0) + ' dmg</option>'; }).join('')
+            : '<option value="">(no missiles for this rack size)</option>';
+          // pick first missile by default and stamp into draft
+          if(pool[0]){ missSel.value = pool[0].id; _cfgDraft['m' + idx + '_missile'] = pool[0].id; }
+          else { delete _cfgDraft['m' + idx + '_missile']; }
+        }
+      }
+    });
+  });
+}
+function applyCfg(){
+  if(!_cfgSide || !_cfgDraft) return closeCfg();
+  // Stamp the source with this side's loadout, switch source to 'custom-cfg' (handled like builder)
+  if(_cfgSide === 'you'){
+    YOU_LOADOUT = _cfgDraft;
+    YOU_SRC = 'builder';  // re-use the builder path so combatStats picks it up
+    document.querySelectorAll('.src-tabs[data-side="you"] .src-tab').forEach(function(t){
+      t.classList.toggle('active', t.dataset.src === 'builder');
+    });
+    YOU = renderFighter('you');
+  } else {
+    ENEMY_LOADOUT = _cfgDraft;
+    // For enemy, we need a path that uses ENEMY_LOADOUT — add a generic 'custom' source
+    ENEMY_SRC = 'custom';
+    document.querySelectorAll('.src-tabs[data-side="enemy"] .src-tab').forEach(function(t){
+      t.classList.remove('active');
+    });
+    // Mark STOCK tab as inactive but show CUSTOM state via the src label
+    ENEMY = renderFighter('enemy');
+  }
+  updateBattle();
+  closeCfg();
+}
+// Wire CONFIGURE buttons via event delegation so we never miss either side
+document.body.addEventListener('click', function(ev){
+  var btn = ev.target.closest && ev.target.closest('.cfg-btn');
+  if(!btn) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  openCfg(btn.dataset.side);
+}, true);
+document.getElementById('cfg-close').addEventListener('click', closeCfg);
+document.getElementById('cfg-cancel').addEventListener('click', function(ev){ ev.preventDefault(); closeCfg(); });
+document.getElementById('cfg-apply').addEventListener('click', function(ev){ ev.preventDefault(); applyCfg(); });
+function refreshCfgEnabled(){
+  document.querySelectorAll('.cfg-btn').forEach(function(btn){
+    var side = btn.dataset.side;
+    var sel = document.getElementById('ship-' + side);
+    var wikiName = sel && sel.value;
+    var legacyName = wikiName && legacyNameFor(wikiName);
+    btn.classList.toggle('disabled', !legacyName || !SHIP_DATA[legacyName]);
+  });
+}
+
+// RUN FIGHT — open detailed result modal
+document.getElementById('run-fight').addEventListener('click', function(ev){
+  ev.preventDefault();
+  if(!YOU || !ENEMY) return;
+  showResult();
+});
+document.getElementById('result-close').addEventListener('click', function(){
+  document.getElementById('result').setAttribute('aria-hidden','true');
+});
+
+function showResult(){
+  var youDps = YOU.dps, enemyDps = ENEMY.dps;
+  var youHP = YOU.totalHP, enemyHP = ENEMY.totalHP;
+  var youTTK = (youDps>0 && enemyHP>0) ? enemyHP/youDps : Infinity;
+  var enemyTTK = (enemyDps>0 && youHP>0) ? youHP/enemyDps : Infinity;
+  // Apply alpha-strike: if first salvo can break their shield, accelerate the kill
+  var youAlpha = YOU.alpha + YOU.missileTotal;
+  var enemyAlpha = ENEMY.alpha + ENEMY.missileTotal;
+  var verdict, headlineCls;
+  if(youTTK < enemyTTK * 0.7){ verdict = 'YOU WIN'; headlineCls = 'win'; }
+  else if(enemyTTK < youTTK * 0.7){ verdict = 'YOU LOSE'; headlineCls = 'lose'; }
+  else { verdict = 'CLOSE FIGHT'; headlineCls = 'close'; }
+
+  document.getElementById('r-headline').textContent = verdict;
+  document.getElementById('r-headline').className = 'r-headline ' + headlineCls;
+  document.getElementById('r-summary').textContent = (YOU.name||'?').toUpperCase() + '  vs  ' + (ENEMY.name||'?').toUpperCase();
+  document.getElementById('r-grid').innerHTML =
+    '<div class="r-tile"><div class="r-tile-l">YOUR DPS</div><div class="r-tile-v r">'+fmtK(youDps)+'</div></div>' +
+    '<div class="r-tile"><div class="r-tile-l">ENEMY DPS</div><div class="r-tile-v r">'+fmtK(enemyDps)+'</div></div>' +
+    '<div class="r-tile"><div class="r-tile-l">YOUR HP</div><div class="r-tile-v s">'+fmtK(youHP)+'</div></div>' +
+    '<div class="r-tile"><div class="r-tile-l">ENEMY HP</div><div class="r-tile-v s">'+fmtK(enemyHP)+'</div></div>' +
+    '<div class="r-tile"><div class="r-tile-l">YOUR TTK</div><div class="r-tile-v">'+fmtSec(youTTK)+'</div></div>' +
+    '<div class="r-tile"><div class="r-tile-l">ENEMY TTK</div><div class="r-tile-v">'+fmtSec(enemyTTK)+'</div></div>' +
+    '<div class="r-tile"><div class="r-tile-l">YOUR ALPHA</div><div class="r-tile-v r">'+fmtK(youAlpha)+'</div></div>' +
+    '<div class="r-tile"><div class="r-tile-l">ENEMY ALPHA</div><div class="r-tile-v r">'+fmtK(enemyAlpha)+'</div></div>';
+
+  // Fight log — second-by-second simulated TTK damage exchange
+  var log = [];
+  log.push({t:0, c:'note', s:'COMBAT INITIATED · ' + YOU.sourceLabel + ' vs ' + ENEMY.sourceLabel});
+  if(youAlpha > ENEMY.shieldHP){
+    log.push({t:0.0, c:'win', s:'YOU FIRE FIRST · alpha strike '+fmtK(youAlpha)+' breaks shield ('+fmtK(ENEMY.shieldHP)+')'});
+  } else if(enemyAlpha > YOU.shieldHP){
+    log.push({t:0.0, c:'lose', s:'ENEMY FIRES FIRST · alpha strike '+fmtK(enemyAlpha)+' breaks YOUR shield ('+fmtK(YOU.shieldHP)+')'});
+  } else {
+    log.push({t:0.0, c:'note', s:'NEITHER ALPHA BREAKS SHIELDS · DPS RACE BEGINS'});
+  }
+  // Mid-fight checkpoints
+  var ticks = [1,3,5,10,15,20,30,45,60];
+  var youHPLeft = youHP, enemyHPLeft = enemyHP;
+  ticks.forEach(function(t){
+    if(youHPLeft <= 0 || enemyHPLeft <= 0) return;
+    var youDmg = enemyDps * t;
+    var enemyDmg = youDps * t;
+    var youAt = Math.max(0, youHP - youDmg);
+    var enemyAt = Math.max(0, enemyHP - enemyDmg);
+    log.push({t:t, c:'', s:'YOU '+fmtK(youAt)+' HP · ENEMY '+fmtK(enemyAt)+' HP'});
+    if(enemyAt <= 0 && enemyHPLeft > 0){
+      log.push({t:t, c:'win', s:'⚔ ENEMY DESTROYED at T+' + fmtSec(enemyHP/youDps)});
+      enemyHPLeft = 0;
+    }
+    if(youAt <= 0 && youHPLeft > 0){
+      log.push({t:t, c:'lose', s:'⚔ YOU DESTROYED at T+' + fmtSec(youHP/enemyDps)});
+      youHPLeft = 0;
+    }
+  });
+  // Final verdict line
+  if(verdict === 'YOU WIN'){
+    log.push({t:'END', c:'win', s:'★ VICTORY · ' + Math.round((1 - youTTK/(enemyTTK||1e9))*100) + '% TTK ADVANTAGE'});
+  } else if(verdict === 'YOU LOSE'){
+    log.push({t:'END', c:'lose', s:'☠ DEFEAT · ' + Math.round((1 - enemyTTK/(youTTK||1e9))*100) + '% TTK DEFICIT'});
+  } else {
+    log.push({t:'END', c:'note', s:'⌛ CLOSE FIGHT · skill decides'});
+  }
+  document.getElementById('r-log-rows').innerHTML = log.map(function(r){
+    return '<div class="r-log-row '+(r.c||'')+'"><span class="t">T+'+(typeof r.t === 'number' ? fmtSec(r.t) : r.t)+'</span>'+r.s+'</div>';
+  }).join('');
+  document.getElementById('result').setAttribute('aria-hidden','false');
+}
+
+function setRunFightEnabled(){
+  var btn = document.getElementById('run-fight');
+  if(YOU && ENEMY) btn.classList.remove('disabled');
+  else btn.classList.add('disabled');
+}
+
+// Hook setRunFightEnabled + refreshCfgEnabled into updateBattle
+var _originalUpdate = updateBattle;
+updateBattle = function(){ _originalUpdate(); setRunFightEnabled(); refreshCfgEnabled(); };
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+Promise.all([loadShips(), loadLegacy()]).then(function(){
+  var qs = new URLSearchParams(location.search);
+  var youParam = qs.get('you');
+  var enemyParam = qs.get('vs') || qs.get('enemy');
+  var youBuild = qs.get('you_b');
+  var enemyBuild = qs.get('vs_b') || qs.get('enemy_b');
+  // Helper: accept BOTH wrapped `{ship, loadout: {...}}` and flat `{ship, sl, m, c, ...}` shapes.
+  // Wrapped shape comes from /recommend; flat shape comes from /loadouts community feed.
+  function decodeBuildPayload(b64){
+    if(!b64) return null;
+    try {
+      var json = decodeURIComponent(escape(atob(b64)));
+      var p = JSON.parse(json);
+      if(!p) return null;
+      // If wrapped, use sub-key. Otherwise treat the whole payload as the loadout.
+      var loadout = (p.loadout && typeof p.loadout === 'object') ? p.loadout : p;
+      var ship = p.ship || loadout.ship || null;
+      return { loadout: loadout, ship: ship };
+    } catch(e){ console.error('Failed to decode build payload', e); return null; }
+  }
+  // YOU side
+  if(youBuild){
+    var py = decodeBuildPayload(youBuild);
+    if(py){
+      YOU_LOADOUT = py.loadout;
+      YOU_SRC = 'builder';
+      document.querySelectorAll('.src-tabs[data-side="you"] .src-tab').forEach(function(t){
+        t.classList.toggle('active', t.dataset.src === 'builder');
+      });
+      if(py.ship && !youParam) youParam = py.ship;
+    }
+  }
+  // ENEMY side — community FIGHT links / AI Build TEST IN SHOWDOWN
+  if(enemyBuild){
+    var pe = decodeBuildPayload(enemyBuild);
+    if(pe){
+      if(typeof ENEMY_LOADOUT !== 'undefined') ENEMY_LOADOUT = pe.loadout;
+      if(typeof ENEMY_SRC !== 'undefined') ENEMY_SRC = 'builder';
+      document.querySelectorAll('.src-tabs[data-side="enemy"] .src-tab').forEach(function(t){
+        t.classList.toggle('active', t.dataset.src === 'builder');
+      });
+      if(pe.ship && !enemyParam) enemyParam = pe.ship;
+    }
+  }
+  populateSelect('you');
+  populateSelect('enemy');
+  // Reconcile any builder/legacy name to the wiki-name dropdown value
+  if(youParam){
+    var w = wikiNameFor(youParam) || youParam;
+    document.getElementById('ship-you').value = w;
+    YOU = renderFighter('you');
+  }
+  if(enemyParam){
+    var w2 = wikiNameFor(enemyParam) || enemyParam;
+    document.getElementById('ship-enemy').value = w2;
+    ENEMY = renderFighter('enemy');
+  }
+  updateBattle();
+}).catch(function(e){
+  document.getElementById('vd-result').textContent = 'DATA LOAD FAILED';
+  document.getElementById('vd-edge').textContent = e.message;
+});
+</script>
+
+<script>
+window.TUTORIAL_PAGE_ID="showdown";
+window.TUTORIAL_STEPS=[{"selector":"#battle","title":"Showdown — Pick Two Ships","body":"Choose your ship and an enemy. Each side can use a saved BUILDER loadout (custom) or AI BEST (auto)."},{"selector":"#vs","title":"The Verdict","body":"After picking ships, the engine simulates the matchup and shows TTK (time-to-kill), advantage breakdown, and a winner."},{"selector":"#battle-panel","title":"AI Best Build","body":"The AI BEST tab picks the strongest archetype + tier loadout for each ship — perfect for asking \"what would this ship look like fully kitted?\""}];
+</script>
+<script src="/tutorial.js" defer></script>
+</body>
+</html>
